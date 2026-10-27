@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app to keep track of your reading for ao3</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+label { display: grid; gap: 4px; }
+label > span { font: 13px/1.4 var(--mono); color: var(--meta); }
+.item { padding: 12px 0; border-bottom: 1px solid var(--line); display: grid; gap: 6px; }
+.item .t { font-weight: 500; overflow-wrap: anywhere; }
+.item a { color: var(--ink); display: inline-flex; align-items: center; min-height: var(--tap); }
+.bar { height: 4px; background: var(--line); border-radius: 2px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--ink); }
+.pill { border: 1px solid var(--line); border-radius: 999px; padding: 0 10px; font: 13px/24px var(--mono); color: var(--meta); }
+.sm { min-height: var(--tap); padding: 0 12px; }
+textarea { min-height: 88px; font: 13px/1.4 var(--mono); }
+#msg { min-height: 1.45em; }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make an app to keep track of your reading for ao3</h1>
+
+<main id="app" class="stack">
+  <form id="form" class="stack" autocomplete="off">
+    <label><span>title</span><input id="title" required maxlength="200"></label>
+    <div class="grid2">
+      <label><span>fandom</span><input id="fandom" maxlength="100"></label>
+      <label><span>link</span><input id="url" inputmode="url" maxlength="300"></label>
+    </div>
+    <div class="grid2">
+      <label><span>chapters read</span><input id="read" type="number" min="0" inputmode="numeric" value="0"></label>
+      <label><span>chapters total</span><input id="total" type="number" min="0" inputmode="numeric" placeholder="?"></label>
+    </div>
+    <div class="grid2">
+      <label><span>status</span><select id="status"><option>reading</option><option>to read</option><option>finished</option><option>on hold</option><option>dropped</option></select></label>
+      <label><span>rating</span><select id="rating"><option value="0">none</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></label>
+    </div>
+    <button class="primary" id="add" type="submit">add</button>
+  </form>
+
+  <div class="grid2">
+    <label><span>show</span><select id="filter"><option value="all">all</option><option>reading</option><option>to read</option><option>finished</option><option>on hold</option><option>dropped</option></select></label>
+    <label><span>sort</span><select id="sort"><option value="updated">last updated</option><option value="title">title</option><option value="rating">rating</option><option value="fandom">fandom</option></select></label>
+  </div>
+  <input id="q" type="search" placeholder="search title or fandom" aria-label="search">
+  <div class="meta" id="count"></div>
+  <ul class="plain" id="list" style="display:block"></ul>
+  <div class="meta" id="msg" role="status"></div>
+
+  <details>
+    <summary class="row" style="min-height:44px">backup</summary>
+    <div class="stack">
+      <textarea id="io" aria-label="json" spellcheck="false"></textarea>
+      <div class="row"><button id="export" type="button">export</button><button id="import" type="button">import</button></div>
+    </div>
+  </details>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const KEY = 'ao3-log-v1';
+  const now = Date.now();
+  // Example rows shown until the first real entry is saved.
+  const sample = [
+    { id: 's1', title: 'Example: a long slow burn', fandom: 'Any fandom', url: '', read: 12, total: 30, status: 'reading', rating: 0, t: now },
+    { id: 's2', title: 'Example: saved for later', fandom: 'Any fandom', url: '', read: 0, total: 5, status: 'to read', rating: 0, t: now - 1 },
+    { id: 's3', title: 'Example: one-shot', fandom: 'Another fandom', url: '', read: 1, total: 1, status: 'finished', rating: 5, t: now - 2 }
+  ];
+  let items = store.get(KEY, null);
+  let isSample = !Array.isArray(items);
+  if (isSample) items = sample;
+
+  const msg = t => { $('#msg').textContent = t || ''; };
+  const save = () => { isSample = false; if (!store.set(KEY, items)) msg('Could not save here. Use backup to keep your list.'); };
+  const safeUrl = u => { try { const x = new URL(u); return /^https?:$/.test(x.protocol) ? x.href : ''; } catch { return ''; } };
+  const num = v => { const n = parseInt(v, 10); return Number.isFinite(n) && n >= 0 ? n : 0; };
+
+  function render() {
+    const f = $('#filter').value, s = $('#sort').value, q = $('#q').value.trim().toLowerCase();
+    let v = items.filter(i => (f === 'all' || i.status === f) && (!q || (i.title + ' ' + i.fandom).toLowerCase().includes(q)));
+    v.sort((a, b) => s === 'title' ? a.title.localeCompare(b.title)
+      : s === 'fandom' ? a.fandom.localeCompare(b.fandom) || a.title.localeCompare(b.title)
+      : s === 'rating' ? b.rating - a.rating || b.t - a.t : b.t - a.t);
+    $('#count').textContent = items.length ? v.length + ' of ' + items.length + (isSample ? ' (examples)' : '') : '';
+    const ul = $('#list');
+    ul.textContent = '';
+    if (!v.length) {
+      const li = document.createElement('li');
+      li.className = 'empty';
+      li.textContent = items.length ? 'Nothing matches.' : 'No fics yet. Add one above.';
+      ul.append(li);
+      return;
+    }
+    for (const i of v) {
+      const li = document.createElement('li');
+      li.className = 'item';
+      li.style.display = 'grid';
+      const t = document.createElement('div'); t.className = 't'; t.textContent = i.title;
+      const m = document.createElement('div'); m.className = 'row';
+      const pills = [i.status, i.fandom, i.rating ? i.rating + '/5' : ''].filter(Boolean);
+      for (const p of pills) { const sp = document.createElement('span'); sp.className = 'pill'; sp.textContent = p; m.append(sp); }
+      const prog = document.createElement('div'); prog.className = 'meta';
+      prog.textContent = 'ch ' + i.read + ' / ' + (i.total || '?');
+      li.append(t, m, prog);
+      if (i.total) {
+        const bar = document.createElement('div'); bar.className = 'bar';
+        const b = document.createElement('i'); b.style.width = Math.min(100, i.read / i.total * 100) + '%';
+        bar.append(b); li.append(bar);
+      }
+      const act = document.createElement('div'); act.className = 'row';
+      const mk = (label, fn) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'sm'; b.textContent = label; b.onclick = fn; act.append(b); };
+      if (i.status !== 'finished') mk('+1 ch', () => {
+        i.read++;
+        if (i.total && i.read >= i.total) { i.read = i.total; i.status = 'finished'; }
+        else if (i.status === 'to read') i.status = 'reading';
+        i.t = Date.now(); save(); render();
+      });
+      if (i.status === 'finished') mk('reread', () => { i.status = 'reading'; i.read = 0; i.t = Date.now(); save(); render(); });
+      mk('delete', () => { items = items.filter(x => x !== i); save(); render(); });
+      const u = safeUrl(i.url);
+      if (u) { const a = document.createElement('a'); a.href = u; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.textContent = 'open'; act.append(a); }
+      li.append(act);
+      ul.append(li);
+    }
+  }
+
+  $('#form').addEventListener('submit', e => {
+    e.preventDefault();
+    const title = $('#title').value.trim();
+    if (!title) { msg('Add a title.'); return; }
+    const total = num($('#total').value);
+    let read = num($('#read').value);
+    if (total && read > total) read = total;
+    const url = $('#url').value.trim();
+    if (url && !safeUrl(url)) { msg('Link must start with http.'); return; }
+    if (isSample) items = [];
+    items.unshift({ id: 'f' + Date.now() + Math.random().toString(36).slice(2, 6), title, fandom: $('#fandom').value.trim(), url, read, total, status: $('#status').value, rating: num($('#rating').value), t: Date.now() });
+    save(); msg('Added.');
+    for (const id of ['title', 'fandom', 'url', 'total']) $('#' + id).value = '';
+    $('#read').value = 0; $('#status').value = 'reading'; $('#rating').value = '0';
+    render();
+  });
+  for (const id of ['filter', 'sort', 'q']) $('#' + id).addEventListener('input', render);
+
+  $('#export').onclick = () => {
+    $('#io').value = JSON.stringify(isSample ? [] : items);
+    $('#io').select();
+    try { navigator.clipboard.writeText($('#io').value).then(() => msg('Copied.'), () => msg('Select the text and copy it.')); } catch { msg('Select the text and copy it.'); }
+  };
+  $('#import').onclick = () => {
+    try {
+      const d = JSON.parse($('#io').value);
+      if (!Array.isArray(d)) throw 0;
+      const clean = d.filter(x => x && typeof x.title === 'string' && x.title).map(x => ({
+        id: 'f' + Math.random().toString(36).slice(2, 10), title: String(x.title).slice(0, 200), fandom: String(x.fandom || '').slice(0, 100),
+        url: safeUrl(String(x.url || '')), read: num(x.read), total: num(x.total),
+        status: ['reading', 'to read', 'finished', 'on hold', 'dropped'].includes(x.status) ? x.status : 'to read',
+        rating: Math.min(5, num(x.rating)), t: Number(x.t) || Date.now()
+      }));
+      if (isSample) items = [];
+      items = clean.concat(items);
+      save(); render(); msg('Imported ' + clean.length + '.');
+    } catch { msg('That is not a valid list.'); }
+  };
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+{
+  "slug": "layering-song-alarm",
+  "wish": "someone should make an alarm that adds more instruments to a song each minute you don't dismiss it",
+  "year": 2020,
+  "agreed": 168,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/je2eg3/",
+      "date": "2020-10-19",
+      "points": 141,
+      "comments": 27
+    }
+  ],
+  "spec": "Set a wake time; at that time a looping song starts with one instrument and adds a layer (bass, kick, hi-hat, pad, bells) every minute until dismissed.\nPick a time, tap set alarm, leave the page open with sound on; tap hear it (fast) to preview one layer per second.\nIt does not ring if the page is closed or the phone is locked, and it makes no network requests.",
+  "tests": [
+    {
+      "tap": "#try"
+    },
+    {
+      "wait": 1500
+    },
+    {
+      "expect": {
+        "sel": "#count",
+        "matches": "^[2-6] of 6"
+      }
+    },
+    {
+      "tap": "#dismiss"
+    },
+    {
+      "tap": "#arm"
+    },
+    {
+      "expect": {
+        "sel": "#status",
+        "contains": "alarm set for"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:42:33Z",
+  "model": "sonnet-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": "Browser alarms only sound while the page stays open and the screen is on; no way around that offline."
+}

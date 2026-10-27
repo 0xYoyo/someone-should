@@ -234,3 +234,4 @@ NO tiles: small-web-search-engine [needs: a server] · idea-giveaway-board [need
 
 </details>
 
+| 08:43 | factory | wave 2 batch 2: 34 built / 34 PASS / 0 fail so far (sonnet). opus 0.96M · sonnet 7.79M · wave-2 total $34.90 · builders 34, avg 64k tok ($0.22)/PASS. Projection: 479 × $0.22 ≈ $107 + $29 spent = $136 → within the $140 cap; stay on sonnet, 12 parallel, rolling launches (a new builder as each finishes), push per ~15 tools. | sonnet builders | — |

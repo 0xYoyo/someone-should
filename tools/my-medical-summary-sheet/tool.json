@@ -1,0 +1,57 @@
+{
+  "slug": "my-medical-summary-sheet",
+  "wish": "someone should make an app that keeps your medical information in one form you can hand to your doctor",
+  "year": 2018,
+  "agreed": 187,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/9x1uy9/",
+      "date": "2018-11-14",
+      "points": 165,
+      "comments": 22
+    }
+  ],
+  "spec": "Keeps name, allergies, conditions, medications, surgeries and an emergency contact in one form on this device.\nType into the fields and add list items; the one-page summary above updates and prints or saves as PDF to hand to a doctor.\nDoes not send anything anywhere, check interactions or give medical advice.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#name",
+        "text": "Ana Cruz"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#sum-name",
+        "contains": "Ana Cruz"
+      }
+    },
+    {
+      "type": {
+        "sel": "#allergies-in",
+        "text": "latex"
+      }
+    },
+    {
+      "tap": "#allergies-add"
+    },
+    {
+      "expect": {
+        "sel": "#sum-allergies",
+        "contains": "latex"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#sum-meds",
+        "contains": "albuterol"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:42:32Z",
+  "model": "sonnet-5.5",
+  "minutes": 5,
+  "approved": false,
+  "notes": "Stored only in this browser (localStorage). Print uses the browser print dialog."
+}

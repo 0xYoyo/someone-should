@@ -1,0 +1,51 @@
+{
+  "slug": "be-the-boss-battle",
+  "wish": "someone should make a game where you are the boss in a boss battle against nimble AI players",
+  "year": 2020,
+  "agreed": 211,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/jtx6ck/",
+      "date": "2020-11-14",
+      "points": 190,
+      "comments": 21
+    }
+  ],
+  "spec": "A boss-battle arena: you are the big slow boss against four AI heroes (fighter, ranger, mage, healer) who dodge slams and heal each other.\nDrag in the arena to move, tap slam (telegraphed area hit) and roar (knockback); clear waves before your health runs out.\nIt does not do multiplayer or sound; best wave is kept on this device.",
+  "tests": [
+    {
+      "tap": "#start"
+    },
+    {
+      "tap": "#slam"
+    },
+    {
+      "wait": 900
+    },
+    {
+      "expect": {
+        "sel": "#wave",
+        "contains": "wave 1"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#hp",
+        "matches": "boss \\d+"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#start",
+        "contains": "restart"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:41:06Z",
+  "model": "sonnet-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": ""
+}

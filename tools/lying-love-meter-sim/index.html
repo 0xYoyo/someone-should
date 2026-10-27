@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a dating sim where the relationship meter secretly lies to you</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+.meter { height: 18px; border: 1.5px solid var(--ink); border-radius: var(--radius); overflow: hidden; }
+.meter i { display: block; height: 100%; width: 50%; background: var(--ink); transition: width .4s; }
+.label { display: flex; justify-content: space-between; font: 16px/1.3 var(--mono); color: var(--meta); }
+.scene { font-size: 19px; min-height: 5.6em; margin: 0; }
+.scene q { display: block; color: var(--meta); margin-top: 6px; quotes: none; }
+#choices { display: grid; gap: 10px; }
+#choices button { text-align: left; padding: 10px 14px; line-height: 1.3; }
+.ending h2 { font: 500 24px/1.2 var(--sans); margin: 0 0 6px; }
+.cmp { display: grid; gap: 8px; margin: 14px 0; }
+.cmp .meter i.t { background: var(--no); }
+svg { width: 100%; height: 90px; display: block; border-bottom: 1.5px solid var(--line); }
+.note { font-size: 16px; color: var(--meta); margin: 0; }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a dating sim where the relationship meter secretly lies to you</h1>
+<main id="app" class="stack">
+  <div class="stack" id="play">
+    <div>
+      <div class="label"><span>Mina is feeling</span><span id="shown">50</span></div>
+      <div class="meter" aria-hidden="true"><i id="bar"></i></div>
+    </div>
+    <p class="scene" id="scene"></p>
+    <div id="choices"></div>
+  </div>
+  <div class="stack ending" id="ending" hidden>
+    <h2 id="title"></h2>
+    <p id="text" style="margin:0"></p>
+    <div class="cmp" id="reveal">
+      <div class="label"><span>The meter said</span><span id="finalShown">0</span></div>
+      <div class="meter"><i id="barShown"></i></div>
+      <div class="label"><span>She felt</span><span id="truth">0</span></div>
+      <div class="meter"><i class="t" id="barTrue"></i></div>
+    </div>
+    <svg id="chart" viewBox="0 0 100 40" preserveAspectRatio="none" aria-label="meter against truth over time"></svg>
+    <p class="note">Ink is the meter. Red is her.</p>
+    <button class="primary" id="again">Play again</button>
+  </div>
+</main>
+<script>
+(() => {
+  'use strict';
+  const $ = (s, r = document) => r.querySelector(s);
+  // Each choice: [label, shown change, true change]. The meter rewards what looks good, not what lands.
+  const scenes = [
+    { t: 'Mina is waiting outside the cafe. You are ten minutes late.', q: '"Oh. Hi."', c: [
+      ['Say traffic was terrible', 12, -8], ['Say you lost track of time', 2, 9], ['Hand her a coffee you bought for yourself', 15, -10]] },
+    { t: 'She mentions her sister is moving away next month.', q: '"It is fine. It is just a lot."', c: [
+      ['Tell her it will be great for them both', 14, -9], ['Ask what she will miss most', -3, 12], ['Change the subject to a movie', 9, -6]] },
+    { t: 'Her phone buzzes during dinner. She does not look at it.', q: '"Sorry, go on."', c: [
+      ['Keep telling your best story', 13, -7], ['Ask if she needs to get it', -4, 10], ['Check your own phone too', 6, -12]] },
+    { t: 'The night ends at her door. She is quiet.', q: '"Well."', c: [
+      ['Say you had the best night ever', 16, -9], ['Say you were nervous and she made it easier', -2, 14], ['Ask for a second date right now', 10, -4]] }
+  ];
+  let i, shown, truth, hs, ht;
+  const clamp = n => Math.max(0, Math.min(100, n));
+
+  function start() {
+    i = 0; shown = 50; truth = 50; hs = [50]; ht = [50];
+    $('#play').hidden = false; $('#ending').hidden = true;
+    render();
+  }
+  function render() {
+    const s = scenes[i];
+    $('#scene').innerHTML = '';
+    $('#scene').append(s.t);
+    const q = document.createElement('q'); q.textContent = s.q; $('#scene').append(q);
+    $('#choices').innerHTML = '';
+    s.c.forEach((c, k) => {
+      const b = document.createElement('button');
+      b.textContent = c[0]; b.dataset.k = k;
+      b.addEventListener('click', () => pick(k));
+      $('#choices').append(b);
+    });
+    $('#shown').textContent = shown;
+    $('#bar').style.width = shown + '%';
+  }
+  function pick(k) {
+    const c = scenes[i].c[k];
+    shown = clamp(shown + c[1]); truth = clamp(truth + c[2]);
+    hs.push(shown); ht.push(truth);
+    i++;
+    if (i < scenes.length) render(); else finish();
+  }
+  function line(arr, cls) {
+    const pts = arr.map((v, n) => (n * 100 / (arr.length - 1)).toFixed(1) + ',' + (38 - v * 0.36).toFixed(1)).join(' ');
+    return '<polyline fill="none" stroke-width="1.5" vector-effect="non-scaling-stroke" stroke="' + cls + '" points="' + pts + '"/>';
+  }
+  function finish() {
+    $('#play').hidden = true; $('#ending').hidden = false;
+    $('#finalShown').textContent = shown; $('#truth').textContent = truth;
+    $('#barShown').style.width = shown + '%'; $('#barTrue').style.width = truth + '%';
+    let title, text;
+    if (truth >= 70) { title = 'She says yes to a second date.'; text = 'The meter was wrong about how you got here, but she stayed anyway.'; }
+    else if (truth >= 45) { title = 'She says she will think about it.'; text = 'You were liked a little. The meter made it look like a lot.'; }
+    else { title = 'She says goodnight.'; text = 'The meter climbed the whole evening. She had been leaving since the cafe.'; }
+    $('#title').textContent = title; $('#text').textContent = text;
+    $('#chart').innerHTML = line(hs, 'currentColor') + line(ht, '#c8321e');
+  }
+  $('#again').addEventListener('click', start);
+  start();
+})();
+</script>
+</body>
+</html>

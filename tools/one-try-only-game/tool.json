@@ -1,0 +1,48 @@
+{
+  "slug": "one-try-only-game",
+  "wish": "someone should make a game that gives you only one try and you fail forever",
+  "year": 2020,
+  "agreed": 184,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/g7px48/",
+      "date": "2020-04-25",
+      "points": 143,
+      "comments": 41
+    }
+  ],
+  "spec": "A marker sweeps a track; you get one tap to stop it inside the grey zone.\nYour single result is saved in local storage and shown on every return, with no reset.\nIt does not sync across devices, and clearing site data is the only way around it.",
+  "tests": [
+    {
+      "expect": {
+        "sel": "#stop",
+        "visible": true
+      }
+    },
+    {
+      "wait": 300
+    },
+    {
+      "tap": "#stop"
+    },
+    {
+      "expect": {
+        "sel": "#result",
+        "matches": "Hit|Missed"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#stop",
+        "contains": "Used"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:42:00Z",
+  "model": "sonnet-5.5",
+  "minutes": 3,
+  "approved": false,
+  "notes": ""
+}

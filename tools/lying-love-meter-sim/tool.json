@@ -1,0 +1,48 @@
+{
+  "slug": "lying-love-meter-sim",
+  "wish": "someone should make a dating sim where the relationship meter secretly lies to you",
+  "year": 2018,
+  "agreed": 176,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/8mb45z/",
+      "date": "2018-05-26",
+      "points": 163,
+      "comments": 13
+    }
+  ],
+  "spec": "A four-scene dating sim with one character and a visible affection meter.\nTap one of three replies per scene; the meter rewards flattery and deflection while her real feeling moves the other way.\nIt ends by revealing what the meter said against what she felt, with a chart; it has no save and one fixed story.",
+  "tests": [
+    {
+      "expect": {
+        "sel": "#shown",
+        "matches": "^50$"
+      }
+    },
+    {
+      "tap": "#choices button"
+    },
+    {
+      "tap": "#choices button"
+    },
+    {
+      "tap": "#choices button"
+    },
+    {
+      "tap": "#choices button"
+    },
+    {
+      "expect": {
+        "sel": "#truth",
+        "matches": "^\\d+$"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:42:24Z",
+  "model": "sonnet-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": ""
+}

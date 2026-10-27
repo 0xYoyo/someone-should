@@ -1,0 +1,54 @@
+{
+  "slug": "fanfic-reading-log",
+  "wish": "someone should make an app to keep track of your reading for ao3",
+  "year": 2024,
+  "agreed": 141,
+  "sources": [
+    {
+      "site": "bsky",
+      "url": "https://bsky.app/profile/did:plc:kbswiy2m4awmcfaoprncyfic/post/3layfes7o2c25",
+      "date": "2024-11-15",
+      "points": 133,
+      "comments": 8
+    }
+  ],
+  "spec": "Logs fics with title, fandom, link, chapters read and total, status and rating.\nAdd a fic, tap +1 ch as you read, filter by status, sort, search; export and import JSON in backup.\nIt does not fetch anything from AO3 and does not sync between devices; the list stays in this browser.",
+  "tests": [
+    {
+      "expect": {
+        "sel": ".item .t",
+        "contains": "Example"
+      }
+    },
+    {
+      "type": {
+        "sel": "#title",
+        "text": "My saved fic"
+      }
+    },
+    {
+      "tap": "#add"
+    },
+    {
+      "expect": {
+        "sel": ".item .t",
+        "contains": "My saved fic"
+      }
+    },
+    {
+      "tap": ".item button"
+    },
+    {
+      "expect": {
+        "sel": ".item .meta",
+        "contains": "ch 1 /"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:42:45Z",
+  "model": "sonnet-5.5",
+  "minutes": 5,
+  "approved": false,
+  "notes": ""
+}

@@ -1,0 +1,48 @@
+{
+  "slug": "gif-player-with-progress",
+  "wish": "someone should make a progress bar for gifs so you know how long they run",
+  "year": 2017,
+  "agreed": 203,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/74b0ht/",
+      "date": "2017-10-04",
+      "points": 185,
+      "comments": 18
+    }
+  ],
+  "spec": "Opens a GIF from your device and plays it with a progress bar showing elapsed and total time.\nTap or drag the bar to scrub; pause, step frame by frame, change speed; frame count is shown.\nIt does not load GIFs from links, and does not edit or save them.",
+  "tests": [
+    {
+      "wait": 400
+    },
+    {
+      "expect": {
+        "sel": "#total",
+        "matches": "2\\.00 s"
+      }
+    },
+    {
+      "tap": "#play"
+    },
+    {
+      "tap": "#next"
+    },
+    {
+      "expect": {
+        "sel": "#frameinfo",
+        "matches": "frame \\d+ of 20"
+      }
+    },
+    {
+      "tap": "#speed"
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:41:11Z",
+  "model": "sonnet-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Offline: GIFs are opened from the device; a built-in sample plays first."
+}

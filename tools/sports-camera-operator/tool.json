@@ -1,0 +1,51 @@
+{
+  "slug": "sports-camera-operator",
+  "wish": "someone should make a sports video game where you play as the camera operator",
+  "year": 2017,
+  "agreed": 184,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/72tgyg/",
+      "date": "2017-09-27",
+      "points": 171,
+      "comments": 13
+    }
+  ],
+  "spec": "A soccer match plays itself for 60 seconds. You drag the red broadcast frame over the pitch and choose how tight the shot is.\nThe more time the ball stays inside the frame, and the tighter the zoom, the more points you score; best score is remembered.\nIt does not have rules, fouls or a real game, only the camera job.",
+  "tests": [
+    {
+      "tap": "#zoomin"
+    },
+    {
+      "expect": {
+        "sel": "#zoom",
+        "contains": "2.5"
+      }
+    },
+    {
+      "tap": "#start"
+    },
+    {
+      "wait": 1200
+    },
+    {
+      "expect": {
+        "sel": "#time",
+        "matches": "^(59|58)$"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#framed",
+        "matches": "%"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:42:30Z",
+  "model": "sonnet-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": ""
+}

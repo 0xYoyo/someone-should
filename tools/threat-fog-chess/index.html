@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a chess variant where you only see opposing pieces that threaten or are threatened</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+.board { display: grid; grid-template-columns: repeat(8, 1fr); width: min(100vw, 480px); margin-left: calc(-1 * var(--gutter)); max-width: none; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.sq { min-height: 0; aspect-ratio: 1; padding: 0; border: 0; border-radius: 0; background: var(--paper); font-size: 30px; line-height: 1; position: relative; display: flex; align-items: center; justify-content: center; }
+.sq.dk { background: var(--line); }
+.sq.sel { outline: 3px solid var(--ink); outline-offset: -3px; }
+.sq.foe { color: var(--no); }
+.sq.tgt::after { content: ""; width: 12px; height: 12px; border-radius: 50%; background: var(--ink); opacity: .45; position: absolute; }
+.sq.tgt.foe::after { width: 100%; height: 100%; border-radius: 0; background: none; border: 3px solid var(--no); opacity: 1; }
+.hand { min-height: 240px; display: grid; gap: 16px; align-content: center; justify-items: start; border: 1.5px solid var(--line); border-radius: var(--radius); padding: 20px; }
+#status { font-weight: 500; }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a chess variant where you only see opposing pieces that threaten or are threatened</h1>
+<main id="app" class="stack">
+  <div id="status" aria-live="polite"></div>
+  <div id="board" class="board"></div>
+  <div id="handoff" class="hand" hidden>
+    <div id="handmsg" class="big"></div>
+    <button id="reveal" class="primary">show my board</button>
+  </div>
+  <div class="row"><button id="new">new game</button><span id="note" class="meta"></span></div>
+</main>
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  // Board: 64 cells, index = row*8+col, row 0 = rank 8. Uppercase = white.
+  const GLYPH = { K: '\u2654', Q: '\u2655', R: '\u2656', B: '\u2657', N: '\u2658', P: '\u2659',
+                  k: '\u265A', q: '\u265B', r: '\u265C', b: '\u265D', n: '\u265E', p: '\u265F' };
+  const NAME = { w: 'White', b: 'Black' };
+  const isW = c => c && c === c.toUpperCase();
+  const side = c => (isW(c) ? 'w' : 'b');
+  const sqName = i => 'abcdefgh'[i % 8] + (8 - (i >> 3));
+  const idx = n => (8 - +n[1]) * 8 + 'abcdefgh'.indexOf(n[0]);
+  const KN = [[1,2],[2,1],[-1,2],[-2,1],[1,-2],[2,-1],[-1,-2],[-2,-1]];
+  const KG = [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];
+  const DIAG = [[1,1],[1,-1],[-1,1],[-1,-1]], ORTH = [[1,0],[-1,0],[0,1],[0,-1]];
+
+  function fresh() {
+    const b = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'.replace(/\d/g, d => '.'.repeat(+d)).replace(/\//g, '').split('');
+    return { b, turn: 'w', cast: 'KQkq', ep: -1, hand: false, over: '' };
+  }
+
+  // Squares a piece geometrically attacks (own-occupied squares included).
+  function attacks(b, i) {
+    const p = b[i].toLowerCase(), r = i >> 3, c = i & 7, out = [];
+    const step = (dr, dc) => { const rr = r + dr, cc = c + dc; if (rr >= 0 && rr < 8 && cc >= 0 && cc < 8) out.push(rr * 8 + cc); };
+    const slide = dirs => dirs.forEach(([dr, dc]) => {
+      for (let rr = r + dr, cc = c + dc; rr >= 0 && rr < 8 && cc >= 0 && cc < 8; rr += dr, cc += dc) {
+        out.push(rr * 8 + cc); if (b[rr * 8 + cc] !== '.') break;
+      }
+    });
+    if (p === 'p') { const d = isW(b[i]) ? -1 : 1; step(d, -1); step(d, 1); }
+    else if (p === 'n') KN.forEach(([a, z]) => step(a, z));
+    else if (p === 'k') KG.forEach(([a, z]) => step(a, z));
+    else if (p === 'b') slide(DIAG);
+    else if (p === 'r') slide(ORTH);
+    else slide(DIAG.concat(ORTH));
+    return out;
+  }
+  function attackedBy(b, sq, s) {
+    for (let i = 0; i < 64; i++) if (b[i] !== '.' && side(b[i]) === s && attacks(b, i).includes(sq)) return true;
+    return false;
+  }
+  const kingSq = (b, s) => b.indexOf(s === 'w' ? 'K' : 'k');
+  const other = s => (s === 'w' ? 'b' : 'w');
+  const inCheck = (b, s) => attackedBy(b, kingSq(b, s), other(s));
+
+  function apply(st, m) {
+    const b = st.b.slice(), p = b[m.from], s = side(p);
+    let ep = -1, cast = st.cast;
+    b[m.to] = m.promo || p; b[m.from] = '.';
+    if (m.epCap != null) b[m.epCap] = '.';
+    if (p.toLowerCase() === 'p' && Math.abs(m.to - m.from) === 16) ep = (m.to + m.from) / 2;
+    if (m.rook) { b[m.rook[1]] = b[m.rook[0]]; b[m.rook[0]] = '.'; }
+    if (p === 'K') cast = cast.replace(/[KQ]/g, ''); if (p === 'k') cast = cast.replace(/[kq]/g, '');
+    [[56,'Q'],[63,'K'],[0,'q'],[7,'k']].forEach(([sq, f]) => { if (m.from === sq || m.to === sq) cast = cast.replace(f, ''); });
+    return { b, turn: other(s), cast, ep, hand: false, over: '' };
+  }
+
+  function pseudo(st, s) {
+    const b = st.b, ms = [];
+    for (let i = 0; i < 64; i++) {
+      const p = b[i];
+      if (p === '.' || side(p) !== s) continue;
+      const lp = p.toLowerCase(), r = i >> 3;
+      if (lp === 'p') {
+        const d = s === 'w' ? -8 : 8, last = s === 'w' ? 0 : 7, home = s === 'w' ? 6 : 1;
+        const add = (to, extra) => ms.push(Object.assign({ from: i, to, promo: (to >> 3) === last ? (s === 'w' ? 'Q' : 'q') : null }, extra));
+        if (b[i + d] === '.') { add(i + d); if (r === home && b[i + 2 * d] === '.') add(i + 2 * d); }
+        attacks(b, i).forEach(t => {
+          if (b[t] !== '.' && side(b[t]) !== s) add(t);
+          else if (t === st.ep) add(t, { epCap: t - d });
+        });
+      } else {
+        attacks(b, i).forEach(t => { if (b[t] === '.' || side(b[t]) !== s) ms.push({ from: i, to: t }); });
+        if (lp === 'k') {
+          const base = s === 'w' ? 60 : 4, K = s === 'w' ? 'K' : 'k', Q = s === 'w' ? 'Q' : 'q';
+          if (i === base && !inCheck(b, s)) {
+            if (st.cast.includes(K) && b[base + 1] === '.' && b[base + 2] === '.' && !attackedBy(b, base + 1, other(s)))
+              ms.push({ from: i, to: base + 2, rook: [base + 3, base + 1] });
+            if (st.cast.includes(Q) && b[base - 1] === '.' && b[base - 2] === '.' && b[base - 3] === '.' && !attackedBy(b, base - 1, other(s)))
+              ms.push({ from: i, to: base - 2, rook: [base - 4, base - 1] });
+          }
+        }
+      }
+    }
+    return ms;
+  }
+  const legal = (st, s) => pseudo(st, s).filter(m => !inCheck(apply(st, m).b, s));
+
+  // Fog: the viewer sees an enemy piece only if it attacks one of theirs, or one of theirs attacks it.
+  function visible(b, viewer) {
+    const seen = new Set();
+    for (let i = 0; i < 64; i++) {
+      if (b[i] === '.') continue;
+      const mine = side(b[i]) === viewer;
+      attacks(b, i).forEach(t => {
+        if (b[t] === '.' || side(b[t]) === side(b[i])) return;
+        seen.add(mine ? t : i);
+      });
+    }
+    return seen;
+  }
+
+  function play(st, from, to) { const m = legal(st, st.turn).find(x => x.from === idx(from) && x.to === idx(to)); return apply(st, m); }
+  function sample() { return play(play(fresh(), 'e2', 'e4'), 'd7', 'd5'); }
+
+  let st = store.get('tfc-state', null);
+  if (!st || !Array.isArray(st.b) || st.b.length !== 64) st = sample();
+  let sel = -1, confirmNew = 0;
+  const boardEl = $('#board');
+
+  function save() { store.set('tfc-state', st); }
+
+  function render() {
+    const me = st.turn, moves = st.over ? [] : legal(st, me);
+    const check = inCheck(st.b, me);
+    if (!st.over && !moves.length) st.over = check ? 'Checkmate. ' + NAME[other(me)] + ' wins.' : 'Stalemate. Draw.';
+    const fog = st.over ? new Set([...Array(64).keys()]) : visible(st.b, me);
+    const targets = sel >= 0 ? moves.filter(m => m.from === sel).map(m => m.to) : [];
+    const hidden = st.hand && !st.over;
+    boardEl.hidden = hidden; $('#handoff').hidden = !hidden;
+    $('#handmsg').textContent = 'Pass to ' + NAME[me];
+    $('#status').textContent = st.over || (NAME[me] + ' to move' + (check ? ', in check' : ''));
+    $('#note').textContent = st.over ? '' : 'enemy pieces show only when they threaten or are threatened';
+    boardEl.innerHTML = '';
+    for (let k = 0; k < 64; k++) {
+      const i = me === 'w' ? k : 63 - k, p = st.b[i], mine = p !== '.' && side(p) === me;
+      const show = p !== '.' && (mine || fog.has(i));
+      const el = document.createElement('button');
+      el.id = 's-' + sqName(i);
+      el.className = 'sq' + (((i >> 3) + (i & 7)) % 2 ? ' dk' : '') + (i === sel ? ' sel' : '')
+        + (show && !mine ? ' foe' : '') + (targets.includes(i) ? ' tgt' : '');
+      el.textContent = show ? GLYPH[p] + '\uFE0E' : '';
+      el.setAttribute('aria-label', sqName(i) + (show ? ' ' + p : ''));
+      el.dataset.i = i;
+      boardEl.appendChild(el);
+    }
+    save();
+  }
+
+  boardEl.addEventListener('click', e => {
+    const el = e.target.closest('.sq'); if (!el || st.over) return;
+    const i = +el.dataset.i, p = st.b[i], moves = legal(st, st.turn);
+    const m = sel >= 0 && moves.find(x => x.from === sel && x.to === i);
+    if (m) { st = apply(st, m); st.hand = true; sel = -1; }
+    else if (p !== '.' && side(p) === st.turn) sel = i === sel ? -1 : i;
+    else sel = -1;
+    render();
+  });
+  $('#reveal').addEventListener('click', () => { st.hand = false; render(); });
+  $('#new').addEventListener('click', () => {
+    if (!confirmNew) { confirmNew = 1; $('#new').textContent = 'tap again to start over'; setTimeout(() => { confirmNew = 0; $('#new').textContent = 'new game'; }, 3000); return; }
+    confirmNew = 0; $('#new').textContent = 'new game'; st = fresh(); sel = -1; render();
+  });
+  render();
+})();
+</script>
+</body>
+</html>

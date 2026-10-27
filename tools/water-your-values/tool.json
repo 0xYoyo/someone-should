@@ -1,0 +1,61 @@
+{
+  "slug": "water-your-values",
+  "wish": "someone should make an app where you water plants that represent the things you value most",
+  "year": 2021,
+  "agreed": 192,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/SomebodyMakeThis/comments/lge33u/",
+      "date": "2021-02-09",
+      "points": 73,
+      "comments": 25
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/AppIdeas/comments/lge324/",
+      "date": "2021-02-09",
+      "points": 61,
+      "comments": 33
+    }
+  ],
+  "spec": "Name a value and it becomes a plant in a pot. Tap water each time you act on that value; the plant grows with every two waterings and droops after three days without water. Stored on this device only; it sends no reminders and keeps no history beyond watering times.",
+  "tests": [
+    {
+      "expect": {
+        "sel": ".plant",
+        "visible": true
+      }
+    },
+    {
+      "type": {
+        "sel": "#name",
+        "text": "kindness"
+      }
+    },
+    {
+      "tap": "#add"
+    },
+    {
+      "expect": {
+        "sel": ".plant:last-child .name",
+        "contains": "kindness"
+      }
+    },
+    {
+      "tap": ".plant:last-child .water"
+    },
+    {
+      "expect": {
+        "sel": ".plant:last-child .count",
+        "contains": "1 watering"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:41:38Z",
+  "model": "sonnet-5.5",
+  "minutes": 5,
+  "approved": false,
+  "notes": ""
+}

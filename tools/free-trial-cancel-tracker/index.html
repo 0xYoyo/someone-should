@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app that reminds you to cancel free trials before they end</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+.meta { font-size: 16px; }
+label { display: grid; gap: 4px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.full { grid-column: 1 / -1; }
+.chips button { padding: 0 14px; min-width: 56px; }
+.chips button.on { background: var(--ink); color: var(--paper); }
+#list li { align-items: flex-start; }
+#list .info { display: grid; gap: 2px; min-width: 0; }
+#list .nm { font-weight: 500; overflow-wrap: anywhere; }
+#list .days { font: 500 22px/1.1 var(--mono); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.warn { color: #b25e00; }
+@media (prefers-color-scheme: dark) { .warn { color: #e8a04a; } }
+.ok { color: var(--built); }
+#err { color: var(--no); min-height: 0; }
+.total { font-size: 17px; }
+.del { min-width: var(--tap); padding: 0; }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make an app that reminds you to cancel free trials before they end</h1>
+
+<main id="app" class="stack">
+  <form id="form" class="grid" autocomplete="off">
+    <label class="full">Service
+      <input id="name" type="text" placeholder="Streaming service" maxlength="60">
+    </label>
+    <label>Started
+      <input id="start" type="date">
+    </label>
+    <label>Trial days
+      <input id="len" type="number" inputmode="numeric" min="1" max="365" value="14">
+    </label>
+    <div class="chips row full" id="chips">
+      <button type="button" data-d="7">7</button>
+      <button type="button" data-d="14" class="on">14</button>
+      <button type="button" data-d="30">30</button>
+      <button type="button" data-d="90">90</button>
+    </div>
+    <label class="full">Price after trial (per month, optional)
+      <input id="price" type="number" inputmode="decimal" min="0" step="0.01" placeholder="9.99">
+    </label>
+    <button id="add" type="submit" class="primary full">Add trial</button>
+    <div id="err" class="full" role="status"></div>
+  </form>
+
+  <div id="total" class="total"></div>
+  <ul id="list" class="plain"></ul>
+  <div id="empty" class="empty" hidden>No trials yet.</div>
+  <div class="row">
+    <button id="ics" type="button">Export reminders (.ics)</button>
+  </div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const DAY = 86400000;
+
+  const pad = n => String(n).padStart(2, '0');
+  const iso = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  const parse = s => { const [y, m, d] = s.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d)); };
+  const todayUTC = () => { const n = new Date(); return Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()); };
+  const addDays = (s, n) => { const d = new Date(parse(s).getTime() + n * DAY); return d.getUTCFullYear() + '-' + pad(d.getUTCMonth() + 1) + '-' + pad(d.getUTCDate()); };
+  const daysLeft = t => Math.round((parse(t.end).getTime() - todayUTC()) / DAY);
+
+  let trials = store.get('fct.trials', null);
+  if (!Array.isArray(trials)) {
+    // first visit: two examples so the list is not empty; delete them freely
+    const t = iso(new Date());
+    trials = [
+      { id: 1, name: 'Example: video streaming', end: addDays(t, 2), price: 12.99 },
+      { id: 2, name: 'Example: music app', end: addDays(t, 19), price: 10.99 }
+    ];
+    store.set('fct.trials', trials);
+  }
+
+  const nameEl = $('#name'), startEl = $('#start'), lenEl = $('#len'), priceEl = $('#price'), errEl = $('#err');
+  startEl.value = iso(new Date());
+
+  $('#chips').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    lenEl.value = b.dataset.d; syncChips();
+  });
+  lenEl.addEventListener('input', syncChips);
+  function syncChips() { $$('#chips button').forEach(b => b.classList.toggle('on', b.dataset.d === lenEl.value)); }
+
+  function label(n) {
+    if (n < 0) return 'ended ' + (-n) + 'd ago';
+    if (n === 0) return 'ends today';
+    return n + (n === 1 ? ' day left' : ' days left');
+  }
+
+  function render() {
+    const list = $('#list');
+    list.textContent = '';
+    const sorted = trials.slice().sort((a, b) => daysLeft(a) - daysLeft(b));
+    let atRisk = 0;
+    sorted.forEach(t => {
+      const n = daysLeft(t);
+      const cls = n < 0 ? 'meta' : n <= 3 ? 'no' : n <= 7 ? 'warn' : 'ok';
+      if (n >= 0 && n <= 7 && t.price) atRisk += t.price;
+      const li = document.createElement('li');
+      const info = document.createElement('div'); info.className = 'info';
+      const nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = t.name;
+      const sub = document.createElement('span'); sub.className = 'meta';
+      sub.textContent = 'ends ' + t.end + (t.price ? ' \u00b7 ' + t.price.toFixed(2) + '/mo after' : '');
+      info.append(nm, sub);
+      const days = document.createElement('span'); days.className = 'days ' + cls; days.textContent = label(n);
+      const del = document.createElement('button'); del.className = 'del'; del.type = 'button';
+      del.setAttribute('aria-label', 'Remove ' + t.name); del.textContent = '\u00d7'; del.dataset.id = t.id;
+      const right = document.createElement('div'); right.className = 'row'; right.style.flexWrap = 'nowrap';
+      right.append(days, del);
+      li.append(info, right);
+      list.append(li);
+    });
+    $('#empty').hidden = sorted.length > 0;
+    $('#ics').disabled = sorted.length === 0;
+    $('#total').textContent = atRisk > 0 ? atRisk.toFixed(2) + ' would be charged within 7 days' : '';
+  }
+
+  $('#list').addEventListener('click', e => {
+    const b = e.target.closest('.del'); if (!b) return;
+    trials = trials.filter(t => String(t.id) !== b.dataset.id);
+    store.set('fct.trials', trials); render();
+  });
+
+  $('#form').addEventListener('submit', e => {
+    e.preventDefault();
+    const name = nameEl.value.trim();
+    const len = parseInt(lenEl.value, 10);
+    if (!name) { errEl.textContent = 'Enter the service name.'; nameEl.focus(); return; }
+    if (!startEl.value) { errEl.textContent = 'Pick the start date.'; return; }
+    if (!(len >= 1 && len <= 365)) { errEl.textContent = 'Trial length must be 1 to 365 days.'; return; }
+    const price = parseFloat(priceEl.value);
+    errEl.textContent = '';
+    trials.push({ id: Date.now(), name, end: addDays(startEl.value, len), price: price > 0 ? price : 0 });
+    store.set('fct.trials', trials);
+    nameEl.value = ''; priceEl.value = '';
+    render();
+  });
+
+  function icsEscape(s) { return s.replace(/[\\;,]/g, m => '\\' + m).replace(/\n/g, ' '); }
+  $('#ics').addEventListener('click', () => {
+    const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
+    const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//someone should//trial cancel//EN'];
+    trials.filter(t => daysLeft(t) >= 0).forEach(t => {
+      // all-day event the day before the trial ends, with a morning alarm
+      const rem = daysLeft(t) >= 1 ? addDays(t.end, -1) : t.end;
+      const next = addDays(rem, 1);
+      lines.push('BEGIN:VEVENT', 'UID:' + t.id + '@trial-cancel', 'DTSTAMP:' + stamp,
+        'DTSTART;VALUE=DATE:' + rem.replace(/-/g, ''), 'DTEND;VALUE=DATE:' + next.replace(/-/g, ''),
+        'SUMMARY:' + icsEscape('Cancel ' + t.name.replace(/^Example: /, '') + ' trial'),
+        'DESCRIPTION:' + icsEscape('Trial ends ' + t.end + (t.price ? ', then ' + t.price.toFixed(2) + ' per month' : '')),
+        'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:Cancel trial', 'TRIGGER:PT9H', 'END:VALARM', 'END:VEVENT');
+    });
+    lines.push('END:VCALENDAR');
+    if (lines.length <= 4) { errEl.textContent = 'Nothing to export: no active trials.'; return; }
+    try {
+      const url = URL.createObjectURL(new Blob([lines.join('\r\n') + '\r\n'], { type: 'text/calendar' }));
+      const a = document.createElement('a'); a.href = url; a.download = 'trial-reminders.ics';
+      document.body.append(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+      errEl.textContent = '';
+    } catch { errEl.textContent = 'Could not create the file.'; }
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

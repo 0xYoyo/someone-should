@@ -1,0 +1,51 @@
+{
+  "slug": "faster-run-better-sound",
+  "wish": "someone should make a music player where sound quality improves with your jogging speed",
+  "year": 2015,
+  "agreed": 176,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/3r5x8j/",
+      "date": "2015-11-02",
+      "points": 164,
+      "comments": 12
+    }
+  ],
+  "spec": "Plays a demo loop or a song from your device through a low-pass filter. Your step rate from the motion sensor, or set by hand or by tapping, opens the filter from muffled at 60 steps/min to full quality at 180. It does not stream music, read your music library, or work without a tap to start.",
+  "tests": [
+    {
+      "expect": {
+        "sel": "#quality",
+        "contains": "getting clearer"
+      }
+    },
+    {
+      "tap": "#up"
+    },
+    {
+      "tap": "#up"
+    },
+    {
+      "tap": "#up"
+    },
+    {
+      "expect": {
+        "sel": "#spm",
+        "contains": "150"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#quality",
+        "contains": "full quality"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:42:34Z",
+  "model": "sonnet-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": "Offline. Motion cadence needs a phone with a motion sensor; buttons and step tapping are the fallback."
+}

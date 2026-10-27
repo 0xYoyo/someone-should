@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a sports video game where you play as the camera operator</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+canvas { width: 100%; display: block; border: 1.5px solid var(--line); border-radius: var(--radius); touch-action: none; background: #3c7a4b; }
+.stats { display: flex; gap: 20px; flex-wrap: wrap; }
+.stats b { font: 500 28px/1.1 var(--sans); font-variant-numeric: tabular-nums; display: block; }
+.stats span { display: block; }
+button { min-width: var(--tap); }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a sports video game where you play as the camera operator</h1>
+<main id="app" class="stack">
+  <canvas id="pitch" width="360" height="216" aria-label="pitch with camera frame"></canvas>
+  <div class="stats">
+    <div><b id="time">60</b><span class="meta">seconds left</span></div>
+    <div><b id="framed">0%</b><span class="meta">ball framed</span></div>
+    <div><b id="pts">0</b><span class="meta">points</span></div>
+    <div><b id="best">0</b><span class="meta">best</span></div>
+  </div>
+  <div class="row">
+    <button id="start" class="primary">start match</button>
+    <button id="zoomout" aria-label="zoom out">wider</button>
+    <button id="zoomin" aria-label="zoom in">tighter</button>
+    <span id="zoom" class="meta">zoom 2.0x</span>
+  </div>
+  <p id="msg" class="meta" style="margin:0">drag on the pitch to aim the camera. tighter shots score more.</p>
+</main>
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const W = 1000, H = 600, MATCH = 60;
+  const cv = $('#pitch'), ctx = cv.getContext('2d');
+  let zoom = 2, cam = { x: 500, y: 300 }, playing = false, left = MATCH, framedT = 0, pts = 0;
+  let best = store.get('scb', 0);
+  $('#best').textContent = best;
+
+  // players: two teams of 6, drifting around home spots
+  const players = [];
+  for (let i = 0; i < 12; i++) {
+    const team = i % 2, k = i >> 1;
+    const hx = 120 + (k % 3) * 180 + team * 380 + (Math.random() * 60), hy = 80 + Math.floor(k / 3) * 220 + Math.random() * 120;
+    players.push({ team, hx, hy, x: hx, y: hy, ph: Math.random() * 6 });
+  }
+  const ball = { x: 500, y: 300, from: players[0], to: players[1], t: 0, dur: 1 };
+  function newPass() {
+    ball.from = ball.to;
+    let n;
+    do { n = players[Math.floor(Math.random() * players.length)]; } while (n === ball.from);
+    ball.to = n; ball.t = 0;
+    const d = Math.hypot(n.x - ball.from.x, n.y - ball.from.y);
+    ball.dur = 0.5 + d / 520 + Math.random() * 0.5;
+  }
+  newPass();
+
+  function step(dt, now) {
+    for (const p of players) {
+      p.x = p.hx + Math.sin(now / 1100 + p.ph) * 70;
+      p.y = p.hy + Math.cos(now / 1500 + p.ph * 2) * 50;
+    }
+    ball.t += dt / ball.dur;
+    if (ball.t >= 1) newPass();
+    const u = Math.min(ball.t, 1);
+    ball.x = ball.from.x + (ball.to.x - ball.from.x) * u;
+    ball.y = ball.from.y + (ball.to.y - ball.from.y) * u;
+  }
+
+  function frameRect() {
+    const fw = W / zoom, fh = fw * 9 / 16;
+    cam.x = Math.max(fw / 2, Math.min(W - fw / 2, cam.x));
+    cam.y = Math.max(fh / 2, Math.min(H - fh / 2, cam.y));
+    return { x: cam.x - fw / 2, y: cam.y - fh / 2, w: fw, h: fh };
+  }
+
+  function draw() {
+    const s = cv.width / W;
+    ctx.setTransform(s, 0, 0, s, 0, 0);
+    ctx.fillStyle = '#3c7a4b'; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = 'rgba(255,255,255,.7)'; ctx.lineWidth = 3;
+    ctx.strokeRect(20, 20, W - 40, H - 40);
+    ctx.beginPath(); ctx.moveTo(W / 2, 20); ctx.lineTo(W / 2, H - 20); ctx.stroke();
+    ctx.beginPath(); ctx.arc(W / 2, H / 2, 70, 0, 7); ctx.stroke();
+    for (const p of players) {
+      ctx.fillStyle = p.team ? '#e8e3d3' : '#141414';
+      ctx.beginPath(); ctx.arc(p.x, p.y, 14, 0, 7); ctx.fill();
+    }
+    ctx.fillStyle = '#fff'; ctx.strokeStyle = '#141414'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(ball.x, ball.y, 9, 0, 7); ctx.fill(); ctx.stroke();
+    const f = frameRect();
+    ctx.fillStyle = 'rgba(0,0,0,.35)';
+    ctx.fillRect(0, 0, W, f.y); ctx.fillRect(0, f.y + f.h, W, H - f.y - f.h);
+    ctx.fillRect(0, f.y, f.x, f.h); ctx.fillRect(f.x + f.w, f.y, W - f.x - f.w, f.h);
+    ctx.strokeStyle = '#c8321e'; ctx.lineWidth = 5; ctx.strokeRect(f.x, f.y, f.w, f.h);
+  }
+
+  function inFrame() {
+    const f = frameRect(), m = 12;
+    return ball.x > f.x + m && ball.x < f.x + f.w - m && ball.y > f.y + m && ball.y < f.y + f.h - m;
+  }
+
+  let last = 0;
+  function loop(now) {
+    const dt = Math.min(0.05, (now - last) / 1000 || 0);
+    last = now;
+    step(dt, now);
+    if (!playing) {
+      // attract mode: a lazy auto camera so the first frame shows play
+      cam.x += (ball.x - cam.x) * Math.min(1, dt * 2.5);
+      cam.y += (ball.y - cam.y) * Math.min(1, dt * 2.5);
+    } else {
+      left -= dt;
+      if (inFrame()) { framedT += dt; pts += dt * 10 * zoom; }
+      if (left <= 0) finish();
+      render();
+    }
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  function render() {
+    $('#time').textContent = Math.max(0, Math.ceil(left));
+    $('#framed').textContent = Math.round(100 * framedT / Math.max(0.001, MATCH - left)) + '%';
+    $('#pts').textContent = Math.round(pts);
+  }
+
+  function finish() {
+    playing = false; left = 0; render();
+    const p = Math.round(pts);
+    if (p > best) { best = p; store.set('scb', best); $('#best').textContent = best; $('#msg').textContent = 'full time. new best: ' + p + ' points.'; }
+    else $('#msg').textContent = 'full time. ' + p + ' points.';
+    $('#start').textContent = 'play again';
+  }
+
+  function start() {
+    playing = true; left = MATCH; framedT = 0; pts = 0;
+    $('#msg').textContent = 'keep the ball inside the red frame.';
+    $('#start').textContent = 'restart';
+    render();
+  }
+
+  function aim(e) {
+    const r = cv.getBoundingClientRect();
+    cam.x = (e.clientX - r.left) / r.width * W;
+    cam.y = (e.clientY - r.top) / r.height * H;
+  }
+  let drag = false;
+  cv.addEventListener('pointerdown', e => { drag = true; try { cv.setPointerCapture(e.pointerId); } catch {} aim(e); });
+  cv.addEventListener('pointermove', e => { if (drag) aim(e); });
+  cv.addEventListener('pointerup', () => { drag = false; });
+  cv.addEventListener('pointercancel', () => { drag = false; });
+
+  function setZoom(z) {
+    zoom = Math.max(1.5, Math.min(4, z));
+    $('#zoom').textContent = 'zoom ' + zoom.toFixed(1) + 'x';
+  }
+  $('#zoomin').addEventListener('click', () => setZoom(zoom + 0.5));
+  $('#zoomout').addEventListener('click', () => setZoom(zoom - 0.5));
+  $('#start').addEventListener('click', start);
+
+  function size() {
+    const w = Math.round(cv.clientWidth || 360);
+    cv.width = w; cv.height = Math.round(w * H / W);
+  }
+  window.addEventListener('resize', size);
+  size();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

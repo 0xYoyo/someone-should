@@ -1,0 +1,58 @@
+{
+  "slug": "free-trial-cancel-tracker",
+  "wish": "someone should make an app that reminds you to cancel free trials before they end",
+  "year": 2019,
+  "agreed": 191,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/achrpg/",
+      "date": "2019-01-04",
+      "points": 163,
+      "comments": 13
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/AppIdeas/comments/b30ux0/",
+      "date": "2019-03-19",
+      "points": 9,
+      "comments": 6
+    }
+  ],
+  "spec": "Keeps a list of free trials sorted by days left, coloured red, amber or green as the end nears.\nType the service, start date and trial length (and price), tap Add trial; it is saved on this device.\nExport reminders writes an .ics calendar file with an alert the day before each trial ends; it cannot send notifications itself or read your accounts.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#name",
+        "text": "Gym app"
+      }
+    },
+    {
+      "tap": ".chips button[data-d=\"7\"]"
+    },
+    {
+      "tap": "#add"
+    },
+    {
+      "expect": {
+        "sel": "#list",
+        "contains": "Gym app"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#list li",
+        "count": 3
+      }
+    },
+    {
+      "tap": "#ics"
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:42:34Z",
+  "model": "sonnet-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Offline: reminders come from the exported .ics file in your calendar app; the page cannot notify you by itself."
+}

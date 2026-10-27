@@ -1,45 +1,45 @@
 {
- "slug": "snake-pacman-relay",
- "wish": "someone should make a video game that alternates snake and pac-man levels, one feeding the next",
- "year": 2017,
- "agreed": 222,
- "sources": [
-  {
-   "site": "reddit",
-   "url": "https://www.reddit.com/r/Lightbulb/comments/6jszj3/",
-   "date": "2017-06-27",
-   "points": 206,
-   "comments": 16
-  }
- ],
- "spec": "Alternating levels on one grid: as snake you eat food and your final body becomes the maze walls.\nThen you play pac-man in that maze, eating dots while a ghost chases; the dots eaten set the next snake's length.\nIt does not save runs or have online scores; best score is kept locally.",
- "tests": [
-  {
-   "tap": "#start"
-  },
-  {
-   "expect": {
-    "sel": "#mode",
-    "contains": "Snake"
-   }
-  },
-  {
-   "tap": "#down"
-  },
-  {
-   "wait": 400
-  },
-  {
-   "expect": {
-    "sel": "#score",
-    "matches": "\\d+"
-   }
-  }
- ],
- "status": "pending",
- "built": "2026-10-27T08:40:51Z",
- "model": "sonnet-5.5",
- "minutes": 1,
- "approved": false,
- "notes": ""
+  "slug": "snake-pacman-relay",
+  "wish": "someone should make a video game that alternates snake and pac-man levels, one feeding the next",
+  "year": 2017,
+  "agreed": 222,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/6jszj3/",
+      "date": "2017-06-27",
+      "points": 206,
+      "comments": 16
+    }
+  ],
+  "spec": "Alternating levels on one grid: as snake you eat food and your final body becomes the maze walls.\nThen you play pac-man in that maze, eating dots while a ghost chases; the dots eaten set the next snake's length.\nIt does not save runs or have online scores; best score is kept locally.",
+  "tests": [
+    {
+      "tap": "#start"
+    },
+    {
+      "expect": {
+        "sel": "#mode",
+        "contains": "Snake"
+      }
+    },
+    {
+      "tap": "#down"
+    },
+    {
+      "wait": 400
+    },
+    {
+      "expect": {
+        "sel": "#score",
+        "matches": "\\d+"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:40:51Z",
+  "model": "sonnet-5.5",
+  "minutes": 1,
+  "approved": false,
+  "notes": ""
 }

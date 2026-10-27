@@ -1,0 +1,51 @@
+{
+  "slug": "threat-fog-chess",
+  "wish": "someone should make a chess variant where you only see opposing pieces that threaten or are threatened",
+  "year": 2016,
+  "agreed": 220,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/5g3nz1/",
+      "date": "2016-12-02",
+      "points": 197,
+      "comments": 23
+    }
+  ],
+  "spec": "Two-player pass-and-play chess with full legal moves, castling, en passant, check and mate.\nTap a piece, tap a dot; each side sees only enemy pieces that attack or are attacked by its own, and a hand-off screen hides the board between turns.\nNo computer opponent, no clock, no undo, promotion is always a queen.",
+  "tests": [
+    {
+      "tap": "#s-e4"
+    },
+    {
+      "tap": "#s-d5"
+    },
+    {
+      "expect": {
+        "sel": "#handoff",
+        "visible": true
+      }
+    },
+    {
+      "tap": "#reveal"
+    },
+    {
+      "expect": {
+        "sel": "#status",
+        "contains": "Black to move"
+      }
+    },
+    {
+      "expect": {
+        "sel": ".foe",
+        "count": 1
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:41:11Z",
+  "model": "sonnet-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Promotion is automatic queen. State is kept in localStorage."
+}

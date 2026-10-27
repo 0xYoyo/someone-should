@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app that keeps your medical information in one form you can hand to your doctor</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+label { display: grid; gap: 4px; }
+fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: 8px; }
+legend { font: 13px/1.4 var(--mono); color: var(--meta); padding: 0; margin-bottom: 4px; }
+.add { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+.chips { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.chips li { display: flex; justify-content: space-between; align-items: center; gap: 8px; border-bottom: 1px solid var(--line); min-height: var(--tap); }
+.chips button { min-width: var(--tap); padding: 0 10px; border-color: var(--line); }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+#sheet { border: 1.5px solid var(--ink); border-radius: var(--radius); padding: 16px; display: grid; gap: 10px; }
+#sheet h2 { font: 500 17px/1.3 var(--sans); margin: 0; }
+#sheet h3 { font: 13px/1.4 var(--mono); color: var(--meta); margin: 6px 0 0; font-weight: 500; }
+#sheet ul { margin: 0; padding-left: 20px; }
+#sheet p { margin: 0; white-space: pre-wrap; }
+@media print {
+  #form, h1, .actions { display: none !important; }
+  body { padding: 0; }
+  #sheet { border: 0; padding: 0; }
+  :root { --paper: #fff; --ink: #000; --meta: #444; }
+}
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make an app that keeps your medical information in one form you can hand to your doctor</h1>
+
+<main id="app" class="stack">
+  <section id="sheet" aria-label="Summary">
+    <h2 id="sum-name"></h2>
+    <p class="meta" id="sum-basic"></p>
+    <h3>allergies</h3><div id="sum-allergies"></div>
+    <h3>conditions</h3><div id="sum-conditions"></div>
+    <h3>medications</h3><div id="sum-meds"></div>
+    <h3>surgeries</h3><div id="sum-surgeries"></div>
+    <h3>emergency contact</h3><p id="sum-contact"></p>
+    <h3>notes</h3><p id="sum-notes"></p>
+    <p class="meta" id="sum-date"></p>
+  </section>
+
+  <div class="row actions">
+    <button class="primary" id="print">print or save as pdf</button>
+    <button id="clear">clear all</button>
+  </div>
+  <p class="meta" id="msg" role="status"></p>
+
+  <form id="form" class="stack" onsubmit="return false">
+    <label>name<input id="name" autocomplete="name"></label>
+    <div class="two">
+      <label>date of birth<input id="dob" placeholder="1980-04-02"></label>
+      <label>blood type<input id="blood" placeholder="O+"></label>
+    </div>
+    <fieldset><legend>allergies</legend>
+      <div class="add"><input id="allergies-in" aria-label="allergy" placeholder="penicillin, rash"><button id="allergies-add">add</button></div>
+      <ul class="chips" id="allergies-list"></ul></fieldset>
+    <fieldset><legend>conditions</legend>
+      <div class="add"><input id="conditions-in" aria-label="condition" placeholder="asthma"><button id="conditions-add">add</button></div>
+      <ul class="chips" id="conditions-list"></ul></fieldset>
+    <fieldset><legend>medications</legend>
+      <div class="add"><input id="meds-in" aria-label="medication" placeholder="name, dose, how often"><button id="meds-add">add</button></div>
+      <ul class="chips" id="meds-list"></ul></fieldset>
+    <fieldset><legend>surgeries</legend>
+      <div class="add"><input id="surgeries-in" aria-label="surgery" placeholder="appendectomy, 2009"><button id="surgeries-add">add</button></div>
+      <ul class="chips" id="surgeries-list"></ul></fieldset>
+    <label>emergency contact<input id="contact" placeholder="name, relation, phone"></label>
+    <label>notes<textarea id="notes" rows="3"></textarea></label>
+  </form>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const KEY = 'medsheet.v1';
+  const LISTS = ['allergies', 'conditions', 'meds', 'surgeries'];
+  const FIELDS = ['name', 'dob', 'blood', 'contact', 'notes'];
+  const blank = () => ({ name: '', dob: '', blood: '', contact: '', notes: '', allergies: [], conditions: [], meds: [], surgeries: [] });
+  // Example shown until the person edits anything; never saved on its own.
+  const example = () => ({ name: 'Sample Person', dob: '1985-06-15', blood: 'A+', contact: 'Jordan Sample, sister, 555 0100',
+    notes: 'Example entries. Clear all to start your own.', allergies: ['penicillin, rash'], conditions: ['asthma'],
+    meds: ['albuterol inhaler, as needed'], surgeries: ['appendectomy, 2009'] });
+
+  let state = store.get(KEY, null);
+  const saved = !!state;
+  state = state ? Object.assign(blank(), state) : example();
+  let storageOk = true;
+
+  function save() { storageOk = store.set(KEY, state); if (!storageOk) $('#msg').textContent = 'could not save on this device'; }
+  function esc(s) { return String(s); }
+
+  function renderList(k) {
+    const ul = $('#' + k + '-list');
+    ul.textContent = '';
+    state[k].forEach((t, i) => {
+      const li = document.createElement('li');
+      const sp = document.createElement('span'); sp.textContent = t;
+      const b = document.createElement('button'); b.textContent = 'x'; b.setAttribute('aria-label', 'remove ' + t);
+      b.addEventListener('click', () => { state[k].splice(i, 1); save(); render(); });
+      li.append(sp, b); ul.append(li);
+    });
+  }
+  function sumList(id, arr) {
+    const box = $(id); box.textContent = '';
+    if (!arr.length) { const p = document.createElement('p'); p.textContent = 'none listed'; box.append(p); return; }
+    const ul = document.createElement('ul');
+    arr.forEach(t => { const li = document.createElement('li'); li.textContent = t; ul.append(li); });
+    box.append(ul);
+  }
+  function render() {
+    LISTS.forEach(renderList);
+    $('#sum-name').textContent = state.name || 'name not entered';
+    $('#sum-basic').textContent = [state.dob && 'born ' + state.dob, state.blood && 'blood type ' + state.blood].filter(Boolean).join(' · ') || 'no date of birth';
+    sumList('#sum-allergies', state.allergies);
+    sumList('#sum-conditions', state.conditions);
+    sumList('#sum-meds', state.meds);
+    sumList('#sum-surgeries', state.surgeries);
+    $('#sum-contact').textContent = state.contact || 'none listed';
+    $('#sum-notes').textContent = state.notes || 'none';
+    $('#sum-date').textContent = 'updated ' + new Date().toISOString().slice(0, 10);
+  }
+  function fillFields() { FIELDS.forEach(f => { $('#' + f).value = state[f]; }); }
+
+  FIELDS.forEach(f => $('#' + f).addEventListener('input', e => { state[f] = e.target.value; save(); render(); }));
+  LISTS.forEach(k => {
+    const add = () => {
+      const inp = $('#' + k + '-in'); const v = inp.value.trim();
+      if (!v) return;
+      state[k].push(v); inp.value = ''; save(); render();
+    };
+    $('#' + k + '-add').addEventListener('click', add);
+    $('#' + k + '-in').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); add(); } });
+  });
+  $('#print').addEventListener('click', () => { try { window.print(); } catch { $('#msg').textContent = 'printing is not available here'; } });
+  $('#clear').addEventListener('click', () => { state = blank(); save(); fillFields(); render(); $('#msg').textContent = 'cleared'; });
+
+  fillFields(); render();
+})();
+</script>
+</body>
+</html>

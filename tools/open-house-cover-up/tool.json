@@ -1,0 +1,51 @@
+{
+  "slug": "open-house-cover-up",
+  "wish": "someone should make a game where you hide flaws in a house during an open house",
+  "year": 2022,
+  "agreed": 176,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/uj18uk/",
+      "date": "2022-05-05",
+      "points": 160,
+      "comments": 16
+    }
+  ],
+  "spec": "Six flaws in a house, a few rugs, paintings, a bulb and a candle. Tap a cover, then tap the flaw it fits, then open the doors.\nThree buyers walk through, spot most of what is still showing, and each makes an offer against the asking price.\nIt does not model real appraisals; buyers spot flaws at random.",
+  "tests": [
+    {
+      "tap": "[data-flaw=\"1\"]"
+    },
+    {
+      "expect": {
+        "sel": "[data-flaw=\"1\"]",
+        "contains": "hidden under painting"
+      }
+    },
+    {
+      "tap": "#open"
+    },
+    {
+      "wait": 200
+    },
+    {
+      "expect": {
+        "sel": "#price",
+        "matches": "\\$\\d+k"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#offers li",
+        "visible": true
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:42:37Z",
+  "model": "sonnet-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": ""
+}

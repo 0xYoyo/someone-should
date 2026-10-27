@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T08:41:01.853Z",
+ "updated": "2026-10-27T08:43:02.399Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -1275,6 +1275,204 @@
    "tests": "6/6",
    "built": "2026-10-27T08:40:33Z",
    "minutes": 3,
+   "approved": false
+  },
+  {
+   "slug": "hidden-king-chess",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 9.9,
+   "tests": "6/6",
+   "built": "2026-10-27T08:40:52Z",
+   "minutes": 4,
+   "approved": false
+  },
+  {
+   "slug": "snake-pacman-relay",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 12.3,
+   "tests": "5/5",
+   "built": "2026-10-27T08:40:51Z",
+   "minutes": 1,
+   "approved": false
+  },
+  {
+   "slug": "ghost-of-you-boss",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 10.9,
+   "tests": "6/6",
+   "built": "2026-10-27T08:40:53Z",
+   "minutes": 6,
+   "approved": false
+  },
+  {
+   "slug": "learn-to-cook-ladder",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 14.8,
+   "tests": "6/6",
+   "built": "2026-10-27T08:40:57Z",
+   "minutes": 6,
+   "approved": false
+  },
+  {
+   "slug": "be-the-boss-battle",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 12,
+   "tests": "6/6",
+   "built": "2026-10-27T08:41:06Z",
+   "minutes": 4,
+   "approved": false
+  },
+  {
+   "slug": "gif-player-with-progress",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 23.8,
+   "tests": "6/6",
+   "built": "2026-10-27T08:41:11Z",
+   "minutes": 6,
+   "approved": false
+  },
+  {
+   "slug": "threat-fog-chess",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 12.2,
+   "tests": "6/6",
+   "built": "2026-10-27T08:41:11Z",
+   "minutes": 6,
+   "approved": false
+  },
+  {
+   "slug": "water-your-values",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 8.3,
+   "tests": "6/6",
+   "built": "2026-10-27T08:41:38Z",
+   "minutes": 5,
+   "approved": false
+  },
+  {
+   "slug": "one-try-only-game",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 5.6,
+   "tests": "5/5",
+   "built": "2026-10-27T08:42:00Z",
+   "minutes": 3,
+   "approved": false
+  },
+  {
+   "slug": "lying-love-meter-sim",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 8.1,
+   "tests": "6/6",
+   "built": "2026-10-27T08:42:24Z",
+   "minutes": 4,
+   "approved": false
+  },
+  {
+   "slug": "sports-camera-operator",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 9.6,
+   "tests": "6/6",
+   "built": "2026-10-27T08:42:30Z",
+   "minutes": 4,
+   "approved": false
+  },
+  {
+   "slug": "layering-song-alarm",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 9.8,
+   "tests": "6/6",
+   "built": "2026-10-27T08:42:33Z",
+   "minutes": 4,
+   "approved": false
+  },
+  {
+   "slug": "my-medical-summary-sheet",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 10,
+   "tests": "6/6",
+   "built": "2026-10-27T08:42:32Z",
+   "minutes": 5,
+   "approved": false
+  },
+  {
+   "slug": "faster-run-better-sound",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 8.8,
+   "tests": "6/6",
+   "built": "2026-10-27T08:42:34Z",
+   "minutes": 4,
+   "approved": false
+  },
+  {
+   "slug": "free-trial-cancel-tracker",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 11,
+   "tests": "6/6",
+   "built": "2026-10-27T08:42:34Z",
+   "minutes": 6,
+   "approved": false
+  },
+  {
+   "slug": "story-character-ages",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 8.4,
+   "tests": "6/6",
+   "built": "2026-10-27T08:42:33Z",
+   "minutes": 6,
+   "approved": false
+  },
+  {
+   "slug": "open-house-cover-up",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 8.6,
+   "tests": "6/6",
+   "built": "2026-10-27T08:42:37Z",
+   "minutes": 4,
+   "approved": false
+  },
+  {
+   "slug": "fanfic-reading-log",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 12.2,
+   "tests": "6/6",
+   "built": "2026-10-27T08:42:45Z",
+   "minutes": 5,
    "approved": false
   }
  ]

@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a game where you hide flaws in a house during an open house</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+.flaws { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.flaw { display: grid; gap: 2px; text-align: left; padding: 10px 12px; min-height: 64px; border-color: var(--line); }
+.flaw .meta { font-size: 16px; }
+.flaw.covered { border-style: dashed; border-color: var(--built); }
+.flaw.covered .meta { color: var(--built); }
+.items { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.item { padding: 0 4px; display: grid; align-content: center; gap: 0; line-height: 1.2; }
+.item.on { background: var(--ink); color: var(--paper); }
+.item:disabled { opacity: .35; cursor: default; }
+.msg { min-height: 24px; }
+.sold { color: var(--built); }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a game where you hide flaws in a house during an open house</h1>
+<main id="app" class="stack">
+  <div class="meta" id="hint">pick a cover, then tap a flaw</div>
+  <div class="items" id="items"></div>
+  <div class="flaws" id="flaws"></div>
+  <div class="msg meta" id="msg"></div>
+  <div class="row"><button class="primary" id="open">open the doors</button><button id="again">new house</button></div>
+  <div id="result" class="stack"></div>
+</main>
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  // what covers what
+  const ITEMS = {
+    rug: { name: 'rug', hides: 'floor', n: 2 },
+    art: { name: 'painting', hides: 'wall', n: 2 },
+    fan: { name: 'new bulb', hides: 'ceiling', n: 1 },
+    candle: { name: 'candle', hides: 'smell', n: 1 }
+  };
+  // flaw name, where, cost in $k
+  const POOL = [
+    ['wine stain', 'floor', 14], ['cracked tile', 'floor', 9], ['squeaky boards', 'floor', 6], ['pet damage', 'floor', 12],
+    ['hole in drywall', 'wall', 11], ['mold patch', 'wall', 22], ['crayon mural', 'wall', 5], ['bad paint job', 'wall', 7],
+    ['water ring', 'ceiling', 18], ['flickering light', 'ceiling', 4], ['bulging plaster', 'ceiling', 15],
+    ['damp smell', 'smell', 13], ['smoke smell', 'smell', 10], ['drain smell', 'smell', 8]
+  ];
+  const ASKING = 480;
+  const BUYERS = ['first buyer', 'second buyer', 'third buyer'];
+
+  let flaws, left, pick, done;
+
+  function fresh(first) {
+    // first frame is a fixed example with one cover already placed
+    const idx = first ? [0, 4, 8, 11, 1, 5] : shuffle(POOL.map((_, i) => i)).slice(0, 6);
+    flaws = idx.map(i => ({ name: POOL[i][0], where: POOL[i][1], cost: POOL[i][2], cover: null }));
+    left = {}; for (const k in ITEMS) left[k] = ITEMS[k].n;
+    if (first) { flaws[0].cover = 'rug'; left.rug--; }
+    pick = first ? 'art' : null; done = false;
+    $('#result').textContent = ''; say('');
+    draw();
+  }
+  function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+  function say(t) { $('#msg').textContent = t; }
+
+  function draw() {
+    $('#items').innerHTML = '';
+    for (const k in ITEMS) {
+      const b = document.createElement('button');
+      b.className = 'item' + (pick === k ? ' on' : '');
+      b.dataset.item = k; b.disabled = done || left[k] === 0 && pick !== k;
+      b.innerHTML = ITEMS[k].name + '<span class="meta" style="color:inherit;font-size:16px">' + left[k] + ' left</span>';
+      $('#items').appendChild(b);
+    }
+    $('#flaws').innerHTML = '';
+    flaws.forEach((f, i) => {
+      const b = document.createElement('button');
+      b.className = 'flaw' + (f.cover ? ' covered' : '');
+      b.dataset.flaw = i; b.disabled = done;
+      b.innerHTML = '<span>' + f.name + '</span><span class="meta">' + (f.cover ? 'hidden under ' + ITEMS[f.cover].name : f.where + ' / -$' + f.cost + 'k') + '</span>';
+      $('#flaws').appendChild(b);
+    });
+    $('#open').disabled = done;
+  }
+
+  $('#items').addEventListener('click', e => {
+    const b = e.target.closest('[data-item]'); if (!b) return;
+    pick = pick === b.dataset.item ? null : b.dataset.item; say(''); draw();
+  });
+
+  $('#flaws').addEventListener('click', e => {
+    const b = e.target.closest('[data-flaw]'); if (!b || done) return;
+    const f = flaws[+b.dataset.flaw];
+    if (f.cover) { left[f.cover]++; f.cover = null; say('picked back up'); draw(); return; }
+    if (!pick) { say('pick a cover first'); return; }
+    if (left[pick] < 1) { say('none left'); return; }
+    if (ITEMS[pick].hides !== f.where) { say('a ' + ITEMS[pick].name + ' will not hide a ' + f.where + ' flaw'); return; }
+    f.cover = pick; left[pick]--;
+    if (left[pick] === 0) pick = null;
+    say(''); draw();
+  });
+
+  $('#open').addEventListener('click', () => {
+    if (done) return;
+    done = true;
+    const bad = flaws.filter(f => !f.cover);
+    let best = 0, html = '';
+    BUYERS.forEach(name => {
+      // each buyer spots most of what is in plain sight
+      const seen = bad.filter(() => Math.random() < 0.75);
+      const cut = seen.reduce((s, f) => s + f.cost, 0);
+      const offer = Math.max(0, ASKING - cut);
+      best = Math.max(best, offer);
+      html += '<li><span>' + name + (seen.length ? ' spotted ' + seen.map(f => f.name).join(', ') : ' spotted nothing') + '</span><span class="meta">$' + offer + 'k</span></li>';
+    });
+    const prev = store.get('best', 0);
+    if (best > prev) store.set('best', best);
+    $('#result').innerHTML = '<div class="big sold" id="price">$' + best + 'k</div><div class="meta">best offer, asking $' + ASKING + 'k' + (prev ? ', best ever $' + Math.max(prev, best) + 'k' : '') + '</div><ul class="plain" id="offers">' + html + '</ul>';
+    say(''); draw();
+  });
+
+  $('#again').addEventListener('click', () => fresh(false));
+  fresh(true);
+})();
+</script>
+</body>
+</html>
