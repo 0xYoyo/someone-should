@@ -1,0 +1,55 @@
+{
+  "slug": "small-svg-editor",
+  "wish": "someone should make a standalone SVG editor",
+  "year": 2014,
+  "agreed": 49,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/46362/a-standalone-svg-editor",
+      "date": "2017-10-12",
+      "points": 39,
+      "comments": 5
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/2035/vector-drawing-app-for-android",
+      "date": "2014-03-06",
+      "points": 5,
+      "comments": 0
+    }
+  ],
+  "spec": "Draws rectangles, ovals, lines, freehand paths and text on an SVG canvas, and edits any attribute of any element.\nTap a tool, tap or drag on the canvas; select to move, resize, reorder, copy or delete; open a .svg file, edit it, save it back, or edit the raw source.\nIt does not do boolean path operations, node-by-node bezier editing, gradients by picker, or anything online.",
+  "tests": [
+    {
+      "tap": "#t-rect"
+    },
+    {
+      "tap": "#canvas"
+    },
+    {
+      "expect": {
+        "sel": "#layers li",
+        "count": 1
+      }
+    },
+    {
+      "type": {
+        "sel": "#attr-fill",
+        "text": "#c8321e"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#code",
+        "matches": "<rect[^>]*fill=\"#c8321e\""
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T02:08:17Z",
+  "model": "opus-5.5",
+  "minutes": 7,
+  "approved": false,
+  "notes": "Opened files are cleaned of scripts and event attributes. External images in opened files will not load (no network by design)."
+}
