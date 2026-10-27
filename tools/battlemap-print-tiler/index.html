@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that prints large battlemaps for rpgs</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+main { max-width: 640px; }
+label.field { display: grid; gap: 4px; flex: 1 1 140px; min-width: 0; }
+label.field span { font: 15px/1.3 var(--mono); color: var(--meta); }
+.file { display: inline-flex; align-items: center; min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); border-radius: var(--radius); cursor: pointer; }
+.file input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+#fname { color: var(--meta); overflow-wrap: anywhere; }
+#preview { width: 100%; height: auto; display: block; border: 1px solid var(--line); background: #fff; }
+#preview[hidden] { display: none; }
+#summary { font-size: 20px; }
+#pagelist { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: 0; padding: 0; }
+#pagelist li { font: 15px/1 var(--mono); padding: 8px 10px; border: 1px solid var(--line); border-radius: var(--radius); }
+#sheets { display: none; }
+@media print {
+  html, body { background: #fff !important; padding: 0 !important; margin: 0 !important; }
+  body > *:not(#sheets) { display: none !important; }
+  #sheets { display: block; }
+  .sheet { position: relative; overflow: hidden; page-break-after: always; break-after: page; }
+  .sheet:last-child { page-break-after: auto; break-after: auto; }
+  .sheet img { position: absolute; display: block; }
+}
+</style>
+<style id="pagecss"></style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that prints large battlemaps for rpgs</h1>
+
+<main id="app" class="stack">
+  <div class="row">
+    <label class="file" role="button" tabindex="0">Choose map image<input id="file" type="file" accept="image/*"></label>
+    <span id="fname">No image: prints a blank grid.</span>
+  </div>
+  <div class="row">
+    <label class="field"><span>Squares across</span><input id="across" type="number" inputmode="numeric" min="1" max="500" value="30"></label>
+    <label class="field"><span>Squares down</span><input id="down" type="number" inputmode="numeric" min="1" max="500" value="20"></label>
+  </div>
+  <div class="row">
+    <label class="field"><span>Square size</span>
+      <select id="size">
+        <option value="1">1 inch</option>
+        <option value="0.98425">25 mm</option>
+        <option value="1.1811">30 mm</option>
+        <option value="1.5">1.5 inch</option>
+        <option value="0.5">0.5 inch</option>
+      </select></label>
+    <label class="field"><span>Paper</span>
+      <select id="paper">
+        <option value="letter">Letter</option>
+        <option value="a4">A4</option>
+        <option value="legal">Legal</option>
+        <option value="a3">A3</option>
+        <option value="tabloid">Tabloid</option>
+      </select></label>
+    <label class="field"><span>Grid lines</span>
+      <select id="grid">
+        <option value="auto">Auto</option>
+        <option value="on">Draw</option>
+        <option value="off">None</option>
+      </select></label>
+  </div>
+  <div class="row">
+    <button id="plan" class="primary">Split into pages</button>
+    <button id="print" disabled>Print pages</button>
+  </div>
+  <p id="summary" class="empty">Set the map size, then split.</p>
+  <canvas id="preview" hidden></canvas>
+  <ul id="pagelist"></ul>
+  <p class="meta">Print at 100% / actual size. Trim each sheet on the grey cut line and butt the edges.</p>
+</main>
+<div id="sheets"></div>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  // inches
+  const PAPERS = { letter: [8.5, 11, 'Letter'], a4: [8.2677, 11.6929, 'A4'], legal: [8.5, 14, 'Legal'], a3: [11.6929, 16.5354, 'A3'], tabloid: [11, 17, 'Tabloid'] };
+  const MARGIN = 0.25;
+  const ROWS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+  let img = null;
+  let plan = null;
+
+  const saved = store.get('bmpt', {});
+  if (saved.size) $('#size').value = saved.size;
+  if (saved.paper) $('#paper').value = saved.paper;
+  if (saved.grid) $('#grid').value = saved.grid;
+
+  const num = id => Math.floor(Number($(id).value));
+  const rowName = r => r < 26 ? ROWS[r] : ROWS[Math.floor(r / 26) - 1] + ROWS[r % 26];
+
+  $('#file').addEventListener('change', e => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onerror = () => { $('#fname').textContent = 'Could not read that file.'; };
+    reader.onload = () => {
+      const im = new Image();
+      im.onload = () => {
+        img = im;
+        $('#fname').textContent = f.name + ' (' + im.naturalWidth + ' × ' + im.naturalHeight + ' px)';
+        syncDown();
+        makePlan();
+      };
+      im.onerror = () => { img = null; $('#fname').textContent = 'That file is not an image this browser can open.'; };
+      im.src = reader.result;
+    };
+    reader.readAsDataURL(f);
+  });
+  $('.file').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('#file').click(); } });
+
+  // with an image, squares down follows its aspect ratio
+  function syncDown() {
+    if (!img) return;
+    const a = num('#across');
+    if (a > 0) $('#down').value = Math.max(1, Math.round(a * img.naturalHeight / img.naturalWidth));
+  }
+  $('#across').addEventListener('input', syncDown);
+
+  function layout(mapW, mapH, pw, ph) {
+    const aw = pw - 2 * MARGIN, ah = ph - 2 * MARGIN;
+    return { pw, ph, aw, ah, cols: Math.ceil(mapW / aw - 1e-6), rows: Math.ceil(mapH / ah - 1e-6) };
+  }
+
+  function makePlan() {
+    const across = num('#across'), down = num('#down'), sq = Number($('#size').value);
+    const paperKey = $('#paper').value, [pw, ph, pname] = PAPERS[paperKey];
+    store.set('bmpt', { size: $('#size').value, paper: paperKey, grid: $('#grid').value });
+    if (!(across > 0 && down > 0 && across <= 500 && down <= 500)) {
+      plan = null; $('#print').disabled = true; $('#preview').hidden = true; $('#pagelist').textContent = '';
+      $('#summary').className = 'empty';
+      $('#summary').textContent = 'Squares across and down must be between 1 and 500.';
+      return;
+    }
+    const mapW = across * sq, mapH = down * sq;
+    const p = layout(mapW, mapH, pw, ph), l = layout(mapW, mapH, ph, pw);
+    const best = (l.cols * l.rows < p.cols * p.rows) ? Object.assign(l, { orient: 'landscape' }) : Object.assign(p, { orient: 'portrait' });
+    plan = Object.assign(best, { across, down, sq, mapW, mapH, pname });
+    const n = plan.cols * plan.rows;
+    $('#summary').className = '';
+    $('#summary').textContent = n + (n === 1 ? ' page' : ' pages') + ' — ' + plan.cols + ' across × ' + plan.rows + ' down, ' + plan.orient + ' ' + pname + '. Map is ' + fmt(mapW) + ' × ' + fmt(mapH) + ' in.';
+    $('#print').disabled = false;
+    const list = $('#pagelist');
+    list.textContent = '';
+    for (let r = 0; r < plan.rows; r++) for (let c = 0; c < plan.cols; c++) {
+      const li = document.createElement('li');
+      li.textContent = rowName(r) + (c + 1);
+      list.appendChild(li);
+    }
+    drawPreview();
+  }
+  const fmt = v => (Math.round(v * 10) / 10).toString();
+
+  function gridOn() {
+    const g = $('#grid').value;
+    return g === 'on' || (g === 'auto' && !img);
+  }
+
+  // draws the map region [x0,y0,w,h] (inches) into ctx at scale px-per-inch
+  function drawRegion(ctx, x0, y0, w, h, ppi) {
+    const P = plan;
+    const ix0 = Math.max(0, x0), iy0 = Math.max(0, y0);
+    const ix1 = Math.min(P.mapW, x0 + w), iy1 = Math.min(P.mapH, y0 + h);
+    if (ix1 <= ix0 || iy1 <= iy0) return;
+    ctx.fillStyle = '#fff';
+    ctx.fillRect((ix0 - x0) * ppi, (iy0 - y0) * ppi, (ix1 - ix0) * ppi, (iy1 - iy0) * ppi);
+    if (img) {
+      const sx = img.naturalWidth / P.mapW, sy = img.naturalHeight / P.mapH;
+      ctx.drawImage(img, ix0 * sx, iy0 * sy, (ix1 - ix0) * sx, (iy1 - iy0) * sy,
+        (ix0 - x0) * ppi, (iy0 - y0) * ppi, (ix1 - ix0) * ppi, (iy1 - iy0) * ppi);
+    }
+    if (gridOn()) {
+      ctx.strokeStyle = '#555';
+      ctx.lineWidth = Math.max(1, ppi / 100);
+      ctx.beginPath();
+      for (let i = Math.ceil(ix0 / P.sq - 1e-6); i * P.sq <= ix1 + 1e-6; i++) {
+        const x = (i * P.sq - x0) * ppi; ctx.moveTo(x, (iy0 - y0) * ppi); ctx.lineTo(x, (iy1 - y0) * ppi);
+      }
+      for (let j = Math.ceil(iy0 / P.sq - 1e-6); j * P.sq <= iy1 + 1e-6; j++) {
+        const y = (j * P.sq - y0) * ppi; ctx.moveTo((ix0 - x0) * ppi, y); ctx.lineTo((ix1 - x0) * ppi, y);
+      }
+      ctx.stroke();
+    }
+  }
+
+  function drawPreview() {
+    const cv = $('#preview'), P = plan;
+    const ppi = Math.min(900 / (P.cols * P.aw), 900 / (P.rows * P.ah));
+    cv.width = Math.round(P.cols * P.aw * ppi);
+    cv.height = Math.round(P.rows * P.ah * ppi);
+    const ctx = cv.getContext('2d');
+    ctx.fillStyle = '#e8e4da';
+    ctx.fillRect(0, 0, cv.width, cv.height);
+    drawRegion(ctx, 0, 0, P.cols * P.aw, P.rows * P.ah, ppi);
+    ctx.strokeStyle = '#c8321e';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([8, 6]);
+    ctx.font = '600 ' + Math.max(14, Math.round(Math.min(P.aw, P.ah) * ppi / 6)) + 'px ' + getComputedStyle(document.body).fontFamily;
+    ctx.fillStyle = '#c8321e';
+    for (let r = 0; r < P.rows; r++) for (let c = 0; c < P.cols; c++) {
+      ctx.strokeRect(c * P.aw * ppi + 1, r * P.ah * ppi + 1, P.aw * ppi - 2, P.ah * ppi - 2);
+      ctx.fillText(rowName(r) + (c + 1), c * P.aw * ppi + 8, r * P.ah * ppi + 8 + parseInt(ctx.font.split(' ')[1], 10));
+    }
+    cv.hidden = false;
+  }
+
+  // one sheet: the tile, a cut line round the printed map, corner crosshairs and neighbour labels
+  function renderSheet(r, c, dpi) {
+    const P = plan;
+    const cv = document.createElement('canvas');
+    cv.width = Math.round(P.aw * dpi);
+    cv.height = Math.round(P.ah * dpi);
+    const ctx = cv.getContext('2d');
+    const x0 = c * P.aw, y0 = r * P.ah;
+    drawRegion(ctx, x0, y0, P.aw, P.ah, dpi);
+    const w = Math.min(P.aw, P.mapW - x0) * dpi, h = Math.min(P.ah, P.mapH - y0) * dpi;
+    ctx.strokeStyle = '#999';
+    ctx.lineWidth = Math.max(1, dpi / 150);
+    ctx.strokeRect(0.5, 0.5, w - 1, h - 1);
+    // corner crosshairs for lining up neighbours
+    const k = dpi * 0.15;
+    ctx.strokeStyle = '#000';
+    ctx.beginPath();
+    for (const [x, y] of [[0, 0], [w, 0], [0, h], [w, h]]) {
+      ctx.moveTo(x - k, y); ctx.lineTo(x + k, y); ctx.moveTo(x, y - k); ctx.lineTo(x, y + k);
+    }
+    ctx.stroke();
+    const fs = Math.round(dpi * 0.13);
+    ctx.font = '600 ' + fs + 'px sans-serif';
+    const tag = (txt, x, y, align, base) => {
+      ctx.textAlign = align; ctx.textBaseline = base;
+      ctx.lineWidth = fs / 4; ctx.strokeStyle = '#fff'; ctx.strokeText(txt, x, y);
+      ctx.fillStyle = '#000'; ctx.fillText(txt, x, y);
+    };
+    const pad = dpi * 0.08;
+    tag(rowName(r) + (c + 1), pad, pad, 'left', 'top');
+    if (c + 1 < P.cols) tag(rowName(r) + (c + 2) + ' >', w - pad, h / 2, 'right', 'middle');
+    if (c > 0) tag('< ' + rowName(r) + c, pad, h / 2, 'left', 'middle');
+    if (r + 1 < P.rows) tag(rowName(r + 1) + (c + 1) + ' v', w / 2, h - pad, 'center', 'bottom');
+    if (r > 0) tag('^ ' + rowName(r - 1) + (c + 1), w / 2, pad, 'center', 'top');
+    return cv.toDataURL('image/png');
+  }
+
+  $('#plan').addEventListener('click', makePlan);
+  $('#size').addEventListener('change', () => { if (plan) makePlan(); });
+  $('#paper').addEventListener('change', () => { if (plan) makePlan(); });
+  $('#grid').addEventListener('change', () => { if (plan) makePlan(); });
+
+  $('#print').addEventListener('click', () => {
+    if (!plan) return;
+    const P = plan;
+    const pw = P.orient === 'portrait' ? P.pw : P.ph;
+    const ph = P.orient === 'portrait' ? P.ph : P.pw;
+    // keep source resolution, within sane bounds
+    const srcPpi = img ? img.naturalWidth / P.mapW : 150;
+    const dpi = Math.max(100, Math.min(200, Math.round(srcPpi)));
+    $('#summary').textContent = 'Preparing ' + P.cols * P.rows + ' pages…';
+    setTimeout(() => {
+      try {
+        const sheets = $('#sheets');
+        sheets.textContent = '';
+        $('#pagecss').textContent = '@page { size: ' + pw + 'in ' + ph + 'in; margin: 0; }';
+        for (let r = 0; r < P.rows; r++) for (let c = 0; c < P.cols; c++) {
+          const s = document.createElement('div');
+          s.className = 'sheet';
+          s.style.width = pw + 'in'; s.style.height = ph + 'in';
+          const im = document.createElement('img');
+          im.alt = '';
+          im.src = renderSheet(r, c, dpi);
+          im.style.left = MARGIN + 'in'; im.style.top = MARGIN + 'in';
+          im.style.width = P.aw + 'in'; im.style.height = P.ah + 'in';
+          s.appendChild(im);
+          sheets.appendChild(s);
+        }
+        makePlan();
+        window.print();
+      } catch (err) {
+        $('#summary').textContent = 'Too large to render here. Try fewer squares or a smaller image.';
+      }
+    }, 30);
+  });
+  window.addEventListener('afterprint', () => { $('#sheets').textContent = ''; });
+})();
+</script>
+</body>
+</html>

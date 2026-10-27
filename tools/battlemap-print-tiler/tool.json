@@ -1,0 +1,57 @@
+{
+  "slug": "battlemap-print-tiler",
+  "wish": "someone should make a tool that prints large battlemaps for rpgs",
+  "year": 2014,
+  "agreed": 20,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/923/what-mapping-software-can-print-large-battlemaps-for-rpgs",
+      "date": "2014-02-11",
+      "points": 19,
+      "comments": 1
+    }
+  ],
+  "spec": "Splits a map image (or a blank grid) across Letter/A4/Legal/A3/Tabloid sheets so each grid square prints at true scale (1 in, 25 mm, 30 mm, 1.5 in, 0.5 in).\nChoose an image, say how many squares across it is, pick square size and paper, split, then print at 100%; each sheet has a cut line, corner crosshairs and neighbour labels (A1, B2...).\nIt does not draw or edit maps, detect the grid automatically, or fix printers that scale pages.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#across",
+        "text": "30"
+      }
+    },
+    {
+      "type": {
+        "sel": "#down",
+        "text": "20"
+      }
+    },
+    {
+      "tap": "#plan"
+    },
+    {
+      "expect": {
+        "sel": "#summary",
+        "contains": "8 pages — 4 across × 2 down, portrait Letter"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#pagelist li",
+        "count": 8
+      }
+    },
+    {
+      "expect": {
+        "sel": "#pagelist li",
+        "contains": "A1"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:37:18Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Orientation is picked per map to minimise sheet count; 0.25 in printer margin; sheets render at the image's own resolution clamped to 100-200 dpi."
+}
