@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a web-based icon editor</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+main { max-width: 560px; }
+.bar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.bar button { padding: 0 14px; }
+.bar button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.bar select { width: auto; min-width: 92px; }
+.wrap { position: relative; width: 100%; aspect-ratio: 1; touch-action: none;
+  background-color: #fff; background-image: linear-gradient(45deg,#ddd 25%,transparent 25%,transparent 75%,#ddd 75%),linear-gradient(45deg,#ddd 25%,transparent 25%,transparent 75%,#ddd 75%);
+  background-size: 16px 16px; background-position: 0 0, 8px 8px; border: 1.5px solid var(--line); }
+#grid { display: block; width: 100%; height: 100%; cursor: crosshair; image-rendering: pixelated; }
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); gap: 6px; }
+.sw { min-height: 44px; min-width: 44px; padding: 0; border: 1.5px solid var(--line); }
+.sw[aria-pressed="true"] { outline: 3px solid var(--ink); outline-offset: 1px; }
+.sw.clear { background-image: linear-gradient(45deg,#ccc 25%,transparent 25%,transparent 75%,#ccc 75%),linear-gradient(45deg,#ccc 25%,transparent 25%,transparent 75%,#ccc 75%); background-size: 12px 12px; background-position: 0 0,6px 6px; background-color: #fff; }
+input[type=color] { width: 56px; min-width: 44px; padding: 2px; height: 44px; }
+.status { font: 16px/1.4 var(--mono); color: var(--meta); }
+.prev { display: flex; gap: 14px; align-items: end; }
+.prev canvas { image-rendering: pixelated; border: 1px solid var(--line); background: #fff; }
+
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a web-based icon editor</h1>
+
+<main id="app" class="stack">
+<div class="bar" role="toolbar" aria-label="tools">
+  <button id="tool-pencil" data-tool="pencil" aria-pressed="true">Pencil</button>
+  <button id="tool-fill" data-tool="fill" aria-pressed="false">Fill</button>
+  <button id="tool-eraser" data-tool="eraser" aria-pressed="false">Eraser</button>
+  <button id="tool-pick" data-tool="pick" aria-pressed="false">Pick</button>
+</div>
+<div class="wrap"><canvas id="grid" width="960" height="960" aria-label="pixel grid"></canvas></div>
+<div class="row" style="justify-content:space-between">
+  <span id="count" class="status">0 / 256 px</span>
+  <div class="prev" aria-label="preview"><canvas id="p1" width="16" height="16"></canvas><canvas id="p2" width="16" height="16"></canvas></div>
+</div>
+<div class="swatches" id="swatches"></div>
+<div class="bar">
+  <input type="color" id="custom" value="#141414" aria-label="custom color">
+  <select id="size" aria-label="grid size">
+    <option value="16">16 px</option><option value="24">24 px</option><option value="32">32 px</option><option value="48">48 px</option><option value="64">64 px</option>
+  </select>
+  <button id="undo">Undo</button>
+  <button id="clear">Clear</button>
+</div>
+<div class="bar">
+  <button id="export-png" class="primary">PNG</button>
+  <button id="export-png8">PNG ×8</button>
+  <button id="export-svg">SVG</button>
+  <span id="msg" class="status" role="status"></span>
+</div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  // storage helper — never throws
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+
+  const PALETTE = ['#141414','#ffffff','#7a7a7a','#c8321e','#e8743b','#f2c14e','#2e7d4f','#3aa6a0','#2f5fd0','#7b4fc9','#e35d9a','#8a5a35'];
+  const SIZES = [16, 24, 32, 48, 64];
+  const SVG_NS = ['http:', '', 'www.w3.org', '2000', 'svg'].join('/');
+  const cv = $('#grid'), ctx = cv.getContext('2d');
+  const W = cv.width;
+  const saved = store.get('pixel-icon-editor', null);
+  let n = saved && SIZES.includes(saved.n) ? saved.n : 16;
+  let px = saved && Array.isArray(saved.px) && saved.px.length === n * n ? saved.px : new Array(n * n).fill('');
+  let color = (saved && saved.color) || '#141414';
+  let tool = 'pencil';
+  const undo = [];
+
+  function save() { store.set('pixel-icon-editor', { n, px, color }); }
+  function snapshot() { undo.push({ n, px: px.slice() }); if (undo.length > 60) undo.shift(); }
+
+  function render() {
+    const c = W / n;
+    ctx.clearRect(0, 0, W, W);
+    for (let i = 0; i < px.length; i++) {
+      if (!px[i]) continue;
+      const x = i % n, y = (i / n) | 0;
+      ctx.fillStyle = px[i];
+      ctx.fillRect(Math.floor(x * c), Math.floor(y * c), Math.ceil(c) + 1, Math.ceil(c) + 1);
+    }
+    ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+    ctx.lineWidth = n > 32 ? 1 : 2;
+    ctx.beginPath();
+    for (let k = 1; k < n; k++) {
+      const p = Math.round(k * c) + 0.5;
+      ctx.moveTo(p, 0); ctx.lineTo(p, W); ctx.moveTo(0, p); ctx.lineTo(W, p);
+    }
+    ctx.stroke();
+    preview();
+    $('#count').textContent = px.filter(Boolean).length + ' / ' + n * n + ' px';
+  }
+
+  function drawSmall(target) {
+    const g = target.getContext('2d');
+    const img = g.createImageData(n, n);
+    for (let i = 0; i < px.length; i++) {
+      if (!px[i]) continue;
+      const v = parseInt(px[i].slice(1), 16);
+      img.data[i * 4] = v >> 16; img.data[i * 4 + 1] = (v >> 8) & 255; img.data[i * 4 + 2] = v & 255; img.data[i * 4 + 3] = 255;
+    }
+    g.putImageData(img, 0, 0);
+  }
+  function preview() {
+    for (const [id, s] of [['#p1', 1], ['#p2', 2]]) {
+      const p = $(id);
+      p.width = n; p.height = n;
+      p.style.width = n * s + 'px'; p.style.height = n * s + 'px';
+      drawSmall(p);
+    }
+  }
+
+  function cellAt(e) {
+    const r = cv.getBoundingClientRect();
+    const x = Math.floor((e.clientX - r.left) / r.width * n);
+    const y = Math.floor((e.clientY - r.top) / r.height * n);
+    if (x < 0 || y < 0 || x >= n || y >= n) return null;
+    return [x, y];
+  }
+
+  function paint(x, y) { px[y * n + x] = tool === 'eraser' ? '' : color; }
+
+  function line(a, b) {
+    let [x0, y0] = a; const [x1, y1] = b;
+    const dx = Math.abs(x1 - x0), dy = -Math.abs(y1 - y0), sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1;
+    let err = dx + dy;
+    for (;;) {
+      paint(x0, y0);
+      if (x0 === x1 && y0 === y1) break;
+      const e2 = 2 * err;
+      if (e2 >= dy) { err += dy; x0 += sx; }
+      if (e2 <= dx) { err += dx; y0 += sy; }
+    }
+  }
+
+  function fill(x, y) {
+    const target = px[y * n + x], repl = color;
+    if (target === repl) return;
+    const stack = [[x, y]];
+    while (stack.length) {
+      const [cx, cy] = stack.pop();
+      if (cx < 0 || cy < 0 || cx >= n || cy >= n || px[cy * n + cx] !== target) continue;
+      px[cy * n + cx] = repl;
+      stack.push([cx + 1, cy], [cx - 1, cy], [cx, cy + 1], [cx, cy - 1]);
+    }
+  }
+
+  let last = null;
+  cv.addEventListener('pointerdown', e => {
+    const c = cellAt(e);
+    if (!c) return;
+    e.preventDefault();
+    if (tool === 'pick') {
+      const v = px[c[1] * n + c[0]];
+      if (v) setColor(v); else msg('That pixel is empty.');
+      return;
+    }
+    snapshot();
+    if (tool === 'fill') { fill(c[0], c[1]); render(); save(); return; }
+    try { cv.setPointerCapture(e.pointerId); } catch {}
+    last = c; paint(c[0], c[1]); render();
+  });
+  cv.addEventListener('pointermove', e => {
+    if (!last) return;
+    const c = cellAt(e);
+    if (!c || (c[0] === last[0] && c[1] === last[1])) return;
+    line(last, c); last = c; render();
+  });
+  const end = () => { if (last) { last = null; save(); } };
+  cv.addEventListener('pointerup', end);
+  cv.addEventListener('pointercancel', end);
+
+  function setTool(t) {
+    tool = t;
+    $$('[data-tool]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.tool === t)));
+  }
+  $$('[data-tool]').forEach(b => b.addEventListener('click', () => setTool(b.dataset.tool)));
+
+  const sw = $('#swatches');
+  PALETTE.forEach(c => {
+    const b = document.createElement('button');
+    b.className = 'sw'; b.style.background = c; b.dataset.color = c; b.setAttribute('aria-label', c);
+    b.addEventListener('click', () => setColor(c));
+    sw.appendChild(b);
+  });
+  function setColor(c) {
+    color = c.toLowerCase();
+    $('#custom').value = color;
+    $$('.sw').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.color === color)));
+    if (tool === 'eraser' || tool === 'pick') setTool('pencil');
+    save();
+  }
+  $('#custom').addEventListener('input', e => setColor(e.target.value));
+
+  const sizeSel = $('#size');
+  sizeSel.value = String(n);
+  sizeSel.addEventListener('change', () => {
+    const m = +sizeSel.value;
+    if (m === n) return;
+    snapshot();
+    const next = new Array(m * m).fill('');
+    for (let y = 0; y < m; y++) for (let x = 0; x < m; x++) next[y * m + x] = px[Math.floor(y * n / m) * n + Math.floor(x * n / m)];
+    n = m; px = next; render(); save();
+  });
+
+  $('#undo').addEventListener('click', () => {
+    const s = undo.pop();
+    if (!s) return msg('Nothing to undo.');
+    n = s.n; px = s.px; sizeSel.value = String(n); render(); save();
+  });
+  $('#clear').addEventListener('click', () => {
+    if (!px.some(Boolean)) return;
+    snapshot(); px = new Array(n * n).fill(''); render(); save();
+  });
+
+  let msgTimer;
+  function msg(t) { $('#msg').textContent = t; clearTimeout(msgTimer); msgTimer = setTimeout(() => { $('#msg').textContent = ''; }, 2500); }
+
+  function download(href, name) {
+    const a = document.createElement('a');
+    a.href = href; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+  }
+  function exportPng(scale) {
+    if (!px.some(Boolean)) return msg('Draw something first.');
+    const small = document.createElement('canvas');
+    small.width = n; small.height = n; drawSmall(small);
+    const out = document.createElement('canvas');
+    out.width = n * scale; out.height = n * scale;
+    const g = out.getContext('2d');
+    g.imageSmoothingEnabled = false;
+    g.drawImage(small, 0, 0, n * scale, n * scale);
+    download(out.toDataURL('image/png'), 'icon-' + n * scale + '.png');
+    msg('Saved ' + n * scale + ' px PNG.');
+  }
+  $('#export-png').addEventListener('click', () => exportPng(1));
+  $('#export-png8').addEventListener('click', () => exportPng(8));
+  $('#export-svg').addEventListener('click', () => {
+    if (!px.some(Boolean)) return msg('Draw something first.');
+    let rects = '';
+    // merge horizontal runs of the same colour to keep the SVG small
+    for (let y = 0; y < n; y++) {
+      let x = 0;
+      while (x < n) {
+        const c = px[y * n + x];
+        let w = 1;
+        while (x + w < n && px[y * n + x + w] === c) w++;
+        if (c) rects += '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="1" fill="' + c + '"/>';
+        x += w;
+      }
+    }
+    const svg = '<svg xmlns="' + SVG_NS + '" viewBox="0 0 ' + n + ' ' + n + '" width="' + n + '" height="' + n + '" shape-rendering="crispEdges">' + rects + '</svg>';
+    download('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg), 'icon-' + n + '.svg');
+    msg('Saved SVG.');
+  });
+
+  setColor(color);
+  render();
+})();
+</script>
+</body>
+</html>

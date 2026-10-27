@@ -1,0 +1,48 @@
+{
+  "slug": "pixel-icon-editor",
+  "wish": "someone should make a web-based icon editor",
+  "year": 2009,
+  "agreed": 56,
+  "sources": [
+    {
+      "site": "hn",
+      "url": "https://news.ycombinator.com/item?id=636388",
+      "date": "2009-06-01",
+      "points": 25,
+      "comments": 31
+    }
+  ],
+  "spec": "Draws pixel icons on a 16 to 64 px grid with pencil, fill, eraser, eyedropper, palette, custom colour and undo.\nTap or drag on the grid; pick a size; export a PNG at actual size or 8x, or an SVG.\nDoes not import images, layers or animate; the drawing is kept only in this browser.",
+  "tests": [
+    {
+      "tap": "#tool-fill"
+    },
+    {
+      "tap": "#grid"
+    },
+    {
+      "expect": {
+        "sel": "#count",
+        "contains": "256 / 256"
+      }
+    },
+    {
+      "tap": "#tool-eraser"
+    },
+    {
+      "tap": "#grid"
+    },
+    {
+      "expect": {
+        "sel": "#count",
+        "contains": "255 / 256"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:34:29Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": ""
+}
