@@ -1,0 +1,1002 @@
+[
+{
+"topic": "samegame-tetris-hybrid",
+"verdict": "build",
+"slug": "samegame-tetris-alternator",
+"kind": "fun",
+"spec_hint": "Canvas puzzle game alternating SameGame color-cluster clearing levels with Tetris levels; shared score, keyboard and touch controls.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "scrabble-clone",
+"verdict": "no",
+"slug": "pass-and-play-word-tiles",
+"kind": "fun",
+"spec_hint": null,
+"wish": null,
+"no": "exists: Words With Friends",
+"dup": null
+},
+{
+"topic": "dvorak-typing-trainer",
+"verdict": "build",
+"slug": "qwerty-to-dvorak-typing-box",
+"kind": "study",
+"spec_hint": "Text box remapping QWERTY keypresses to Dvorak output live, with on-screen Dvorak layout highlight and words-per-minute counter.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "phone-freefall-scream",
+"verdict": "build",
+"slug": "phone-freefall-scream-alarm",
+"kind": "fun",
+"spec_hint": "Tap to arm; motion sensor detects freefall (near-zero acceleration) and plays a synthesized scream; adjustable sensitivity and drop counter.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "draw-pi-digits",
+"verdict": "build",
+"slug": "pi-digits-drawing",
+"kind": "creative",
+"spec_hint": "Built-in thousands of pi digits drive a canvas drawing: digit-as-direction walk, colored circle chords, or grid; export PNG.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "interval-ping-timer",
+"verdict": "build",
+"slug": "interval-ping-timer",
+"kind": "everyday",
+"spec_hint": "Set interval and total duration; beeps at each interval with remaining count and progress ring; pause, resume, choose tone.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "memorize-text-game",
+"verdict": "build",
+"slug": "memorize-a-speech-game",
+"kind": "study",
+"spec_hint": "Paste a speech; game shows text so far and offers word choices for the next word in rhythm, hiding more each round.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "colour-blindness-filter",
+"verdict": "build",
+"slug": "build-my-color-vision-filter",
+"kind": "health",
+"spec_hint": "Adjust per-channel color matrix with sliders while matching test swatches to describe your own vision; apply it to any image, share settings.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "applause-after-speaking",
+"verdict": "build",
+"slug": "applause-when-i-finish",
+"kind": "fun",
+"spec_hint": "Microphone listens; after speech followed by set seconds of silence, plays synthesized applause; sensitivity and silence-length sliders.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "net-worth-tracker",
+"verdict": "build",
+"slug": "monthly-net-worth-log",
+"kind": "money",
+"spec_hint": "Monthly manual entries of accounts and debts; totals net worth, shows month-over-month change and a simple line chart; local storage, export.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "wrong-countdown-timer",
+"verdict": "build",
+"slug": "countdown-that-lies",
+"kind": "fun",
+"spec_hint": "Countdown timer whose seconds tick irregularly, skip, stall or run backward, yet finishes on time; chaos-level slider.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "fake-computer-sounds",
+"verdict": "build",
+"slug": "computer-bleep-noises",
+"kind": "fun",
+"spec_hint": "Plays synthesized retro computer bleeps and bloops on every tap, click and keypress; several sound sets and volume.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "freelance-work-organizer",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": "freelance-money-ledger"
+},
+{
+"topic": "puppy-schedule-tracker",
+"verdict": "build",
+"slug": "puppy-potty-break-tracker",
+"kind": "pets",
+"spec_hint": "Log puppy outings, meals, naps with one tap; shows time since last outing and next due time from age-based interval.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "tetris-constant-speed",
+"verdict": "build",
+"slug": "endless-steady-tetris",
+"kind": "fun",
+"spec_hint": "Falling-block game that never speeds up; choose a fixed speed, play indefinitely, pause anytime, keyboard and touch.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "track-last-changed-clothes",
+"verdict": "build",
+"slug": "last-changed-clothes-tracker",
+"kind": "everyday",
+"spec_hint": "List clothing items with a tap to mark changed; shows days since each change, colored by staleness; local storage.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "daily-mood-sleep-log",
+"verdict": "no",
+"slug": "evening-mood-sleep-questions",
+"kind": "health",
+"spec_hint": null,
+"wish": null,
+"no": "exists: Daylio",
+"dup": null
+},
+{
+"topic": "timer-hours-tracker",
+"verdict": "no",
+"slug": "hours-per-timer-chart",
+"kind": "work",
+"spec_hint": null,
+"wish": null,
+"no": "exists: Toggl Track",
+"dup": null
+},
+{
+"topic": "gamified-task-list",
+"verdict": "no",
+"slug": "gamified-task-list",
+"kind": "everyday",
+"spec_hint": null,
+"wish": null,
+"no": "exists: Habitica",
+"dup": null
+},
+{
+"topic": "habit-reward-3d",
+"verdict": "no",
+"slug": "habit-reward-pet",
+"kind": "everyday",
+"spec_hint": null,
+"wish": null,
+"no": "exists: Finch",
+"dup": null
+},
+{
+"topic": "spreadsheet-idle-game",
+"verdict": "build",
+"slug": "spreadsheet-idle-game",
+"kind": "fun",
+"spec_hint": "Idle game played inside a mini spreadsheet: write cell formulas to automate production, unlocking functions that teach real spreadsheet skills.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "blind-to-sight-game",
+"verdict": "build",
+"slug": "blind-to-superhuman-sight-game",
+"kind": "fun",
+"spec_hint": "Short canvas game starting in darkness navigated by sound; collect upgrades revealing echoes, outlines, color, then x-ray vision.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "inventory-counter",
+"verdict": "build",
+"slug": "simple-inventory-counter",
+"kind": "work",
+"spec_hint": "Add items, tap plus/minus to count, set low-stock alerts, search, export CSV; stored locally.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "split-shopping-list-cost",
+"verdict": "build",
+"slug": "split-shopping-list-by-person",
+"kind": "money",
+"spec_hint": "Type items with prices, tick who shares each; outputs what each person owes including shared tax or discount.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "log-weaknesses-reminders",
+"verdict": "build",
+"slug": "weakness-lessons-journal",
+"kind": "everyday",
+"spec_hint": "Log weaknesses and the lesson for each; shows a random lesson on open and a daily review list; local storage.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "price-in-work-hours",
+"verdict": "build",
+"slug": "price-in-hours-of-life",
+"kind": "money",
+"spec_hint": "Enter take-home pay and hours; type any price to see it in hours and days of your working life.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "period-tracker",
+"verdict": "no",
+"slug": "simple-period-tracker",
+"kind": "health",
+"spec_hint": null,
+"wish": null,
+"no": "exists: Clue",
+"dup": null
+},
+{
+"topic": "silly-walks-physics-game",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "24-hour-countdown-clock",
+"verdict": "build",
+"slug": "day-countdown-clock",
+"kind": "everyday",
+"spec_hint": "Large clock counting down from 24:00 to 0:00 showing time left in today; optional custom day start.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "explain-tech-to-parents",
+"verdict": "build",
+"slug": "tech-explained-for-parents",
+"kind": "everyday",
+"spec_hint": "Plain-language one-paragraph explainers of everyday tech terms (Wi-Fi, cloud, browser, phishing, updates), searchable, large print.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "computer-piano-choir",
+"verdict": "build",
+"slug": "piano-with-choir-voices",
+"kind": "hobby",
+"spec_hint": "On-screen and keyboard-playable piano synthesizing piano, organ and choir-like vowel voices; sustain, octave shift.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "pixel-art-editor",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": "pixel-icon-editor"
+},
+{
+"topic": "website-playlist",
+"verdict": "build",
+"slug": "website-playlist",
+"kind": "everyday",
+"spec_hint": "Build a named list of links; step through them in order with next and previous, mark visited; local storage.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "pinball-table-designer",
+"verdict": "build",
+"slug": "design-your-pinball-table",
+"kind": "fun",
+"spec_hint": "Place bumpers, flippers, walls and ramps on a canvas table, then play it with physics; save tables locally.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "level-haptic-camera",
+"verdict": "no",
+"slug": "level-camera-buzz",
+"kind": "everyday",
+"spec_hint": null,
+"wish": null,
+"no": "your phone does this",
+"dup": null
+},
+{
+"topic": "projector-perspective-correction",
+"verdict": "build",
+"slug": "projector-keystone-warp",
+"kind": "work",
+"spec_hint": "Load a local video or image, drag four corners to warp it for projection mapping, play fullscreen.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "paint-color-matcher",
+"verdict": "build",
+"slug": "paint-mix-color-matcher",
+"kind": "creative",
+"spec_hint": "Pick target color and your mix from photos; shows the difference and suggests adding white, black, or a named primary.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "handwriting-generator",
+"verdict": "build",
+"slug": "random-handwriting-generator",
+"kind": "creative",
+"spec_hint": "Type text; renders it as wobbly procedural handwriting strokes with adjustable slant, messiness, ink; export PNG.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "cognitive-bias-training",
+"verdict": "build",
+"slug": "cognitive-bias-trainer",
+"kind": "study",
+"spec_hint": "Short scenario quiz game covering common cognitive biases; explains each trap after answering, tracks score.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "evolution-simulator",
+"verdict": "no",
+"slug": "shared-evolution-ecosystem",
+"kind": "fun",
+"spec_hint": null,
+"wish": null,
+"no": "needs: a server",
+"dup": null
+},
+{
+"topic": "paid-bathroom-break-timer",
+"verdict": "build",
+"slug": "paid-while-pooping-timer",
+"kind": "fun",
+"spec_hint": "Enter hourly wage; start timer on the toilet; shows money earned live and running total of sessions.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "life-countdown-clock",
+"verdict": "build",
+"slug": "life-countdown-clock",
+"kind": "everyday",
+"spec_hint": "Enter birthday and expected lifespan; shows live countdown of time left, weeks grid, and percentage lived.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "notes-to-budget",
+"verdict": "build",
+"slug": "plain-notes-to-budget",
+"kind": "money",
+"spec_hint": "Paste lines like 'rent 1200'; parses amounts into categories, totals income and spending, shows what's left.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "track-what-i-told-people",
+"verdict": "build",
+"slug": "what-i-told-whom",
+"kind": "work",
+"spec_hint": "Sticky notes grouped per person recording what you told them and when; search, filter by person, local storage.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "pr-agency-game",
+"verdict": "build",
+"slug": "pr-agency-damage-control",
+"kind": "fun",
+"spec_hint": "Text choice game: clients are about to say stupid things in interviews; pick spin responses, keep reputation and budget alive.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "couple-gift-balance",
+"verdict": "build",
+"slug": "couple-gift-balance",
+"kind": "money",
+"spec_hint": "Two people log gift spending on each other; shows the running balance and who owes the next gift.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "remind-current-task",
+"verdict": "build",
+"slug": "what-am-i-doing-now",
+"kind": "work",
+"spec_hint": "Type current task; big always-visible banner with elapsed time, chimes every set minutes asking if still on it.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "key-and-mouse-sounds",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": "fake-computer-sounds"
+},
+{
+"topic": "virtual-wardrobe",
+"verdict": "no",
+"slug": "virtual-wardrobe-catalog",
+"kind": "everyday",
+"spec_hint": null,
+"wish": null,
+"no": "exists: Whering",
+"dup": null
+},
+{
+"topic": "random-reddit-frontpage",
+"verdict": "build",
+"slug": "random-multi-subreddit-link",
+"kind": "social",
+"spec_hint": "Type or use built-in subreddit list; generates random combined multi-subreddit links to open as a fresh front page.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "sunscreen-reapply-timer",
+"verdict": "build",
+"slug": "sunscreen-reapply-timer",
+"kind": "health",
+"spec_hint": "Pick SPF, water or sweat activity; starts a reapply countdown with alarm sound; standard two-hour guidance shown.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "fake-hacker-screen",
+"verdict": "no",
+"slug": "fake-movie-hacker-screen",
+"kind": "fun",
+"spec_hint": null,
+"wish": null,
+"no": "exists: GeekTyper",
+"dup": null
+},
+{
+"topic": "decide-what-to-do",
+"verdict": "build",
+"slug": "tell-me-what-to-do",
+"kind": "everyday",
+"spec_hint": "Pick time available, energy and indoor or outdoor; draws one concrete activity from a built-in list.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "time-capsule-note",
+"verdict": "no",
+"slug": "time-capsule-note",
+"kind": "everyday",
+"spec_hint": null,
+"wish": null,
+"no": "exists: FutureMe",
+"dup": null
+},
+{
+"topic": "gift-idea-picker",
+"verdict": "build",
+"slug": "gift-idea-finder",
+"kind": "everyday",
+"spec_hint": "Answer a few questions about recipient, budget, interests; shows matching gift ideas from a built-in list.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "pairwise-rank-list",
+"verdict": "build",
+"slug": "rank-by-pairwise-matchups",
+"kind": "everyday",
+"spec_hint": "Paste a list; answer head-to-head 'which is better' prompts; outputs the full ranked list.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "decide-what-to-cook",
+"verdict": "build",
+"slug": "swipe-dishes-to-cook",
+"kind": "food",
+"spec_hint": "Swipe through built-in dish cards, left to skip and right to keep; shows your shortlist and a final pick.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "body-infection-rts-game",
+"verdict": "build",
+"slug": "immune-system-strategy-game",
+"kind": "fun",
+"spec_hint": "One-screen real-time strategy: direct white blood cells to defend organs from spreading germs; waves, resources, simple unit types.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "round-soccer-possession-game",
+"verdict": "build",
+"slug": "round-stadium-possession-soccer",
+"kind": "fun",
+"spec_hint": "Top-down canvas soccer in a round arena with no goals or keepers; team keeping possession longest wins.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "sheepdog-herding-game",
+"verdict": "build",
+"slug": "sheepdog-herding-game",
+"kind": "fun",
+"spec_hint": "Control a dog to herd a flock with flocking rules into a pen across timed levels.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "slam-phone-sound",
+"verdict": "build",
+"slug": "slam-down-the-phone",
+"kind": "fun",
+"spec_hint": "Big button plays a synthesized desk phone slam and dial tone when you hang up angry.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "bucket-list-achievements",
+"verdict": "build",
+"slug": "life-achievement-badges",
+"kind": "everyday",
+"spec_hint": "Check off things you've ever done from a built-in list or your own; earn badges and points; local storage.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "big-button-stopwatch",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": "timer-and-stopwatch"
+},
+{
+"topic": "myth-busting-quiz",
+"verdict": "build",
+"slug": "common-misconceptions-quiz",
+"kind": "study",
+"spec_hint": "Quiz of common misconceptions, true or false, with the short correct explanation after each; score and shuffle.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "emu-war-fps",
+"verdict": "build",
+"slug": "emu-war-shooter",
+"kind": "fun",
+"spec_hint": "Small first-person raycast shooter across a 1932 Australian wheat field where emus dodge and outnumber you.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "workout-interval-voice-cues",
+"verdict": "build",
+"slug": "spoken-workout-interval-cues",
+"kind": "health",
+"spec_hint": "Enter exercise list and durations; speaks exercise changes aloud while your own music plays elsewhere.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "remind-to-contact-people",
+"verdict": "build",
+"slug": "keep-in-touch-reminder",
+"kind": "social",
+"spec_hint": "List people with desired contact frequency; log contacts; shows who's overdue, sorted, with last-contact dates.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "mood-day-rating-patterns",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": "daily-mood-sleep-log"
+},
+{
+"topic": "plan-places-to-visit",
+"verdict": "no",
+"slug": "trip-places-planner",
+"kind": "travel",
+"spec_hint": null,
+"wish": null,
+"no": "exists: Wanderlog",
+"dup": null
+},
+{
+"topic": "gym-cost-stopwatch",
+"verdict": "build",
+"slug": "gym-cost-per-minute",
+"kind": "money",
+"spec_hint": "Enter membership price; stopwatch during workouts shows cost per minute dropping as total time grows.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "remember-where-things-are",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": "where-did-i-put-it"
+},
+{
+"topic": "weeping-angels-graveyard-game",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "deathbed-short-game",
+"verdict": "build",
+"slug": "deathbed-short-game",
+"kind": "fun",
+"spec_hint": "Short reflective narrative game: on your deathbed, choose memories to revisit; endings reflect what you chose.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "sonic-grapple-hook-game",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "relentless-follower-game",
+"verdict": "build",
+"slug": "it-follows-chase-game",
+"kind": "fun",
+"spec_hint": "Top-down game where a slow unstoppable figure always walks toward you; survive, complete tasks, never let it touch.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "reality-tv-adventure-game",
+"verdict": "build",
+"slug": "reality-tv-adventure",
+"kind": "fun",
+"spec_hint": "Branching text adventure as a reality TV contestant; producers twist choices, ratings meter, multiple endings.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "background-removal-from-reference",
+"verdict": "build",
+"slug": "clean-plate-background-remover",
+"kind": "creative",
+"spec_hint": "Load a video and an empty background photo; pixel differencing removes background, threshold slider, export frames.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "solar-system-simulator",
+"verdict": "build",
+"slug": "toss-planets-gravity-sandbox",
+"kind": "study",
+"spec_hint": "2D gravity sandbox: drag to fling planets and comets around a sun; trails, mass slider, pause.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "productivity-tower-defense",
+"verdict": "build",
+"slug": "to-do-tower-defense",
+"kind": "fun",
+"spec_hint": "Completing tasks from your to-do list earns towers; tower defense waves advance with time; local storage.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "receive-morse-code",
+"verdict": "build",
+"slug": "morse-code-listener",
+"kind": "hobby",
+"spec_hint": "Microphone detects tone beeps, decodes Morse timing into letters live; adjustable speed and tone frequency.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "suggest-new-hobbies",
+"verdict": "build",
+"slug": "hobby-suggester",
+"kind": "hobby",
+"spec_hint": "Pick current interests; suggests related hobbies from a built-in list with first-step tips for each.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "last-hangout-tracker",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": "remind-to-contact-people"
+},
+{
+"topic": "knit-swatch-preview",
+"verdict": "build",
+"slug": "knitting-swatch-preview",
+"kind": "hobby",
+"spec_hint": "Enter stitch pattern, colors and gauge; renders a knitted swatch preview with stockinette V stitches.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "crazy-wall-board",
+"verdict": "build",
+"slug": "crazy-wall-pinboard",
+"kind": "creative",
+"spec_hint": "Corkboard canvas: pin notes and images, connect with red string, drag around; saves locally, export PNG.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "open-huge-text-files",
+"verdict": "build",
+"slug": "huge-text-file-viewer",
+"kind": "dev",
+"spec_hint": "Open huge text file, read only visible chunks via slicing; scroll, jump to line or offset, search.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "text-to-url-slug",
+"verdict": "build",
+"slug": "text-to-url-slug",
+"kind": "dev",
+"spec_hint": "Paste text; outputs URL-friendly slug with accent stripping, separator and case options, bulk lines.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "remind-stay-in-touch",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": "remind-to-contact-people"
+},
+{
+"topic": "quiz-from-my-notes",
+"verdict": "no",
+"slug": "quiz-me-on-my-notes",
+"kind": "study",
+"spec_hint": null,
+"wish": null,
+"no": "exists: Quizlet",
+"dup": null
+},
+{
+"topic": "preview-art-on-wall",
+"verdict": "build",
+"slug": "art-on-my-wall-preview",
+"kind": "home",
+"spec_hint": "Upload wall photo and artwork; drag, scale, perspective-fit the art on the wall, add frame; export image.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "record-family-memories",
+"verdict": "build",
+"slug": "grandparent-memory-interview",
+"kind": "everyday",
+"spec_hint": "Guided interview prompts for grandparents; record audio or type answers per question, saved locally; export as a file.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "desk-tap-buttons",
+"verdict": "build",
+"slug": "desk-knock-shortcuts",
+"kind": "fun",
+"spec_hint": "Microphone detects knocks on the desk; single, double and triple knock patterns trigger chosen on-page actions.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "fake-traffic-noise-call",
+"verdict": "build",
+"slug": "fake-traffic-noise",
+"kind": "fun",
+"spec_hint": "Tap to play synthesized traffic noise, honks and a breaking-up line effect to end a phone call.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "dig-through-earth-antipode",
+"verdict": "no",
+"slug": "dig-through-earth-antipode",
+"kind": "fun",
+"spec_hint": null,
+"wish": null,
+"no": "exists: Antipodes Map",
+"dup": null
+},
+{
+"topic": "home-inventory-list",
+"verdict": "build",
+"slug": "home-inventory-list",
+"kind": "home",
+"spec_hint": "Add items by room with value, photo, purchase date; totals per room; export CSV for insurance; local storage.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "idea-slot-machine",
+"verdict": "build",
+"slug": "idea-slot-machine",
+"kind": "creative",
+"spec_hint": "Enter word lists per reel; pull the lever to spin and combine random words into idea prompts.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "charades-card-game",
+"verdict": "no",
+"slug": "charades-card-game",
+"kind": "fun",
+"spec_hint": null,
+"wish": null,
+"no": "exists: Heads Up!",
+"dup": null
+},
+{
+"topic": "random-daily-reminders",
+"verdict": "build",
+"slug": "random-daily-reminder-times",
+"kind": "everyday",
+"spec_hint": "Set reminders with daily count and time window; generates random times each day, shows them, and chimes while open.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "goal-habit-tracker",
+"verdict": "no",
+"slug": "any-goal-tracker",
+"kind": "health",
+"spec_hint": null,
+"wish": null,
+"no": "exists: Loop Habit Tracker",
+"dup": null
+},
+{
+"topic": "save-places-bookmark",
+"verdict": "no",
+"slug": "saved-places-bookmark",
+"kind": "travel",
+"spec_hint": null,
+"wish": null,
+"no": "exists: Google Maps",
+"dup": null
+},
+{
+"topic": "doomsday-prepper-game",
+"verdict": "build",
+"slug": "doomsday-prepper-game",
+"kind": "fun",
+"spec_hint": "Resource-management game: buy supplies on a budget before an unknown disaster, then survive its days.",
+"wish": null,
+"no": null,
+"dup": null
+}
+]

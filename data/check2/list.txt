@@ -1,0 +1,832 @@
+overtime-kitchen-timer — an oven timer that counts negative after it hits zero
+text-case-toggler — a tool where highlighting text and pressing caps lock switches its case
+twenty-questions-dinner — a 20 questions tool that helps you work out what you want to eat
+see-without-glasses — a website where you type your vision level and see what you see without glasses
+character-dress-up-game — a game where customizing your character is the game
+fake-call-escape — an app that calls you back after a few minutes so you can leave a conversation
+cat-perspective-game — a cat simulator game from the perspective of a cat
+random-daily-objective — an app that gives you random objectives for the day
+are-we-there-yet-bar — a progress bar for the back seat so kids can see if we're there yet
+contacts-local-time-board — a phone that shows each contact's time zone
+hidden-king-chess — a chess variant where a hidden random piece is the king
+price-in-work-hours — an app that converts shopping prices into hours of your life
+learn-to-cook-ladder — a couch-to-5k style app that teaches cooking one recipe at a time
+ghost-of-you-boss — a game where you have to beat a copy of yourself as the final boss
+fridge-expiry-list — an app that tells you which food in your kitchen is expiring soon
+snake-pacman-relay — a video game that alternates snake and pac-man levels, one feeding the next
+threat-fog-chess — a chess variant where you only see opposing pieces that threaten or are threatened
+be-the-boss-battle — a game where you are the boss in a boss battle against nimble AI players
+gif-player-with-progress — a progress bar for gifs so you know how long they run
+who-to-call-today — an app that randomly prompts you to call your loved ones
+fighting-words-scrabble — a scrabble game where the words you build fight each other
+water-your-values — an app where you water plants that represent the things you value most
+my-medical-summary-sheet — an app that keeps your medical information in one form you can hand to your doctor
+one-try-only-game — a game that gives you only one try and you fail forever
+sports-camera-operator — a sports video game where you play as the camera operator
+story-character-ages — an app that tracks the ages of characters in a story for writers
+book-a-flight-badly — a puzzle web game where you book a flight on a badly designed website
+cart-running-total — an app that adds up the price of everything you put in your cart
+open-house-cover-up — a game where you hide flaws in a house during an open house
+lying-love-meter-sim — a dating sim where the relationship meter secretly lies to you
+faster-run-better-sound — a music player where sound quality improves with your jogging speed
+layering-song-alarm — an alarm that adds more instruments to a song each minute you don't dismiss it
+subscription-renewal-tracker — an app that tracks subscriptions and warns before they charge
+fanfic-reading-log — an app to keep track of your reading for ao3
+learning-enemies-arena — a game where the enemies are neural networks that get better at fighting you over time
+smashing-pieces-chess — an animated wizard's chess app
+swipe-between-calculators — a calculator app with multiple blank calculators you can swipe through
+level-up-lose-weapons — a game where you lose weapons as you level up instead of unlocking them
+keep-in-touch-list — a program that reminds me to email people every few weeks to stay in touch
+midnight-drop-start-time — a website that tells you when to start a song so the bass drops at midnight
+wire-the-house-puzzle — an electrician simulator game that teaches wiring household circuits
+hidden-ideas-list — a note app for jokes and ideas that hides the whole list until you want to see it
+hum-to-chiptune — software that converts your humming into 8-bit music
+play-only-when-running — a running app that plays your playlist only when you move above a set speed
+nobody-looks-at-you — a video game where all the NPCs avoid eye contact with you
+semi-truck-spotter-dex — a Pokedex that records all the semi-trucks you have seen, with images and descriptions
+fake-degauss-button — a program that degausses an LCD screen with the warp and the noise
+you-are-the-zombie — a game where you are the zombie
+keep-in-touch-reminder — a contact management app that reminds you to contact people you have not reached
+talked-too-long-buzzer — an app that buzzes me when I've talked too long
+unsearchable-text-scrambler — an app that scrambles your text with symbols so it can't be searched
+keep-in-touch-reminders — a personal CRM app that reminds you to stay in touch with people
+upside-down-photo-filter — an app that adds a Stranger Things upside down filter to photos
+birth-control-tower-defense — a tower defense game where birth control methods defend against sperm
+night-mode-video-player — a night mode for video players that evens out loud and quiet volume
+two-player-faceless-hunt — a 2 player game where one player is Slenderman and hunts the other
+who-gets-my-things — an app to photograph belongings and assign who gets them after you die
+caps-lock-shouting-reader — a text-to-speech tool that yells when text is in all caps
+trace-it-drawing-game — a game that teaches drawing by tracing an image for speed and accuracy points
+lasting-scars-rpg — an rpg where your character gets permanent injuries
+snap-to-see-horror — a horror game where finger snapping lights up the dark
+magic-conch-shell — a bot that answers questions like the magic conch
+ghost-in-your-photo — an app that randomly adds ghostly figures to photos you take
+stay-in-power-dictator — a computer game where you are an evil dictator keeping power
+sealed-predictions-log — an app to record private predictions
+road-trip-gas-cost — a tool that figures out gas expenses for a road trip
+santa-stealth-delivery — a stealth game where Santa breaks into houses to deliver gifts
+write-more-code-less-timer — a timer that adds time when you write blog posts and subtracts double when you code the blog
+run-in-donuts — a running app that shows your progress in terms of popular foods
+random-reveal-camera — a disposable camera app that locks photos away for a random time
+metric-for-americans — a simple entertaining guide that teaches Americans the metric system
+one-internet-time-clock — a timezone for the internet
+war-weary-nations — a turn-based strategy game where warring countries degrade from war effort
+tiny-steps-improvement — an app that gives you small objectives to gradually improve yourself
+regex-plain-words-translator — a structured regex language that parses to and from regex
+shark-dragon-pet — a Tamagotchi with cooler animals like sharks and dragons
+find-the-moving-walker — a Where's Waldo smartphone game where the characters move around the map
+score-your-day-diary — a diary and habit tracker where you score each positive or negative event of the day
+everyday-object-ruler — a database of standard everyday object sizes for measuring with what you have
+world-takeover-economy-board — a board game combining Monopoly and Risk with world takeover and economy
+artillery-worms-remake — a browser-based remake of Worms
+inflation-property-game — a Monopoly edition where inflation changes prices
+notebook-cover-designer — an online designer for notepad book covers
+fuzzy-date-todo — calendar apps that support approximate dates for to-do items
+walk-to-mordor-tracker — an app that charts your walking miles on a map of Frodo's journey
+solar-noon-daily-timelapse — an app that takes one picture a day facing south at solar noon and makes a time-lapse
+sort-songs-by-bpm — a music player that organizes songs by BPM
+earned-since-clock-in — an app where you enter your hourly pay and see what you have made since clocking in
+see-like-a-dog — an app that shows what the camera sees the way a dog sees it
+one-line-reading-ruler — a reader that highlights one line at a time to help you focus
+ant-dodge-the-feet — a 3D game where you play an ant avoiding people stepping on you
+computer-bleep-noises — an app that makes computer bleeping noises when you do things
+name-that-song-quiz — an app that quizzes you on the titles of your own songs
+urgent-important-calendar — a task manager that combines the eisenhower matrix with a calendar
+todo-news-ticker — a web ticker that scrolls your to-do list
+shrinking-snooze-alarm — an alarm clock whose snooze gets shorter each time
+pool-cue-minigolf — a minigolf game played with pool cues
+logarithmic-calendar — a calendar app with a logarithmic view
+wall-of-text-splitter — a tool that adds paragraphs to posts without them
+text-to-animal-speak — a program that translates text into animal-language sounds
+coin-flip-snooze-alarm — an alarm clock app with a snooze that works like a 50/50 game
+organic-chemistry-scrabble — an organic chemistry scrabble
+ai-trapped-in-robot — a game where you play an AI trapped in a small robot
+file-to-video-encoder — an app that stores any file as a video
+graphics-level-up-game — a game that gets nicer looking as you level up
+salmon-life-cycle-game — a video game where you start as a baby salmon and survive to reproduce
+gift-idea-finder — an app to help choose the right gift for someone when out of ideas
+draw-to-cast-spells — a mobile spell-casting game like the halloween doodle with more unlockables
+mars-rover-delay — a mars rover video game with a 14 minute input delay
+fake-bad-signal — an app that simulates static on a phone call so you can leave an awkward call
+pi-cheat-code-game — video games that use mathematical constants as cheat codes
+photo-to-color-by-number — a website that turns any picture into a custom color by number
+chore-countdown-bars — a reminder app with game-style countdowns for chores
+favorite-things-alarm — an alarm clock that wakes you with a custom list of your favorite things
+best-value-drink-ranker — an app that ranks the beers on a menu by value from their prices
+mp3-plus-image-video — a tool that combines an mp3 and an image into a video
+experience-badge-album — an app with digital badges and tokens for experiences
+quarterly-tax-estimator — a calculator for quarterly estimated taxes
+too-loud-alarm — an alarm that sounds a high pitch when a room's sound level goes over a threshold
+project-nag-reminder — an app that keeps reminding you to work on your project
+daily-data-allowance — a calculator for how much phone data you can use per day
+chess-move-stealth — a stealth game where everyone moves like chess pieces
+self-scrambling-cube — a digital Rubik's Cube that rescrambles itself with a random turn every few seconds
+guided-missile-target-game — a war game where you fly remote-controlled missiles onto precise targets
+gift-ideas-by-age — a website that suggests gifts from a person's age and sex
+hobby-time-log — an app for tracking all of my hobbies
+document-expiry-tracker — a reminder app for expiring documents
+what-else-is-this-size — a website that shows objects of similar size to the dimensions you enter
+keep-in-touch-score — an app that grades how well you keep in touch with people
+two-way-linked-cells — a spreadsheet where a formula sits between cells so data can be entered in either one
+evolve-a-face — a program that uses an evolutionary algorithm to evolve a face from a mental image
+capped-todo-list — a to-do app with visualization and hard limits on how many to-dos you have
+before-after-ghost-camera — a photo app that lines up the angle for precise before and after shots
+ranked-choice-movie-vote — a ranked-choice voting app for groups picking netflix movies
+who-did-the-chores — an app that tracks who completed each chore and the percentage over time
+monkeys-typing-shakespeare — a random typing program that tries to retype Shakespeare
+quarter-hour-clock — a clock that rounds the time to 15 minute intervals
+extreme-slow-music — a music player with a mode that plays your music 800% slower
+kindle-highlights-review — an app to help me remember what I read on my Kindle
+natural-handwriting-text — a handwriting font that varies slightly with every letter
+seamless-song-shortener — software that seamlessly shortens a music audio file
+scriptable-notes — a scriptable notes app
+awkward-silence-buzzer — an app that detects awkward silence and plays a random comical sound
+drag-tasks-to-calendar — a calendar with a task list where items can be dragged either way
+savings-pet — a virtual pet that grows with your savings
+bucket-list — an app called bucket list
+tasks-to-day-schedule — an app that generates a schedule from given tasks
+subscription-tracker — an app that tracks subscriptions
+speedrun-only-platformer — a game that can only be won by speedrunning it
+pretend-portfolio-game — a game that teaches investing and finance
+cigarette-taper-plan — an app that schedules smoking breaks to cut down to zero
+what-sites-know-about-you — a website that shows all the information websites can know about your computer
+renewal-date-tracker — an app that reminds you of important renewals before they expire
+small-daily-goals — an app that tracks your small daily goals
+near-light-speed-game — a computer game that visibly shows relativistic effects
+hypercard-style-stacks — a web-based remake of the original HyperCard
+typo-aware-spellcheck — spell check that also considers keys close to each other for typo suggestions
+lazy-productive-tasks — an app for lazy people that suggests easy things to do to be productive
+sight-singing-trainer — a musical app that helps you read music without a tempered instrument
+friend-notes-journal — an app that works like a journal of your friends' personalities
+conversation-practice-game — a video game that teaches social interaction
+kids-activity-schedule — a parenting app that helps parents keep track of their children's activities
+monthly-net-worth-log — a minimalist net worth app for people who update their finances monthly
+applause-when-i-finish — an app that applauds after I finish speaking
+interval-ping-timer — an app that pings at set intervals for a set time
+memorize-a-speech-game — a rhythm game for memorizing speeches by picking the next word
+build-my-color-vision-filter — software that lets a colour blind person build a filter of their own vision
+samegame-tetris-alternator — a video game that alternates between SameGame and Tetris levels
+pi-digits-drawing — a program that draws the digits of pi
+phone-freefall-scream-alarm — an app that detects freefall and makes the phone scream
+endless-board-game — a turn-based board game that continues forever with no way to win or lose
+qwerty-to-dvorak-typing-box — a typing area that shows dvorak output from qwerty keypresses
+countdown-that-lies — a timer app that counts down incorrectly
+last-changed-clothes-tracker — an app that tracks the last time you changed your underwear or t-shirt
+endless-steady-tetris — a tetris that never speeds up so you can play indefinitely
+puppy-potty-break-tracker — an app that tracks when the puppy needs to go out
+blind-to-superhuman-sight-game — a video game where you start blind and upgrade to superhuman sight
+weakness-lessons-journal — an app to log your weaknesses and remind you of lessons to improve
+price-in-hours-of-life — an app that converts dollar amounts into hours of your life
+job-search-tracker — a website to help organize job searches and track cover letter versions
+spreadsheet-idle-game — an idle game with a spreadsheet that takes macro instructions to teach spreadsheets
+split-shopping-list-by-person — an app that divides a shopping list price among the people paying
+simple-inventory-counter — a simple inventory counting app
+random-handwriting-generator — a random handwriting generator
+cognitive-bias-trainer — a game to train yourself against cognitive biases
+paint-mix-color-matcher — a phone app that compares a color photo to your paint mix and says what to add
+projector-keystone-warp — software that corrects perspective for video projection
+piano-with-choir-voices — a computer piano program with choir sound options
+design-your-pinball-table — a pinball computer game where you design and play your own table
+tech-explained-for-parents — a website for teaching parents technical concepts in very simple language
+day-countdown-clock — an app for a clock that counts down from 24:00 to 0:00
+website-playlist — a website or addon that makes a playlist of websites to visit
+plain-notes-to-budget — an app that turns plain notes into a budget
+pr-agency-damage-control — a game where you run a pr agency and stop clients saying stupid things
+life-countdown-clock — an app with a countdown to death to maximize life
+paid-while-pooping-timer — an app that calculates how much money you make while pooping
+what-i-told-whom — a web app of sticky notes to track things you said to people
+tell-me-what-to-do — an app that tells people what to do
+sunscreen-reapply-timer — an app that sets a sunscreen reapply alarm from your SPF
+random-multi-subreddit-link — a website that generates random reddit multi-subreddit links for new front pages
+couple-gift-balance — a website that calculates gift expense equilibrium for couples
+what-am-i-doing-now — a program that reminds me what I am currently supposed to be doing
+rank-by-pairwise-matchups — an app that ranks a list by matching options against each other
+swipe-dishes-to-cook — a tinder-style app for choosing dishes to cook
+life-achievement-badges — a bucket list app that awards you for everything you have ever done
+spoken-workout-interval-cues — a fitness app that gives voice cues for changing exercises over your own music
+slam-down-the-phone — an app that plays a desk phone being slammed down when you hang up in anger
+emu-war-shooter — a short FPS game based on the Emu War
+common-misconceptions-quiz — a web game based on myth busting to rid you of common misconceptions
+sheepdog-herding-game — a sheepdog simulator game that tests your herding instinct
+immune-system-strategy-game — a real-time strategy game set inside the human body
+round-stadium-possession-soccer — a soccer game without keepers, where the stadium is round and possession wins
+clean-plate-background-remover — a tool that uses a picture of the empty background to remove the background from video
+huge-text-file-viewer — a mobile text editor that opens huge files by loading only part
+crazy-wall-pinboard — a Crazy Wall for the Windows desktop
+gym-cost-per-minute — a stopwatch that counts down how much each minute of your gym membership costs
+knitting-swatch-preview — software that renders models of knitted items, like digital swatching
+text-to-url-slug — a tool that converts text to a URL-friendly format
+it-follows-chase-game — a game where an unstoppable "It" slowly follows you, like It Follows
+reality-tv-adventure — a choose-your-own-adventure video game mocking reality TV
+hobby-suggester — a website that suggests new hobbies based on your current interests, with starter links
+deathbed-short-game — a short video game where you are on your deathbed
+morse-code-listener — a phone app that receives Morse code
+toss-planets-gravity-sandbox — a simple 2D solar system simulator where I can toss planets and comets around
+to-do-tower-defense — a productivity-based tower defense game
+desk-knock-shortcuts — an app that turns the desk around your laptop into tappable buttons
+random-daily-reminder-times — an app for adjustable pseudorandom daily reminders for anything
+idea-slot-machine — a slot machine website where you enter words to generate ideas
+minimal-origami-folds — a minimal origami folding game
+post-hysterectomy-cycle-log — a cycle tracker for after a hysterectomy
+art-on-my-wall-preview — an app to see what a painting would look like on my wall
+grandparent-memory-interview — a website to curate the memories of your grandparents
+no-backspace-journal — a journaling app that blocks backspacing and fixing text
+nutrition-label-scaler — an app that scales a nutrition label to how much you ate
+home-inventory-list — an electronic home inventory system
+doomsday-prepper-game — a doomsday prepper game
+deadline-pace-timer — a timer app that tracks tasks completed against a deadline
+fake-traffic-noise — an app that simulates traffic noise during a call to end it
+people-i-care-about — an app to remember things about the people you care about
+daily-writing-streaks — a writing app that gamifies daily writing
+book-finish-date — software that splits a book into daily chapters to track when you will finish
+pothole-spot-logger — an app that logs location, direction and date for pothole repairs
+day-clock-sketcher — an app for sketching your day around a clock
+outfit-color-checker — an app that tells you if your outfit colors match
+haptic-scroll-fidget — an app that lets you scroll endlessly with haptic feedback
+meal-timers-by-dish — a kitchen timer app that loads meals and their cooking times
+buzzword-esolang — an esoteric programming language based on business buzzwords
+word-limit-cutoff — an app that highlights which part of a text falls within a word count
+what-did-i-learn — an app that asks you what did you learn today
+shifted-keyboard-decoder — a search suggestion that decodes what you typed when your hands were shifted on the keyboard
+owned-lent-borrowed-sold — a stuff tracker for everything you own, lent, borrowed and sold
+hear-your-own-voice — an app that makes a recording of your voice sound like it does to you
+noise-threshold-alarm — an app that flashes the screen or beeps when the noise reaches a set threshold
+four-player-buzzer — an app with four buzzer buttons that shows who buzzed first
+hieroglyph-keyboard — a tool that types on a normal keyboard but outputs hieroglyphics
+activity-tap-log — an app to track things throughout the day
+concert-sos-flasher — an SOS app that flashes colors on your screen at concerts
+virtual-baby-days — an app where a virtual baby ages and tells you a thing each day
+merchant-final-boss — a game where the final boss is a merchant you sold to
+five-oclock-somewhere — a widget that states a place where it is currently 5 o'clock
+digital-money-jar — a digital money jar
+roll-for-a-goal — an app where you roll a dice to pick from your pre-written desires or goals
+human-vs-animal-size — an app that compares human size to different animals
+sock-pair-tracker — an easy-to-use sock tracking system to prevent missing socks
+spider-web-game — a spider simulator game
+paper-book-bookmarks — a digital bookmark system for physical books
+decision-helper — an app for making decisions
+inventory-tetris-rpg — an RPG that is almost all inventory management
+ocean-ground-skater — a skateboarding game where the earth rolls like the ocean
+vintage-pc-sounds — a background app that plays vintage PC fan and drive noises
+rags-to-riches — a game where you work your way up from the bottom
+portal-tetris — a Tetris and Portal mashup game
+sort-images-and-export — a program for drag and drop sorting images and exporting in that order
+fitness-rpg-quests — an RPG-style fitness app
+weekly-meal-grocery-list — an app that generates a weekly grocery list from your preferences
+action-one-liners — a generator of action movie one-liners
+last-time-we-talked — a CRM for personal social contacts that tracks when you last got in touch
+dedupe-lines — a tool that deletes duplicate lines
+calming-sensory-screen — an app for calming autistic kids
+language-differences-meme — a meme generator for "Language Differences" cartoons
+random-game-idea — a game that generates a random genre, title and story for a new game each time
+contract-every-word — a tool that contracts every contractable word in an essay
+copy-paste-shortcut-game — a game for kids that teaches ctrl-c, ctrl-x, ctrl-v and ctrl-z
+song-bracket — an app that runs your music library as a tournament
+glitch-head-screensaver — a Max Headroom screensaver
+play-the-enemies — a sidescroller where you play the enemies
+button-mash-fighter — a 2D fighter that only allows button mashing
+murder-mystery-dinner-party — a murder mystery dinner party as a mobile app
+teacher-hours-tracker — a time tracker for teachers
+shopping-cart-running-total — an app that tracks your total as you shop
+truth-or-dare — a truth or dare app
+resolution-check-ins — a new year resolution reminder app
+higher-or-lower-cards — a simple higher or lower game
+task-city-builder — an app that builds a virtual city as you finish tasks toward a goal
+personal-values-tracker — an app for millennials to set and track their values
+what-to-do-by-mood — an app that suggests things to do based on your mood
+instead-of-very — a word generator that suggests words to use instead of "very"
+shows-books-games-log — a site to log and rate shows, movies, games and books you have consumed
+draw-a-sound-canvas — a music editor where you draw sound and apply photoshop-style filters
+relapse-check-ins — an app that asks at set intervals if you've relapsed to break bad habits
+band-manager-sim — a stats-based band simulator game like Football Manager for music
+set-and-forget-start-page — a good-looking set-and-forget start page for Firefox
+time-since-last-refresh — a clock showing time since the last page refresh
+fake-incoming-call — an app that fakes a call to rescue you from a long conversation
+writing-process-recorder — a text editor that records your writing process to prove you did not cheat
+plant-growth-diary — an app to document your plants growth over time
+three-line-gratitude — a three-line gratitude journal app
+friends-local-times — a timezone app for people, not places
+desktop-utc-clock — a small clock set to UTC for your monitor or desktop
+interval-vibration-buzzer — an app that vibrates at specific intervals
+stacked-block-day-planner — a visual day planner with tetris-style stacked tasks
+pixel-food-quest-log — a food tracking app that looks like a video game
+periodic-table-game — a chemistry game app
+storyboard-to-animatic — a storyboarding and animatic app
+notes-about-friends — an app to write notes about your friends so you do not forget
+tap-to-log-gps — an app that records the phone's current gps location to a csv file
+achievement-unlocked-maker — an achievement generator that makes a video game style achievement from a picture, title and text
+hum-a-tune-maker — a music creation app for making simple tunes by humming, whistling or thumping into the mic
+multi-move-chess — spontaneous chess where you can move multiple pieces per turn
+my-travels-timeline — an app to build a timeline of my travels and dates
+wasteland-trail-game — an Oregon Trail style Mad Max game
+xml-fold-viewer — a program to display xml with intelligent collapsing options
+face-name-flashcards — an app to make face and name flashcards
+warranty-expiry-tracker — an app that stores warranty info for everything you own
+move-in-condition-log — a renter's digital vault for timestamped move-in and move-out proof
+bingo-caller-and-cards — a bingo app or website
+cook-by-serving-time — a recipe app that creates a cooking schedule, exports it to a calendar and builds a shopping list
+reseller-stock-tracker — a way to keep track of inventory when you sell on different platforms
+night-sky-photo-stacker — an astrophotography stacking app for Android
+fake-bookcase-background — an app that procedurally generates vanity bookcases for Zoom backgrounds
+phone-bass-vibrator — a subwoofer app where your phone vibrates to the bass of your music
+free-time-idea-jar — an app to track what to do when you have free time
+household-chore-planner — a chore planner
+park-checkers — a simple game with incredible graphics: Central Park checkers
+line-focus-reader — a UI overlay that helps with reading long paragraphs on a phone
+notes-pinned-to-places — an app to save a memory tied to a place so you can find it later
+make-a-dictionary-entry — a site where you can make your own word definitions and dictionary entries
+wobbly-jelly-sandbox — a physics sandbox game where the whole world is wobbly and bouncy
+pomodoro-rpg-levels — an app that combines Pomodoro, a balance app and an RPG-style XP system
+keyboard-cleaning-lock — a timed keyboard disabler for when you wipe down your laptop
+cash-flow-timeline — budgeting software that lays your budget out on a timeline
+batch-voice-take-recorder — a helper app for recording dozens of sound files at once
+cost-per-day-owned — an app that calculates how much my stuff costs per day
+reader-with-ambient-music — a book reader that generates background music
+today-i-learned-recall — an app to capture things you learn each day and recall them later
+family-loan-agreement — an app that creates loan contracts between friends and relatives
+number-scanned-pages — a scanner app that adds borders, page numbers and names to each page
+pantry-and-medicine-stock — an app to manage the food and medicine you have at home
+vacation-roulette — an app for vacation roulette
+vscode-shortcut-drills — a game to learn visual studio code keyboard shortcuts
+guitar-tab-to-notes — an app that turns guitar tabs into notes on a scale
+obscure-word-swapper — a tool that swaps normal words in a sentence for obscure ones
+spoonerism-game — a phone game about spoonerisms
+backwards-rpg — an rpg played in reverse order
+deep-sea-fish-survival — a top-down fish survival game in the deep sea
+phone-rep-counter — a phone app that records accelerometer data during weight machine workouts
+passport-photo-sheet — a site that turns a picture into a printable sheet of id photos
+lifeboat-to-do-game — a to-do list game where each task is a person to save on a sinking lifeboat
+fading-thought-notes — a notes app where quick thoughts decay and disappear if you do not act on them
+pantry-restock-tracker — an app to track grocery supplies and tell me when to restock
+hex-to-food-coloring — an app that gives food coloring amounts for a hex color and liquid volume
+one-compliment-a-day — an app that tells you nice compliments each day
+tap-the-beat-rhythm-game — a mobile rhythm game played with fingers like Beat Saber
+walking-steady-text-reader — an ebook reader that stabilizes text so you can read while walking
+scroll-feed-minigames — a mini game app set up like a social media feed
+balanced-week-activity-picker — an app that suggests the best activity based on your weekly activity
+gender-word-swapper — a bot that reverses gender terms in text
+daily-word-count-tracker — a Fitbit-like app for writers that tracks writing
+anagram-letter-tiles — an app that helps me with anagrams without solving them for me
+fiction-writing-quests — a website that gamifies fiction writing to make it easier to get into
+grooming-due-dates — a grooming calendar and reminder app
+strip-url-tracking-params — a tool that removes non-essential query parameters from URLs
+friends-sandwich-orders — an app that remembers my and my friends' custom sandwich orders
+sunrise-screen-alarm — a light alarm clock program for your computer
+plate-of-the-minute — an app that shows a random license plate every minute
+grow-a-virtual-plant — a virtual plant simulator app
+night-out-spend-meter — an app to keep you from overspending on a night out
+meme-folder-with-tags — a meme manager app for organizing your favorite memes
+three-good-things-log — a gratitude recorder app
+hum-to-guitar-notes — an app that turns hummed tunes into guitar or bass notes and chords
+plan-my-own-funeral — an app to plan your own funeral
+times-tables-trainer — an app for kids to learn and master multiplication tables
+screen-time-to-pushups — an app that converts screen time into push-ups, reading and walking
+waking-hours-left-today — an app that counts down the remaining waking hours of each day
+street-sweeping-move-car — a parking reminder app for street sweeping and moving your car
+pack-clothes-into-bags — a wardrobe planning app for packing clothes into bags
+modern-geek-test — an updated 2020/2021 version of the original Geek Test
+things-to-look-forward-to — an app that lists things you look forward to in date order
+free-trial-cancel-tracker — an app that reminds you to cancel free trials before they end
+random-team-maker — an app that randomly makes teams for backyard games
+js-safe-zip-for-email — a zip utility that renames .js files so code can be sent through Gmail
+number-key-toggle-board — a program where pressing keys 0-9 toggles the same number on or off
+hockey-glove-colorer — an app or website that lets you color hockey gloves
+room-by-room-inventory — an in-case-of-fire app that tracks your possessions room by room with photos
+snap-style-caption-maker — an app that mimics the Snapchat caption with moving text
+av-cable-room-planner — a website with a 2D room planner for audio, video and cable setups
+audio-only-adventure — a completely auditory adventure game
+big-triumph-button — a big triumphant sound button to smash when you accomplish something
+small-decision-spinner — an app that makes small decisions for you
+reading-thoughts-log — an app that saves my thoughts while I'm reading
+pocket-virtual-pet — a virtual pet app like a tamagotchi
+earn-your-break-timer — a stopwatch and timer app that gives break time equal to work time
+food-expiry-countdown — an app that reminds you before food expires
+type-a-book-practice — an app that does typing practice using paragraphs from a book
+closet-outfit-picker — a closet stylist app where you input your clothes
+who-has-which-key — an app to register who has which physical keys
+todo-sorted-by-effort — a todo list that sorts tasks by effort and time
+finger-is-the-hero — a game where your finger is the character
+chore-chart-shrinking-reward — a chore chart with decreasing incentive
+todo-by-shame-score — a todo list that prioritizes tasks by how much shame you will feel
+orchestra-tuning-sleep-sound — a procedurally generated sound of an orchestra tuning up for sleeping
+whatsapp-any-number-link — a simple webpage that sends a message to any phone number via WhatsApp
+chat-bubble-diary — a diary app with a messenger-style layout
+dawn-of-the-final-day — a website to create Majora's Mask style countdowns
+bike-instead-of-drive-savings — an app that tracks gas savings when you bike instead of drive
+home-network-ip-ledger — an app to keep track of a home or small business network
+text-speak-translator — a tool that turns SMS shorthand into full text and back
+asterisk-swear-word-guesser — a website where you type the number of asterisks and it lists matching swear words
+split-concert-by-setlist — an app that splits a one-file concert recording into songs using a setlist
+beach-ball-chart-maker — a beach ball chart maker
+swatch-beat-to-vanadiel — an app that converts Swatch Internet Time to Vana'diel time
+pet-vaccination-log — an app that manages pets and logs vaccinations
+notes-that-forget-24h — a notes app that forgets everything after 24 hours
+energy-based-day-planner — an app that reschedules daily tasks based on energy levels
+noise-triggered-alarm — an app that detects sounds and plays a loud alarm
+whats-this-colour-called — an app to name colours
+music-box-punch-strip — a programmable music box
+skipped-days-tracker — an anti habit tracker where you only log the days you skip
+type-words-into-morse — an app where you type regular words and it encodes them into morse
+bouquet-designer — an app with transparent flower images to design a bouquet and see flower meanings
+scent-memory-album — a perfume library or album for scents that trigger memories
+extra-simple-calorie-counter — an extra simple calorie tracking app
+rolling-video-buffer — an app that constantly records video and deletes earlier footage as it goes
+pinata-smash-tap-game — a pinata tap game where you mash the pinata
+run-for-local-office — a political adventure game where you run for local office
+movie-prediction-notes — an app to input plot predictions from a movie while you watch
+colour-list-sheet — a spreadsheet-like app for making and sharing lists of rgb colors
+folder-file-lister — a website that lists all files in a folder
+is-the-moon-up — an app that tells you when the moon is visible
+hourly-chime-clock — an hourly chime
+touch-screen-theremin — a touch-based theremin
+random-file-from-folder — a tool that picks a random file from deep folders
+relax-your-shoulders-cue — an app that reminds me every 20 seconds to relax my shoulders
+draining-need-buckets — a life-balance app with auto-draining need buckets
+habit-moderation-limits — an app to moderate and track not-so-good habits without quitting them
+phrase-bingo-cards — a random bingo generator from a list of phrases
+my-usual-orders — an app that remembers your favourite orders
+wadokei-japanese-clock — a traditional Japanese clock app
+decision-options-board — a notes app for writing to make decisions and compare options
+weighted-random-picker — a random picker with weighted items
+see-it-as-cash — an app for visualizing a payment as cash in hand
+what-to-mix-it-with — an app that tells you which alcohol to mix with a drink you enter
+compliment-me — an app that compliments you
+food-spending-diary — a food diary app that tracks how much money you spent on what you ate
+boss-rush-arena — a video game that consists only of boss battles
+change-mp4-dates — a utility that copies an mp4 video with a changed encoded date and tagged date
+sunrise-offset-alarm — an alarm clock for farmers based on local sunrise and sunset times
+common-words-checker — an app that checks a document for words outside the 1000 most common English words
+shred-a-negative-thought — an app that gamifies cognitive behavioural therapy by shredding, burning and exploding negative thoughts
+dockerfile-maker — a dockerfile maker
+envelope-budget — standalone envelope budgeting software
+christmas-gift-list — a christmas list app
+room-furniture-layout — a room layout app
+scam-or-not-quiz — a true or false quiz of common internet lies and scams
+rehearse-lines-alone — an app for actors to rehearse lines alone
+hourly-what-are-you-doing — an app that asks what you are doing every hour to build a daily log
+handwriting-tracing-sheets — a penmanship practice app
+holiday-visit-rotation — an app that calculates who goes where for christmas
+random-episode-picker — a random episode picker for shows like the office
+markdown-to-docx — a markdown to word converter on the web
+dashcam-speed-from-lines — a tool to measure driving speed in dash cam videos by clicking road lines
+spoken-motivation — an app that speaks random motivating things to you
+my-subscriptions-list — an app that manages my personal subscriptions
+budget-village-builder — a budgeting app that works like Clash of Clans
+two-cook-days-meal-plan — a meal planner built around cooking only two days a week
+knitting-pdf-row-counter — a knitting PDF viewer that saves your exact row and repeat count
+mistake-and-lesson-log — a mistake tracker app
+shrink-image-to-size-limit — a tool that resizes images to fit website upload limits
+domains-and-tools-renewals — a tracker for my domains, tools and accounts
+jigsaw-puzzle-log — a Goodreads for jigsaw puzzles
+shortcut-cheatsheet-wallpaper — a desktop background image with Windows keyboard shortcuts
+plain-text-todo-syntax — a text-based to-do list with its own syntax
+restaurant-order-notes — an app that stores restaurants and reminds you what to avoid or re-order
+one-task-per-project — a to-do app that shows one to-do per project at a time
+timed-potion-brewing — a potion brewing game with a time limit and rising difficulty
+banana-for-scale — a banana for scale app
+newest-at-bottom-notes — a minimal writing app that adds new text at the bottom in reverse order
+call-timer-to-invoice — an app that tracks call time and auto-generates an invoice
+real-life-character-sheet — an app to track your skills and interests in a character sheet for real life
+what-to-do-with-free-time — an app that suggests how to spend your free time
+motion-photo-to-gif — an app that converts MVIMG motion photos to gifs or webm
+questions-to-ask-partner — an app that reminds me to ask my boyfriend questions
+positive-negative-word-count — a script that counts words in a document and finds the most common positive and negative words
+walk-the-music-landscape — an interactive music visualizer game where you walk a landscape that moves to the music
+css-minify-merge-selectors — a CSS minifier that combines selectors
+html-css-to-png — a tool that turns HTML, CSS and JavaScript into an SVG or image
+animated-gif-gallery — a browser GIF viewer with animated thumbnails
+corporate-mission-statement-generator — a copy of the Dilbert Mission Statement Generator
+family-document-expiry-list — an app that tracks family documents and reminds you before they expire
+media-diary-taste-stats — an app to track movies, books, games and shows and show insights on taste
+energy-drink-caffeine-log — an energy drink tracker app
+indoor-lap-counter — an indoor lap counter
+assignment-into-daily-steps — an app that breaks school assignments into manageable workload
+savings-goal-shopping-cart — a savings app that feels like shopping
+track-anything-counters — an app for tracking anything
+how-my-beliefs-changed — an app that keeps a timeline of how your beliefs evolve
+toddler-swipe-feed — a children's game that emulates YouTube scrolling
+repeating-interval-chime — a reminder app with intervals
+skype-export-reader — a web app to parse a skype export messages.json
+pantry-use-bulk-buy — an app that tracks what you eat and helps you buy in bulk
+squeegee-window-cleaner — a game where you clean windows with a squeegee
+tap-speed-test — an app that tests how fast you can tap
+full-screen-big-text — an app that stretches any input text across the whole screen
+beginner-guitar-tab-generator — a guitar tab generator with the talent of a beginner
+real-hourly-wage — an effective hourly wage calculator for salaried employees
+project-lessons-learned — software that helps create lessons learned after a project ends
+when-sunsets-get-later — a site that shows the date sunset times start getting later for a location
+morning-three-goals — a minimalist daily goals and tasks app that offers options each morning
+quick-test-grader — an easy grader app for teachers
+text-to-post-thread-count — a website where you put in text and it tells you how many tweets it would take
+copy-next-line-feeder — a program that copies one line at a time to the clipboard on a timer
+progress-photo-ghost-overlay — a camera view that overlays another image to line up progress pictures
+volunteer-hours-donations-log — an app that calculates and tracks volunteer hours and donations
+game-that-knows-its-a-game — a computer game which knows it is a computer game and the player is the user
+point-to-world-cities — a phone app like Google SkyMap that points to other countries and cities
+paint-on-spectrogram — a tool to draw on a spectrogram to edit music and sound effects
+soft-matter-sandbox — 2D digital molecular matter
+vuvuzela-noise-machine — a website like SimplyNoise that plays vuvuzela sounds
+random-reality-check-chime — an app that randomly plays a noise to remind you to check if you are dreaming
+circular-progress-ring-maker — a circular progress bar
+bash-history-scorer — a utility that scores your bash history for effective command line use
+subnet-ip-address-planner — a modern open source IP address management tool
+subreddit-match-dating — a dating service that matches people by how similar their subreddits are [NO]
+messages-after-death — a website that is notified when you die and sends letters and closes your accounts [NO]
+terms-in-plain-language — a website where people summarize terms and conditions in plain language [NO]
+identify-car-noise — an app that identifies the strange sound your car is making and the problem [NO]
+ad-profile-noise-searches — a program that searches for things you don't like to skew your ad data [NO]
+sad-to-happy-playlist — a playlist app that starts with a sad song and gradually plays happier ones [NO]
+gym-crowd-now — a gym app that counts how many people are in the gym right now [NO]
+find-best-friends — a website like okcupid but for finding best friends [NO]
+silent-message-flag — a silent flag for messages so they do not wake the recipient [NO]
+fresh-photo-dating — a dating app that requires a fresh photo every time you open it [NO]
+swipe-for-new-friends — an app like tinder that matches you with new friends instead of dates [NO]
+modern-songs-old-style — a website where you enter decades of music you like and get modern songs in that style [NO]
+thirty-two-player-chess — a chess game with 32 players, each controlling one piece [NO]
+historical-borders-slider — a map with a slider to go back in time to Yugoslavia or the USSR [NO]
+facts-overturned-since-graduation — a website where you enter your graduation year and see what has since been found false [NO]
+flights-within-budget — a travel website where you enter a date and budget and see everywhere you can fly [NO]
+random-show-picker — a button that suggests a random show or movie to watch [NO]
+match-by-shared-subreddits — a dating site that matches people by shared subreddits [NO]
+anonymous-workplace-organizing — an anonymous union app for employees to organize [NO]
+blind-description-dating — a Tinder-style app where you swipe on descriptions and see photos after a match [NO]
+halfway-meeting-spot — a tool that finds a good halfway point between two destinations [NO]
+foreign-word-subtitles — a language learning mode for streaming sites that swaps subtitle words into another language [NO]
+band-member-matching — a Tinder-style swiping app for musicians with audio samples who want to form bands [NO]
+yesterday-vs-today-weather — a weather app that shows yesterday's high next to today's [NO]
+bird-call-identifier — a Shazam for bird calls [NO]
+amazon-price-history — price history and average market price show up for every Amazon item [NO]
+movie-protagonist-routes — movie routes in Google Earth so you can follow the protagonist's path [NO]
+date-idea-dating — a dating app that only shows people who want the same date idea [NO]
+recipes-from-my-pantry — a website that shows recipes from the cooking supplies you have [NO]
+world-news-map — an international news site with a clickable world map [NO]
+wake-before-destination — an alarm that wakes you right before your destination [NO]
+police-scanner-noir-jazz — an app that plays your local police scanner alongside noir jazz [NO]
+shared-alarm-time-count — an alarm clock that tells you how many others set the same time [NO]
+fake-disease-ar-game — an AR game that simulates a fake disease spreading between nearby players [NO]
+emergency-location-sender — an app called safeword that sends your location and photos to police [NO]
+is-it-getting-worse — a website that lists every statistic to settle debates about whether things are getting worse [NO]
+movies-we-both-like — a tool that recommends movies two people would both like [NO]
+paid-to-watch-ads — an app where we watch ads and get a share of the ad revenue [NO]
+isp-outage-complainer — an app that detects connection problems and emails my internet provider [NO]
+amateur-film-streaming — a Netflix-like site where amateur filmmakers submit their films [NO]
+scheduled-text-sender — an app that holds texts until a set time [NO]
+politician-donor-overlay — an overlay for C-SPAN that shows a politician's biggest donors [NO]
+real-animal-pokedex — a Pokedex app for real life animals [NO]
+business-ethics-ratings — an app like Yelp that rates businesses on ethics [NO]
+country-swap-matching — an app that matches people who want to swap countries with each other [NO]
+strangers-pick-alarm-song — a social alarm clock app that wakes you with songs picked by strangers [NO]
+terms-of-service-summary — an add-on that sums up the unethical parts of terms and agreements [NO]
+crowd-reaction-broadcast — an app where fans react to a game and the combined audio plays on the broadcast [NO]
+incoming-caller-lookup — a phone button that googles the number while it is ringing [NO]
+silent-text-message — a way to send a silent text that does not sound the recipient's ringer [NO]
+swipe-cat-pictures — a Tinder-style app for swiping on cat pictures [NO]
+say-word-aloud — a tool where you type a word and it says it out loud to show how it sounds [NO]
+builds-from-my-lego-sets — a website that shows what you can build with the Lego sets you own [NO]
+resumes-that-got-hired — a database of resumes that got people specific jobs [NO]
+clothes-on-my-body-type — a clothing site feature that shows an item on your body type [NO]
+noise-alert-for-deaf — an app for deaf people that checks for noises [NO]
+voice-message-forum — a Reddit-like site where you leave audio messages instead of text [NO]
+grocery-aisle-street-view — a street view style app for the inside of grocery stores [NO]
+scam-call-time-waster — a number you can forward scam calls to that wastes the scammer's time with a chatbot [NO]
+shower-water-timer — a timer in your shower that shows how long the water has been running [NO]
+when-shows-get-worse — a website that tells you when a show starts to decline in quality [NO]
+late-bus-tracker — a mobile app that tracks late buses and shows how long they will be [NO]
+dashcam-chat-roulette — a Chatroulette-style site for vehicle dashboard cameras [NO]
+summon-ice-cream-truck — an Uber-style app for summoning ice cream trucks [NO]
+expert-prediction-scores — a site that scores how accurate experts' predictions turned out to be [NO]
+letters-about-censored-news — a letter writing program where people abroad write to us about censored news [NO]
+wait-on-hold-for-me — an app that waits on hold for you and calls you back when a person answers [NO]
+compare-news-coverage — a news app that compares how stations cover the same event [NO]
+paste-without-formatting — an app that pastes copied text without its formatting [NO]
+concert-buddy-finder — an app like Tinder to find concert buddies [NO]
+memorial-wiki — a wiki-like memorial website for anyone who has passed away [NO]
+right-swipe-percentage — a dating app that shows what percentage of profiles someone swipes right on [NO]
+two-password-photo-vault — cloud photo storage that needs two passwords to open [NO]
+mobile-data-left — an icon that shows how much mobile data you have left this month [NO]
+problems-for-inventors — a website that lists common problems for aspiring inventors to solve [NO]
+fun-near-me-on-budget — an app that lists entertainment near you for a set amount of money [NO]
+keyword-post-filter — a browser extension that removes pages and posts by keyword [NO]
+songs-matching-running-pace — an app that detects your pace and finds songs matching the tempo [NO]
+locked-post-thread-bot — a bot that starts a new thread for every locked post [NO]
+group-project-stand-in — a fiverr-like service to hire a stand-in for group projects [NO]
+crowdfund-bill-lobbying — a website where people fund bills to lobby them through congress [NO]
+group-theater-rental — a website to rent movie theaters with others for older films [NO]
+hide-notifications-from-onlookers — a phone setting that hides notifications when someone else looks at the screen [NO]
+emergency-record-and-dial — an emergency app that dials and records audio, video and location [NO]
+search-video-captions — a way to text-search the captions of YouTube videos [NO]
+loud-mic-timeout-bot — a discord bot that times you out when your mic gets too loud [NO]
+where-to-live-on-savings — a website that tells you where you can live comfortably on your savings [NO]
+dating-app-about-date — a dating app that is about the date [NO]
+vote-to-skip-song — an app that lets people vote to skip a song at a party [NO]
+compass-to-cell-tower — a compass app that points to the nearest cell tower [NO]
+sleep-amount-status-bar — a phone status bar that shows how much sleep you are getting [NO]
+family-video-archive — a website where families store videos of themselves for descendants [NO]
+neighbor-home-cooked-food — a service to order healthy dishes from your neighbors [NO]
+parts-of-an-object-wiki — a wikipedia-like website listing the parts within an object and where they came from [NO]
+custom-tv-channel-schedule — an app that builds a custom TV channel schedule from the shows you pick [NO]
+rent-out-your-stuff — an app that lets you rent out things you own to people nearby [NO]
+share-subscriptions-strangers — an app that matches strangers to share streaming subscriptions [NO]
+fake-bad-connection-zoom — an app that makes your video look laggy so you can leave a Zoom call [NO]
+dating-site-niche — a dating site for average looking people [NO]
+hold-decline-to-block — a phone option to block a caller by holding the decline button [NO]
+sort-shows-by-seasons — Netflix sort shows by the number of seasons made [NO]
+find-sports-partners — a Tinder for sports to find people to play with in a new city [NO]
+search-ahead-on-route — Google Maps search for places ahead of you, not just near you [NO]
+receipt-verified-reviews — a review website where you must post a receipt to write a review [NO]
+dream-job-roadmap — a website that tells you how to get your dream job [NO]
+video-screenshot — phones record a video screenshot when you hold the screenshot buttons longer [NO]
+dating-app-photos-after-match — a dating app where you only see pictures after you match [NO]
+key-episodes-skip-filler — a website that lists the key episodes of a TV series so you can skip filler [NO]
+recipe-without-the-story — a recipe website that just gives you the recipe [NO]
+similar-shows-recommender — a website that recommends shows like your cancelled favorites that are still on [NO]
+auto-cancel-free-trial — an app that cancels your subscriptions when the free trial ends [NO]
+puzzle-before-distracting-apps — an app that makes you solve puzzles before opening apps you procrastinate in [NO]
+nearby-historical-sites — an app that tells you when you are near something historical [NO]
+meet-in-the-middle-places — a website that finds places to meet halfway between two locations [NO]
+terms-and-conditions-tldr — an app that gives a tl;dr of terms and conditions [NO]
+show-tariff-cost-amazon — a browser extension that shows tariff costs on Amazon items [NO]
+dating-app-common-subreddits — a dating app that shows which subreddits you have in common [NO]
+add-on-neighbors-food-order — an app that lets you add on to a nearby order for delivery [NO]
+generated-creature-discovery-game — a Pokemon-like game where players discover and name generated creatures [NO]
+twenty-questions-dating — a 20 questions dating app [NO]
+gps-avoid-freeway-unless-faster — a GPS option that avoids the freeway unless it saves five minutes [NO]
+repost-counter-bot — a bot that tells you how many times a post was posted before [NO]
+match-adults-with-seniors — an app that matches parentless adults with childless seniors for companionship [NO]
+rate-profile-pictures — an app where others rate your photos to pick the best profile picture [NO]
+reviews-of-jobs — an app like Yelp for reviews of jobs [NO]
+dating-site-first-timers — a dating site for people who have never been on a date [NO]
+remember-deleted-video-titles — a plugin that remembers the titles of YouTube videos you watched, so deleted ones show their name [NO]
+compare-two-urls-side-by-side — a website that loads two URLs side by side to compare the pages [NO]
+corporation-ownership-database — an IMDB-style database of corporations, their owners and subsidiaries [NO]
+flight-passenger-chat — an app to communicate with other passengers on your flight [NO]
+turing-test-chat-game — a Turing test game where you chat with a stranger or an AI [NO]
+browse-where-others-left-off — a web browser where you pick up where someone else left off [NO]
+amputee-shoe-swap — a website for amputees to find people to swap shoes and gloves with [NO]
+shared-fictional-universe-site — a website where one person creates a universe and others submit characters and stories [NO]
+daily-group-chat — a chat app that puts you in a daily group chat of 6 people [NO]
+grocery-scan-running-total — an app that scans groceries as you shop and totals the tax and cost [NO]
+dating-by-viewing-history — an online dating service that pairs people by their Netflix viewing histories [NO]
+dinosaurs-by-location — a website that lists the dinosaurs that lived at a location you enter [NO]
+remove-music-from-video — an app that removes copyrighted music from videos but keeps other audio [NO]
+check-in-safety-share — an app that sends your whereabouts to authorities if you don't check in after a date [NO]
+find-someone-to-do-things — a non-dating Tinder for finding someone to do something right now [NO]
+youtube-alternative — a major competitor to YouTube [NO]
+spoiler-free-imdb — a non-spoiler version of IMDb that hides seasons, episodes and deaths [NO]
+outfit-recommendations — a website that sells whole outfits matched to your build and style [NO]
+street-view-photo-contest — a photography contest that uses Google Maps street view [NO]
+scaling-shared-pixel-canvas — an r/place that doubles its resolution after enough edits [NO]
+gym-dating-app — a dating app for gym rats called Spotr [NO]
+fact-check-typing — a browser extension that fact checks what you type and adds references [NO]
+clean-random-chat — an online chat that isn't full of people showing their genitals [NO]
+identify-movie — a Shazam for movies [NO]
+viewer-controls-stream-game — a way for a streamer to let a viewer control the game with their own controller [NO]
+follow-up-news-stories — an app that tracks news stories so you can follow up months later [NO]
+travel-country-laws — a website that tells you everything relevant about a country's laws before you travel [NO]
+ex-convict-job-search — an app or website to help ex-convicts find a job [NO]
+find-nearest-weather — an app that tells you where the nearest desired weather is [NO]
+video-dating-interviews — a video dating app where you watch interviews of potential dates [NO]
+gym-battle-fitness-game — a social fitness app where your character powers up as you work out [NO]
+identify-car-engine-sound — a Shazam for car engine sounds [NO]
+politician-wiki — a wiki on politicians with voting history, promises and scandals [NO]
+hidden-second-password-space — a way to hide pictures, apps and texts behind a second unlock password [NO]
+grocery-list-by-aisle — a grocery list app ordered by your store's layout [NO]
+tattoo-on-body-photo — a website where you upload a body photo and place tattoo designs or text on it [NO]
+zork-on-your-phone — old text adventures like Zork playable on phones [NO]
+double-exposure-blender — an app that superimposes a new photo on an existing one for double exposure [NO]
+meeting-time-zone-converter — a universal time component for meeting invites across timezones [NO]
+songs-for-my-range — an app where you record your voice and it tells you what songs you'd sing well [NO]
+traffic-jam-puzzle — a traffic jam simulator puzzle game [NO]
+politics-quiz-world-map — an online political quiz that ends with a shaded world map [NO]
+reverse-a-gif — a bot that reverses GIFs [NO]
+evening-mood-sleep-questions — an app that asks a few questions each evening to learn what improves your sleep and mood [NO]
+adhd-nagging-reminders — a reminders app for people with adhd [NO]
+classroom-quiet-meter — an app that keeps kids quiet [NO]
+knowledge-graph-notes — an app that visualizes everything you know as a knowledge graph [NO]
+articles-read-aloud — an app that turns saved articles into audio to listen to on the go [NO]
+fitness-rpg-tracker — a weight loss and fitness tracking app with RPG mechanics [NO]
+morse-code-keyboard — a Morse code keyboard for people with limited finger dexterity [NO]
+chores-as-game — a to-do list app that turns chores into a game [NO]
+walk-to-stop-alarm — a phone alarm that only turns off once you have moved 15 feet [NO]
+furnish-floor-plan — a program that lets you furnish your house layout digitally [NO]
+geography-quiz-practice — a duolingo for geography [NO]
+rpg-daily-log — an app where you log your day and level up like an rpg [NO]
+task-reward-points — an app where you give yourself virtual rewards for tasks accomplished [NO]
+camera-level — a camera app with a level [NO]
+learning-recap-log — an app that counts your learning progress and helps you recap what you learnt [NO]
+pass-and-play-word-tiles — a decent scrabble clone [NO]
+habit-reward-pet — a 3d app that rewards you each time you act on a daily habit [NO]
+hours-per-timer-chart — a timer app that tracks hours spent on each timer as a graphic [NO]
+gamified-task-list — a gamified task app [NO]
+simple-period-tracker — a period tracker app for young girls [NO]
+level-camera-buzz — a camera app that vibrates when the phone is perfectly level [NO]
+shared-evolution-ecosystem — a cloud-based evolution simulator with a virtual ecosystem [NO]
+time-capsule-note — a time capsule app to remind yourself of something in the future [NO]
+fake-movie-hacker-screen — a customizable software app that emulates fake high-tech movie interfaces [NO]
+virtual-wardrobe-catalog — an online virtual wardrobe to document clothes you own [NO]
+quiz-me-on-my-notes — an app that tests you on the information you feed it [NO]
+trip-places-planner — an app to plan the places to visit on your next trip [NO]
+charades-card-game — a game of charades using cards against humanity cards [NO]
+dig-through-earth-antipode — an app that tells you where you end up if you dig through the earth [NO]
+any-goal-tracker — an app that tracks any goals, like diet, exercise and sleep [NO]
+saved-places-bookmark — an app that bookmarks locations so you can revisit them [NO]
+offline-life-organizer — an offline life organizer that never connects to the cloud [NO]
+tarot-meanings-trainer — an app like Duolingo for learning tarot card meanings [NO]
+speak-typed-text — an app that speaks typed text aloud for people without a voice [NO]
+custom-exam-quiz — a site where you can quickly make your own custom quiz to prepare for exams [NO]
+animated-metronome — an online animated metronome with good animations [NO]
+photo-calendar-maker — a website where users create their own calendar with pictures [NO]
+world-clock — a world clock website [NO]
+document-version-history — version control software for documents [NO]
+printable-us-constitution — a printable PDF of the US Constitution and Amendments [NO]
+private-notes — a private note taking app [NO]
+business-idea-notes — an app for noting down business ideas [NO]
+translate-flash-cards — a flash card app inspired by Google Translate [NO]
+friend-iou-tracker — an app that tracks IOUs between friends [NO]
+year-in-pixels — an app where you track your days with one click each evening [NO]
+pregnancy-week-facts — a less boring fetal development notifier [NO]
+puzzle-alarm-clock — an alarm clock that makes you solve a task before it turns off [NO]
+spin-the-wheel — an online spin wheel generator [NO]
+plan-meals-ahead — a weight loss app that focuses on future eating rather than past tracking [NO]
+math-problem-practice — a math website in the style of LeetCode [NO]
+multi-shopping-lists — a shopping list app with multiple lists [NO]
+infinite-canvas-notes — a note-taking app on an infinite canvas [NO]
+learn-to-whistle-lesson — a 3D animation that teaches how to whistle [NO]
+3d-artist-pose-model — an online manipulable 3D human model for artists to pose [NO]
+kana-to-romaji-converter — a Firefox addon that converts hiragana and katakana to romaji [NO]
+cross-language-phonetic-respell — an app that rewrites text in Language A using the phonetics of Language B [NO]
+calendar-for-any-year — a calendar website that lets you choose the year [NO]
+vocab-spaced-flashcards — a vocabulary learning app that reminds me of new words again and again [NO]
+wardrobe-outfit-picker — an app for wardrobe inventory that suggests outfits [NO]
+dnd-character-sheet — a D&D app to build, save and update a character sheet [NO]
+tag-sorted-notes — a text editor that sorts what you write by tags, keywords, colors or icons [NO]
+good-notes — a good note app [NO]
+animated-dice-roller — a dice roller game app [NO]
+split-restaurant-bill — an app to split the restaurant bill between friends [NO]
+tip-calculator — an app that calculates the right tip [NO]
+smart-grocery-list — a smart shopping list app [NO]
+weekly-meal-grocery-planner — a meal planner, grocery shopping and diet app [NO]
+on-this-day-journal — a journal that shows entries from the same date in previous years [NO]
+keyfile-text-encryption — open-source crypto software that uses keyfiles of random content [NO]
+gamified-focus-timer — a timer app that is a game [NO]
+trip-packing-suggester — an app that suggests what to pack for my next trip [NO]
+exercise-calorie-budget — an app that tells how many calories you can eat based on exercise [NO]
+spaced-repetition-cards — an app that helps you recall what you have learned [NO]
+sale-price-calculator — an app that works out sale prices like half price for shop items [NO]
+watch-face-designer — an app that lets you design a watch face from images and pre-made features [NO]
+film-camera-photo-filter — a photo app that simulates a film camera [NO]
+park-animal-sighting-log — a national park animal sighting tracker [NO]
+quick-idea-capture — an app to capture random ideas quickly [NO]
+travel-place-notes — an app to keep notes on places I find while travelling [NO]
+workout-program-picker — a workout program app where you pick from a list of workouts [NO]
+audio-fade-in-out — an app that fades audio files in and out [NO]
+colour-sobriety-counter — a shame-free, colour-based sobriety app [NO]
+focus-timer-city-trip — a focus timer shown as a trip between two cities [NO]
+wind-down-for-sleep — an app that helps you get in the mood for sleep [NO]
+random-colour-hex — an app that generates a random colour and shows its html code [NO]
+video-habit-journal — a video journaling app to help build habits and skills [NO]
+seamless-audio-cut — software that seamlessly cuts a music audio file between two points [NO]
+quit-smoking-tracker — an app to track my progress quitting smoking with encouragement [NO]
+dnd-encounter-difficulty — a better encounter difficulty formula calculator for d&d 5e [NO]
+chronic-symptom-tracker — a symptom tracking app for people with chronic conditions [NO]
+notes-links-images — an app to save notes, links and images [NO]
+birthday-tracker — an app to track birthdays of the people who matter [NO]
+social-post-reminder — an app that reminds you to post something specific on social media [NO]
+drinking-game-prompts — a drinking game app [NO]
+world-travel-log — a world travel log app [NO]
+tagged-bookmarks — a tool that lets you tag bookmarks with keywords [NO]
+rich-text-cursor-api — a javascript rich text editor with get and set cursor position [NO]
+streaming-watchlist-by-service — an app that tracks what to watch on each streaming service [NO]
+finances-with-projects — an app that keeps your finances and projects in the same place [NO]
+code-typing-practice — a game to practice coding and typing at the same time [NO]
+places-i-have-been — an app to track the places you have been [NO]
+concerts-seen-log — an app like Letterboxd for music to log artists I have seen live [NO]
+tasks-habits-journal-mood — an app that combines tasks, habits, journal and mood in one place [NO]
+party-drinking-cards — a Dutch drinking game app [NO]
+dream-room-mockup — an app to mock up your dream room with virtual items [NO]
+timezone-meeting-finder — an app to schedule meetings across remote timezones [NO]
+pdf-book-read-aloud — an app that turns PDF books into audiobooks with text to speech [NO]
+trip-itinerary-planner — a travel itinerary app [NO]
+matching-colour-finder — an app that matches a colour to colours that go well with it [NO]
+am-i-on-time — an app that uses GPS and speed to tell if you are on time [NO]
+wifi-qr-code — an app that creates a QR code to connect to WiFi [NO]
+habit-goal-chart — a habits and goals chart app for viewing progress at scale [NO]
+search-or-create-notes — a Notational Velocity clone for Android [NO]
+developer-toolbox — a developers toolbox app or website [NO]
+make-my-own-quiz — a website where I enter questions and answers and it makes a personal test [NO]
+greeting-card-maker — a greeting card app [NO]
+plan-accountability-check — an app that keeps you accountable and follows up with your plan [NO]
+gamified-habit-tracker — a gamified habit tracking app [NO]
+daily-reading-goal-log — an app that encourages reading, logs it and sets daily goals [NO]
+save-for-later-organizer — a web app to organize the things you save for later [NO]
+recipe-calorie-calculator — a calories calculator where you add food items and ingredients [NO]
+long-term-notes — an app for taking notes for the long term [NO]
+vocabulary-builder — a vocabulary builder app [NO]
+resume-from-linkedin — an app that creates resumes from your LinkedIn info using templates [NO]
+gps-run-walk-points — an app that logs your run or walk by GPS and gives points [NO]
+workout-exercise-swaps — a workout app where you can put in alternative exercises when equipment is in use [NO]
+desk-worker-quick-workouts — an app showing quick bodyweight workouts for desk workers [NO]
+words-to-emoji-typing — an app that swaps words for emojis while you type [NO]
+mood-behaviour-correlations — an app that tracks correlations between behaviour and happiness [NO]
+kitten-adventure-game — an adventure videogame where you play as a kitten [NO]
+human-migrations-animation — an animation showing human emigrations throughout history [NO]

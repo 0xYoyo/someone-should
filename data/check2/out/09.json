@@ -1,0 +1,872 @@
+[
+{
+"topic": "search-video-captions",
+"verdict": "no",
+"slug": "search-video-captions",
+"kind": "fun",
+"spec_hint": null,
+"wish": null,
+"no": "needs: other people's data",
+"dup": null
+},
+{
+"topic": "loud-mic-timeout-bot",
+"verdict": "no",
+"slug": "loud-mic-timeout-bot",
+"kind": "social",
+"spec_hint": null,
+"wish": null,
+"no": "needs: a server",
+"dup": null
+},
+{
+"topic": "vote-to-skip-song",
+"verdict": "no",
+"slug": "vote-to-skip-song",
+"kind": "fun",
+"spec_hint": null,
+"wish": null,
+"no": "needs: a server",
+"dup": null
+},
+{
+"topic": "dating-app-about-date",
+"verdict": "no",
+"slug": "dating-app-about-date",
+"kind": "social",
+"spec_hint": null,
+"wish": null,
+"no": "too vague",
+"dup": null
+},
+{
+"topic": "where-to-live-on-savings",
+"verdict": "no",
+"slug": "where-to-live-on-savings",
+"kind": "money",
+"spec_hint": null,
+"wish": null,
+"no": "needs: other people's data",
+"dup": null
+},
+{
+"topic": "family-video-archive",
+"verdict": "no",
+"slug": "family-video-archive",
+"kind": "social",
+"spec_hint": null,
+"wish": null,
+"no": "needs: a server",
+"dup": null
+},
+{
+"topic": "sleep-amount-status-bar",
+"verdict": "no",
+"slug": "sleep-amount-status-bar",
+"kind": "health",
+"spec_hint": null,
+"wish": null,
+"no": "your phone does this",
+"dup": null
+},
+{
+"topic": "compass-to-cell-tower",
+"verdict": "no",
+"slug": "compass-to-cell-tower",
+"kind": "travel",
+"spec_hint": null,
+"wish": null,
+"no": "needs: other people's data",
+"dup": null
+},
+{
+"topic": "track-stock-trades",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": "asset-transaction-tracker"
+},
+{
+"topic": "parts-of-an-object-wiki",
+"verdict": "no",
+"slug": "parts-of-an-object-wiki",
+"kind": "study",
+"spec_hint": null,
+"wish": null,
+"no": "needs: other people's data",
+"dup": null
+},
+{
+"topic": "neighbor-home-cooked-food",
+"verdict": "no",
+"slug": "neighbor-home-cooked-food",
+"kind": "food",
+"spec_hint": null,
+"wish": null,
+"no": "needs: a server",
+"dup": null
+},
+{
+"topic": "custom-tv-channel-schedule",
+"verdict": "no",
+"slug": "custom-tv-channel-schedule",
+"kind": "fun",
+"spec_hint": null,
+"wish": null,
+"no": "needs: other people's data",
+"dup": null
+},
+{
+"topic": "rent-out-your-stuff",
+"verdict": "no",
+"slug": "rent-out-your-stuff",
+"kind": "home",
+"spec_hint": null,
+"wish": null,
+"no": "needs: other people's data",
+"dup": null
+},
+{
+"topic": "share-subscriptions-strangers",
+"verdict": "no",
+"slug": "share-subscriptions-strangers",
+"kind": "money",
+"spec_hint": null,
+"wish": null,
+"no": "needs: a server",
+"dup": null
+},
+{
+"topic": "fake-bad-connection-zoom",
+"verdict": "no",
+"slug": "fake-bad-connection-zoom",
+"kind": "social",
+"spec_hint": null,
+"wish": null,
+"no": "too vague",
+"dup": null
+},
+{
+"topic": "animal-battle-royale",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "dating-site-niche",
+"verdict": "no",
+"slug": "dating-site-niche",
+"kind": "social",
+"spec_hint": null,
+"wish": null,
+"no": "needs: other people's data",
+"dup": null
+},
+{
+"topic": "hold-decline-to-block",
+"verdict": "no",
+"slug": "hold-decline-to-block",
+"kind": "everyday",
+"spec_hint": null,
+"wish": null,
+"no": "your phone does this",
+"dup": null
+},
+{
+"topic": "receipt-verified-reviews",
+"verdict": "no",
+"slug": "receipt-verified-reviews",
+"kind": "social",
+"spec_hint": null,
+"wish": null,
+"no": "needs: other people's data",
+"dup": null
+},
+{
+"topic": "search-ahead-on-route",
+"verdict": "no",
+"slug": "search-ahead-on-route",
+"kind": "travel",
+"spec_hint": null,
+"wish": null,
+"no": "exists: Google Maps",
+"dup": null
+},
+{
+"topic": "find-sports-partners",
+"verdict": "no",
+"slug": "find-sports-partners",
+"kind": "social",
+"spec_hint": null,
+"wish": null,
+"no": "needs: a server",
+"dup": null
+},
+{
+"topic": "sort-shows-by-seasons",
+"verdict": "no",
+"slug": "sort-shows-by-seasons",
+"kind": "fun",
+"spec_hint": null,
+"wish": null,
+"no": "needs: other people's data",
+"dup": null
+},
+{
+"topic": "dream-job-roadmap",
+"verdict": "no",
+"slug": "dream-job-roadmap",
+"kind": "work",
+"spec_hint": null,
+"wish": null,
+"no": "needs: other people's data",
+"dup": null
+},
+{
+"topic": "race-on-real-streets",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "dating-app-photos-after-match",
+"verdict": "no",
+"slug": "dating-app-photos-after-match",
+"kind": "social",
+"spec_hint": null,
+"wish": null,
+"no": "needs: a server",
+"dup": null
+},
+{
+"topic": "video-screenshot",
+"verdict": "no",
+"slug": "video-screenshot",
+"kind": "everyday",
+"spec_hint": null,
+"wish": null,
+"no": "your phone does this",
+"dup": null
+},
+{
+"topic": "key-episodes-skip-filler",
+"verdict": "no",
+"slug": "key-episodes-skip-filler",
+"kind": "fun",
+"spec_hint": null,
+"wish": null,
+"no": "needs: other people's data",
+"dup": null
+},
+{
+"topic": "recipe-without-the-story",
+"verdict": "no",
+"slug": "recipe-without-the-story",
+"kind": "food",
+"spec_hint": null,
+"wish": null,
+"no": "needs: other people's data",
+"dup": null
+},
+{
+"topic": "auto-cancel-free-trial",
+"verdict": "no",
+"slug": "auto-cancel-free-trial",
+"kind": "money",
+"spec_hint": null,
+"wish": null,
+"no": "needs: your bank password",
+"dup": null
+},
+{
+"topic": "puzzle-before-distracting-apps",
+"verdict": "no",
+"slug": "puzzle-before-distracting-apps",
+"kind": "health",
+"spec_hint": null,
+"wish": null,
+"no": "exists: one sec",
+"dup": null
+},
+{
+"topic": "similar-shows-recommender",
+"verdict": "no",
+"slug": "similar-shows-recommender",
+"kind": "fun",
+"spec_hint": null,
+"wish": null,
+"no": "needs: other people's data",
+"dup": null
+},
+{
+"topic": "nearby-historical-sites",
+"verdict": "no",
+"slug": "nearby-historical-sites",
+"kind": "travel",
+"spec_hint": null,
+"wish": null,
+"no": "needs: other people's data",
+"dup": null
+},
+{
+"topic": "meet-in-the-middle-places",
+"verdict": "no",
+"slug": "meet-in-the-middle-places",
+"kind": "travel",
+"spec_hint": null,
+"wish": null,
+"no": "needs: other people's data",
+"dup": null
+},
+{
+"topic": "terms-and-conditions-tldr",
+"verdict": "no",
+"slug": "terms-and-conditions-tldr",
+"kind": "everyday",
+"spec_hint": null,
+"wish": null,
+"no": "exists: ToS;DR",
+"dup": null
+},
+{
+"topic": "show-tariff-cost-amazon",
+"verdict": "no",
+"slug": "show-tariff-cost-amazon",
+"kind": "money",
+"spec_hint": null,
+"wish": null,
+"no": "needs: other people's data",
+"dup": null
+},
+{
+"topic": "dating-app-common-subreddits",
+"verdict": "no",
+"slug": "dating-app-common-subreddits",
+"kind": "social",
+"spec_hint": null,
+"wish": null,
+"no": "needs: a server",
+"dup": null
+},
+{
+"topic": "add-on-neighbors-food-order",
+"verdict": "no",
+"slug": "add-on-neighbors-food-order",
+"kind": "food",
+"spec_hint": null,
+"wish": null,
+"no": "needs: other people's data",
+"dup": null
+},
+{
+"topic": "generated-creature-discovery-game",
+"verdict": "no",
+"slug": "generated-creature-discovery-game",
+"kind": "fun",
+"spec_hint": null,
+"wish": null,
+"no": "needs: a server",
+"dup": null
+},
+{
+"topic": "twenty-questions-dating",
+"verdict": "no",
+"slug": "twenty-questions-dating",
+"kind": "social",
+"spec_hint": null,
+"wish": null,
+"no": "needs: a server",
+"dup": null
+},
+{
+"topic": "monopoly-battle-royale",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "repost-counter-bot",
+"verdict": "no",
+"slug": "repost-counter-bot",
+"kind": "social",
+"spec_hint": null,
+"wish": null,
+"no": "needs: a server",
+"dup": null
+},
+{
+"topic": "gps-avoid-freeway-unless-faster",
+"verdict": "no",
+"slug": "gps-avoid-freeway-unless-faster",
+"kind": "travel",
+"spec_hint": null,
+"wish": null,
+"no": "needs: other people's data",
+"dup": null
+},
+{
+"topic": "match-adults-with-seniors",
+"verdict": "no",
+"slug": "match-adults-with-seniors",
+"kind": "social",
+"spec_hint": null,
+"wish": null,
+"no": "needs: a server",
+"dup": null
+},
+{
+"topic": "rate-profile-pictures",
+"verdict": "no",
+"slug": "rate-profile-pictures",
+"kind": "creative",
+"spec_hint": null,
+"wish": null,
+"no": "exists: Photofeeler",
+"dup": null
+},
+{
+"topic": "reviews-of-jobs",
+"verdict": "no",
+"slug": "reviews-of-jobs",
+"kind": "work",
+"spec_hint": null,
+"wish": null,
+"no": "exists: Glassdoor",
+"dup": null
+},
+{
+"topic": "remember-deleted-video-titles",
+"verdict": "no",
+"slug": "remember-deleted-video-titles",
+"kind": "fun",
+"spec_hint": null,
+"wish": null,
+"no": "too vague",
+"dup": null
+},
+{
+"topic": "dating-site-first-timers",
+"verdict": "no",
+"slug": "dating-site-first-timers",
+"kind": "social",
+"spec_hint": null,
+"wish": null,
+"no": "needs: a server",
+"dup": null
+},
+{
+"topic": "fps-swap-gun-game",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "corporation-ownership-database",
+"verdict": "no",
+"slug": "corporation-ownership-database",
+"kind": "dev",
+"spec_hint": null,
+"wish": null,
+"no": "needs: other people's data",
+"dup": null
+},
+{
+"topic": "compare-two-urls-side-by-side",
+"verdict": "no",
+"slug": "compare-two-urls-side-by-side",
+"kind": "dev",
+"spec_hint": null,
+"wish": null,
+"no": "needs: a server",
+"dup": null
+},
+{
+"topic": "coop-hallucination-horror-game",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "browse-where-others-left-off",
+"verdict": "no",
+"slug": "browse-where-others-left-off",
+"kind": "social",
+"spec_hint": null,
+"wish": null,
+"no": "needs: other people's data",
+"dup": null
+},
+{
+"topic": "turing-test-chat-game",
+"verdict": "no",
+"slug": "turing-test-chat-game",
+"kind": "fun",
+"spec_hint": null,
+"wish": null,
+"no": "exists: Human or Not",
+"dup": null
+},
+{
+"topic": "flight-passenger-chat",
+"verdict": "no",
+"slug": "flight-passenger-chat",
+"kind": "travel",
+"spec_hint": null,
+"wish": null,
+"no": "needs: a server",
+"dup": null
+},
+{
+"topic": "wake-before-destination",
+"verdict": "no",
+"slug": "wake-before-destination",
+"kind": "travel",
+"spec_hint": null,
+"wish": null,
+"no": "exists: Citymapper",
+"dup": null
+},
+{
+"topic": "shared-fictional-universe-site",
+"verdict": "no",
+"slug": "shared-fictional-universe-site",
+"kind": "creative",
+"spec_hint": null,
+"wish": null,
+"no": "exists: World Anvil",
+"dup": null
+},
+{
+"topic": "amputee-shoe-swap",
+"verdict": "no",
+"slug": "amputee-shoe-swap",
+"kind": "social",
+"spec_hint": null,
+"wish": null,
+"no": "needs: other people's data",
+"dup": null
+},
+{
+"topic": "grocery-scan-running-total",
+"verdict": "no",
+"slug": "grocery-scan-running-total",
+"kind": "money",
+"spec_hint": null,
+"wish": null,
+"no": "needs: camera hardware",
+"dup": null
+},
+{
+"topic": "daily-group-chat",
+"verdict": "no",
+"slug": "daily-group-chat",
+"kind": "social",
+"spec_hint": null,
+"wish": null,
+"no": "needs: a server",
+"dup": null
+},
+{
+"topic": "dating-by-viewing-history",
+"verdict": "no",
+"slug": "dating-by-viewing-history",
+"kind": "social",
+"spec_hint": null,
+"wish": null,
+"no": "needs: other people's data",
+"dup": null
+},
+{
+"topic": "dinosaurs-by-location",
+"verdict": "no",
+"slug": "dinosaurs-by-location",
+"kind": "study",
+"spec_hint": null,
+"wish": null,
+"no": "needs: other people's data",
+"dup": null
+},
+{
+"topic": "remove-music-from-video",
+"verdict": "no",
+"slug": "remove-music-from-video",
+"kind": "fun",
+"spec_hint": null,
+"wish": null,
+"no": "needs: a server",
+"dup": null
+},
+{
+"topic": "check-in-safety-share",
+"verdict": "no",
+"slug": "check-in-safety-share",
+"kind": "social",
+"spec_hint": null,
+"wish": null,
+"no": "exists: Noonlight",
+"dup": null
+},
+{
+"topic": "find-someone-to-do-things",
+"verdict": "no",
+"slug": "find-someone-to-do-things",
+"kind": "social",
+"spec_hint": null,
+"wish": null,
+"no": "needs: a server",
+"dup": null
+},
+{
+"topic": "youtube-alternative",
+"verdict": "no",
+"slug": "youtube-alternative",
+"kind": "fun",
+"spec_hint": null,
+"wish": null,
+"no": "needs: a server",
+"dup": null
+},
+{
+"topic": "outfit-recommendations",
+"verdict": "no",
+"slug": "outfit-recommendations",
+"kind": "everyday",
+"spec_hint": null,
+"wish": null,
+"no": "needs: other people's data",
+"dup": null
+},
+{
+"topic": "spoiler-free-imdb",
+"verdict": "no",
+"slug": "spoiler-free-imdb",
+"kind": "fun",
+"spec_hint": null,
+"wish": null,
+"no": "needs: other people's data",
+"dup": null
+},
+{
+"topic": "scaling-shared-pixel-canvas",
+"verdict": "no",
+"slug": "scaling-shared-pixel-canvas",
+"kind": "fun",
+"spec_hint": null,
+"wish": null,
+"no": "needs: a server",
+"dup": null
+},
+{
+"topic": "street-view-photo-contest",
+"verdict": "no",
+"slug": "street-view-photo-contest",
+"kind": "creative",
+"spec_hint": null,
+"wish": null,
+"no": "needs: other people's data",
+"dup": null
+},
+{
+"topic": "gym-dating-app",
+"verdict": "no",
+"slug": "gym-dating-app",
+"kind": "social",
+"spec_hint": null,
+"wish": null,
+"no": "needs: a server",
+"dup": null
+},
+{
+"topic": "prices-as-work-hours",
+"verdict": "build",
+"slug": "price-in-work-hours",
+"kind": "money",
+"spec_hint": "Enter take-home pay per hour/month and weekly hours, then any price or pasted list of prices; shows each as hours and days of work.",
+"wish": "someone should make a tool that turns prices into the hours of work needed to earn them",
+"no": null,
+"dup": null
+},
+{
+"topic": "fact-check-typing",
+"verdict": "no",
+"slug": "fact-check-typing",
+"kind": "creative",
+"spec_hint": null,
+"wish": null,
+"no": "needs: a server",
+"dup": null
+},
+{
+"topic": "clean-random-chat",
+"verdict": "no",
+"slug": "clean-random-chat",
+"kind": "social",
+"spec_hint": null,
+"wish": null,
+"no": "needs: a server",
+"dup": null
+},
+{
+"topic": "identify-movie",
+"verdict": "no",
+"slug": "identify-movie",
+"kind": "fun",
+"spec_hint": null,
+"wish": null,
+"no": "needs: other people's data",
+"dup": null
+},
+{
+"topic": "character-switch-game",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "viewer-controls-stream-game",
+"verdict": "no",
+"slug": "viewer-controls-stream-game",
+"kind": "fun",
+"spec_hint": null,
+"wish": null,
+"no": "exists: Parsec",
+"dup": null
+},
+{
+"topic": "wake-me-at-my-stop",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": "wake-before-destination"
+},
+{
+"topic": "travel-country-laws",
+"verdict": "no",
+"slug": "travel-country-laws",
+"kind": "travel",
+"spec_hint": null,
+"wish": null,
+"no": "needs: other people's data",
+"dup": null
+},
+{
+"topic": "ex-convict-job-search",
+"verdict": "no",
+"slug": "ex-convict-job-search",
+"kind": "work",
+"spec_hint": null,
+"wish": null,
+"no": "exists: Honest Jobs",
+"dup": null
+},
+{
+"topic": "find-nearest-weather",
+"verdict": "no",
+"slug": "find-nearest-weather",
+"kind": "travel",
+"spec_hint": null,
+"wish": null,
+"no": "needs: other people's data",
+"dup": null
+},
+{
+"topic": "follow-up-news-stories",
+"verdict": "no",
+"slug": "follow-up-news-stories",
+"kind": "fun",
+"spec_hint": null,
+"wish": null,
+"no": "needs: a server",
+"dup": null
+},
+{
+"topic": "identify-car-engine-sound",
+"verdict": "no",
+"slug": "identify-car-engine-sound",
+"kind": "everyday",
+"spec_hint": null,
+"wish": null,
+"no": "needs: other people's data",
+"dup": null
+},
+{
+"topic": "gym-battle-fitness-game",
+"verdict": "no",
+"slug": "gym-battle-fitness-game",
+"kind": "health",
+"spec_hint": null,
+"wish": null,
+"no": "needs: a server",
+"dup": null
+},
+{
+"topic": "economic-systems-mmo",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "video-dating-interviews",
+"verdict": "no",
+"slug": "video-dating-interviews",
+"kind": "social",
+"spec_hint": null,
+"wish": null,
+"no": "needs: a server",
+"dup": null
+},
+{
+"topic": "politician-wiki",
+"verdict": "no",
+"slug": "politician-wiki",
+"kind": "everyday",
+"spec_hint": null,
+"wish": null,
+"no": "needs: other people's data",
+"dup": null
+},
+{
+"topic": "hidden-second-password-space",
+"verdict": "no",
+"slug": "hidden-second-password-space",
+"kind": "everyday",
+"spec_hint": null,
+"wish": null,
+"no": "your phone does this",
+"dup": null
+}
+]

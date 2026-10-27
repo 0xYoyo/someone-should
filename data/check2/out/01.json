@@ -1,0 +1,1002 @@
+[
+{
+"topic": "daily-photo-timelapse",
+"verdict": "build",
+"slug": "solar-noon-daily-timelapse",
+"kind": "creative",
+"spec_hint": "Shows today's solar noon for your latitude, takes a ghost-aligned camera photo, stores frames locally, plays them back as a time-lapse.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "hourly-earnings-counter",
+"verdict": "build",
+"slug": "earned-since-clock-in",
+"kind": "money",
+"spec_hint": "Type hourly pay, tap clock in; a live counter shows money earned so far this shift, saved across reloads.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "ant-dodge-game",
+"verdict": "build",
+"slug": "ant-dodge-the-feet",
+"kind": "fun",
+"spec_hint": "Top-down canvas game: steer an ant across a floor while shadows of feet grow and stomp; survive longer for higher score.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "one-line-reading-focus",
+"verdict": "build",
+"slug": "one-line-reading-ruler",
+"kind": "study",
+"spec_hint": "Paste text; only one line is highlighted and the rest dimmed; arrow keys or tap move the line down.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "dog-vision-camera",
+"verdict": "build",
+"slug": "see-like-a-dog",
+"kind": "pets",
+"spec_hint": "Camera or chosen photo shown through a dog-vision filter: two-colour dichromat palette and softened detail, side by side with normal view.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "political-quiz-world-map",
+"verdict": "no",
+"slug": "politics-quiz-world-map",
+"kind": "everyday",
+"spec_hint": null,
+"wish": null,
+"no": "exists: The Political Compass",
+"dup": null
+},
+{
+"topic": "visual-task-manager",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": "pocket-kanban-board"
+},
+{
+"topic": "reverse-gif",
+"verdict": "no",
+"slug": "reverse-a-gif",
+"kind": "creative",
+"spec_hint": null,
+"wish": null,
+"no": "exists: ezgif",
+"dup": null
+},
+{
+"topic": "music-quiz-own-songs",
+"verdict": "build",
+"slug": "name-that-song-quiz",
+"kind": "hobby",
+"spec_hint": "Pick local audio files; plays a random few-second clip, you type or choose the title from file names, keeps score.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "eisenhower-calendar-tasks",
+"verdict": "build",
+"slug": "urgent-important-calendar",
+"kind": "work",
+"spec_hint": "Tasks with a due date sorted into four urgent/important boxes beside a month calendar showing each task colour-coded by box.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "political-system-sim",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "adhd-reminders",
+"verdict": "no",
+"slug": "adhd-nagging-reminders",
+"kind": "health",
+"spec_hint": null,
+"wish": null,
+"no": "exists: Tiimo",
+"dup": null
+},
+{
+"topic": "shrinking-snooze-alarm",
+"verdict": "build",
+"slug": "shrinking-snooze-alarm",
+"kind": "everyday",
+"spec_hint": "Set an alarm time; each snooze is shorter than the last (10, 5, 2, 1 minutes) until you must get up.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "scrolling-todo-ticker",
+"verdict": "build",
+"slug": "todo-news-ticker",
+"kind": "everyday",
+"spec_hint": "Type to-dos; they scroll across the screen as a full-width ticker, tap an item to tick it off.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "keep-in-touch-reminder",
+"verdict": "build",
+"slug": "keep-in-touch-list",
+"kind": "social",
+"spec_hint": "List people with how often to contact each; shows who is overdue, tap to log a contact and reset the clock.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "classroom-noise-meter",
+"verdict": "no",
+"slug": "classroom-quiet-meter",
+"kind": "kids",
+"spec_hint": null,
+"wish": null,
+"no": "exists: Bouncy Balls",
+"dup": null
+},
+{
+"topic": "minigolf-pool-cues",
+"verdict": "build",
+"slug": "pool-cue-minigolf",
+"kind": "fun",
+"spec_hint": "Canvas minigolf holes where you aim a pool cue, pull back for power and strike the ball; nine holes, stroke count.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "hum-to-8bit-music",
+"verdict": "build",
+"slug": "hum-to-chiptune",
+"kind": "creative",
+"spec_hint": "Record humming from the microphone; detects pitch per note and plays it back as square-wave 8-bit melody you can save as WAV.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "logarithmic-calendar-view",
+"verdict": "build",
+"slug": "logarithmic-calendar",
+"kind": "everyday",
+"spec_hint": "Add dated events; a timeline where today fills most space and next week, month, year compress logarithmically.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "text-to-animal-sounds",
+"verdict": "build",
+"slug": "text-to-animal-speak",
+"kind": "fun",
+"spec_hint": "Type text, pick an animal; each letter becomes a synthesized moo, meow, chirp or woof sequence played aloud.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "auto-paragraph-text",
+"verdict": "build",
+"slug": "wall-of-text-splitter",
+"kind": "everyday",
+"spec_hint": "Paste a wall of text; splits it into paragraphs at topic shifts and sentence counts, copy the result.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "random-snooze-alarm",
+"verdict": "build",
+"slug": "coin-flip-snooze-alarm",
+"kind": "everyday",
+"spec_hint": "Alarm whose snooze button flips a coin: heads you get ten more minutes, tails the alarm keeps ringing.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "organic-chemistry-scrabble",
+"verdict": "build",
+"slug": "organic-chemistry-scrabble",
+"kind": "study",
+"spec_hint": "Board game with atom tiles (C, H, O, N); place them to form valid molecules, scored by bonds, vs a friend on one device.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "sing-to-instrument",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": "hum-to-8bit-music"
+},
+{
+"topic": "ai-in-robot-game",
+"verdict": "build",
+"slug": "ai-trapped-in-robot",
+"kind": "fun",
+"spec_hint": "Short puzzle game: you are an AI in a tiny robot with limited commands and sensors, escaping a lab room by room.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "personal-knowledge-graph",
+"verdict": "no",
+"slug": "knowledge-graph-notes",
+"kind": "study",
+"spec_hint": null,
+"wish": null,
+"no": "exists: Obsidian",
+"dup": null
+},
+{
+"topic": "game-graphics-improve-levels",
+"verdict": "build",
+"slug": "graphics-level-up-game",
+"kind": "fun",
+"spec_hint": "Small canvas game that starts monochrome pixel art and gains colour, smoothness and effects with each level cleared.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "file-as-video",
+"verdict": "build",
+"slug": "file-to-video-encoder",
+"kind": "dev",
+"spec_hint": "Pick any file; encodes its bytes as coloured block frames into a video, and decodes such a video back to the file.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "posture-reminder",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": "rest-break-reminder"
+},
+{
+"topic": "fake-call-static",
+"verdict": "build",
+"slug": "fake-bad-signal",
+"kind": "fun",
+"spec_hint": "Tap to play convincing phone-line static and dropouts through the speaker so you can bow out of a call.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "mars-rover-delay-game",
+"verdict": "build",
+"slug": "mars-rover-delay",
+"kind": "fun",
+"spec_hint": "Queue commands to a rover on a grid map; each command takes effect after a signal delay, reach targets without crashing.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "spell-casting-mobile-game",
+"verdict": "build",
+"slug": "draw-to-cast-spells",
+"kind": "fun",
+"spec_hint": "Ghosts approach with symbols overhead; swipe the matching shape to banish them, unlock new spells between waves.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "read-text-aloud",
+"verdict": "no",
+"slug": "articles-read-aloud",
+"kind": "everyday",
+"spec_hint": null,
+"wish": null,
+"no": "your phone does this",
+"dup": null
+},
+{
+"topic": "salmon-survival-game",
+"verdict": "build",
+"slug": "salmon-life-cycle-game",
+"kind": "fun",
+"spec_hint": "Canvas game: a salmon fry dodges predators and dams, grows, travels to sea and swims back upstream to spawn.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "religion-sim-game",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "constants-cheat-codes",
+"verdict": "build",
+"slug": "pi-cheat-code-game",
+"kind": "fun",
+"spec_hint": "Small arcade game where typing digits of pi, e or the golden ratio unlocks cheats like invincibility or slow motion.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "fitness-rpg-tracker",
+"verdict": "no",
+"slug": "fitness-rpg-tracker",
+"kind": "health",
+"spec_hint": null,
+"wish": null,
+"no": "exists: Habitica",
+"dup": null
+},
+{
+"topic": "best-value-beer",
+"verdict": "build",
+"slug": "best-value-drink-ranker",
+"kind": "food",
+"spec_hint": "Type each beer's price, size and ABV; ranks them by price per litre and per unit of alcohol.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "custom-voice-alarm",
+"verdict": "build",
+"slug": "favorite-things-alarm",
+"kind": "everyday",
+"spec_hint": "Type a list of things you love; at alarm time the page speaks them aloud one by one to wake you.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "picture-color-by-number",
+"verdict": "build",
+"slug": "photo-to-color-by-number",
+"kind": "creative",
+"spec_hint": "Pick a photo and colour count; outputs a printable numbered outline with a matching colour key.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "duck-hunt-revenge",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "reddit-alien-f5-game",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "audio-image-to-video",
+"verdict": "build",
+"slug": "mp3-plus-image-video",
+"kind": "creative",
+"spec_hint": "Pick an audio file and an image; records a video of the still image with the audio track, saved as WebM.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "noise-level-alarm",
+"verdict": "build",
+"slug": "too-loud-alarm",
+"kind": "everyday",
+"spec_hint": "Microphone level meter with a threshold slider; plays a high-pitched beep whenever the room goes over it.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "quarterly-estimated-tax-calculator",
+"verdict": "build",
+"slug": "quarterly-tax-estimator",
+"kind": "money",
+"spec_hint": "Type expected income, deductions and your tax rates; shows the four quarterly payment amounts and due dates.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "autosave-notepad-template",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": "text-scratchpad"
+},
+{
+"topic": "organize-home-library",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": "home-library-catalog"
+},
+{
+"topic": "daily-data-allowance-calculator",
+"verdict": "build",
+"slug": "daily-data-allowance",
+"kind": "everyday",
+"spec_hint": "Type monthly data allowance, used so far and cycle reset date; shows how much you can use per day left.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "gift-ideas-by-age",
+"verdict": "build",
+"slug": "gift-ideas-by-age",
+"kind": "social",
+"spec_hint": "Pick age range, interests and budget; filters a built-in list of gift ideas and shuffles suggestions.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "fly-missile-war-game",
+"verdict": "build",
+"slug": "guided-missile-target-game",
+"kind": "fun",
+"spec_hint": "Single-screen canvas game: steer a remote-controlled missile through wind and obstacles onto marked targets.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "rescrambling-rubiks-cube",
+"verdict": "build",
+"slug": "self-scrambling-cube",
+"kind": "fun",
+"spec_hint": "Playable 3D Rubik's cube on canvas that makes a random turn every few seconds while you try to solve it.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "chess-stealth-game",
+"verdict": "build",
+"slug": "chess-move-stealth",
+"kind": "fun",
+"spec_hint": "Turn-based grid stealth game: you and the guards move like chess pieces; reach the exit unseen.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "hidden-idea-list",
+"verdict": "build",
+"slug": "hidden-ideas-list",
+"kind": "creative",
+"spec_hint": "Add jokes or ideas without seeing earlier ones; the whole list stays hidden until you choose to reveal it.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "track-hobbies",
+"verdict": "build",
+"slug": "hobby-time-log",
+"kind": "hobby",
+"spec_hint": "Add hobbies, log sessions with time and notes; shows totals, streaks and last-done per hobby.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "compare-object-size",
+"verdict": "build",
+"slug": "what-else-is-this-size",
+"kind": "everyday",
+"spec_hint": "Type dimensions; lists everyday objects of similar size from a built-in table, with a scaled drawing.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "morse-code-keyboard",
+"verdict": "no",
+"slug": "morse-code-keyboard",
+"kind": "everyday",
+"spec_hint": null,
+"wish": null,
+"no": "exists: Gboard",
+"dup": null
+},
+{
+"topic": "move-to-stop-alarm",
+"verdict": "no",
+"slug": "walk-to-stop-alarm",
+"kind": "everyday",
+"spec_hint": null,
+"wish": null,
+"no": "exists: Alarmy",
+"dup": null
+},
+{
+"topic": "one-word-speed-reader",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": "one-word-speed-reader"
+},
+{
+"topic": "two-way-spreadsheet-formulas",
+"verdict": "build",
+"slug": "two-way-linked-cells",
+"kind": "work",
+"spec_hint": "Define a relation between cells; typing in either side recalculates the other, like a two-way converter grid.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "evolve-face-portrait",
+"verdict": "build",
+"slug": "evolve-a-face",
+"kind": "creative",
+"spec_hint": "Shows nine generated faces; pick the closest to the one in your head, next generation mutates from it.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "highlight-text-in-images",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": "arrows-on-a-screenshot"
+},
+{
+"topic": "urinal-sound",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "round-time-15-minutes",
+"verdict": "build",
+"slug": "quarter-hour-clock",
+"kind": "work",
+"spec_hint": "Big clock showing the current time rounded to the nearest 15 minutes, with option to round up or down.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "monkeys-typing-shakespeare",
+"verdict": "build",
+"slug": "monkeys-typing-shakespeare",
+"kind": "fun",
+"spec_hint": "Random typists generate letters live; shows the longest stretch matching a Shakespeare passage so far and attempts count.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "furnish-floor-plan",
+"verdict": "no",
+"slug": "furnish-floor-plan",
+"kind": "home",
+"spec_hint": null,
+"wish": null,
+"no": "exists: Planner 5D",
+"dup": null
+},
+{
+"topic": "limited-todo-list",
+"verdict": "build",
+"slug": "capped-todo-list",
+"kind": "everyday",
+"spec_hint": "To-do list with a hard cap you set; refuses new items until one is done, shows load as a fill bar.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "slow-down-music",
+"verdict": "build",
+"slug": "extreme-slow-music",
+"kind": "hobby",
+"spec_hint": "Pick an audio file; renders it up to 8x slower with time-stretching and plays or saves the result.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "chore-completion-tracker",
+"verdict": "build",
+"slug": "who-did-the-chores",
+"kind": "home",
+"spec_hint": "Add people and chores, tap who did each one; shows each person's share percentage per week and over time.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "ranked-choice-group-vote",
+"verdict": "build",
+"slug": "ranked-choice-movie-vote",
+"kind": "social",
+"spec_hint": "Add options, pass the phone around to rank them; runs instant-runoff rounds and shows the winner.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "before-after-photo-align",
+"verdict": "build",
+"slug": "before-after-ghost-camera",
+"kind": "creative",
+"spec_hint": "Load the before photo; camera view shows it as a translucent overlay so you line up the after shot, then compare.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "rpg-daily-log",
+"verdict": "no",
+"slug": "rpg-daily-log",
+"kind": "everyday",
+"spec_hint": null,
+"wish": null,
+"no": "exists: Habitica",
+"dup": null
+},
+{
+"topic": "geography-quiz-practice",
+"verdict": "no",
+"slug": "geography-quiz-practice",
+"kind": "study",
+"spec_hint": null,
+"wish": null,
+"no": "exists: Seterra",
+"dup": null
+},
+{
+"topic": "scriptable-notes",
+"verdict": "build",
+"slug": "scriptable-notes",
+"kind": "dev",
+"spec_hint": "Notes app where each note can hold JavaScript snippets run on demand to transform or compute note text, all local.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "awkward-silence-sound",
+"verdict": "build",
+"slug": "awkward-silence-buzzer",
+"kind": "fun",
+"spec_hint": "Listens to microphone level; after a set seconds of silence plays a random comical synthesized sound.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "handwriting-font-variation",
+"verdict": "build",
+"slug": "natural-handwriting-text",
+"kind": "creative",
+"spec_hint": "Type text; renders it in handwriting style with each letter slightly varied in size, slant and stroke, save as PNG.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "shorten-audio-file",
+"verdict": "build",
+"slug": "seamless-song-shortener",
+"kind": "hobby",
+"spec_hint": "Pick a song and target length; choose sections to cut, joins them with beat-aligned crossfades, save as WAV.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "calendar-task-list-drag",
+"verdict": "build",
+"slug": "drag-tasks-to-calendar",
+"kind": "work",
+"spec_hint": "Task list beside a week calendar; drag tasks onto days to schedule and back to the list to unschedule.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "bucket-list",
+"verdict": "build",
+"slug": "bucket-list",
+"kind": "everyday",
+"spec_hint": "Add life goals with categories; tick them off with date and note, shows progress done versus left.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "virtual-pet-savings",
+"verdict": "build",
+"slug": "savings-pet",
+"kind": "money",
+"spec_hint": "Set a savings goal and log deposits; a drawn pet grows and gets happier as the balance approaches the goal.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "subscription-tracker",
+"verdict": "build",
+"slug": "subscription-tracker",
+"kind": "money",
+"spec_hint": "Type subscriptions with price, cycle and renewal date; shows monthly and yearly totals and what renews next.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "remind-contact-friends",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": "keep-in-touch-reminder"
+},
+{
+"topic": "poker-chip-tracker",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "idea-notes",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": "hidden-idea-list"
+},
+{
+"topic": "cigarette-taper-schedule",
+"verdict": "build",
+"slug": "cigarette-taper-plan",
+"kind": "health",
+"spec_hint": "Type current daily cigarettes and quit date; builds a spaced daily schedule tapering to zero, with next-allowed countdown.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "camera-with-level",
+"verdict": "no",
+"slug": "camera-level",
+"kind": "everyday",
+"spec_hint": null,
+"wish": null,
+"no": "your phone does this",
+"dup": null
+},
+{
+"topic": "browser-info-viewer",
+"verdict": "build",
+"slug": "what-sites-know-about-you",
+"kind": "everyday",
+"spec_hint": "Shows everything this page can read about your device: screen, language, time zone, hardware, fonts, with plain explanations.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "speedrun-only-game",
+"verdict": "build",
+"slug": "speedrun-only-platformer",
+"kind": "fun",
+"spec_hint": "Small platformer whose doors close on a timer, so every level can only be cleared by moving fast.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "hypercard-remake",
+"verdict": "build",
+"slug": "hypercard-style-stacks",
+"kind": "creative",
+"spec_hint": "Make stacks of cards with text, drawings and buttons that link to other cards; browse mode and edit mode, saved locally.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "relativity-game",
+"verdict": "build",
+"slug": "near-light-speed-game",
+"kind": "fun",
+"spec_hint": "Fly a ship toward light speed on canvas; scenery shows length contraction, Doppler colour shift and clock slowing.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "renewal-reminders",
+"verdict": "build",
+"slug": "renewal-date-tracker",
+"kind": "everyday",
+"spec_hint": "List things that expire (passport, licence, insurance) with dates; sorts by soonest, warns ahead, exports calendar reminders.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "lazy-productivity-ideas",
+"verdict": "build",
+"slug": "lazy-productive-tasks",
+"kind": "everyday",
+"spec_hint": "Tap for a random two-minute productive task from a built-in list, filtered by energy level and where you are.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "track-seeing-friends",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": "keep-in-touch-reminder"
+},
+{
+"topic": "social-skills-game",
+"verdict": "build",
+"slug": "conversation-practice-game",
+"kind": "social",
+"spec_hint": "Branching dialogue scenes (small talk, joining a group, saying no); choose replies and see how the other person reacts.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "friend-personality-journal",
+"verdict": "build",
+"slug": "friend-notes-journal",
+"kind": "social",
+"spec_hint": "Per-friend notes: likes, dislikes, important dates, what they said last time; searchable and saved locally.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "sight-reading-trainer",
+"verdict": "build",
+"slug": "sight-singing-trainer",
+"kind": "hobby",
+"spec_hint": "Shows a random note on a staff; sing it, microphone checks your pitch and scores accuracy without needing an instrument.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "idea-reminder",
+"verdict": "skip",
+"slug": null,
+"kind": null,
+"spec_hint": null,
+"wish": null,
+"no": null,
+"dup": "hidden-idea-list"
+},
+{
+"topic": "keyboard-aware-spellcheck",
+"verdict": "build",
+"slug": "typo-aware-spellcheck",
+"kind": "everyday",
+"spec_hint": "Paste text; flags misspelled words and suggests fixes ranked by keyboard-neighbour typos using a built-in word list.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "learning-progress-recap",
+"verdict": "no",
+"slug": "learning-recap-log",
+"kind": "study",
+"spec_hint": null,
+"wish": null,
+"no": "exists: Anki",
+"dup": null
+},
+{
+"topic": "kids-activity-tracker",
+"verdict": "build",
+"slug": "kids-activity-schedule",
+"kind": "kids",
+"spec_hint": "Add each child's activities with days, times and what to bring; shows today's and this week's plan per child.",
+"wish": null,
+"no": null,
+"dup": null
+},
+{
+"topic": "endless-board-game",
+"verdict": "build",
+"slug": "endless-board-game",
+"kind": "fun",
+"spec_hint": "Two-player board game on one screen with no win or loss: tiles shift and the board grows forever, turn by turn.",
+"wish": null,
+"no": null,
+"dup": null
+}
+]

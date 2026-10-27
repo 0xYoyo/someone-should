@@ -51,6 +51,14 @@ if (existsSync(mergeFile)) for (const [keep, ...dups] of JSON.parse(readFileSync
   for (const d of dups) { const o = picked.get(d); if (!o) { console.error('merge: unknown', d); continue; } absorb(k._w, o._w); picked.delete(d); }
 }
 
+// Optional data/check2/exists.json: {slug: "exists: <name>"} from the second, stricter audit of the build list.
+const existsFile = join(D, 'check2', 'exists.json');
+if (existsFile && existsSync(existsFile)) for (const [slug, no] of Object.entries(JSON.parse(readFileSync(existsFile, 'utf8')))) {
+  const e = picked.get(slug); if (!e) { console.error('exists: unknown', slug); continue; }
+  if (!VOCAB.test(no) || no.split(/\s+/).length > 5) { console.error('exists: outside vocabulary', slug, no); continue; }
+  Object.assign(e, { verdict: 'no', no });
+}
+
 const out = e => {
   const w = e._w;
   const sources = w.sources.slice().sort((a, b) => (b.points + b.comments) - (a.points + a.comments)).slice(0, 8);
