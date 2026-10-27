@@ -1,0 +1,58 @@
+{
+  "slug": "split-scanned-photos",
+  "wish": "someone should make a tool that crops a scan of several photos into separate images",
+  "year": 2014,
+  "agreed": 21,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/13152/automatically-crop-a-scan-of-multiple-photos",
+      "date": "2014-10-13",
+      "points": 7,
+      "comments": 4
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/21056/program-to-cutsave-rectangles-out-of-a-scanned-document",
+      "date": "2015-07-10",
+      "points": 7,
+      "comments": 3
+    }
+  ],
+  "spec": "Finds each photo on a flatbed scan, straightens crooked ones, and saves every photo as its own full-resolution JPEG.\nOpen a scan (or drop it on the page); drag on it to add a photo it missed, tap a box to remove one, turn sideways photos, then save one or save all.\nIt does not fix colour or dust, and photos touching each other on the glass may come out as one box.",
+  "tests": [
+    {
+      "tap": "#sample"
+    },
+    {
+      "wait": 800
+    },
+    {
+      "expect": {
+        "sel": "#status",
+        "contains": "3 photos found"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#crops li.crop canvas",
+        "count": 3
+      }
+    },
+    {
+      "tap": "#crops li.crop .drop"
+    },
+    {
+      "expect": {
+        "sel": "#crops li.crop",
+        "count": 2
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T02:08:17Z",
+  "model": "opus-5.5",
+  "minutes": 9,
+  "approved": false,
+  "notes": "Detection runs on a 500px downscale (background = median border colour, threshold, morphology, connected components, minimum-area rotated rectangle). Crops are rendered from the full-resolution image."
+}

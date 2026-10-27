@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that crops a scan of several photos into separate images</title>
+<style>
+/* ---- paste design/tokens.css here, verbatim ---- */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+main { max-width: 760px; }
+.file { position: relative; display: inline-flex; align-items: center; min-height: var(--tap); padding: 0 18px; border-radius: var(--radius); background: var(--ink); color: var(--paper); border: 1.5px solid var(--ink); cursor: pointer; }
+.file input { position: absolute; inset: 0; opacity: 0; width: 100%; min-height: 0; padding: 0; cursor: pointer; }
+.file:focus-within { outline: 2px solid var(--ink); outline-offset: 2px; }
+#status { margin: 0; color: var(--meta); }
+#status.err { color: var(--no); }
+#view { display: block; width: 100%; height: auto; touch-action: none; border: 1px solid var(--line); border-radius: var(--radius); cursor: crosshair; }
+.tol { display: flex; align-items: center; gap: 10px; flex: 1 1 200px; color: var(--meta); }
+.tol input { padding: 0; border: 0; accent-color: var(--ink); flex: 1; }
+ul#crops li { flex-direction: column; align-items: stretch; }
+ul#crops canvas { display: block; max-width: 100%; max-height: 220px; width: auto; height: auto; align-self: flex-start; border: 1px solid var(--line); }
+.dims { flex-basis: 100%; color: var(--meta); font-variant-numeric: tabular-nums; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that crops a scan of several photos into separate images</h1>
+
+<main id="app" class="stack">
+  <div class="row">
+    <label class="file">open scan<input id="file" type="file" accept="image/*"></label>
+    <button id="sample" type="button">try a sample scan</button>
+  </div>
+  <p id="status">Open a scan with several photos on it.</p>
+  <canvas id="view" hidden></canvas>
+  <div class="row" id="controls" hidden>
+    <label class="tol">tolerance <input id="tol" type="range" min="8" max="80" value="30"></label>
+    <button id="saveall" class="primary" type="button">save all</button>
+  </div>
+  <ul id="crops" class="plain"></ul>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const view = $('#view'), vctx = view.getContext('2d');
+  const statusEl = $('#status'), list = $('#crops'), tolEl = $('#tol');
+  tolEl.value = store.get('ssp-tol', 30);
+
+  let src = null;          // image or canvas holding the full-resolution scan
+  let srcW = 0, srcH = 0, name = 'scan';
+  let boxes = [];          // {cx, cy, w, h, a, r} in full-res pixels; a = radians, r = quarter turns
+  let small = null;        // downscaled ImageData used for detection
+  let smallScale = 1;      // full-res px per small px
+
+  const say = (t, err) => { statusEl.textContent = t; statusEl.classList.toggle('err', !!err); };
+
+  // ---------- loading ----------
+  function useSource(s, w, h, n) {
+    src = s; srcW = w; srcH = h; name = n;
+    const max = 500, k = Math.min(1, max / Math.max(w, h));
+    const sw = Math.max(1, Math.round(w * k)), sh = Math.max(1, Math.round(h * k));
+    const c = document.createElement('canvas');
+    c.width = sw; c.height = sh;
+    const cx = c.getContext('2d', { willReadFrequently: true });
+    cx.drawImage(s, 0, 0, sw, sh);
+    small = cx.getImageData(0, 0, sw, sh);
+    smallScale = w / sw;
+    view.hidden = false; $('#controls').hidden = false;
+    const vw = Math.min(w, 1400);
+    view.width = vw; view.height = Math.round(h * vw / w);
+    detect();
+  }
+
+  $('#file').addEventListener('change', e => { const f = e.target.files[0]; if (f) loadFile(f); e.target.value = ''; });
+  document.addEventListener('dragover', e => e.preventDefault());
+  document.addEventListener('drop', e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) loadFile(f); });
+
+  function loadFile(f) {
+    say('Reading…');
+    const fr = new FileReader();
+    fr.onerror = () => say('That file could not be read.', true);
+    fr.onload = () => {
+      const img = new Image();
+      img.onload = () => useSource(img, img.naturalWidth, img.naturalHeight, f.name.replace(/\.[^.]+$/, '') || 'scan');
+      img.onerror = () => say('That file is not an image this browser can open.', true);
+      img.src = fr.result;
+    };
+    fr.readAsDataURL(f);
+  }
+
+  $('#sample').addEventListener('click', () => {
+    const c = makeSample();
+    useSource(c, c.width, c.height, 'sample-scan');
+  });
+
+  // A fake flatbed scan: off-white glass, three photos, two of them slightly crooked.
+  function makeSample() {
+    const W = 1200, H = 900, c = document.createElement('canvas');
+    c.width = W; c.height = H;
+    const g = c.getContext('2d');
+    g.fillStyle = '#f1efe8'; g.fillRect(0, 0, W, H);
+    let seed = 7;
+    const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    for (let i = 0; i < 2500; i++) { g.fillStyle = `rgba(120,110,90,${rnd() * 0.25})`; g.fillRect(rnd() * W, rnd() * H, 1, 1); }
+    const photo = (cx, cy, w, h, deg, sky, sky2, ground, sun) => {
+      g.save(); g.translate(cx, cy); g.rotate(deg * Math.PI / 180);
+      const grad = g.createLinearGradient(0, -h / 2, 0, h / 2);
+      grad.addColorStop(0, sky); grad.addColorStop(0.6, sky2);
+      g.fillStyle = grad; g.fillRect(-w / 2, -h / 2, w, h);
+      g.fillStyle = sun; g.beginPath(); g.arc(w * 0.2, -h * 0.15, Math.min(w, h) * 0.12, 0, 7); g.fill();
+      g.fillStyle = ground; g.beginPath(); g.moveTo(-w / 2, h * 0.15);
+      g.quadraticCurveTo(-w * 0.1, -h * 0.05, w / 2, h * 0.2); g.lineTo(w / 2, h / 2); g.lineTo(-w / 2, h / 2); g.fill();
+      g.restore();
+    };
+    photo(300, 240, 420, 300, 0, '#3f78b8', '#86a9cf', '#3d6b34', '#e8c44a');
+    photo(860, 270, 380, 280, 7, '#5a3a78', '#d9774a', '#2b2433', '#f2b04a');
+    photo(520, 660, 300, 400, -4, '#4d6f86', '#9ab0ba', '#b59a6a', '#e4dcc0');
+    return c;
+  }
+
+  // ---------- detection ----------
+  function detect() {
+    const { width: w, height: h, data } = small;
+    const tol = +tolEl.value;
+    // background = median colour of the outer 2px frame
+    const rs = [], gs = [], bs = [];
+    const push = i => { rs.push(data[i]); gs.push(data[i + 1]); bs.push(data[i + 2]); };
+    for (let x = 0; x < w; x++) for (const y of [0, 1, h - 2, h - 1]) if (y >= 0 && y < h) push((y * w + x) * 4);
+    for (let y = 0; y < h; y++) for (const x of [0, 1, w - 2, w - 1]) if (x >= 0 && x < w) push((y * w + x) * 4);
+    const med = a => a.sort((p, q) => p - q)[a.length >> 1];
+    const br = med(rs), bgc = med(gs), bb = med(bs);
+
+    let m = new Uint8Array(w * h);
+    for (let i = 0, p = 0; i < m.length; i++, p += 4) {
+      const d = Math.max(Math.abs(data[p] - br), Math.abs(data[p + 1] - bgc), Math.abs(data[p + 2] - bb));
+      m[i] = d > tol ? 1 : 0;
+    }
+    m = morph(m, w, h, 1, false); m = morph(m, w, h, 1, true);   // drop specks
+    m = morph(m, w, h, 3, true); m = morph(m, w, h, 3, false);   // fill gaps inside photos
+
+    const label = new Int32Array(w * h), stack = new Int32Array(w * h);
+    const found = [];
+    let id = 0;
+    for (let s = 0; s < m.length; s++) {
+      if (!m[s] || label[s]) continue;
+      id++;
+      const rowMin = new Map(), rowMax = new Map();
+      let sp = 0, count = 0, x0 = w, x1 = 0, y0 = h, y1 = 0;
+      stack[sp++] = s; label[s] = id;
+      while (sp) {
+        const i = stack[--sp], x = i % w, y = (i - x) / w;
+        count++;
+        if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+        if (!rowMin.has(y) || x < rowMin.get(y)) rowMin.set(y, x);
+        if (!rowMax.has(y) || x > rowMax.get(y)) rowMax.set(y, x);
+        if (x > 0 && m[i - 1] && !label[i - 1]) { label[i - 1] = id; stack[sp++] = i - 1; }
+        if (x < w - 1 && m[i + 1] && !label[i + 1]) { label[i + 1] = id; stack[sp++] = i + 1; }
+        if (y > 0 && m[i - w] && !label[i - w]) { label[i - w] = id; stack[sp++] = i - w; }
+        if (y < h - 1 && m[i + w] && !label[i + w]) { label[i + w] = id; stack[sp++] = i + w; }
+      }
+      const bw = x1 - x0 + 1, bh = y1 - y0 + 1;
+      if (count < w * h * 0.01 || bw < w * 0.04 || bh < h * 0.04) continue;
+      const pts = [];
+      for (const [y, x] of rowMin) pts.push([x, y], [x, y + 1]);
+      for (const [y, x] of rowMax) pts.push([x + 1, y], [x + 1, y + 1]);
+      found.push({ rect: minRect(hull(pts), x0, y0, x1 + 1, y1 + 1), bbox: [x0, y0, x1 + 1, y1 + 1] });
+    }
+    // drop pieces that sit inside a bigger detection
+    const keep = found.filter(f => !found.some(o => o !== f && area(o.bbox) > area(f.bbox) && overlap(f.bbox, o.bbox) > 0.5 * area(f.bbox)));
+    const k = smallScale;
+    boxes = keep.map(({ rect: r }) => ({ cx: r.cx * k, cy: r.cy * k, w: Math.max(4, (r.w - (r.a ? 4 : 2)) * k), h: Math.max(4, (r.h - (r.a ? 4 : 2)) * k), a: r.a, r: 0 }));
+    // reading order: top to bottom, then left to right
+    boxes.sort((p, q) => Math.abs(p.cy - q.cy) > Math.min(p.h, q.h) / 2 ? p.cy - q.cy : p.cx - q.cx);
+    refresh();
+  }
+
+  const area = b => (b[2] - b[0]) * (b[3] - b[1]);
+  const overlap = (a, b) => Math.max(0, Math.min(a[2], b[2]) - Math.max(a[0], b[0])) * Math.max(0, Math.min(a[3], b[3]) - Math.max(a[1], b[1]));
+
+  // square-element erosion (grow=false) or dilation (grow=true), separable
+  function morph(m, w, h, r, grow) {
+    const t = new Uint8Array(m.length), o = new Uint8Array(m.length);
+    const pass = (from, to, horiz) => {
+      for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+        let v = grow ? 0 : 1;
+        for (let d = -r; d <= r; d++) {
+          const xx = horiz ? x + d : x, yy = horiz ? y : y + d;
+          const inside = xx >= 0 && xx < w && yy >= 0 && yy < h;
+          const s = inside ? from[yy * w + xx] : 0;
+          if (grow ? s : !s) { v = grow ? 1 : 0; break; }
+        }
+        to[y * w + x] = v;
+      }
+    };
+    pass(m, t, true); pass(t, o, false);
+    return o;
+  }
+
+  function hull(p) {
+    p.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+    const cross = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+    const lo = [], up = [];
+    for (const q of p) { while (lo.length > 1 && cross(lo[lo.length - 2], lo[lo.length - 1], q) <= 0) lo.pop(); lo.push(q); }
+    for (let i = p.length - 1; i >= 0; i--) { const q = p[i]; while (up.length > 1 && cross(up[up.length - 2], up[up.length - 1], q) <= 0) up.pop(); up.push(q); }
+    return lo.slice(0, -1).concat(up.slice(0, -1));
+  }
+
+  // smallest rotated rectangle around a convex hull; falls back to the plain box when nearly straight
+  function minRect(hp, x0, y0, x1, y1) {
+    let best = { area: (x1 - x0) * (y1 - y0), cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, w: x1 - x0, h: y1 - y0, a: 0 };
+    for (let i = 0; i < hp.length; i++) {
+      const p = hp[i], q = hp[(i + 1) % hp.length];
+      const t = Math.atan2(q[1] - p[1], q[0] - p[0]), c = Math.cos(t), s = Math.sin(t);
+      let u0 = Infinity, u1 = -Infinity, v0 = Infinity, v1 = -Infinity;
+      for (const [x, y] of hp) {
+        const u = x * c + y * s, v = -x * s + y * c;
+        if (u < u0) u0 = u; if (u > u1) u1 = u; if (v < v0) v0 = v; if (v > v1) v1 = v;
+      }
+      const ar = (u1 - u0) * (v1 - v0);
+      if (ar < best.area * 0.98) {
+        const uc = (u0 + u1) / 2, vc = (v0 + v1) / 2;
+        let a = t, rw = u1 - u0, rh = v1 - v0;
+        while (a > Math.PI / 4) { a -= Math.PI / 2; [rw, rh] = [rh, rw]; }
+        while (a < -Math.PI / 4) { a += Math.PI / 2; [rw, rh] = [rh, rw]; }
+        if (Math.abs(a) < 0.008) continue;
+        best = { area: ar, cx: uc * c - vc * s, cy: uc * s + vc * c, w: rw, h: rh, a };
+      }
+    }
+    return best;
+  }
+
+  // ---------- drawing ----------
+  function drawView(temp) {
+    const s = view.width / srcW;
+    vctx.drawImage(src, 0, 0, view.width, view.height);
+    const lw = Math.max(2, view.width / 300);
+    vctx.lineWidth = lw;
+    vctx.font = `600 ${Math.round(lw * 9)}px system-ui, sans-serif`;
+    boxes.forEach((b, i) => {
+      vctx.save(); vctx.translate(b.cx * s, b.cy * s); vctx.rotate(b.a);
+      vctx.strokeStyle = '#c8321e'; vctx.strokeRect(-b.w * s / 2, -b.h * s / 2, b.w * s, b.h * s);
+      vctx.fillStyle = '#c8321e'; const tw = lw * 12;
+      vctx.fillRect(-b.w * s / 2, -b.h * s / 2, tw, tw);
+      vctx.fillStyle = '#fff'; vctx.textAlign = 'center'; vctx.textBaseline = 'middle';
+      vctx.fillText(String(i + 1), -b.w * s / 2 + tw / 2, -b.h * s / 2 + tw / 2 + 1);
+      vctx.restore();
+    });
+    if (temp) {
+      vctx.setLineDash([lw * 3, lw * 2]); vctx.strokeStyle = '#c8321e';
+      vctx.strokeRect(temp.x * s, temp.y * s, temp.w * s, temp.h * s); vctx.setLineDash([]);
+    }
+  }
+
+  function render(b, k) {
+    const ow = Math.round((b.r % 2 ? b.h : b.w) * k), oh = Math.round((b.r % 2 ? b.w : b.h) * k);
+    const c = document.createElement('canvas');
+    c.width = Math.max(1, ow); c.height = Math.max(1, oh);
+    const g = c.getContext('2d');
+    g.imageSmoothingQuality = 'high';
+    g.translate(c.width / 2, c.height / 2); g.scale(k, k);
+    g.rotate(b.r * Math.PI / 2 - b.a);
+    g.drawImage(src, -b.cx, -b.cy);
+    return c;
+  }
+
+  function refresh() {
+    drawView();
+    list.textContent = '';
+    if (!boxes.length) say('No photos found. Drag on the scan to mark one, or change the tolerance.');
+    else say(`${boxes.length} photo${boxes.length > 1 ? 's' : ''} found. Drag to add one, tap a box to remove it.`);
+    $('#saveall').hidden = !boxes.length;
+    boxes.forEach((b, i) => {
+      const li = document.createElement('li'); li.className = 'crop';
+      const k = Math.min(1, 440 / Math.max(b.w, b.h));
+      li.append(render(b, k));
+      const ow = Math.round(b.r % 2 ? b.h : b.w), oh = Math.round(b.r % 2 ? b.w : b.h);
+      const info = document.createElement('div'); info.className = 'row';
+      const dims = document.createElement('span'); dims.className = 'dims'; dims.textContent = `${i + 1} · ${ow} × ${oh}`;
+      const btn = (t, cls, fn) => { const x = document.createElement('button'); x.type = 'button'; x.textContent = t; x.className = cls; x.addEventListener('click', fn); return x; };
+      info.append(dims,
+        btn('turn', 'turn', () => { b.r = (b.r + 1) % 4; refresh(); }),
+        btn('save', 'save', () => save(b, i)),
+        btn('remove', 'drop', () => { boxes.splice(i, 1); refresh(); }));
+      li.append(info);
+      list.append(li);
+    });
+  }
+
+  function save(b, i) {
+    const c = render(b, 1);
+    const go = url => { const a = document.createElement('a'); a.href = url; a.download = `${name}-${i + 1}.jpg`; document.body.append(a); a.click(); a.remove(); };
+    try {
+      c.toBlob(blob => {
+        if (!blob) return say('This photo is too large for the browser to save.', true);
+        const url = URL.createObjectURL(blob); go(url); setTimeout(() => URL.revokeObjectURL(url), 4000);
+      }, 'image/jpeg', 0.92);
+    } catch { say('This photo could not be saved.', true); }
+  }
+
+  $('#saveall').addEventListener('click', () => boxes.forEach((b, i) => setTimeout(() => save(b, i), i * 400)));
+  tolEl.addEventListener('change', () => { store.set('ssp-tol', +tolEl.value); if (src) detect(); });
+
+  // ---------- drawing boxes by hand ----------
+  let start = null, temp = null;
+  const toImg = e => { const r = view.getBoundingClientRect(); return { x: (e.clientX - r.left) / r.width * srcW, y: (e.clientY - r.top) / r.height * srcH }; };
+  view.addEventListener('pointerdown', e => { if (!src) return; start = toImg(e); view.setPointerCapture(e.pointerId); });
+  view.addEventListener('pointermove', e => {
+    if (!start) return;
+    const p = toImg(e);
+    temp = { x: Math.min(start.x, p.x), y: Math.min(start.y, p.y), w: Math.abs(p.x - start.x), h: Math.abs(p.y - start.y) };
+    drawView(temp);
+  });
+  const end = e => {
+    if (!start) return;
+    const p = toImg(e), minSide = srcW / 40;
+    if (temp && temp.w > minSide && temp.h > minSide) {
+      const x0 = Math.max(0, temp.x), y0 = Math.max(0, temp.y), x1 = Math.min(srcW, temp.x + temp.w), y1 = Math.min(srcH, temp.y + temp.h);
+      boxes.push({ cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, w: x1 - x0, h: y1 - y0, a: 0, r: 0 });
+    } else {
+      // a tap: remove the topmost box under the finger
+      for (let i = boxes.length - 1; i >= 0; i--) {
+        const b = boxes[i], dx = p.x - b.cx, dy = p.y - b.cy;
+        const u = dx * Math.cos(b.a) + dy * Math.sin(b.a), v = -dx * Math.sin(b.a) + dy * Math.cos(b.a);
+        if (Math.abs(u) < b.w / 2 && Math.abs(v) < b.h / 2) { boxes.splice(i, 1); break; }
+      }
+    }
+    start = temp = null;
+    refresh();
+  };
+  view.addEventListener('pointerup', end);
+  view.addEventListener('pointercancel', () => { start = temp = null; drawView(); });
+})();
+</script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T02:10:22.805Z",
+ "updated": "2026-10-27T02:11:13.543Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -1054,9 +1054,14 @@
   },
   {
    "slug": "split-scanned-photos",
-   "status": "pending",
+   "status": "pass",
    "attempts": 1,
-   "model": "opus-5.5"
+   "model": "opus-5.5",
+   "kb": 18.9,
+   "tests": "6/6",
+   "built": "2026-10-27T02:08:17Z",
+   "minutes": 9,
+   "approved": false
   },
   {
    "slug": "where-did-i-put-it",
