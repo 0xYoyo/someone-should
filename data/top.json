@@ -1,0 +1,3566 @@
+{
+ "generated": "2026-10-27T01:28:59.126Z",
+ "build": [
+  {
+   "slug": "arrows-on-a-screenshot",
+   "wish": "someone should make a tool that adds text and arrows to a screenshot",
+   "year": 2014,
+   "agreed": 96,
+   "category": "photo",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/3069/simple-program-to-edit-screenshots-add-texts-and-arrows-mark-stuff-on-linux",
+     "date": "2014-04-08",
+     "points": 57,
+     "comments": 7
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/2331/windows-application-for-circling-pointing-highlighting-and-writing-comments-on",
+     "date": "2014-03-14",
+     "points": 17,
+     "comments": 5
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/21486/online-library-for-image-annotation-with-arrows",
+     "date": "2015-07-26",
+     "points": 6,
+     "comments": 4
+    }
+   ],
+   "spec_hint": "Drop or paste an image; add arrows, boxes, text labels and blur; export the result as PNG."
+  },
+  {
+   "slug": "freelance-money-ledger",
+   "wish": "someone should make an app that tracks a freelancer's finances",
+   "year": 2019,
+   "agreed": 343,
+   "category": "money",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=19450331",
+     "date": "2019-03-21",
+     "points": 211,
+     "comments": 132
+    }
+   ],
+   "spec_hint": "Enter income and expenses with client and category; shows monthly totals, profit and tax to set aside; export CSV."
+  },
+  {
+   "slug": "pocket-kanban-board",
+   "wish": "someone should make an app that works like trello",
+   "year": 2014,
+   "agreed": 77,
+   "category": "work",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/15056/open-source-equivalent-to-trello",
+     "date": "2015-01-05",
+     "points": 16,
+     "comments": 2
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/39840/combined-kanban-and-gantt-chart-project-management-tool",
+     "date": "2017-03-03",
+     "points": 10,
+     "comments": 8
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/7502/scrum-workflow-software",
+     "date": "2014-07-03",
+     "points": 14,
+     "comments": 2
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/7625/looking-for-a-project-management-tool-that-would-serve-as-a-mix-of-scrum-and-kan",
+     "date": "2014-07-08",
+     "points": 7,
+     "comments": 8
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/68953/digital-scrum-boards-that-capture-the-physical-board-experience",
+     "date": "2019-09-16",
+     "points": 7,
+     "comments": 3
+    }
+   ],
+   "spec_hint": "Columns of cards you add, edit and drag between columns; saved on the device; export and import JSON."
+  },
+  {
+   "slug": "markdown-writing-room",
+   "wish": "someone should make a beautiful markdown editor",
+   "year": 2014,
+   "agreed": 265,
+   "category": "writing",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=32797711",
+     "date": "2022-09-11",
+     "points": 45,
+     "comments": 56
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/5746/markdown-editor-for-windows-with-live-rendering-in-the-editing-pane-not-in-a-se",
+     "date": "2014-06-07",
+     "points": 61,
+     "comments": 18
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/25/markdown-editor-for-osx-that-includes-a-preview-ideally-in-real-time",
+     "date": "2014-02-04",
+     "points": 50,
+     "comments": 9
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/545/is-there-a-markdown-editor-for-ios",
+     "date": "2014-02-06",
+     "points": 11,
+     "comments": 2
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/27867/free-markdown-editor-for-windows-with-tabs-live-view-tables",
+     "date": "2016-01-08",
+     "points": 12,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "Type Markdown on one side, see it rendered live; open and save .md files; calm readable typography."
+  },
+  {
+   "slug": "blood-test-results-log",
+   "wish": "someone should make a web app to store blood test results",
+   "year": 2011,
+   "agreed": 105,
+   "category": "health",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=36025977",
+     "date": "2023-05-22",
+     "points": 45,
+     "comments": 57
+    },
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=2509092",
+     "date": "2011-05-03",
+     "points": 1,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "Enter date, marker, value, unit and reference range; table and chart per marker, out-of-range values flagged."
+  },
+  {
+   "slug": "markdown-file-viewer",
+   "wish": "someone should make a simple markdown viewer",
+   "year": 2015,
+   "agreed": 239,
+   "category": "text",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/17714/simple-markdown-viewer-for-ubuntu-standalone-program-not-something-that-requir",
+     "date": "2015-03-06",
+     "points": 128,
+     "comments": 22
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/71013/simple-open-source-offline-markdown-viewer-for-windows",
+     "date": "2019-12-02",
+     "points": 72,
+     "comments": 17
+    }
+   ],
+   "spec_hint": "Open or paste a .md file; renders it cleanly with headings, tables, code and a contents sidebar."
+  },
+  {
+   "slug": "compare-two-tables",
+   "wish": "someone should make a tool that compares two tables and shows the differences",
+   "year": 2018,
+   "agreed": 100,
+   "category": "data",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=17924798",
+     "date": "2018-09-06",
+     "points": 68,
+     "comments": 32
+    }
+   ],
+   "spec_hint": "Paste two CSV or TSV tables, pick a key column; shows added, removed and changed rows with changed cells highlighted."
+  },
+  {
+   "slug": "logo-turtle-playground",
+   "wish": "someone should make a LOGO interpreter that has a turtle",
+   "year": 2011,
+   "agreed": 60,
+   "category": "learning",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/3716/is-there-a-logo-interpreter-that-actually-has-a-turtle",
+     "date": "2011-02-17",
+     "points": 51,
+     "comments": 9
+    }
+   ],
+   "spec_hint": "Type LOGO commands (FD, RT, REPEAT, TO procedures); a turtle draws on canvas; save the drawing as PNG."
+  },
+  {
+   "slug": "packet-header-diagram",
+   "wish": "someone should make a tool that draws binary protocol figures from a spec",
+   "year": 2022,
+   "agreed": 68,
+   "category": "dev",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=30895905",
+     "date": "2022-04-03",
+     "points": 51,
+     "comments": 17
+    }
+   ],
+   "spec_hint": "Type field names with bit widths; draws an RFC-style packet header figure; export SVG and ASCII art."
+  },
+  {
+   "slug": "frame-step-video-player",
+   "wish": "someone should make a video player that steps backward frame by frame",
+   "year": 2014,
+   "agreed": 61,
+   "category": "media",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/6907/video-player-with-backward-frame-by-frame-stepping-for-linux",
+     "date": "2014-06-12",
+     "points": 44,
+     "comments": 7
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/7296/view-each-frame-of-video-and-delete-edit-them",
+     "date": "2014-06-25",
+     "points": 8,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "Open a local video; step forward and backward one frame at a time with keys; shows frame number and time."
+  },
+  {
+   "slug": "text-to-timeline",
+   "wish": "someone should make a tool that turns text into a timeline diagram",
+   "year": 2021,
+   "agreed": 49,
+   "category": "design",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=26935278",
+     "date": "2021-04-25",
+     "points": 39,
+     "comments": 10
+    }
+   ],
+   "spec_hint": "Type lines like \"1969: moon landing\"; renders a scaled timeline diagram; export SVG or PNG."
+  },
+  {
+   "slug": "html-css-scratchpad",
+   "wish": "someone should make a site where users can write HTML and CSS",
+   "year": 2022,
+   "agreed": 95,
+   "category": "dev",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=31667761",
+     "date": "2022-06-08",
+     "points": 37,
+     "comments": 58
+    }
+   ],
+   "spec_hint": "Edit HTML and CSS panes; live preview in a sandboxed frame; download the result as one HTML file."
+  },
+  {
+   "slug": "pixel-icon-editor",
+   "wish": "someone should make a web-based icon editor",
+   "year": 2009,
+   "agreed": 56,
+   "category": "design",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=636388",
+     "date": "2009-06-01",
+     "points": 25,
+     "comments": 31
+    }
+   ],
+   "spec_hint": "Pixel grid from 16 to 64 px with palette, pencil, fill and eraser; export PNG and SVG."
+  },
+  {
+   "slug": "one-word-speed-reader",
+   "wish": "someone should make an app that helps with speed reading",
+   "year": 2014,
+   "agreed": 33,
+   "category": "learning",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/1905/speed-reading-software-for-windows",
+     "date": "2014-03-02",
+     "points": 29,
+     "comments": 4
+    }
+   ],
+   "spec_hint": "Paste text; shows one word at a time at a chosen words-per-minute with a focus letter; pause and rewind."
+  },
+  {
+   "slug": "audio-bpm-detector",
+   "wish": "someone should make a tool that detects the BPM of an audio file",
+   "year": 2014,
+   "agreed": 29,
+   "category": "music",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/1727/software-to-detect-bpm-and-tag-mp3-files",
+     "date": "2014-02-26",
+     "points": 23,
+     "comments": 6
+    }
+   ],
+   "spec_hint": "Open an audio file; decodes it locally and estimates tempo in BPM; tap-tempo button as a cross-check."
+  },
+  {
+   "slug": "remove-passersby-from-photos",
+   "wish": "someone should make an app that removes passers-by by combining several photos of the same scene",
+   "year": 2018,
+   "agreed": 10,
+   "category": "photo",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/48650/remove-passers-by-from-picture-by-taking-the-same-picture-several-times",
+     "date": "2018-02-14",
+     "points": 8,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "Load several photos of the same scene; per-pixel median removes moving people; export the clean PNG."
+  },
+  {
+   "slug": "simple-circuit-simulator",
+   "wish": "someone should make an app that simulates electrical circuits",
+   "year": 2014,
+   "agreed": 20,
+   "category": "math",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/3354/software-for-simulating-electrical-circuits",
+     "date": "2014-04-18",
+     "points": 17,
+     "comments": 3
+    }
+   ],
+   "spec_hint": "Place batteries, resistors, bulbs and switches on a grid; solves DC voltages and currents live."
+  },
+  {
+   "slug": "venn-diagram-maker",
+   "wish": "someone should make a tool that draws Venn diagrams",
+   "year": 2014,
+   "agreed": 20,
+   "category": "math",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/7393/javascript-library-to-display-venn-diagrams",
+     "date": "2014-06-29",
+     "points": 11,
+     "comments": 2
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/25706/library-to-generate-a-scaled-4-set-venn-diagram",
+     "date": "2015-10-14",
+     "points": 7,
+     "comments": 0
+    }
+   ],
+   "spec_hint": "Enter two or three set names and their items; draws a labeled Venn diagram; export SVG or PNG."
+  },
+  {
+   "slug": "sing-the-note-trainer",
+   "wish": "someone should make an app that plays a tone and shows if I hit it when singing",
+   "year": 2015,
+   "agreed": 13,
+   "category": "music",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/23540/software-to-play-a-tone-and-show-me-when-i-hit-it-when-singing",
+     "date": "2015-09-03",
+     "points": 11,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "Plays a target tone; listens through the microphone and shows how far your sung pitch is in cents."
+  },
+  {
+   "slug": "plate-tectonics-sandbox",
+   "wish": "someone should make a simulator of plate tectonics",
+   "year": 2014,
+   "agreed": 14,
+   "category": "learning",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/4139/plate-tectonics-geography-simulator",
+     "date": "2014-05-16",
+     "points": 13,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "Random plates drift on a grid world; collisions raise mountains, rifts open oceans; play, pause, speed."
+  },
+  {
+   "slug": "toy-climate-model",
+   "wish": "someone should make a tool that simulates a simple climate model",
+   "year": 2014,
+   "agreed": 13,
+   "category": "learning",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/2762/simple-climate-simulator",
+     "date": "2014-03-27",
+     "points": 12,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "Sliders for CO2, albedo and solar input drive an energy-balance model that plots temperature over years."
+  },
+  {
+   "slug": "battlemap-print-tiler",
+   "wish": "someone should make a tool that prints large battlemaps for rpgs",
+   "year": 2014,
+   "agreed": 20,
+   "category": "games",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/923/what-mapping-software-can-print-large-battlemaps-for-rpgs",
+     "date": "2014-02-11",
+     "points": 19,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "Load a map image and set grid square size; splits it across printable pages at true scale with alignment marks."
+  },
+  {
+   "slug": "seating-chart-planner",
+   "wish": "someone should make a tool that plans seating charts",
+   "year": 2016,
+   "agreed": 11,
+   "category": "everyday",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/34155/javascript-seating-chart-library",
+     "date": "2016-06-24",
+     "points": 8,
+     "comments": 3
+    }
+   ],
+   "spec_hint": "Add tables and guest names; drag guests onto seats; mark pairs to keep apart; print the chart."
+  },
+  {
+   "slug": "decision-tree-builder",
+   "wish": "someone should make a tool that builds decision trees",
+   "year": 2014,
+   "agreed": 21,
+   "category": "work",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/3016/free-decision-tree-software",
+     "date": "2014-04-05",
+     "points": 17,
+     "comments": 4
+    }
+   ],
+   "spec_hint": "Add question nodes, answers and outcomes; draws the tree; click-through mode to walk it; export SVG."
+  },
+  {
+   "slug": "sunrise-sunset-calculator",
+   "wish": "someone should make a tool that shows sunrise and sunset times",
+   "year": 2015,
+   "agreed": 13,
+   "category": "time",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/16588/public-api-for-sunrise-sunset-data",
+     "date": "2015-01-24",
+     "points": 9,
+     "comments": 4
+    }
+   ],
+   "spec_hint": "Enter latitude, longitude and date; computes sunrise, sunset, twilight and day length for the day and month."
+  },
+  {
+   "slug": "night-sky-star-chart",
+   "wish": "someone should make an app that draws star charts",
+   "year": 2015,
+   "agreed": 10,
+   "category": "outdoors",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/21089/linux-software-for-drawing-star-charts",
+     "date": "2015-07-13",
+     "points": 8,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "Enter location, date and time; draws bright stars and constellation lines above the horizon from an embedded catalog."
+  },
+  {
+   "slug": "cafe-ambience-mixer",
+   "wish": "someone should make an app that generates cafe or library ambience noise",
+   "year": 2014,
+   "agreed": 11,
+   "category": "music",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/3507/cafe-library-ambience-noise-generator",
+     "date": "2014-04-22",
+     "points": 10,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "Mix generated layers like murmur, rain, brown noise and cup clatter with volume sliders; all sound synthesized."
+  },
+  {
+   "slug": "spot-image-differences",
+   "wish": "someone should make a tool that shows the differences between two images",
+   "year": 2014,
+   "agreed": 26,
+   "category": "photo",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/10899/a-program-that-diffs-2-images",
+     "date": "2014-08-21",
+     "points": 10,
+     "comments": 3
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/86629/any-recommendation-for-image-comparison-tool",
+     "date": "2023-03-22",
+     "points": 7,
+     "comments": 6
+    }
+   ],
+   "spec_hint": "Load two images; highlights differing pixels, offers a slider overlay and says whether pixels are identical."
+  },
+  {
+   "slug": "json-diff-viewer",
+   "wish": "someone should make a diff tool for JSON files",
+   "year": 2015,
+   "agreed": 68,
+   "category": "dev",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/25018/diff-tool-for-json-files",
+     "date": "2015-09-22",
+     "points": 40,
+     "comments": 7
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/17812/java-library-that-diffs-json-and-generates-what-was-added-deleted-modified",
+     "date": "2015-03-10",
+     "points": 19,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "Paste or open two JSON documents; structural diff listing added, removed and changed paths with values."
+  },
+  {
+   "slug": "sql-on-csv-files",
+   "wish": "someone should make a tool that runs SQL on CSV files",
+   "year": 2019,
+   "agreed": 37,
+   "category": "data",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/61396/is-there-a-software-tool-which-allows-to-perform-sql-on-csv-files",
+     "date": "2019-05-21",
+     "points": 23,
+     "comments": 14
+    }
+   ],
+   "spec_hint": "Load CSV files as tables; run SQL SELECT with WHERE, GROUP BY, ORDER BY and JOIN; shows result table."
+  },
+  {
+   "slug": "mystery-string-decoder",
+   "wish": "someone should make a tool that tries many decoders on a mystery string",
+   "year": 2015,
+   "agreed": 13,
+   "category": "text",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/18615/convert-an-enigmatic-string-using-many-common-decoding-algorithms-to-check-whic",
+     "date": "2015-04-10",
+     "points": 12,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "Paste a string; tries base64, hex, URL, rot13, binary, morse and more; readable results ranked first."
+  },
+  {
+   "slug": "highlight-text-matches",
+   "wish": "someone should make a grep that highlights matches instead of filtering",
+   "year": 2014,
+   "agreed": 46,
+   "category": "text",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/14413/grep-that-highlights-instead-of-filter",
+     "date": "2014-12-05",
+     "points": 32,
+     "comments": 14
+    }
+   ],
+   "spec_hint": "Paste text and a search pattern; every match highlighted in place with a count; regex optional."
+  },
+  {
+   "slug": "plain-text-box-drawer",
+   "wish": "someone should make a tool that draws shapes in plain text",
+   "year": 2014,
+   "agreed": 27,
+   "category": "text",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/3916/software-to-draw-shapes-in-plain-text-file-ascii-unicode",
+     "date": "2014-05-07",
+     "points": 21,
+     "comments": 6
+    }
+   ],
+   "spec_hint": "Draw boxes, lines, arrows and text on a character grid; copy the drawing as plain text."
+  },
+  {
+   "slug": "family-tree-maker",
+   "wish": "someone should make an app that makes family trees simple enough for anyone",
+   "year": 2014,
+   "agreed": 31,
+   "category": "other",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/10971/offline-genealogy-software",
+     "date": "2014-08-25",
+     "points": 10,
+     "comments": 3
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/20098/simple-layman-genealogy-software",
+     "date": "2015-06-05",
+     "points": 8,
+     "comments": 1
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/54015/program-to-visually-organize-family-trees",
+     "date": "2018-12-27",
+     "points": 6,
+     "comments": 3
+    }
+   ],
+   "spec_hint": "Add people, parents and partners; draws a tree that handles remarriage and half-siblings; save JSON, export SVG."
+  },
+  {
+   "slug": "colorblind-image-filter",
+   "wish": "someone should make a tool that filters images so colorblind people can tell colors apart",
+   "year": 2015,
+   "agreed": 10,
+   "category": "accessibility",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/19781/screen-filter-for-colorblind",
+     "date": "2015-05-24",
+     "points": 7,
+     "comments": 3
+    }
+   ],
+   "spec_hint": "Load an image; simulate protan, deutan and tritan vision and apply a color-separating filter; export PNG."
+  },
+  {
+   "slug": "hide-text-in-image",
+   "wish": "someone should make a tool that hides data inside images",
+   "year": 2014,
+   "agreed": 9,
+   "category": "privacy",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/11834/steganography-library-or-command-line-program",
+     "date": "2014-09-29",
+     "points": 7,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "Hide a message in a PNG's lowest bits and download it; load a PNG to reveal a hidden message."
+  },
+  {
+   "slug": "run-a-checklist",
+   "wish": "someone should make an app that runs checklists, like pre-flight or surgical safety lists",
+   "year": 2014,
+   "agreed": 11,
+   "category": "work",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/7071/checklist-app-for-iphone-pre-flight-checklist-surgical-safety-checklist-etc",
+     "date": "2014-06-19",
+     "points": 8,
+     "comments": 3
+    }
+   ],
+   "spec_hint": "Write named checklists; run one step by step with check-offs and a reset; saved on the device."
+  },
+  {
+   "slug": "gpx-track-stats",
+   "wish": "someone should make an app that calculates distance and elevation gain from a GPX file",
+   "year": 2014,
+   "agreed": 21,
+   "category": "outdoors",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/2613/application-for-calculating-distance-and-elevation-from-gpx-file",
+     "date": "2014-03-22",
+     "points": 9,
+     "comments": 2
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/3788/statistical-analysis-of-gpx-files",
+     "date": "2014-05-02",
+     "points": 7,
+     "comments": 3
+    }
+   ],
+   "spec_hint": "Open a GPX file; shows total distance, elevation gain and loss, moving time, pace and an elevation profile."
+  },
+  {
+   "slug": "treasure-hunt-clue-maker",
+   "wish": "someone should make a tool that generates treasure hunts",
+   "year": 2014,
+   "agreed": 7,
+   "category": "games",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/706/application-which-can-generate-online-treasure-hunts-or-progressive-qa",
+     "date": "2014-02-08",
+     "points": 6,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "Enter hiding places in order with a hint each; makes printable numbered clue cards pointing to the next spot."
+  },
+  {
+   "slug": "printable-game-cards",
+   "wish": "someone should make a tool that makes and prints game cards",
+   "year": 2014,
+   "agreed": 10,
+   "category": "games",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/252/software-for-creating-and-publishing-game-cards",
+     "date": "2014-02-05",
+     "points": 9,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "Enter cards by form or pasted CSV with title, text and image; lays them out on printable sheets."
+  },
+  {
+   "slug": "command-line-quest",
+   "wish": "someone should make a game that teaches the Linux command line",
+   "year": 2014,
+   "agreed": 21,
+   "category": "games",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/10543/a-game-to-learn-how-to-use-the-linux-command-line",
+     "date": "2014-08-09",
+     "points": 11,
+     "comments": 1
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/53871/educational-games-to-master-unix-command-line",
+     "date": "2018-12-23",
+     "points": 6,
+     "comments": 3
+    }
+   ],
+   "spec_hint": "Simulated shell over a fake filesystem; puzzles teach ls, cd, cat, grep and mv one step at a time."
+  },
+  {
+   "slug": "piano-note-game",
+   "wish": "someone should make a game that teaches piano playing",
+   "year": 2015,
+   "agreed": 12,
+   "category": "music",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/27198/game-to-learn-piano-play",
+     "date": "2015-12-14",
+     "points": 10,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "A note appears on a staff; press the matching key on an on-screen piano; synthesized sound, score and streak."
+  },
+  {
+   "slug": "skip-silence-player",
+   "wish": "someone should make a player that skips silent parts of audio and video",
+   "year": 2015,
+   "agreed": 13,
+   "category": "media",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/26341/player-that-skips-over-silent-parts-of-an-audio-video",
+     "date": "2015-11-10",
+     "points": 8,
+     "comments": 5
+    }
+   ],
+   "spec_hint": "Open audio or video; plays it while jumping over parts below a volume threshold you set."
+  },
+  {
+   "slug": "transcription-player",
+   "wish": "someone should make an app that plays audio with easy rewind and speed control for transcribing",
+   "year": 2014,
+   "agreed": 11,
+   "category": "writing",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/1930/audio-player-on-android-suitable-for-manual-transcription",
+     "date": "2014-03-03",
+     "points": 9,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "Open audio; shortcut keys for play, rewind 3 seconds, speed 0.5x to 2x; text box with timestamp insert."
+  },
+  {
+   "slug": "delayed-echo-recorder",
+   "wish": "someone should make an app that records a sound and plays it back after a set delay",
+   "year": 2016,
+   "agreed": 11,
+   "category": "media",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/35552/record-a-sound-and-play-it-back-after-a-user-defined-delay",
+     "date": "2016-08-17",
+     "points": 9,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "Microphone audio plays back to your headphones after a delay you set from 0 to 10 seconds."
+  },
+  {
+   "slug": "epub-file-reader",
+   "wish": "someone should make a tool that opens epub files",
+   "year": 2020,
+   "agreed": 11,
+   "category": "media",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/75663/how-to-open-epub-files-on-windows",
+     "date": "2020-08-09",
+     "points": 6,
+     "comments": 5
+    }
+   ],
+   "spec_hint": "Open an .epub; unzips locally, shows chapters with a table of contents, font size and remembered position."
+  },
+  {
+   "slug": "mbox-email-reader",
+   "wish": "someone should make a tool that opens large mbox email files and lets me read them",
+   "year": 2014,
+   "agreed": 11,
+   "category": "files",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/2102/mbox-viewer-for-large-files",
+     "date": "2014-03-07",
+     "points": 9,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "Open an .mbox file; lists messages by date, sender and subject; read bodies and search."
+  },
+  {
+   "slug": "real-file-type-checker",
+   "wish": "someone should make a tool that tells a file's real type from its content, not its extension",
+   "year": 2016,
+   "agreed": 11,
+   "category": "files",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/36519/determine-file-type-from-its-content-not-trusting-the-extension",
+     "date": "2016-09-28",
+     "points": 7,
+     "comments": 4
+    }
+   ],
+   "spec_hint": "Drop a file; reads its magic bytes and reports the actual format versus its extension."
+  },
+  {
+   "slug": "file-checksum-checker",
+   "wish": "someone should make a file integrity checker",
+   "year": 2014,
+   "agreed": 78,
+   "category": "files",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/167/file-integrity-checker",
+     "date": "2014-02-05",
+     "points": 43,
+     "comments": 4
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/21492/tool-to-validate-the-integrity-of-my-data-files",
+     "date": "2015-07-26",
+     "points": 12,
+     "comments": 5
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/13714/portable-app-for-calculating-one-selectable-hash-for-a-selected-file",
+     "date": "2014-11-06",
+     "points": 12,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "Drop files; computes SHA-256, SHA-1 and MD5; compares against a pasted expected hash."
+  },
+  {
+   "slug": "jpgs-to-one-pdf",
+   "wish": "someone should make a tool that joins many JPG images into one PDF without recompressing",
+   "year": 2015,
+   "agreed": 29,
+   "category": "files",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/26084/software-to-quickly-join-many-jpg-images-into-one-pdf-without-recompressing",
+     "date": "2015-10-29",
+     "points": 22,
+     "comments": 7
+    }
+   ],
+   "spec_hint": "Select JPG files; writes one PDF embedding the original JPEG bytes, one per page, no recompression."
+  },
+  {
+   "slug": "hex-file-viewer",
+   "wish": "someone should make a tool that views files as hex",
+   "year": 2014,
+   "agreed": 27,
+   "category": "dev",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/1098/what-is-a-good-hex-viewer-for-windows",
+     "date": "2014-02-14",
+     "points": 20,
+     "comments": 7
+    }
+   ],
+   "spec_hint": "Open a file; hex and ASCII columns with offsets, jump to offset, search for bytes or text."
+  },
+  {
+   "slug": "live-regex-tester",
+   "wish": "someone should make a tool that tests regular expressions live, like SQLFiddle",
+   "year": 2014,
+   "agreed": 46,
+   "category": "dev",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/650/tool-for-building-net-regular-expressions",
+     "date": "2014-02-07",
+     "points": 12,
+     "comments": 3
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/4226/regular-expression-tool-like-sqlfiddle",
+     "date": "2014-05-19",
+     "points": 7,
+     "comments": 4
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/6971/free-program-to-create-regular-expressions-with-a-gui",
+     "date": "2014-06-15",
+     "points": 8,
+     "comments": 3
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/12052/regular-expression-tool-for-windows",
+     "date": "2014-10-09",
+     "points": 6,
+     "comments": 3
+    }
+   ],
+   "spec_hint": "Type a regex, flags and test text; live match highlights, capture groups and a plain reading of each token."
+  },
+  {
+   "slug": "big-json-viewer",
+   "wish": "someone should make a viewer for huge JSON files",
+   "year": 2014,
+   "agreed": 67,
+   "category": "dev",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/18839/viewer-for-huge-json-files-on-windows",
+     "date": "2015-04-19",
+     "points": 50,
+     "comments": 10
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/3277/render-json-with-collapsibility",
+     "date": "2014-04-15",
+     "points": 5,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "Open or paste large JSON; collapsible tree, search, copy path; stays responsive on tens of megabytes."
+  },
+  {
+   "slug": "offline-qr-code-maker",
+   "wish": "someone should make a tool that generates QR codes without a web service",
+   "year": 2015,
+   "agreed": 16,
+   "category": "everyday",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/16794/qr-code-generator-library-no-web-service",
+     "date": "2015-01-31",
+     "points": 5,
+     "comments": 4
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/46678/privacy-friendly-qr-code-app",
+     "date": "2017-10-25",
+     "points": 6,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "Type text, a link or wifi details; generates the QR code locally; download PNG or SVG."
+  },
+  {
+   "slug": "memorable-password-maker",
+   "wish": "someone should make a password generator that makes memorable passwords",
+   "year": 2014,
+   "agreed": 16,
+   "category": "privacy",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/13682/offline-passphrase-generator-for-linux",
+     "date": "2014-11-04",
+     "points": 5,
+     "comments": 3
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/47514/random-truly-memorable-password-generator",
+     "date": "2017-12-08",
+     "points": 6,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "Generates passphrases from an embedded word list; choose words, separator, digits; shows strength in bits."
+  },
+  {
+   "slug": "measure-on-a-photo",
+   "wish": "someone should make a tool that measures real distances on images",
+   "year": 2015,
+   "agreed": 10,
+   "category": "photo",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/21471/software-to-measure-true-distances-on-images-on-linux",
+     "date": "2015-07-25",
+     "points": 6,
+     "comments": 4
+    }
+   ],
+   "spec_hint": "Load an image, mark a reference line of known length; click points to measure distances and areas."
+  },
+  {
+   "slug": "gif-animation-maker",
+   "wish": "someone should make a tool that animates GIFs",
+   "year": 2014,
+   "agreed": 25,
+   "category": "photo",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/3237/free-gif-animator",
+     "date": "2014-04-14",
+     "points": 20,
+     "comments": 5
+    }
+   ],
+   "spec_hint": "Add images or draw frames, set delay per frame; encodes an animated GIF locally for download."
+  },
+  {
+   "slug": "seamless-pixel-tile-maker",
+   "wish": "someone should make an app that makes seamless pixel tiles",
+   "year": 2014,
+   "agreed": 18,
+   "category": "design",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/204/what-pixel-graphics-program-supports-creating-seamless-tiles",
+     "date": "2014-02-05",
+     "points": 14,
+     "comments": 4
+    }
+   ],
+   "spec_hint": "Draw on a pixel grid that wraps at the edges with a live 3x3 tiled preview; export PNG."
+  },
+  {
+   "slug": "geometric-avatar-maker",
+   "wish": "someone should make a tool that generates avatar portraits",
+   "year": 2014,
+   "agreed": 8,
+   "category": "design",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/1238/avatar-portrait-image-generator",
+     "date": "2014-02-16",
+     "points": 7,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "Pick face shape, features and colors or randomize; generates a portrait avatar; export SVG or PNG."
+  },
+  {
+   "slug": "image-color-extractor",
+   "wish": "someone should make a web app that extracts all the colours of an image",
+   "year": 2014,
+   "agreed": 7,
+   "category": "photo",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/14825/web-app-to-extract-all-colours-of-an-image",
+     "date": "2014-12-23",
+     "points": 6,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "Load an image; lists its dominant colors with hex codes and share of pixels; copy the palette."
+  },
+  {
+   "slug": "simple-sketch-pad",
+   "wish": "someone should make an app that is drawing software for amateurs",
+   "year": 2014,
+   "agreed": 52,
+   "category": "design",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/395/drawing-software-for-amateurs",
+     "date": "2014-02-05",
+     "points": 24,
+     "comments": 7
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/35647/tool-for-sketching-drawing-painting-quickly-linux-ubuntu",
+     "date": "2016-08-22",
+     "points": 16,
+     "comments": 5
+    }
+   ],
+   "spec_hint": "Brushes, eraser, colors, sizes and undo on a canvas that works with finger or stylus; save PNG."
+  },
+  {
+   "slug": "mind-map-maker",
+   "wish": "someone should make a tool for making mind maps",
+   "year": 2014,
+   "agreed": 34,
+   "category": "work",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/234/what-are-alternatives-for-mindjets-mind-mapping-software",
+     "date": "2014-02-05",
+     "points": 9,
+     "comments": 4
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/47540/non-hierarchical-mind-map-software",
+     "date": "2017-12-11",
+     "points": 6,
+     "comments": 2
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/16758/free-mind-mapping-software-for-windows-and-android",
+     "date": "2015-01-30",
+     "points": 6,
+     "comments": 1
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/24937/cross-platform-offline-mindmapping",
+     "date": "2015-09-19",
+     "points": 5,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "Add nodes or type an indented outline; draws a draggable mind map; export SVG, PNG and JSON."
+  },
+  {
+   "slug": "flowchart-maker",
+   "wish": "someone should make an app that draws flowcharts",
+   "year": 2014,
+   "agreed": 29,
+   "category": "design",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/10371/free-open-source-tool-for-creating-flowcharts",
+     "date": "2014-08-01",
+     "points": 17,
+     "comments": 2
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/21129/flowchart-editor-for-windows-mac-linux-graphical-works-offline",
+     "date": "2015-07-14",
+     "points": 6,
+     "comments": 4
+    }
+   ],
+   "spec_hint": "Add boxes, decisions and arrows, drag and label them; export SVG or PNG."
+  },
+  {
+   "slug": "visual-equation-editor",
+   "wish": "someone should make a tool that edits math equations visually",
+   "year": 2014,
+   "agreed": 21,
+   "category": "math",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/5681/wysiwyg-for-math-equations",
+     "date": "2014-06-04",
+     "points": 17,
+     "comments": 4
+    }
+   ],
+   "spec_hint": "Build equations with buttons for fractions, roots, powers and symbols; renders the math; copy as LaTeX."
+  },
+  {
+   "slug": "compass-and-straightedge",
+   "wish": "someone should make a WYSIWYG geometry tool",
+   "year": 2014,
+   "agreed": 11,
+   "category": "math",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/7419/wysiwyg-geometry-tool",
+     "date": "2014-06-30",
+     "points": 10,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "Place points, lines and circles with intersections; drag points and the construction updates; measure lengths and angles."
+  },
+  {
+   "slug": "3d-equation-plotter",
+   "wish": "someone should make a tool that plots math equations in 3D",
+   "year": 2014,
+   "agreed": 16,
+   "category": "math",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/2822/math-equations-software-for-3d-plotting",
+     "date": "2014-03-29",
+     "points": 11,
+     "comments": 5
+    }
+   ],
+   "spec_hint": "Type z = f(x, y); renders a rotatable shaded 3D surface on canvas with axis ranges."
+  },
+  {
+   "slug": "graph-image-digitizer",
+   "wish": "someone should make a tool that makes a plot when I click on a graph",
+   "year": 2014,
+   "agreed": 10,
+   "category": "math",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/2239/click-on-graph-to-create-plot",
+     "date": "2014-03-11",
+     "points": 8,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "Load a chart image, calibrate both axes with two clicks each; click points to read data; export CSV."
+  },
+  {
+   "slug": "brainfuck-debugger",
+   "wish": "someone should make an IDE for Brainfuck",
+   "year": 2014,
+   "agreed": 14,
+   "category": "dev",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/3639/brainfuck-ide-for-windows",
+     "date": "2014-04-28",
+     "points": 11,
+     "comments": 3
+    }
+   ],
+   "spec_hint": "Edit Brainfuck code; run or step through it; shows the tape, pointer, input and output."
+  },
+  {
+   "slug": "toddler-tap-games",
+   "wish": "someone should make computer games for 4 year old children",
+   "year": 2015,
+   "agreed": 12,
+   "category": "kids",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/16823/computer-games-for-4-year-old-children",
+     "date": "2015-02-01",
+     "points": 9,
+     "comments": 3
+    }
+   ],
+   "spec_hint": "Big shapes and colors that make sounds and animate when tapped; nothing to lose, no reading needed."
+  },
+  {
+   "slug": "picture-swap-storybook",
+   "wish": "someone should make a storybook program where parents can change the pictures but not the text",
+   "year": 2014,
+   "agreed": 7,
+   "category": "kids",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/11973/personalized-storybook-like-program-that-parents-and-teachers-can-change-the-pic",
+     "date": "2014-10-06",
+     "points": 5,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "A parent writes a short book and locks the text; pictures on each page can be swapped for family photos."
+  },
+  {
+   "slug": "table-to-heatmap",
+   "wish": "someone should make a tool that makes a heatmap from a table of numbers",
+   "year": 2016,
+   "agreed": 11,
+   "category": "data",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/35873/heatmap-chart-generator-for-table-matrix-data",
+     "date": "2016-09-01",
+     "points": 7,
+     "comments": 4
+    }
+   ],
+   "spec_hint": "Paste a table of numbers with labels; draws a colored heatmap with a scale; export PNG or SVG."
+  },
+  {
+   "slug": "redact-a-scan",
+   "wish": "someone should make a tool that blacks out information in scanned documents",
+   "year": 2014,
+   "agreed": 9,
+   "category": "privacy",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/13353/need-program-to-help-remove-information-from-scanned-documents",
+     "date": "2014-10-21",
+     "points": 8,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "Load a scanned page image; draw solid black boxes; exports a flattened PNG with the covered pixels gone."
+  },
+  {
+   "slug": "recipes-to-shopping-list",
+   "wish": "someone should make a recipe database with a shopping list generator",
+   "year": 2015,
+   "agreed": 7,
+   "category": "food",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/18323/recipe-database-with-shopping-list-generator",
+     "date": "2015-03-29",
+     "points": 5,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "Store recipes with ingredients; pick meals for the week; get one merged shopping list."
+  },
+  {
+   "slug": "editor-color-scheme-maker",
+   "wish": "someone should make a tool that generates text editor color schemes",
+   "year": 2014,
+   "agreed": 14,
+   "category": "design",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=7153750",
+     "date": "2014-01-30",
+     "points": 11,
+     "comments": 3
+    }
+   ],
+   "spec_hint": "Pick base colors; preview sample code highlighted live; export as VS Code and Vim theme files."
+  },
+  {
+   "slug": "screenshot-in-browser-frame",
+   "wish": "someone should make a tool that wraps screenshots in a browser window",
+   "year": 2014,
+   "agreed": 6,
+   "category": "design",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/13985/chrome-firefox-extension-for-screenshots-that-are-wrapped-in-a-browser-window",
+     "date": "2014-11-18",
+     "points": 5,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "Load a screenshot; wraps it in a light or dark browser window frame with shadow; export PNG."
+  },
+  {
+   "slug": "guitar-chord-charts",
+   "wish": "someone should make an app that shows guitar chord fingering charts with alternate symbols",
+   "year": 2014,
+   "agreed": 10,
+   "category": "music",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/960/guitar-chords-application-with-a-catalogue-of-fingering-charts-and-alternate-cho",
+     "date": "2014-02-11",
+     "points": 7,
+     "comments": 3
+    }
+   ],
+   "spec_hint": "Type a chord name; shows fingering diagrams with alternate voicings; plays the chord."
+  },
+  {
+   "slug": "draw-on-video",
+   "wish": "someone should make an app that annotates video by drawing on frames",
+   "year": 2014,
+   "agreed": 42,
+   "category": "media",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/266/simple-video-annotation-software-that-allows-drawing-in-frames-windows-or-linux",
+     "date": "2014-02-05",
+     "points": 28,
+     "comments": 6
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/18510/simple-and-local-software-to-annotate-videos",
+     "date": "2015-04-06",
+     "points": 7,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "Open a video; pause to draw on frames; drawings reappear at their times; export annotated frames as PNG."
+  },
+  {
+   "slug": "videos-side-by-side",
+   "wish": "someone should make an app that plays several videos side by side",
+   "year": 2014,
+   "agreed": 21,
+   "category": "media",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/20359/showing-multiple-videos-at-once",
+     "date": "2015-06-16",
+     "points": 7,
+     "comments": 4
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/10105/playing-multiple-video-files-side-by-side",
+     "date": "2014-07-24",
+     "points": 6,
+     "comments": 4
+    }
+   ],
+   "spec_hint": "Open two to four local videos; play them in sync in a grid with per-video offsets."
+  },
+  {
+   "slug": "video-to-frames",
+   "wish": "someone should make a tool that steps through a video and extracts single frames",
+   "year": 2014,
+   "agreed": 42,
+   "category": "media",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/237/what-free-tool-can-step-through-and-extract-individual-frames-of-a-video",
+     "date": "2014-02-05",
+     "points": 15,
+     "comments": 2
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/6783/split-video-into-pictures",
+     "date": "2014-06-08",
+     "points": 8,
+     "comments": 2
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/19252/what-program-will-convert-video-frames-to-jpegs",
+     "date": "2015-05-04",
+     "points": 6,
+     "comments": 3
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/25331/software-for-fast-review-videos-stills-and-grab-screenshots",
+     "date": "2015-10-02",
+     "points": 5,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "Open a video; grab the current frame or one every N seconds; download as images."
+  },
+  {
+   "slug": "cv-website-builder",
+   "wish": "someone should make a site that builds a personal CV website",
+   "year": 2025,
+   "agreed": 27,
+   "category": "work",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=44219898",
+     "date": "2025-06-08",
+     "points": 8,
+     "comments": 19
+    }
+   ],
+   "spec_hint": "Fill in CV sections; live preview; download the finished personal site as one HTML file."
+  },
+  {
+   "slug": "simple-invoice-maker",
+   "wish": "someone should make an app for invoicing and accounting",
+   "year": 2014,
+   "agreed": 21,
+   "category": "money",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/2771/invoicing-and-accounting-software",
+     "date": "2014-03-27",
+     "points": 5,
+     "comments": 3
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/25843/recommended-software-for-invoicing-with-customer-order-databases",
+     "date": "2015-09-07",
+     "points": 6,
+     "comments": 1
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/3848/invoicing-program-to-increase-productivity",
+     "date": "2014-05-05",
+     "points": 5,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "Enter your details, client, line items and tax; shows a printable invoice; remembers invoice numbers."
+  },
+  {
+   "slug": "fountain-screenplay-formatter",
+   "wish": "someone should make a tool that converts fountain screenplays to PDF",
+   "year": 2015,
+   "agreed": 13,
+   "category": "writing",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/17402/convert-fountain-files-to-pdf-files",
+     "date": "2015-02-23",
+     "points": 10,
+     "comments": 3
+    }
+   ],
+   "spec_hint": "Write or open Fountain text; renders standard screenplay layout; print to PDF."
+  },
+  {
+   "slug": "spending-and-budget-tracker",
+   "wish": "someone should make an app that tracks my spending and budget",
+   "year": 2014,
+   "agreed": 50,
+   "category": "money",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=18969737",
+     "date": "2019-01-22",
+     "points": 7,
+     "comments": 12
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/28543/money-management",
+     "date": "2016-02-05",
+     "points": 10,
+     "comments": 1
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/938/lightweight-home-bookkeeping-spending-accounting-service",
+     "date": "2014-02-11",
+     "points": 8,
+     "comments": 2
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/19419/exceedingly-simple-expense-app",
+     "date": "2015-05-09",
+     "points": 7,
+     "comments": 3
+    }
+   ],
+   "spec_hint": "Log expenses by category; set monthly budgets; shows what remains and a category chart."
+  },
+  {
+   "slug": "vegetarian-day-calendar",
+   "wish": "someone should make an app that tracks my vegetarian days",
+   "year": 2018,
+   "agreed": 8,
+   "category": "food",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/51675/is-there-any-app-to-track-my-vegetarian-days",
+     "date": "2018-08-08",
+     "points": 7,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "Tap a day to mark it vegetarian; month calendar, current streak and yearly share."
+  },
+  {
+   "slug": "wine-cellar-log",
+   "wish": "someone should make an app to manage a wine cellar",
+   "year": 2014,
+   "agreed": 8,
+   "category": "food",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/2744/free-wine-cellar-management-software",
+     "date": "2014-03-26",
+     "points": 6,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "Record bottles with vintage, rack location and drink window; search, counts and a drink-now list."
+  },
+  {
+   "slug": "work-diary",
+   "wish": "someone should make an app to keep a work diary",
+   "year": 2015,
+   "agreed": 69,
+   "category": "work",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=10417071",
+     "date": "2015-10-20",
+     "points": 28,
+     "comments": 41
+    }
+   ],
+   "spec_hint": "Dated daily entries with search and a weekly view; export everything as Markdown."
+  },
+  {
+   "slug": "text-scratchpad",
+   "wish": "someone should make a site that is just a text scratchpad",
+   "year": 2022,
+   "agreed": 102,
+   "category": "writing",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=33747231",
+     "date": "2022-11-25",
+     "points": 39,
+     "comments": 63
+    }
+   ],
+   "spec_hint": "One full-page text area that saves itself on the device; word count; nothing else."
+  },
+  {
+   "slug": "programmer-calculator",
+   "wish": "someone should make a calculator for programmers",
+   "year": 2015,
+   "agreed": 13,
+   "category": "dev",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/26241/windows-calculator-for-programmers",
+     "date": "2015-11-05",
+     "points": 11,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "Calculator showing hex, decimal, octal and binary at once with bitwise ops, shifts and word sizes."
+  },
+  {
+   "slug": "text-diff",
+   "wish": "someone should make a tool that diffs two texts pasted into it",
+   "year": 2014,
+   "agreed": 40,
+   "category": "text",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/36023/diff-tool-for-linux-that-you-can-paste-two-texts-into-without-files",
+     "date": "2016-09-08",
+     "points": 13,
+     "comments": 3
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/4278/console-based-file-comparison-diffing-tool",
+     "date": "2014-05-21",
+     "points": 11,
+     "comments": 3
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/16872/diff-text-files-and-print-the-resultant-comparison-two-pane-with-differences-hig",
+     "date": "2015-02-03",
+     "points": 8,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "Paste or open two texts; shows line and word differences side by side or inline."
+  },
+  {
+   "slug": "compare-two-lists",
+   "wish": "someone should make a tool that compares two lists of words, one per line",
+   "year": 2014,
+   "agreed": 16,
+   "category": "text",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/10137/software-that-will-compare-two-txt-files-containing-two-lists-of-line-separated",
+     "date": "2014-07-25",
+     "points": 5,
+     "comments": 3
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/18930/comparing-two-text-files-to-see-they-contain-all-the-same-lines-though-not-nece",
+     "date": "2015-04-22",
+     "points": 5,
+     "comments": 3
+    }
+   ],
+   "spec_hint": "Paste two lists one item per line; shows items only in A, only in B and in both."
+  },
+  {
+   "slug": "repeated-phrase-finder",
+   "wish": "someone should make a tool that detects repeated sentences or phrases in a document",
+   "year": 2015,
+   "agreed": 18,
+   "category": "text",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/16200/detect-repeated-sentences-or-phrases-in-a-document",
+     "date": "2015-01-11",
+     "points": 16,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "Paste a document; lists repeated sentences and phrases by length and count, highlighted in the text."
+  },
+  {
+   "slug": "cooking-measure-converter",
+   "wish": "someone should make an app that converts cooking measures, like 40g of sugar to mL",
+   "year": 2014,
+   "agreed": 8,
+   "category": "food",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/2399/cooking-measures-conversions-app-eg-40g-of-granulated-sugar-%e2%86%92-47-ml-for-andro",
+     "date": "2014-03-17",
+     "points": 6,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "Pick an ingredient and amount; converts grams to cups, mL and spoons using ingredient densities."
+  },
+  {
+   "slug": "base64-hex-converter",
+   "wish": "someone should make a tool that converts between base64 and hex",
+   "year": 2014,
+   "agreed": 13,
+   "category": "dev",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/7382/library-to-convert-between-base64-hex-for-c",
+     "date": "2014-06-29",
+     "points": 9,
+     "comments": 4
+    }
+   ],
+   "spec_hint": "Paste base64, hex or text; converts between all three live, with file input too."
+  },
+  {
+   "slug": "json-csv-xml-converter",
+   "wish": "someone should make a tool that converts structured text like XML, JSON and CSV",
+   "year": 2014,
+   "agreed": 13,
+   "category": "data",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/9859/library-for-transforming-structured-text-files-xml-to-json-or-json-to-csv",
+     "date": "2014-07-16",
+     "points": 11,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "Paste or open JSON, CSV, XML or YAML; converts to any of the others; download the result."
+  },
+  {
+   "slug": "html-to-markdown",
+   "wish": "someone should make a tool that converts HTML to Markdown",
+   "year": 2014,
+   "agreed": 15,
+   "category": "text",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/7321/html-to-markdown-javascript-converter",
+     "date": "2014-06-26",
+     "points": 11,
+     "comments": 1
+    },
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=43240176",
+     "date": "2025-03-03",
+     "points": 1,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "Paste HTML or rich text; converts it to clean Markdown with a preview."
+  },
+  {
+   "slug": "rest-break-reminder",
+   "wish": "someone should make a tool that forces me to take rest breaks at the computer",
+   "year": 2014,
+   "agreed": 54,
+   "category": "health",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/599/software-forcing-me-to-make-rest-breaks-during-work-at-the-computer",
+     "date": "2014-02-07",
+     "points": 22,
+     "comments": 5
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/18082/force-user-to-look-away-from-monitor",
+     "date": "2015-03-20",
+     "points": 15,
+     "comments": 2
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/45143/automated-screen-pause-reminder",
+     "date": "2017-08-13",
+     "points": 8,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "Set work and break lengths; full-screen break prompt with countdown that is hard to skip; eye-rest tips."
+  },
+  {
+   "slug": "timer-and-stopwatch",
+   "wish": "someone should make an app that is a nice-looking timer and stopwatch",
+   "year": 2017,
+   "agreed": 29,
+   "category": "time",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/43145/timer-stopwatch-for-windows-that-looks-nice-and-is-always-on-top-or-in-the-tas",
+     "date": "2017-06-22",
+     "points": 22,
+     "comments": 7
+    }
+   ],
+   "spec_hint": "A clean countdown timer and stopwatch with laps, big digits and a sound at zero."
+  },
+  {
+   "slug": "plain-todo-list",
+   "wish": "someone should make a to-do list app",
+   "year": 2014,
+   "agreed": 12,
+   "category": "everyday",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/2620/simple-mac-to-do-list",
+     "date": "2014-03-22",
+     "points": 10,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "Add, check off, reorder and delete tasks; saved on the device; nothing else."
+  },
+  {
+   "slug": "pomodoro-timer",
+   "wish": "someone should make a pomodoro timer",
+   "year": 2014,
+   "agreed": 8,
+   "category": "time",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/3961/pomodoro-technique-timer-assistant-for-windows",
+     "date": "2014-05-08",
+     "points": 7,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "25-minute work and 5-minute break cycles with adjustable lengths, sound and a count of rounds."
+  },
+  {
+   "slug": "unit-converter",
+   "wish": "someone should make a universal unit conversion app",
+   "year": 2016,
+   "agreed": 10,
+   "category": "math",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/29789/universal-unit-conversion-application",
+     "date": "2016-02-15",
+     "points": 6,
+     "comments": 4
+    }
+   ],
+   "spec_hint": "Convert length, mass, volume, temperature, area, speed, time and data units as you type."
+  }
+ ],
+ "reserve": [
+  {
+   "slug": "mahjong-score-counter",
+   "wish": "someone should make a Mahjong score counting app",
+   "year": 2014,
+   "agreed": 6,
+   "category": "games",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/14919/android-mahjong-score-counting-app",
+     "date": "2014-12-29",
+     "points": 5,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "Four players' points per hand, running totals and dealer rotation; editable scoring values."
+  },
+  {
+   "slug": "relational-algebra-runner",
+   "wish": "someone should make a tool that runs relational algebra queries",
+   "year": 2015,
+   "agreed": 9,
+   "category": "learning",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/25707/a-database-management-system-that-understands-relational-algebra-queries",
+     "date": "2015-10-15",
+     "points": 8,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "Define small tables; write selection, projection, join and set expressions; shows result tables."
+  },
+  {
+   "slug": "ics-calendar-viewer",
+   "wish": "someone should make a tool that shows the contents of an .ics calendar file",
+   "year": 2014,
+   "agreed": 7,
+   "category": "time",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/13231/small-program-to-visualize-the-content-of-an-icalendar-ics-file",
+     "date": "2014-10-16",
+     "points": 6,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "Open an .ics file; lists its events in agenda and month views with details."
+  },
+  {
+   "slug": "eml-attachment-extractor",
+   "wish": "someone should make a tool that extracts attachments from .eml files",
+   "year": 2014,
+   "agreed": 21,
+   "category": "files",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/13470/extract-attachments-from-eml-file",
+     "date": "2014-10-27",
+     "points": 18,
+     "comments": 3
+    }
+   ],
+   "spec_hint": "Open an .eml file; decodes its MIME parts and offers each attachment for download."
+  },
+  {
+   "slug": "chord-progression-player",
+   "wish": "someone should make an app for composing music with good chord playback",
+   "year": 2014,
+   "agreed": 18,
+   "category": "music",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/84/music-composing-software-that-provides-a-good-quality-playback-of-chords",
+     "date": "2014-02-04",
+     "points": 15,
+     "comments": 3
+    }
+   ],
+   "spec_hint": "Place chords on a timeline; plays them with synthesized voicings; tempo and loop."
+  },
+  {
+   "slug": "movie-end-credits-maker",
+   "wish": "someone should make a tool that makes movie end credits",
+   "year": 2014,
+   "agreed": 7,
+   "category": "design",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/4001/movie-end-credits-software",
+     "date": "2014-05-10",
+     "points": 6,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "Enter roles and names; plays scrolling end credits full screen at an adjustable speed."
+  },
+  {
+   "slug": "list-to-graphic",
+   "wish": "someone should make a tool that turns a list into a graphic like SmartArt",
+   "year": 2015,
+   "agreed": 8,
+   "category": "design",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/25153/tool-for-generating-graphics-from-lists-like-microsofts-smartart",
+     "date": "2015-09-26",
+     "points": 5,
+     "comments": 3
+    }
+   ],
+   "spec_hint": "Type a list; renders it as a process, cycle, pyramid or hierarchy graphic; export SVG or PNG."
+  },
+  {
+   "slug": "low-poly-map-maker",
+   "wish": "someone should make an app that creates maps made of polygons",
+   "year": 2014,
+   "agreed": 14,
+   "category": "design",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/151/gui-app-to-create-maps-made-up-of-polygons",
+     "date": "2014-02-05",
+     "points": 13,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "Generates a map of polygon regions; paint terrain and name regions; export PNG."
+  },
+  {
+   "slug": "where-did-i-put-it",
+   "wish": "someone should make an app that reminds me where I put things",
+   "year": 2016,
+   "agreed": 13,
+   "category": "everyday",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=10873151",
+     "date": "2016-01-09",
+     "points": 5,
+     "comments": 8
+    }
+   ],
+   "spec_hint": "Log an item and where it is; search to find it; saved on the device."
+  },
+  {
+   "slug": "memory-and-focus-drills",
+   "wish": "someone should make an app that trains perception, cognition and memory",
+   "year": 2014,
+   "agreed": 10,
+   "category": "games",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/328/brain-trainer-exercise-perception-cognition-and-memory",
+     "date": "2014-02-05",
+     "points": 9,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "Short drills for n-back, digit span and reaction time with local best scores."
+  },
+  {
+   "slug": "lfsr-maximal-taps-finder",
+   "wish": "someone should make a tool that finds polynomial masks with maximal period for LFSRs",
+   "year": 2014,
+   "agreed": 10,
+   "category": "math",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/247/tool-to-calculate-polynomial-masks-with-maximal-period-for-lfsrs",
+     "date": "2014-02-05",
+     "points": 8,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "Choose a register length; finds tap masks with maximal period and checks a given mask."
+  },
+  {
+   "slug": "latex-table-maker",
+   "wish": "someone should make an app that creates latex tables",
+   "year": 2014,
+   "agreed": 18,
+   "category": "text",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/2427/program-to-create-latex-tables",
+     "date": "2014-03-17",
+     "points": 16,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "Edit a grid or paste CSV; outputs LaTeX tabular code with alignment and rules."
+  },
+  {
+   "slug": "number-key-alarm-clock",
+   "wish": "someone should make an alarm clock you set with number keys",
+   "year": 2014,
+   "agreed": 7,
+   "category": "time",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/10011/alarm-clock-with-numpad-digits",
+     "date": "2014-07-22",
+     "points": 6,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "Type the alarm time on number keys; big clock and an alarm sound while the page is open."
+  },
+  {
+   "slug": "small-svg-editor",
+   "wish": "someone should make a standalone SVG editor",
+   "year": 2014,
+   "agreed": 49,
+   "category": "design",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/46362/a-standalone-svg-editor",
+     "date": "2017-10-12",
+     "points": 39,
+     "comments": 5
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/2035/vector-drawing-app-for-android",
+     "date": "2014-03-06",
+     "points": 5,
+     "comments": 0
+    }
+   ],
+   "spec_hint": "Draw and edit SVG shapes, paths and text; edit attributes; open and save .svg files."
+  },
+  {
+   "slug": "xml-diff",
+   "wish": "someone should make a tool that diffs XML files",
+   "year": 2015,
+   "agreed": 37,
+   "category": "dev",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/18098/diff-tool-for-xml-files",
+     "date": "2015-03-20",
+     "points": 31,
+     "comments": 6
+    }
+   ],
+   "spec_hint": "Paste two XML documents; structural diff of elements, attributes and text."
+  },
+  {
+   "slug": "markdown-to-pdf",
+   "wish": "someone should make a tool that converts Markdown to PDF without LaTeX",
+   "year": 2014,
+   "agreed": 37,
+   "category": "writing",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/3588/how-to-convert-markdown-to-pdf-without-latex",
+     "date": "2014-04-25",
+     "points": 30,
+     "comments": 7
+    }
+   ],
+   "spec_hint": "Write or open Markdown; styled preview; print to PDF with page breaks and no LaTeX."
+  },
+  {
+   "slug": "apache-log-viewer",
+   "wish": "someone should make a tool that views Apache logs",
+   "year": 2014,
+   "agreed": 40,
+   "category": "dev",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/1358/apache-log-viewer-alternative-for-linux",
+     "date": "2014-02-19",
+     "points": 37,
+     "comments": 3
+    }
+   ],
+   "spec_hint": "Open an Apache access log; parsed table with filters, top paths, status codes and hourly chart."
+  },
+  {
+   "slug": "identical-image-check",
+   "wish": "someone should make a tool that checks whether two images are exactly the same",
+   "year": 2014,
+   "agreed": 51,
+   "category": "photo",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/9774/command-line-tool-to-check-whether-two-images-are-exactly-the-same-graphically",
+     "date": "2014-07-13",
+     "points": 32,
+     "comments": 8
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/51032/compare-two-image-files-for-identical-data-excluding-metadata",
+     "date": "2018-07-08",
+     "points": 6,
+     "comments": 5
+    }
+   ],
+   "spec_hint": "Load two images; reports whether their pixels are exactly identical, ignoring metadata."
+  },
+  {
+   "slug": "tree-of-notes",
+   "wish": "someone should make a tool that stores links and notes in a tree",
+   "year": 2014,
+   "agreed": 27,
+   "category": "writing",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/14116/a-tool-to-store-knowledge-mostly-links-with-some-notes-in-a-tree-like-structur",
+     "date": "2014-11-23",
+     "points": 9,
+     "comments": 5
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/14521/tree-structured-text-editor-note-taker",
+     "date": "2014-12-10",
+     "points": 9,
+     "comments": 4
+    }
+   ],
+   "spec_hint": "Notes and links arranged in a collapsible tree; drag to reorder; search; export JSON."
+  },
+  {
+   "slug": "gantt-chart-maker",
+   "wish": "someone should make an app that makes gantt charts",
+   "year": 2014,
+   "agreed": 33,
+   "category": "work",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/4542/open-source-gantt-chart-applications",
+     "date": "2014-05-29",
+     "points": 11,
+     "comments": 8
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/21146/simple-gantt-like-timeline-chart-tool",
+     "date": "2015-07-14",
+     "points": 11,
+     "comments": 3
+    }
+   ],
+   "spec_hint": "Enter tasks with start, duration and dependencies; draws a Gantt chart; export PNG."
+  },
+  {
+   "slug": "quick-erd-maker",
+   "wish": "someone should make a tool that draws data model diagrams quickly",
+   "year": 2014,
+   "agreed": 23,
+   "category": "dev",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/1350/quick-and-easy-data-model-diagrams-erd",
+     "date": "2014-02-19",
+     "points": 18,
+     "comments": 5
+    }
+   ],
+   "spec_hint": "Type tables and fields in a short text syntax; draws an entity-relationship diagram; export SVG."
+  },
+  {
+   "slug": "neural-network-diagram",
+   "wish": "someone should make a tool that draws convolutional neural network diagrams",
+   "year": 2016,
+   "agreed": 49,
+   "category": "design",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/28169/drawing-convolutional-neural-networks",
+     "date": "2016-01-20",
+     "points": 38,
+     "comments": 3
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/47841/drawing-neural-networks",
+     "date": "2017-12-29",
+     "points": 6,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "List layers with sizes; draws a convolutional network block diagram; export SVG."
+  },
+  {
+   "slug": "tech-tree-diagram",
+   "wish": "someone should make a tool that diagrams a tech tree",
+   "year": 2014,
+   "agreed": 36,
+   "category": "design",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/10560/diagram-a-tech-tree",
+     "date": "2014-08-09",
+     "points": 23,
+     "comments": 3
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/83408/dsl-to-describe-and-maybe-render-tech-trees",
+     "date": "2022-07-04",
+     "points": 6,
+     "comments": 4
+    }
+   ],
+   "spec_hint": "Write techs and prerequisites as text; renders a layered tech tree; export SVG."
+  },
+  {
+   "slug": "ear-training-drills",
+   "wish": "someone should make an app for ear training",
+   "year": 2014,
+   "agreed": 8,
+   "category": "music",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/4391/ear-training-software",
+     "date": "2014-05-25",
+     "points": 7,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "Plays intervals or chords; you name them; tracks accuracy per type."
+  },
+  {
+   "slug": "voice-character-changer",
+   "wish": "someone should make an app that changes your voice into character voices",
+   "year": 2015,
+   "agreed": 17,
+   "category": "music",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/23429/app-that-can-change-your-voice-into-different-characters-voices",
+     "date": "2015-08-30",
+     "points": 7,
+     "comments": 2
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/25104/voice-modifier-software",
+     "date": "2015-09-24",
+     "points": 6,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "Record or use the microphone; apply pitch, robot and echo effects; download the result."
+  },
+  {
+   "slug": "last-minutes-recorder",
+   "wish": "someone should make an app that keeps recording the last few minutes of microphone audio",
+   "year": 2015,
+   "agreed": 10,
+   "category": "music",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/18349/windows-software-to-constantly-record-the-last-x-minutes-of-audio-entering-the-m",
+     "date": "2015-03-30",
+     "points": 7,
+     "comments": 3
+    }
+   ],
+   "spec_hint": "Keeps the last N minutes of microphone audio in memory; save that slice on tap."
+  },
+  {
+   "slug": "audio-waveform-image",
+   "wish": "someone should make a tool that makes an image of an audio file's waveform",
+   "year": 2014,
+   "agreed": 8,
+   "category": "music",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/13908/library-that-produces-an-image-of-an-audio-files-waveform",
+     "date": "2014-11-14",
+     "points": 5,
+     "comments": 3
+    }
+   ],
+   "spec_hint": "Open an audio file; draws its waveform with chosen colors and size; export PNG or SVG."
+  },
+  {
+   "slug": "batch-image-resizer",
+   "wish": "someone should make a tool that resizes images automatically",
+   "year": 2014,
+   "agreed": 20,
+   "category": "photo",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/200/what-program-offers-automated-image-resizing",
+     "date": "2014-02-05",
+     "points": 13,
+     "comments": 7
+    }
+   ],
+   "spec_hint": "Select many images; resize to a max size or percent and recompress; download them all."
+  },
+  {
+   "slug": "split-scanned-photos",
+   "wish": "someone should make a tool that crops a scan of several photos into separate images",
+   "year": 2014,
+   "agreed": 21,
+   "category": "photo",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/13152/automatically-crop-a-scan-of-multiple-photos",
+     "date": "2014-10-13",
+     "points": 7,
+     "comments": 4
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/21056/program-to-cutsave-rectangles-out-of-a-scanned-document",
+     "date": "2015-07-10",
+     "points": 7,
+     "comments": 3
+    }
+   ],
+   "spec_hint": "Load a scan of several photos; detects or lets you draw each one; saves them as separate images."
+  },
+  {
+   "slug": "blur-screenshot-text",
+   "wish": "someone should make a tool that smears or blurs text in a screenshot",
+   "year": 2014,
+   "agreed": 12,
+   "category": "photo",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/6951/smear-blur-text-image-in-a-screen-shot",
+     "date": "2014-06-13",
+     "points": 11,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "Load a screenshot; drag boxes to pixelate or blur text; export PNG."
+  },
+  {
+   "slug": "sprite-sheet-slicer",
+   "wish": "someone should make a tool that cuts each icon out of a sheet as an individual image",
+   "year": 2012,
+   "agreed": 0,
+   "category": "design",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=4862275",
+     "date": "2012-12-02",
+     "points": 0,
+     "comments": 0
+    }
+   ],
+   "spec_hint": "Load a sprite or icon sheet; set grid or detect icons; download each as its own PNG."
+  },
+  {
+   "slug": "qr-contact-card",
+   "wish": "someone should make an app that makes QR codes to swap contact info",
+   "year": 2023,
+   "agreed": 11,
+   "category": "social",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=35227730",
+     "date": "2023-03-20",
+     "points": 3,
+     "comments": 8
+    }
+   ],
+   "spec_hint": "Enter name, phone and email; makes a vCard QR code someone else can scan."
+  },
+  {
+   "slug": "home-library-catalog",
+   "wish": "someone should make an app for managing a library of books",
+   "year": 2014,
+   "agreed": 23,
+   "category": "home",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/2672/book-management-software-for-library",
+     "date": "2014-03-24",
+     "points": 15,
+     "comments": 2
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/5600/book-library-application",
+     "date": "2014-05-31",
+     "points": 5,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "Add books with title, author, location and loaned-to; search and sort; export CSV."
+  },
+  {
+   "slug": "private-workout-log",
+   "wish": "someone should make an app that tracks my fitness without storing data online",
+   "year": 2014,
+   "agreed": 16,
+   "category": "health",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/13810/fitness-tracking-software-that-doesnt-store-data-online",
+     "date": "2014-11-10",
+     "points": 13,
+     "comments": 3
+    }
+   ],
+   "spec_hint": "Log workouts with exercise, sets, reps and weight; progress charts; data stays on the device."
+  },
+  {
+   "slug": "sun-position-finder",
+   "wish": "someone should make an app that shows where the sun is in the sky",
+   "year": 2015,
+   "agreed": 7,
+   "category": "outdoors",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/20505/sun-positions-app-for-android",
+     "date": "2015-06-22",
+     "points": 5,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "Enter place, date and time; shows the sun's altitude and direction on a sky dome."
+  },
+  {
+   "slug": "random-melody-maker",
+   "wish": "someone should make a tool that generates a random melody over a chord progression",
+   "year": 2014,
+   "agreed": 7,
+   "category": "music",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/137/generate-random-melody-along-a-given-chord-progression",
+     "date": "2014-02-04",
+     "points": 6,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "Pick a chord progression; generates and plays a random melody that fits it; reroll."
+  },
+  {
+   "slug": "anagram-maker",
+   "wish": "someone should make a tool that generates anagrams",
+   "year": 2014,
+   "agreed": 7,
+   "category": "text",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/888/anagram-generator-for-windows-and-linux",
+     "date": "2014-02-10",
+     "points": 6,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "Type letters or words; lists anagrams from an embedded English word list."
+  },
+  {
+   "slug": "css-specificity-calculator",
+   "wish": "someone should make a tool that calculates CSS selector specificity",
+   "year": 2016,
+   "agreed": 10,
+   "category": "dev",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=12488842",
+     "date": "2016-09-13",
+     "points": 6,
+     "comments": 4
+    }
+   ],
+   "spec_hint": "Paste CSS selectors; shows each specificity score and which one wins."
+  },
+  {
+   "slug": "encrypted-diary",
+   "wish": "someone should make an app that keeps an encrypted personal diary",
+   "year": 2015,
+   "agreed": 6,
+   "category": "privacy",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/17083/encrypted-personal-diary-for-android",
+     "date": "2015-02-10",
+     "points": 5,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "Diary entries encrypted on the device with a passphrase; lock, unlock and export."
+  },
+  {
+   "slug": "gapless-loop-player",
+   "wish": "someone should make a media player that loops a file with no gap",
+   "year": 2014,
+   "agreed": 10,
+   "category": "music",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/7235/media-player-that-will-properly-loop-a-file-with-no-intervening-silence",
+     "date": "2014-06-24",
+     "points": 5,
+     "comments": 5
+    }
+   ],
+   "spec_hint": "Open an audio file; loops it or a selected section with no gap."
+  }
+ ],
+ "no": [
+  {
+   "slug": "small-web-search-engine",
+   "wish": "someone should make a search engine that excludes the biggest websites",
+   "year": 2020,
+   "agreed": 806,
+   "category": "media",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=23202850",
+     "date": "2020-05-16",
+     "points": 578,
+     "comments": 228
+    }
+   ],
+   "no": "needs: a server"
+  },
+  {
+   "slug": "idea-giveaway-board",
+   "wish": "someone should make a platform for sharing ideas people want to give away",
+   "year": 2020,
+   "agreed": 452,
+   "category": "social",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=21991260",
+     "date": "2020-01-08",
+     "points": 287,
+     "comments": 165
+    }
+   ],
+   "no": "needs: a server"
+  },
+  {
+   "slug": "social-bookmarking-site",
+   "wish": "someone should make a successor to del.icio.us",
+   "year": 2022,
+   "agreed": 394,
+   "category": "social",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=32506168",
+     "date": "2022-08-18",
+     "points": 223,
+     "comments": 171
+    }
+   ],
+   "no": "needs: a server"
+  },
+  {
+   "slug": "open-calendar-replacement",
+   "wish": "someone should make a powerful open-source replacement for Google Calendar",
+   "year": 2017,
+   "agreed": 320,
+   "category": "time",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=14008085",
+     "date": "2017-03-31",
+     "points": 219,
+     "comments": 101
+    }
+   ],
+   "no": "needs: a server"
+  },
+  {
+   "slug": "cloud-music-library",
+   "wish": "someone should make a cloud music library that does not delete your music",
+   "year": 2022,
+   "agreed": 215,
+   "category": "music",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=33595879",
+     "date": "2022-11-14",
+     "points": 92,
+     "comments": 123
+    }
+   ],
+   "no": "needs: a server"
+  },
+  {
+   "slug": "screen-to-gif-recorder",
+   "wish": "someone should make a tool that records the screen to an animated GIF",
+   "year": 2014,
+   "agreed": 204,
+   "category": "media",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/7019/screen-recording-gif-video-tool-for-mac-os-x",
+     "date": "2014-06-17",
+     "points": 79,
+     "comments": 9
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/710/record-screen-to-animated-gif-on-linux-alternative-to-licecap",
+     "date": "2014-02-08",
+     "points": 79,
+     "comments": 6
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/705/record-screen-section-as-animated-gif",
+     "date": "2014-02-08",
+     "points": 27,
+     "comments": 4
+    }
+   ],
+   "no": "exists: LICEcap"
+  },
+  {
+   "slug": "self-hosted-code-host",
+   "wish": "someone should make a self-hosted replacement for GitHub",
+   "year": 2014,
+   "agreed": 199,
+   "category": "dev",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/867/self-hosted-replacement-for-github",
+     "date": "2014-02-10",
+     "points": 187,
+     "comments": 12
+    }
+   ],
+   "no": "exists: Gitea"
+  },
+  {
+   "slug": "crud-app-builder",
+   "wish": "someone should make an open source tool for creating simple CRUD apps",
+   "year": 2020,
+   "agreed": 165,
+   "category": "dev",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=23264850",
+     "date": "2020-05-21",
+     "points": 114,
+     "comments": 51
+    }
+   ],
+   "no": "too vague"
+  },
+  {
+   "slug": "comment-on-web-pages",
+   "wish": "someone should make a tool that enables commenting on HTML elements",
+   "year": 2022,
+   "agreed": 150,
+   "category": "work",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=32315035",
+     "date": "2022-08-02",
+     "points": 91,
+     "comments": 59
+    }
+   ],
+   "no": "needs: a server"
+  },
+  {
+   "slug": "richest-by-liquid-assets",
+   "wish": "someone should make a list of the richest people by liquid assets",
+   "year": 2022,
+   "agreed": 141,
+   "category": "data",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=33392246",
+     "date": "2022-10-30",
+     "points": 50,
+     "comments": 91
+    }
+   ],
+   "no": "needs: other people's data"
+  },
+  {
+   "slug": "recruiter-blocklist",
+   "wish": "someone should make a recruiter email blocklist",
+   "year": 2021,
+   "agreed": 131,
+   "category": "work",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=28336742",
+     "date": "2021-08-28",
+     "points": 68,
+     "comments": 63
+    }
+   ],
+   "no": "needs: other people's data"
+  },
+  {
+   "slug": "decentralised-team-chat",
+   "wish": "someone should make a decentralised alternative to Slack",
+   "year": 2015,
+   "agreed": 130,
+   "category": "social",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=18724725",
+     "date": "2018-12-20",
+     "points": 51,
+     "comments": 54
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/18754/team-chat-with-private-rooms-file-upload-and-link-previews-alternative-to-slac",
+     "date": "2015-04-15",
+     "points": 17,
+     "comments": 8
+    }
+   ],
+   "no": "needs: a server"
+  },
+  {
+   "slug": "employers-who-do-not-pay",
+   "wish": "someone should make a list of employers who do not pay",
+   "year": 2014,
+   "agreed": 120,
+   "category": "work",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=48707536",
+     "date": "2026-06-28",
+     "points": 54,
+     "comments": 66
+    },
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=7586639",
+     "date": "2014-04-14",
+     "points": 0,
+     "comments": 0
+    }
+   ],
+   "no": "needs: other people's data"
+  },
+  {
+   "slug": "failed-startups-archive",
+   "wish": "someone should make a repository of failed startups",
+   "year": 2012,
+   "agreed": 114,
+   "category": "work",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=3438079",
+     "date": "2012-01-07",
+     "points": 76,
+     "comments": 38
+    }
+   ],
+   "no": "needs: other people's data"
+  },
+  {
+   "slug": "disk-encryption",
+   "wish": "someone should make an alternative to TrueCrypt",
+   "year": 2014,
+   "agreed": 105,
+   "category": "privacy",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/4539/alternatives-to-truecrypt",
+     "date": "2014-05-29",
+     "points": 92,
+     "comments": 13
+    }
+   ],
+   "no": "exists: VeraCrypt"
+  },
+  {
+   "slug": "personal-document-organizer",
+   "wish": "someone should make a tool for personal document hell",
+   "year": 2022,
+   "agreed": 96,
+   "category": "everyday",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=30237284",
+     "date": "2022-02-06",
+     "points": 50,
+     "comments": 46
+    }
+   ],
+   "no": "too vague"
+  },
+  {
+   "slug": "part-time-dev-jobs",
+   "wish": "someone should make a listing of part-time dev jobs",
+   "year": 2014,
+   "agreed": 96,
+   "category": "work",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=8729888",
+     "date": "2014-12-10",
+     "points": 78,
+     "comments": 18
+    }
+   ],
+   "no": "needs: other people's data"
+  },
+  {
+   "slug": "offline-map-browser",
+   "wish": "someone should make an offline map browser with offline search",
+   "year": 2014,
+   "agreed": 94,
+   "category": "travel",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/82/offline-map-browser-on-android-with-offline-search",
+     "date": "2014-02-04",
+     "points": 77,
+     "comments": 10
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/19671/offline-maps-gps-app-for-ios",
+     "date": "2015-05-19",
+     "points": 5,
+     "comments": 2
+    },
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=8255801",
+     "date": "2014-09-02",
+     "points": 0,
+     "comments": 0
+    }
+   ],
+   "no": "exists: Organic Maps"
+  },
+  {
+   "slug": "time-per-program-log",
+   "wish": "someone should make a program that logs time spent in each program",
+   "year": 2014,
+   "agreed": 91,
+   "category": "time",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/696/a-program-to-log-how-much-time-you-spend-in-what-program",
+     "date": "2014-02-08",
+     "points": 84,
+     "comments": 7
+    }
+   ],
+   "no": "exists: ActivityWatch"
+  },
+  {
+   "slug": "searchable-scanned-pdf",
+   "wish": "someone should make a tool that makes a scanned PDF searchable",
+   "year": 2014,
+   "agreed": 87,
+   "category": "files",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/3412/free-ocr-software-that-makes-a-pdf-searchable-with-searchable-text-at-the-right",
+     "date": "2014-04-20",
+     "points": 75,
+     "comments": 12
+    }
+   ],
+   "no": "exists: OCRmyPDF"
+  },
+  {
+   "slug": "dns-ttl-wall-of-shame",
+   "wish": "someone should make a wall of shame for ISPs that ignore DNS TTLs",
+   "year": 2021,
+   "agreed": 82,
+   "category": "dev",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=29596399",
+     "date": "2021-12-17",
+     "points": 68,
+     "comments": 14
+    }
+   ],
+   "no": "needs: other people's data"
+  },
+  {
+   "slug": "linux-office-suite",
+   "wish": "someone should make a tool that replaces Microsoft Office on Linux",
+   "year": 2014,
+   "agreed": 76,
+   "category": "work",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/225/alternative-for-microsoft-office-for-linux",
+     "date": "2014-02-05",
+     "points": 30,
+     "comments": 9
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/18193/alternative-to-microsoft-office-that-does-not-require-internet-or-cloud",
+     "date": "2015-03-24",
+     "points": 28,
+     "comments": 9
+    }
+   ],
+   "no": "exists: LibreOffice"
+  },
+  {
+   "slug": "audiobook-library",
+   "wish": "someone should make a Calibre equivalent for audiobooks",
+   "year": 2022,
+   "agreed": 63,
+   "category": "media",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=32042780",
+     "date": "2022-07-10",
+     "points": 36,
+     "comments": 27
+    }
+   ],
+   "no": "exists: Audiobookshelf"
+  },
+  {
+   "slug": "file-sync-between-computers",
+   "wish": "someone should make a tool that syncs files between computers",
+   "year": 2014,
+   "agreed": 61,
+   "category": "files",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/129/syncing-files-between-computers",
+     "date": "2014-02-04",
+     "points": 55,
+     "comments": 6
+    }
+   ],
+   "no": "exists: Syncthing"
+  },
+  {
+   "slug": "screen-recorder",
+   "wish": "someone should make a tool that records the screen with mouse movement and saves video",
+   "year": 2014,
+   "agreed": 51,
+   "category": "media",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/239/what-is-a-screen-recorder-with-mouse-movement-and-can-save-the-recording-as-vide",
+     "date": "2014-02-05",
+     "points": 33,
+     "comments": 8
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/45597/free-screen-recorder-with-no-watermark-limit",
+     "date": "2017-09-06",
+     "points": 8,
+     "comments": 2
+    }
+   ],
+   "no": "exists: OBS Studio"
+  },
+  {
+   "slug": "realtime-html-collab",
+   "wish": "someone should make a tool that edits HTML together in real time with a preview",
+   "year": 2014,
+   "agreed": 51,
+   "category": "dev",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/272/real-time-collaborative-html-source-code-editor-with-real-time-preview",
+     "date": "2014-02-05",
+     "points": 13,
+     "comments": 1
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/146/self-hosted-collaborative-real-time-editor",
+     "date": "2014-02-05",
+     "points": 12,
+     "comments": 2
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/10234/portable-real-time-collaborative-multimarkdown-editor-with-live-preview-and-v",
+     "date": "2014-07-29",
+     "points": 13,
+     "comments": 1
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/11898/cms-with-real-time-collaboration-co-authoring-like-google-docs",
+     "date": "2014-10-02",
+     "points": 5,
+     "comments": 4
+    }
+   ],
+   "no": "needs: a server"
+  },
+  {
+   "slug": "merge-pdf-pages",
+   "wish": "someone should make a tool that combines pages from several PDFs into one",
+   "year": 2014,
+   "agreed": 47,
+   "category": "files",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/106/free-software-for-selecting-and-combining-pages-from-multiple-pdfs-into-a-single",
+     "date": "2014-02-04",
+     "points": 28,
+     "comments": 19
+    }
+   ],
+   "no": "exists: PDFsam"
+  },
+  {
+   "slug": "private-messaging-network",
+   "wish": "someone should make an alternative messaging network to WhatsApp",
+   "year": 2014,
+   "agreed": 45,
+   "category": "social",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/1530/alternative-messaging-network-to-whatsapp",
+     "date": "2014-02-22",
+     "points": 37,
+     "comments": 8
+    }
+   ],
+   "no": "needs: a server"
+  },
+  {
+   "slug": "password-manager",
+   "wish": "someone should make a password manager",
+   "year": 2014,
+   "agreed": 44,
+   "category": "privacy",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/541/password-manager-for-linux-with-just-working-in-browser-autotype",
+     "date": "2014-02-06",
+     "points": 19,
+     "comments": 5
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/25553/alternative-to-lastpass",
+     "date": "2015-10-09",
+     "points": 16,
+     "comments": 4
+    }
+   ],
+   "no": "exists: KeePassXC"
+  },
+  {
+   "slug": "find-duplicate-files",
+   "wish": "someone should make a tool that finds duplicate files",
+   "year": 2014,
+   "agreed": 41,
+   "category": "files",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/948/software-to-find-duplicate-files",
+     "date": "2014-02-11",
+     "points": 36,
+     "comments": 5
+    }
+   ],
+   "no": "exists: dupeGuru"
+  },
+  {
+   "slug": "thesis-latex-editor",
+   "wish": "someone should make an app that edits LaTeX for writing a thesis",
+   "year": 2014,
+   "agreed": 39,
+   "category": "writing",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/135/what-is-a-good-latex-editor-for-writing-thesis",
+     "date": "2014-02-04",
+     "points": 29,
+     "comments": 10
+    }
+   ],
+   "no": "exists: Overleaf"
+  },
+  {
+   "slug": "lossless-video-cutter",
+   "wish": "someone should make a tool that cuts videos without losing quality",
+   "year": 2015,
+   "agreed": 30,
+   "category": "media",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/25741/simple-program-to-cut-videos-without-any-loss-of-quality-for-windows-linux-or-a",
+     "date": "2015-10-15",
+     "points": 25,
+     "comments": 5
+    }
+   ],
+   "no": "exists: LosslessCut"
+  },
+  {
+   "slug": "free-matlab-alternative",
+   "wish": "someone should make a tool that replaces Matlab for free",
+   "year": 2014,
+   "agreed": 30,
+   "category": "math",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/194/free-alternatives-to-matlab-that-run-on-linux",
+     "date": "2014-02-05",
+     "points": 24,
+     "comments": 6
+    }
+   ],
+   "no": "exists: GNU Octave"
+  },
+  {
+   "slug": "clipboard-history",
+   "wish": "someone should make a tool that remembers clipboard content",
+   "year": 2014,
+   "agreed": 30,
+   "category": "everyday",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/139/tool-to-remember-clipboard-content",
+     "date": "2014-02-04",
+     "points": 26,
+     "comments": 4
+    }
+   ],
+   "no": "exists: Ditto"
+  },
+  {
+   "slug": "disk-space-map",
+   "wish": "someone should make a tool that shows where my disk space went",
+   "year": 2014,
+   "agreed": 28,
+   "category": "files",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/3854/disk-space-monitor-where-did-my-disk-space-go",
+     "date": "2014-05-05",
+     "points": 26,
+     "comments": 2
+    }
+   ],
+   "no": "exists: WinDirStat"
+  },
+  {
+   "slug": "identify-a-song",
+   "wish": "someone should make an app that listens to a song and tells me what it is",
+   "year": 2014,
+   "agreed": 22,
+   "category": "music",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/6792/program-that-can-listen-to-a-song-and-find-out-what-it-is",
+     "date": "2014-06-09",
+     "points": 13,
+     "comments": 2
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/24780/detect-song-by-its-instrumental-version",
+     "date": "2015-09-13",
+     "points": 5,
+     "comments": 2
+    }
+   ],
+   "no": "exists: Shazam"
+  },
+  {
+   "slug": "asset-transaction-tracker",
+   "wish": "someone should make an app that tracks assets and transactions better than mint",
+   "year": 2015,
+   "agreed": 21,
+   "category": "money",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=10473925",
+     "date": "2015-10-29",
+     "points": 17,
+     "comments": 4
+    }
+   ],
+   "no": "needs: your bank password"
+  },
+  {
+   "slug": "warm-night-screen",
+   "wish": "someone should make an app that makes the screen tint warmer at night",
+   "year": 2014,
+   "agreed": 21,
+   "category": "health",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/383/make-my-computer-screens-tint-warmer-at-night",
+     "date": "2014-02-05",
+     "points": 18,
+     "comments": 3
+    }
+   ],
+   "no": "your phone does this"
+  },
+  {
+   "slug": "temporary-phone-numbers",
+   "wish": "someone should make a site that gives temporary phone numbers",
+   "year": 2025,
+   "agreed": 24,
+   "category": "privacy",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=45031111",
+     "date": "2025-08-26",
+     "points": 10,
+     "comments": 14
+    }
+   ],
+   "no": "needs: a server"
+  },
+  {
+   "slug": "handwriting-to-latex",
+   "wish": "someone should make an app that converts handwritten math equations to latex",
+   "year": 2014,
+   "agreed": 24,
+   "category": "math",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/10298/android-app-to-convert-handwritten-math-equations-to-latex-code",
+     "date": "2014-07-31",
+     "points": 21,
+     "comments": 3
+    }
+   ],
+   "no": "exists: Mathpix"
+  }
+ ]
+}

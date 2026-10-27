@@ -1,0 +1,1007 @@
+{
+ "merge": [
+  [
+   "blood-test-tracker",
+   "chart-blood-panel"
+  ],
+  [
+   "file-checksum",
+   "file-checksum-checker",
+   "file-hash-calculator"
+  ],
+  [
+   "text-diff",
+   "file-diff"
+  ],
+  [
+   "regex-tester",
+   "regex-builder"
+  ],
+  [
+   "spending-tracker",
+   "budget-expense-tracker",
+   "simple-expense-tracker"
+  ],
+  [
+   "flowchart-maker",
+   "flowchart-editor"
+  ],
+  [
+   "mind-map",
+   "mind-map-maker"
+  ],
+  [
+   "family-tree-builder",
+   "family-tree"
+  ],
+  [
+   "video-frame-extractor",
+   "video-to-frames",
+   "video-frames-to-images",
+   "video-frame-grabber"
+  ],
+  [
+   "frame-by-frame-video",
+   "video-frame-stepper"
+  ],
+  [
+   "work-break-reminder",
+   "eye-break-reminder",
+   "screen-break-reminder"
+  ],
+  [
+   "side-by-side-video",
+   "play-multiple-videos"
+  ],
+  [
+   "image-identical-check",
+   "compare-images-pixels"
+  ],
+  [
+   "drawing-app",
+   "quick-sketch-pad"
+  ],
+  [
+   "crop-scanned-photos",
+   "crop-scan-regions"
+  ],
+  [
+   "gpx-distance-elevation",
+   "gpx-stats"
+  ],
+  [
+   "annotate-screenshot",
+   "annotate-image"
+  ],
+  [
+   "neural-network-diagrams",
+   "neural-network-diagram"
+  ],
+  [
+   "tech-tree-diagram",
+   "tech-tree-renderer"
+  ],
+  [
+   "learn-command-line-game",
+   "command-line-learning-game"
+  ],
+  [
+   "svg-editor",
+   "vector-drawing"
+  ],
+  [
+   "gantt-chart-maker",
+   "gantt-chart"
+  ],
+  [
+   "home-library-catalog",
+   "book-library"
+  ]
+ ],
+ "build": [
+  {
+   "topic": "annotate-screenshot",
+   "slug": "arrows-on-a-screenshot",
+   "spec_hint": "Drop or paste an image; add arrows, boxes, text labels and blur; export the result as PNG."
+  },
+  {
+   "topic": "track-freelance-finances",
+   "slug": "freelance-money-ledger",
+   "spec_hint": "Enter income and expenses with client and category; shows monthly totals, profit and tax to set aside; export CSV."
+  },
+  {
+   "topic": "kanban-board",
+   "slug": "pocket-kanban-board",
+   "spec_hint": "Columns of cards you add, edit and drag between columns; saved on the device; export and import JSON."
+  },
+  {
+   "topic": "markdown-editor",
+   "slug": "markdown-writing-room",
+   "spec_hint": "Type Markdown on one side, see it rendered live; open and save .md files; calm readable typography."
+  },
+  {
+   "topic": "blood-test-tracker",
+   "slug": "blood-test-results-log",
+   "spec_hint": "Enter date, marker, value, unit and reference range; table and chart per marker, out-of-range values flagged."
+  },
+  {
+   "topic": "markdown-viewer",
+   "slug": "markdown-file-viewer",
+   "spec_hint": "Open or paste a .md file; renders it cleanly with headings, tables, code and a contents sidebar."
+  },
+  {
+   "topic": "table-diff",
+   "slug": "compare-two-tables",
+   "spec_hint": "Paste two CSV or TSV tables, pick a key column; shows added, removed and changed rows with changed cells highlighted."
+  },
+  {
+   "topic": "logo-turtle",
+   "slug": "logo-turtle-playground",
+   "spec_hint": "Type LOGO commands (FD, RT, REPEAT, TO procedures); a turtle draws on canvas; save the drawing as PNG."
+  },
+  {
+   "topic": "protocol-diagram",
+   "slug": "packet-header-diagram",
+   "spec_hint": "Type field names with bit widths; draws an RFC-style packet header figure; export SVG and ASCII art."
+  },
+  {
+   "topic": "frame-by-frame-video",
+   "slug": "frame-step-video-player",
+   "spec_hint": "Open a local video; step forward and backward one frame at a time with keys; shows frame number and time."
+  },
+  {
+   "topic": "text-to-timeline",
+   "slug": "text-to-timeline",
+   "spec_hint": "Type lines like \"1969: moon landing\"; renders a scaled timeline diagram; export SVG or PNG."
+  },
+  {
+   "topic": "html-css-playground",
+   "slug": "html-css-scratchpad",
+   "spec_hint": "Edit HTML and CSS panes; live preview in a sandboxed frame; download the result as one HTML file."
+  },
+  {
+   "topic": "icon-editor",
+   "slug": "pixel-icon-editor",
+   "spec_hint": "Pixel grid from 16 to 64 px with palette, pencil, fill and eraser; export PNG and SVG."
+  },
+  {
+   "topic": "speed-reader",
+   "slug": "one-word-speed-reader",
+   "spec_hint": "Paste text; shows one word at a time at a chosen words-per-minute with a focus letter; pause and rewind."
+  },
+  {
+   "topic": "bpm-detector",
+   "slug": "audio-bpm-detector",
+   "spec_hint": "Open an audio file; decodes it locally and estimates tempo in BPM; tap-tempo button as a cross-check."
+  },
+  {
+   "topic": "remove-people-from-photo",
+   "slug": "remove-passersby-from-photos",
+   "spec_hint": "Load several photos of the same scene; per-pixel median removes moving people; export the clean PNG."
+  },
+  {
+   "topic": "circuit-simulator",
+   "slug": "simple-circuit-simulator",
+   "spec_hint": "Place batteries, resistors, bulbs and switches on a grid; solves DC voltages and currents live."
+  },
+  {
+   "topic": "venn-diagram",
+   "slug": "venn-diagram-maker",
+   "spec_hint": "Enter two or three set names and their items; draws a labeled Venn diagram; export SVG or PNG."
+  },
+  {
+   "topic": "pitch-trainer",
+   "slug": "sing-the-note-trainer",
+   "spec_hint": "Plays a target tone; listens through the microphone and shows how far your sung pitch is in cents."
+  },
+  {
+   "topic": "plate-tectonics-simulator",
+   "slug": "plate-tectonics-sandbox",
+   "spec_hint": "Random plates drift on a grid world; collisions raise mountains, rifts open oceans; play, pause, speed."
+  },
+  {
+   "topic": "climate-simulator",
+   "slug": "toy-climate-model",
+   "spec_hint": "Sliders for CO2, albedo and solar input drive an energy-balance model that plots temperature over years."
+  },
+  {
+   "topic": "print-battlemaps",
+   "slug": "battlemap-print-tiler",
+   "spec_hint": "Load a map image and set grid square size; splits it across printable pages at true scale with alignment marks."
+  },
+  {
+   "topic": "seating-chart-maker",
+   "slug": "seating-chart-planner",
+   "spec_hint": "Add tables and guest names; drag guests onto seats; mark pairs to keep apart; print the chart."
+  },
+  {
+   "topic": "decision-tree-maker",
+   "slug": "decision-tree-builder",
+   "spec_hint": "Add question nodes, answers and outcomes; draws the tree; click-through mode to walk it; export SVG."
+  },
+  {
+   "topic": "sunrise-sunset-times",
+   "slug": "sunrise-sunset-calculator",
+   "spec_hint": "Enter latitude, longitude and date; computes sunrise, sunset, twilight and day length for the day and month."
+  },
+  {
+   "topic": "star-chart",
+   "slug": "night-sky-star-chart",
+   "spec_hint": "Enter location, date and time; draws bright stars and constellation lines above the horizon from an embedded catalog."
+  },
+  {
+   "topic": "ambient-noise-generator",
+   "slug": "cafe-ambience-mixer",
+   "spec_hint": "Mix generated layers like murmur, rain, brown noise and cup clatter with volume sliders; all sound synthesized."
+  },
+  {
+   "topic": "image-diff",
+   "slug": "spot-image-differences",
+   "spec_hint": "Load two images; highlights differing pixels, offers a slider overlay and says whether pixels are identical."
+  },
+  {
+   "topic": "json-diff",
+   "slug": "json-diff-viewer",
+   "spec_hint": "Paste or open two JSON documents; structural diff listing added, removed and changed paths with values."
+  },
+  {
+   "topic": "sql-on-csv",
+   "slug": "sql-on-csv-files",
+   "spec_hint": "Load CSV files as tables; run SQL SELECT with WHERE, GROUP BY, ORDER BY and JOIN; shows result table."
+  },
+  {
+   "topic": "decode-unknown-string",
+   "slug": "mystery-string-decoder",
+   "spec_hint": "Paste a string; tries base64, hex, URL, rot13, binary, morse and more; readable results ranked first."
+  },
+  {
+   "topic": "highlight-matches",
+   "slug": "highlight-text-matches",
+   "spec_hint": "Paste text and a search pattern; every match highlighted in place with a count; regex optional."
+  },
+  {
+   "topic": "ascii-diagram-editor",
+   "slug": "plain-text-box-drawer",
+   "spec_hint": "Draw boxes, lines, arrows and text on a character grid; copy the drawing as plain text."
+  },
+  {
+   "topic": "family-tree-builder",
+   "slug": "family-tree-maker",
+   "spec_hint": "Add people, parents and partners; draws a tree that handles remarriage and half-siblings; save JSON, export SVG."
+  },
+  {
+   "topic": "colorblind-filter",
+   "slug": "colorblind-image-filter",
+   "spec_hint": "Load an image; simulate protan, deutan and tritan vision and apply a color-separating filter; export PNG."
+  },
+  {
+   "topic": "hide-data-in-image",
+   "slug": "hide-text-in-image",
+   "spec_hint": "Hide a message in a PNG's lowest bits and download it; load a PNG to reveal a hidden message."
+  },
+  {
+   "topic": "checklist-app",
+   "slug": "run-a-checklist",
+   "spec_hint": "Write named checklists; run one step by step with check-offs and a reset; saved on the device."
+  },
+  {
+   "topic": "gpx-distance-elevation",
+   "slug": "gpx-track-stats",
+   "spec_hint": "Open a GPX file; shows total distance, elevation gain and loss, moving time, pace and an elevation profile."
+  },
+  {
+   "topic": "treasure-hunt-generator",
+   "slug": "treasure-hunt-clue-maker",
+   "spec_hint": "Enter hiding places in order with a hint each; makes printable numbered clue cards pointing to the next spot."
+  },
+  {
+   "topic": "game-card-maker",
+   "slug": "printable-game-cards",
+   "spec_hint": "Enter cards by form or pasted CSV with title, text and image; lays them out on printable sheets."
+  },
+  {
+   "topic": "learn-command-line-game",
+   "slug": "command-line-quest",
+   "spec_hint": "Simulated shell over a fake filesystem; puzzles teach ls, cd, cat, grep and mv one step at a time."
+  },
+  {
+   "topic": "piano-learning-game",
+   "slug": "piano-note-game",
+   "spec_hint": "A note appears on a staff; press the matching key on an on-screen piano; synthesized sound, score and streak."
+  },
+  {
+   "topic": "skip-silence-player",
+   "slug": "skip-silence-player",
+   "spec_hint": "Open audio or video; plays it while jumping over parts below a volume threshold you set."
+  },
+  {
+   "topic": "transcription-audio-player",
+   "slug": "transcription-player",
+   "spec_hint": "Open audio; shortcut keys for play, rewind 3 seconds, speed 0.5x to 2x; text box with timestamp insert."
+  },
+  {
+   "topic": "delayed-audio-playback",
+   "slug": "delayed-echo-recorder",
+   "spec_hint": "Microphone audio plays back to your headphones after a delay you set from 0 to 10 seconds."
+  },
+  {
+   "topic": "epub-reader",
+   "slug": "epub-file-reader",
+   "spec_hint": "Open an .epub; unzips locally, shows chapters with a table of contents, font size and remembered position."
+  },
+  {
+   "topic": "mbox-viewer",
+   "slug": "mbox-email-reader",
+   "spec_hint": "Open an .mbox file; lists messages by date, sender and subject; read bodies and search."
+  },
+  {
+   "topic": "detect-file-type",
+   "slug": "real-file-type-checker",
+   "spec_hint": "Drop a file; reads its magic bytes and reports the actual format versus its extension."
+  },
+  {
+   "topic": "file-checksum",
+   "slug": "file-checksum-checker",
+   "spec_hint": "Drop files; computes SHA-256, SHA-1 and MD5; compares against a pasted expected hash."
+  },
+  {
+   "topic": "images-to-pdf",
+   "slug": "jpgs-to-one-pdf",
+   "spec_hint": "Select JPG files; writes one PDF embedding the original JPEG bytes, one per page, no recompression."
+  },
+  {
+   "topic": "hex-viewer",
+   "slug": "hex-file-viewer",
+   "spec_hint": "Open a file; hex and ASCII columns with offsets, jump to offset, search for bytes or text."
+  },
+  {
+   "topic": "regex-tester",
+   "slug": "live-regex-tester",
+   "spec_hint": "Type a regex, flags and test text; live match highlights, capture groups and a plain reading of each token."
+  },
+  {
+   "topic": "json-viewer",
+   "slug": "big-json-viewer",
+   "spec_hint": "Open or paste large JSON; collapsible tree, search, copy path; stays responsive on tens of megabytes."
+  },
+  {
+   "topic": "qr-code-generator",
+   "slug": "offline-qr-code-maker",
+   "spec_hint": "Type text, a link or wifi details; generates the QR code locally; download PNG or SVG."
+  },
+  {
+   "topic": "password-generator",
+   "slug": "memorable-password-maker",
+   "spec_hint": "Generates passphrases from an embedded word list; choose words, separator, digits; shows strength in bits."
+  },
+  {
+   "topic": "measure-image-distance",
+   "slug": "measure-on-a-photo",
+   "spec_hint": "Load an image, mark a reference line of known length; click points to measure distances and areas."
+  },
+  {
+   "topic": "gif-maker",
+   "slug": "gif-animation-maker",
+   "spec_hint": "Add images or draw frames, set delay per frame; encodes an animated GIF locally for download."
+  },
+  {
+   "topic": "seamless-tile-maker",
+   "slug": "seamless-pixel-tile-maker",
+   "spec_hint": "Draw on a pixel grid that wraps at the edges with a live 3x3 tiled preview; export PNG."
+  },
+  {
+   "topic": "avatar-generator",
+   "slug": "geometric-avatar-maker",
+   "spec_hint": "Pick face shape, features and colors or randomize; generates a portrait avatar; export SVG or PNG."
+  },
+  {
+   "topic": "extract-image-colors",
+   "slug": "image-color-extractor",
+   "spec_hint": "Load an image; lists its dominant colors with hex codes and share of pixels; copy the palette."
+  },
+  {
+   "topic": "drawing-app",
+   "slug": "simple-sketch-pad",
+   "spec_hint": "Brushes, eraser, colors, sizes and undo on a canvas that works with finger or stylus; save PNG."
+  },
+  {
+   "topic": "mind-map",
+   "slug": "mind-map-maker",
+   "spec_hint": "Add nodes or type an indented outline; draws a draggable mind map; export SVG, PNG and JSON."
+  },
+  {
+   "topic": "flowchart-maker",
+   "slug": "flowchart-maker",
+   "spec_hint": "Add boxes, decisions and arrows, drag and label them; export SVG or PNG."
+  },
+  {
+   "topic": "visual-equation-editor",
+   "slug": "visual-equation-editor",
+   "spec_hint": "Build equations with buttons for fractions, roots, powers and symbols; renders the math; copy as LaTeX."
+  },
+  {
+   "topic": "geometry-construction",
+   "slug": "compass-and-straightedge",
+   "spec_hint": "Place points, lines and circles with intersections; drag points and the construction updates; measure lengths and angles."
+  },
+  {
+   "topic": "plot-3d-equations",
+   "slug": "3d-equation-plotter",
+   "spec_hint": "Type z = f(x, y); renders a rotatable shaded 3D surface on canvas with axis ranges."
+  },
+  {
+   "topic": "plot-from-clicks",
+   "slug": "graph-image-digitizer",
+   "spec_hint": "Load a chart image, calibrate both axes with two clicks each; click points to read data; export CSV."
+  },
+  {
+   "topic": "brainfuck-interpreter",
+   "slug": "brainfuck-debugger",
+   "spec_hint": "Edit Brainfuck code; run or step through it; shows the tape, pointer, input and output."
+  },
+  {
+   "topic": "toddler-games",
+   "slug": "toddler-tap-games",
+   "spec_hint": "Big shapes and colors that make sounds and animate when tapped; nothing to lose, no reading needed."
+  },
+  {
+   "topic": "custom-picture-storybook",
+   "slug": "picture-swap-storybook",
+   "spec_hint": "A parent writes a short book and locks the text; pictures on each page can be swapped for family photos."
+  },
+  {
+   "topic": "heatmap-generator",
+   "slug": "table-to-heatmap",
+   "spec_hint": "Paste a table of numbers with labels; draws a colored heatmap with a scale; export PNG or SVG."
+  },
+  {
+   "topic": "redact-scanned-document",
+   "slug": "redact-a-scan",
+   "spec_hint": "Load a scanned page image; draw solid black boxes; exports a flattened PNG with the covered pixels gone."
+  },
+  {
+   "topic": "recipe-shopping-list",
+   "slug": "recipes-to-shopping-list",
+   "spec_hint": "Store recipes with ingredients; pick meals for the week; get one merged shopping list."
+  },
+  {
+   "topic": "color-scheme-generator",
+   "slug": "editor-color-scheme-maker",
+   "spec_hint": "Pick base colors; preview sample code highlighted live; export as VS Code and Vim theme files."
+  },
+  {
+   "topic": "screenshot-browser-frame",
+   "slug": "screenshot-in-browser-frame",
+   "spec_hint": "Load a screenshot; wraps it in a light or dark browser window frame with shadow; export PNG."
+  },
+  {
+   "topic": "guitar-chord-chart",
+   "slug": "guitar-chord-charts",
+   "spec_hint": "Type a chord name; shows fingering diagrams with alternate voicings; plays the chord."
+  },
+  {
+   "topic": "video-annotation",
+   "slug": "draw-on-video",
+   "spec_hint": "Open a video; pause to draw on frames; drawings reappear at their times; export annotated frames as PNG."
+  },
+  {
+   "topic": "side-by-side-video",
+   "slug": "videos-side-by-side",
+   "spec_hint": "Open two to four local videos; play them in sync in a grid with per-video offsets."
+  },
+  {
+   "topic": "video-frame-extractor",
+   "slug": "video-to-frames",
+   "spec_hint": "Open a video; grab the current frame or one every N seconds; download as images."
+  },
+  {
+   "topic": "resume-site-builder",
+   "slug": "cv-website-builder",
+   "spec_hint": "Fill in CV sections; live preview; download the finished personal site as one HTML file."
+  },
+  {
+   "topic": "invoice-maker",
+   "slug": "simple-invoice-maker",
+   "spec_hint": "Enter your details, client, line items and tax; shows a printable invoice; remembers invoice numbers."
+  },
+  {
+   "topic": "screenplay-formatter",
+   "slug": "fountain-screenplay-formatter",
+   "spec_hint": "Write or open Fountain text; renders standard screenplay layout; print to PDF."
+  },
+  {
+   "topic": "spending-tracker",
+   "slug": "spending-and-budget-tracker",
+   "spec_hint": "Log expenses by category; set monthly budgets; shows what remains and a category chart."
+  },
+  {
+   "topic": "vegetarian-day-tracker",
+   "slug": "vegetarian-day-calendar",
+   "spec_hint": "Tap a day to mark it vegetarian; month calendar, current streak and yearly share."
+  },
+  {
+   "topic": "wine-cellar-tracker",
+   "slug": "wine-cellar-log",
+   "spec_hint": "Record bottles with vintage, rack location and drink window; search, counts and a drink-now list."
+  },
+  {
+   "topic": "work-diary",
+   "slug": "work-diary",
+   "spec_hint": "Dated daily entries with search and a weekly view; export everything as Markdown."
+  },
+  {
+   "topic": "text-scratchpad",
+   "slug": "text-scratchpad",
+   "spec_hint": "One full-page text area that saves itself on the device; word count; nothing else."
+  },
+  {
+   "topic": "programmer-calculator",
+   "slug": "programmer-calculator",
+   "spec_hint": "Calculator showing hex, decimal, octal and binary at once with bitwise ops, shifts and word sizes."
+  },
+  {
+   "topic": "text-diff",
+   "slug": "text-diff",
+   "spec_hint": "Paste or open two texts; shows line and word differences side by side or inline."
+  },
+  {
+   "topic": "compare-two-lists",
+   "slug": "compare-two-lists",
+   "spec_hint": "Paste two lists one item per line; shows items only in A, only in B and in both."
+  },
+  {
+   "topic": "repeated-phrase-finder",
+   "slug": "repeated-phrase-finder",
+   "spec_hint": "Paste a document; lists repeated sentences and phrases by length and count, highlighted in the text."
+  },
+  {
+   "topic": "cooking-measure-converter",
+   "slug": "cooking-measure-converter",
+   "spec_hint": "Pick an ingredient and amount; converts grams to cups, mL and spoons using ingredient densities."
+  },
+  {
+   "topic": "base64-hex-converter",
+   "slug": "base64-hex-converter",
+   "spec_hint": "Paste base64, hex or text; converts between all three live, with file input too."
+  },
+  {
+   "topic": "convert-data-formats",
+   "slug": "json-csv-xml-converter",
+   "spec_hint": "Paste or open JSON, CSV, XML or YAML; converts to any of the others; download the result."
+  },
+  {
+   "topic": "html-to-markdown",
+   "slug": "html-to-markdown",
+   "spec_hint": "Paste HTML or rich text; converts it to clean Markdown with a preview."
+  },
+  {
+   "topic": "work-break-reminder",
+   "slug": "rest-break-reminder",
+   "spec_hint": "Set work and break lengths; full-screen break prompt with countdown that is hard to skip; eye-rest tips."
+  },
+  {
+   "topic": "timer-stopwatch",
+   "slug": "timer-and-stopwatch",
+   "spec_hint": "A clean countdown timer and stopwatch with laps, big digits and a sound at zero."
+  },
+  {
+   "topic": "todo-list",
+   "slug": "plain-todo-list",
+   "spec_hint": "Add, check off, reorder and delete tasks; saved on the device; nothing else."
+  },
+  {
+   "topic": "pomodoro-timer",
+   "slug": "pomodoro-timer",
+   "spec_hint": "25-minute work and 5-minute break cycles with adjustable lengths, sound and a count of rounds."
+  },
+  {
+   "topic": "unit-converter",
+   "slug": "unit-converter",
+   "spec_hint": "Convert length, mass, volume, temperature, area, speed, time and data units as you type."
+  }
+ ],
+ "reserve": [
+  {
+   "topic": "mahjong-score",
+   "slug": "mahjong-score-counter",
+   "spec_hint": "Four players' points per hand, running totals and dealer rotation; editable scoring values."
+  },
+  {
+   "topic": "relational-algebra-queries",
+   "slug": "relational-algebra-runner",
+   "spec_hint": "Define small tables; write selection, projection, join and set expressions; shows result tables."
+  },
+  {
+   "topic": "view-ics-file",
+   "slug": "ics-calendar-viewer",
+   "spec_hint": "Open an .ics file; lists its events in agenda and month views with details."
+  },
+  {
+   "topic": "extract-eml-attachments",
+   "slug": "eml-attachment-extractor",
+   "spec_hint": "Open an .eml file; decodes its MIME parts and offers each attachment for download."
+  },
+  {
+   "topic": "chord-composer",
+   "slug": "chord-progression-player",
+   "spec_hint": "Place chords on a timeline; plays them with synthesized voicings; tempo and loop."
+  },
+  {
+   "topic": "end-credits-maker",
+   "slug": "movie-end-credits-maker",
+   "spec_hint": "Enter roles and names; plays scrolling end credits full screen at an adjustable speed."
+  },
+  {
+   "topic": "list-to-graphic",
+   "slug": "list-to-graphic",
+   "spec_hint": "Type a list; renders it as a process, cycle, pyramid or hierarchy graphic; export SVG or PNG."
+  },
+  {
+   "topic": "polygon-map-maker",
+   "slug": "low-poly-map-maker",
+   "spec_hint": "Generates a map of polygon regions; paint terrain and name regions; export PNG."
+  },
+  {
+   "topic": "where-i-put-things",
+   "slug": "where-did-i-put-it",
+   "spec_hint": "Log an item and where it is; search to find it; saved on the device."
+  },
+  {
+   "topic": "brain-training-games",
+   "slug": "memory-and-focus-drills",
+   "spec_hint": "Short drills for n-back, digit span and reaction time with local best scores."
+  },
+  {
+   "topic": "lfsr-polynomial-calculator",
+   "slug": "lfsr-maximal-taps-finder",
+   "spec_hint": "Choose a register length; finds tap masks with maximal period and checks a given mask."
+  },
+  {
+   "topic": "latex-table-generator",
+   "slug": "latex-table-maker",
+   "spec_hint": "Edit a grid or paste CSV; outputs LaTeX tabular code with alignment and rules."
+  },
+  {
+   "topic": "alarm-clock-numpad",
+   "slug": "number-key-alarm-clock",
+   "spec_hint": "Type the alarm time on number keys; big clock and an alarm sound while the page is open."
+  },
+  {
+   "topic": "svg-editor",
+   "slug": "small-svg-editor",
+   "spec_hint": "Draw and edit SVG shapes, paths and text; edit attributes; open and save .svg files."
+  },
+  {
+   "topic": "xml-diff",
+   "slug": "xml-diff",
+   "spec_hint": "Paste two XML documents; structural diff of elements, attributes and text."
+  },
+  {
+   "topic": "markdown-to-pdf",
+   "slug": "markdown-to-pdf",
+   "spec_hint": "Write or open Markdown; styled preview; print to PDF with page breaks and no LaTeX."
+  },
+  {
+   "topic": "log-viewer",
+   "slug": "apache-log-viewer",
+   "spec_hint": "Open an Apache access log; parsed table with filters, top paths, status codes and hourly chart."
+  },
+  {
+   "topic": "image-identical-check",
+   "slug": "identical-image-check",
+   "spec_hint": "Load two images; reports whether their pixels are exactly identical, ignoring metadata."
+  },
+  {
+   "topic": "tree-notes",
+   "slug": "tree-of-notes",
+   "spec_hint": "Notes and links arranged in a collapsible tree; drag to reorder; search; export JSON."
+  },
+  {
+   "topic": "gantt-chart-maker",
+   "slug": "gantt-chart-maker",
+   "spec_hint": "Enter tasks with start, duration and dependencies; draws a Gantt chart; export PNG."
+  },
+  {
+   "topic": "erd-diagram-maker",
+   "slug": "quick-erd-maker",
+   "spec_hint": "Type tables and fields in a short text syntax; draws an entity-relationship diagram; export SVG."
+  },
+  {
+   "topic": "neural-network-diagrams",
+   "slug": "neural-network-diagram",
+   "spec_hint": "List layers with sizes; draws a convolutional network block diagram; export SVG."
+  },
+  {
+   "topic": "tech-tree-diagram",
+   "slug": "tech-tree-diagram",
+   "spec_hint": "Write techs and prerequisites as text; renders a layered tech tree; export SVG."
+  },
+  {
+   "topic": "ear-training",
+   "slug": "ear-training-drills",
+   "spec_hint": "Plays intervals or chords; you name them; tracks accuracy per type."
+  },
+  {
+   "topic": "voice-changer",
+   "slug": "voice-character-changer",
+   "spec_hint": "Record or use the microphone; apply pitch, robot and echo effects; download the result."
+  },
+  {
+   "topic": "rolling-audio-recorder",
+   "slug": "last-minutes-recorder",
+   "spec_hint": "Keeps the last N minutes of microphone audio in memory; save that slice on tap."
+  },
+  {
+   "topic": "audio-waveform-image",
+   "slug": "audio-waveform-image",
+   "spec_hint": "Open an audio file; draws its waveform with chosen colors and size; export PNG or SVG."
+  },
+  {
+   "topic": "batch-resize-images",
+   "slug": "batch-image-resizer",
+   "spec_hint": "Select many images; resize to a max size or percent and recompress; download them all."
+  },
+  {
+   "topic": "crop-scanned-photos",
+   "slug": "split-scanned-photos",
+   "spec_hint": "Load a scan of several photos; detects or lets you draw each one; saves them as separate images."
+  },
+  {
+   "topic": "blur-screenshot-text",
+   "slug": "blur-screenshot-text",
+   "spec_hint": "Load a screenshot; drag boxes to pixelate or blur text; export PNG."
+  },
+  {
+   "topic": "sprite-sheet-slicer",
+   "slug": "sprite-sheet-slicer",
+   "spec_hint": "Load a sprite or icon sheet; set grid or detect icons; download each as its own PNG."
+  },
+  {
+   "topic": "qr-contact-card",
+   "slug": "qr-contact-card",
+   "spec_hint": "Enter name, phone and email; makes a vCard QR code someone else can scan."
+  },
+  {
+   "topic": "home-library-catalog",
+   "slug": "home-library-catalog",
+   "spec_hint": "Add books with title, author, location and loaned-to; search and sort; export CSV."
+  },
+  {
+   "topic": "private-fitness-log",
+   "slug": "private-workout-log",
+   "spec_hint": "Log workouts with exercise, sets, reps and weight; progress charts; data stays on the device."
+  },
+  {
+   "topic": "sun-position",
+   "slug": "sun-position-finder",
+   "spec_hint": "Enter place, date and time; shows the sun's altitude and direction on a sky dome."
+  },
+  {
+   "topic": "random-melody",
+   "slug": "random-melody-maker",
+   "spec_hint": "Pick a chord progression; generates and plays a random melody that fits it; reroll."
+  },
+  {
+   "topic": "anagram-generator",
+   "slug": "anagram-maker",
+   "spec_hint": "Type letters or words; lists anagrams from an embedded English word list."
+  },
+  {
+   "topic": "css-specificity-calculator",
+   "slug": "css-specificity-calculator",
+   "spec_hint": "Paste CSS selectors; shows each specificity score and which one wins."
+  },
+  {
+   "topic": "encrypted-diary",
+   "slug": "encrypted-diary",
+   "spec_hint": "Diary entries encrypted on the device with a passphrase; lock, unlock and export."
+  },
+  {
+   "topic": "gapless-loop-player",
+   "slug": "gapless-loop-player",
+   "spec_hint": "Open an audio file; loops it or a selected section with no gap."
+  }
+ ],
+ "no": [
+  {
+   "topic": "small-web-search",
+   "slug": "small-web-search-engine",
+   "no": "needs: a server"
+  },
+  {
+   "topic": "idea-giveaway",
+   "slug": "idea-giveaway-board",
+   "no": "needs: a server"
+  },
+  {
+   "topic": "social-bookmarks",
+   "slug": "social-bookmarking-site",
+   "no": "needs: a server"
+  },
+  {
+   "topic": "calendar-replacement",
+   "slug": "open-calendar-replacement",
+   "no": "needs: a server"
+  },
+  {
+   "topic": "cloud-music-library",
+   "slug": "cloud-music-library",
+   "no": "needs: a server"
+  },
+  {
+   "topic": "screen-to-gif",
+   "slug": "screen-to-gif-recorder",
+   "no": "exists: LICEcap"
+  },
+  {
+   "topic": "self-hosted-git",
+   "slug": "self-hosted-code-host",
+   "no": "exists: Gitea"
+  },
+  {
+   "topic": "crud-app-builder",
+   "slug": "crud-app-builder",
+   "no": "too vague"
+  },
+  {
+   "topic": "comment-on-html",
+   "slug": "comment-on-web-pages",
+   "no": "needs: a server"
+  },
+  {
+   "topic": "richest-by-liquid-assets",
+   "slug": "richest-by-liquid-assets",
+   "no": "needs: other people's data"
+  },
+  {
+   "topic": "recruiter-blocklist",
+   "slug": "recruiter-blocklist",
+   "no": "needs: other people's data"
+  },
+  {
+   "topic": "team-chat",
+   "slug": "decentralised-team-chat",
+   "no": "needs: a server"
+  },
+  {
+   "topic": "bad-employers-list",
+   "slug": "employers-who-do-not-pay",
+   "no": "needs: other people's data"
+  },
+  {
+   "topic": "failed-startups",
+   "slug": "failed-startups-archive",
+   "no": "needs: other people's data"
+  },
+  {
+   "topic": "disk-encryption",
+   "slug": "disk-encryption",
+   "no": "exists: VeraCrypt"
+  },
+  {
+   "topic": "personal-documents",
+   "slug": "personal-document-organizer",
+   "no": "too vague"
+  },
+  {
+   "topic": "part-time-dev-jobs",
+   "slug": "part-time-dev-jobs",
+   "no": "needs: other people's data"
+  },
+  {
+   "topic": "offline-maps",
+   "slug": "offline-map-browser",
+   "no": "exists: Organic Maps"
+  },
+  {
+   "topic": "time-per-program",
+   "slug": "time-per-program-log",
+   "no": "exists: ActivityWatch"
+  },
+  {
+   "topic": "ocr-pdf",
+   "slug": "searchable-scanned-pdf",
+   "no": "exists: OCRmyPDF"
+  },
+  {
+   "topic": "isp-dns-ttl-shame",
+   "slug": "dns-ttl-wall-of-shame",
+   "no": "needs: other people's data"
+  },
+  {
+   "topic": "office-suite",
+   "slug": "linux-office-suite",
+   "no": "exists: LibreOffice"
+  },
+  {
+   "topic": "audiobook-library",
+   "slug": "audiobook-library",
+   "no": "exists: Audiobookshelf"
+  },
+  {
+   "topic": "file-sync",
+   "slug": "file-sync-between-computers",
+   "no": "exists: Syncthing"
+  },
+  {
+   "topic": "screen-recorder",
+   "slug": "screen-recorder",
+   "no": "exists: OBS Studio"
+  },
+  {
+   "topic": "realtime-collab-editor",
+   "slug": "realtime-html-collab",
+   "no": "needs: a server"
+  },
+  {
+   "topic": "merge-pdf-pages",
+   "slug": "merge-pdf-pages",
+   "no": "exists: PDFsam"
+  },
+  {
+   "topic": "private-chat",
+   "slug": "private-messaging-network",
+   "no": "needs: a server"
+  },
+  {
+   "topic": "password-manager",
+   "slug": "password-manager",
+   "no": "exists: KeePassXC"
+  },
+  {
+   "topic": "find-duplicate-files",
+   "slug": "find-duplicate-files",
+   "no": "exists: dupeGuru"
+  },
+  {
+   "topic": "latex-editor",
+   "slug": "thesis-latex-editor",
+   "no": "exists: Overleaf"
+  },
+  {
+   "topic": "lossless-video-cut",
+   "slug": "lossless-video-cutter",
+   "no": "exists: LosslessCut"
+  },
+  {
+   "topic": "matlab-alternative",
+   "slug": "free-matlab-alternative",
+   "no": "exists: GNU Octave"
+  },
+  {
+   "topic": "clipboard-history",
+   "slug": "clipboard-history",
+   "no": "exists: Ditto"
+  },
+  {
+   "topic": "disk-space-monitor",
+   "slug": "disk-space-map",
+   "no": "exists: WinDirStat"
+  },
+  {
+   "topic": "identify-song",
+   "slug": "identify-a-song",
+   "no": "exists: Shazam"
+  },
+  {
+   "topic": "asset-transaction-tracker",
+   "slug": "asset-transaction-tracker",
+   "no": "needs: your bank password"
+  },
+  {
+   "topic": "warm-screen-tint",
+   "slug": "warm-night-screen",
+   "no": "your phone does this"
+  },
+  {
+   "topic": "temp-phone-number",
+   "slug": "temporary-phone-numbers",
+   "no": "needs: a server"
+  },
+  {
+   "topic": "handwriting-to-latex",
+   "slug": "handwriting-to-latex",
+   "no": "exists: Mathpix"
+  }
+ ]
+}
