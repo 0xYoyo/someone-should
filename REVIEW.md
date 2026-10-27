@@ -37,4 +37,4 @@ Quality check on arrows-on-a-screenshot, freelance-money-ledger, sing-the-note-t
 **Reserve left ($187 of credit, 40 reserve wishes):** a second factory run with the same prompt builds the reserve if you want 140. Not tonight; approve the 100 first.
 
 ## 2026-10-27 10:05 — WAVE 2 brief
-Owner's verdict on wave 1: too many decade-old, generic, developer-ish wishes. Read `WAVE2.md` and execute it. Recent (2020+), human, sonnet builders, cap $140, stop at 600 PASS total. The wall already merges `data/top2.json` and sorts recent + wanted first.
+Owner's verdict on wave 1: too many decade-old, generic, developer-ish wishes. Read `WAVE2.md` and execute it. Most-agreed, human, obsolescence-checked, sonnet builders, cap $140, stop at 600 PASS total. The wall already merges `data/top2.json` and sorts most-wanted first.
