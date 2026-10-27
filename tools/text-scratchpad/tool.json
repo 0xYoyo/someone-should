@@ -1,0 +1,54 @@
+{
+  "slug": "text-scratchpad",
+  "wish": "someone should make a site that is just a text scratchpad",
+  "year": 2022,
+  "agreed": 102,
+  "sources": [
+    {
+      "site": "hn",
+      "url": "https://news.ycombinator.com/item?id=33747231",
+      "date": "2022-11-25",
+      "points": 39,
+      "comments": 63
+    }
+  ],
+  "spec": "One full-page text area that saves itself on this device as you type, with a live word count.\nOpen it and type; the text is there next time, and copy or a two-tap clear sit below it.\nIt does not sync between devices, format text, or send anything anywhere.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#pad",
+        "text": "buy milk then call the plumber"
+      }
+    },
+    {
+      "wait": 500
+    },
+    {
+      "expect": {
+        "sel": "#count",
+        "contains": "6 words"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#status",
+        "contains": "saved"
+      }
+    },
+    {
+      "tap": "#clear"
+    },
+    {
+      "expect": {
+        "sel": "#clear",
+        "contains": "sure?"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T02:04:27Z",
+  "model": "opus-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": ""
+}
