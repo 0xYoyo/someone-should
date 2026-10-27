@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app to keep a work diary</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+
+
+.add { display: flex; gap: 10px; }
+.add input { flex: 1; min-width: 0; }
+.nav { display: grid; grid-template-columns: 44px 1fr 44px; gap: 8px; align-items: center; }
+.nav button { padding: 0; }
+#label { text-align: center; font-weight: 500; }
+.tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.tabs button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+h2 { font: 500 16px/1.3 var(--mono); color: var(--meta); margin: 16px 0 0; }
+ul.plain li { align-items: flex-start; }
+ul.plain li .txt { flex: 1; min-width: 0; overflow-wrap: anywhere; white-space: pre-wrap; }
+ul.plain li time { font: 16px/1.45 var(--mono); color: var(--meta); flex: none; }
+ul.plain li button { min-width: 44px; padding: 0 10px; border-color: var(--line); color: var(--meta); }
+.foot { display: flex; gap: 10px; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+#count { font: 16px/1.4 var(--mono); color: var(--meta); }
+#msg { font: 16px/1.4 var(--mono); color: var(--meta); margin: 0; }
+#msg:empty { display: none; }
+
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make an app to keep a work diary</h1>
+
+<main id="app" class="stack">
+  <form class="add" id="form" autocomplete="off">
+    <input id="entry" type="text" placeholder="What did you work on?" aria-label="Diary entry" enterkeyhint="done">
+    <button id="add" class="primary" type="submit">Add</button>
+  </form>
+  <div class="tabs" role="group" aria-label="View">
+    <button id="day" type="button" aria-pressed="true">Day</button>
+    <button id="week" type="button" aria-pressed="false">Week</button>
+  </div>
+  <div class="nav">
+    <button id="prev" type="button" aria-label="Previous">&lsaquo;</button>
+    <div id="label"></div>
+    <button id="next" type="button" aria-label="Next">&rsaquo;</button>
+  </div>
+  <input id="search" type="search" placeholder="Search all entries" aria-label="Search all entries">
+  <div id="list"></div>
+  <p id="msg"></p>
+  <div class="foot">
+    <span id="count"></span>
+    <button id="export" type="button">Export Markdown</button>
+  </div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  // storage helper — never throws
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+
+  const KEY = 'work-diary.v1';
+  let entries = store.get(KEY, []);
+  if (!Array.isArray(entries)) entries = [];
+  let mode = 'day';
+  let cursor = startOfDay(new Date());
+
+  function startOfDay(d) { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; }
+  function startOfWeek(d) { const x = startOfDay(d); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x; }
+  function addDays(d, n) { const x = new Date(d); x.setDate(x.getDate() + n); return x; }
+  function dayKey(t) { const d = new Date(t); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  const fmtDay = d => d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+  const fmtShort = d => d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  const fmtTime = t => new Date(t).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+  const save = () => store.set(KEY, entries);
+
+  function range() {
+    if (mode === 'day') return [cursor, addDays(cursor, 1)];
+    const s = startOfWeek(cursor);
+    return [s, addDays(s, 7)];
+  }
+
+  function groupByDay(list) {
+    const groups = new Map();
+    for (const e of list) {
+      const k = dayKey(e.t);
+      if (!groups.has(k)) groups.set(k, []);
+      groups.get(k).push(e);
+    }
+    return groups;
+  }
+
+  function render() {
+    const q = $('#search').value.trim().toLowerCase();
+    const [from, to] = range();
+    $('#day').setAttribute('aria-pressed', mode === 'day');
+    $('#week').setAttribute('aria-pressed', mode === 'week');
+    $('#label').textContent = q ? 'Search results' : mode === 'day' ? fmtDay(from) : fmtShort(from) + ' – ' + fmtShort(addDays(to, -1));
+    $('#prev').disabled = $('#next').disabled = !!q;
+
+    const shown = entries
+      .filter(e => q ? e.text.toLowerCase().includes(q) : e.t >= +from && e.t < +to)
+      .sort((a, b) => q ? b.t - a.t : a.t - b.t);
+
+    const list = $('#list');
+    list.textContent = '';
+    if (!shown.length) {
+      const p = document.createElement('p');
+      p.className = 'empty';
+      p.textContent = q ? 'Nothing matches.' : entries.length ? 'No entries for this ' + mode + '.' : 'No entries yet.';
+      list.append(p);
+    }
+    const multi = q || mode === 'week';
+    for (const [k, items] of groupByDay(shown)) {
+      if (multi) {
+        const h = document.createElement('h2');
+        h.textContent = fmtDay(new Date(items[0].t));
+        list.append(h);
+      }
+      const ul = document.createElement('ul');
+      ul.className = 'plain';
+      for (const e of items) {
+        const li = document.createElement('li');
+        const time = document.createElement('time');
+        time.dateTime = new Date(e.t).toISOString();
+        time.textContent = fmtTime(e.t);
+        const txt = document.createElement('span');
+        txt.className = 'txt';
+        txt.textContent = e.text;
+        const del = document.createElement('button');
+        del.type = 'button';
+        del.className = 'del';
+        del.textContent = '×';
+        del.setAttribute('aria-label', 'Delete entry');
+        del.dataset.id = e.id;
+        li.append(time, txt, del);
+        ul.append(li);
+      }
+      list.append(ul);
+    }
+    const days = groupByDay(entries).size;
+    $('#count').textContent = entries.length ? entries.length + ' entr' + (entries.length === 1 ? 'y' : 'ies') + ' · ' + days + ' day' + (days === 1 ? '' : 's') : '';
+  }
+
+  $('#form').addEventListener('submit', ev => {
+    ev.preventDefault();
+    const text = $('#entry').value.trim();
+    if (!text) { $('#msg').textContent = 'Write something first.'; return; }
+    // log into the day being viewed: now if it is today, otherwise end of that day
+    const today = startOfDay(new Date());
+    let t = Date.now();
+    if (mode === 'day' && +cursor !== +today) t = +cursor + 17 * 3600e3 + entries.length % 60 * 1000;
+    entries.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), t, text });
+    save();
+    $('#entry').value = '';
+    $('#msg').textContent = '';
+    $('#search').value = '';
+    if (mode === 'week' && !(t >= +range()[0] && t < +range()[1])) cursor = today;
+    render();
+  });
+
+  $('#list').addEventListener('click', ev => {
+    const b = ev.target.closest('button.del');
+    if (!b) return;
+    entries = entries.filter(e => e.id !== b.dataset.id);
+    save();
+    render();
+  });
+
+  $('#day').addEventListener('click', () => { mode = 'day'; render(); });
+  $('#week').addEventListener('click', () => { mode = 'week'; render(); });
+  $('#prev').addEventListener('click', () => { cursor = addDays(cursor, mode === 'day' ? -1 : -7); render(); });
+  $('#next').addEventListener('click', () => { cursor = addDays(cursor, mode === 'day' ? 1 : 7); render(); });
+  $('#search').addEventListener('input', render);
+
+  $('#export').addEventListener('click', () => {
+    if (!entries.length) { $('#msg').textContent = 'Nothing to export yet.'; return; }
+    const sorted = [...entries].sort((a, b) => a.t - b.t);
+    let md = '# Work diary\n';
+    for (const [k, items] of groupByDay(sorted)) {
+      md += '\n## ' + k + '\n\n';
+      for (const e of items) md += '- ' + fmtTime(e.t) + ' ' + e.text.replace(/\n/g, ' ') + '\n';
+    }
+    try {
+      const url = URL.createObjectURL(new Blob([md], { type: 'text/markdown' }));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'work-diary-' + dayKey(Date.now()) + '.md';
+      document.body.append(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      $('#msg').textContent = 'Exported ' + sorted.length + ' entries.';
+    } catch {
+      $('#msg').textContent = 'Export failed in this browser.';
+    }
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

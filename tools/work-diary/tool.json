@@ -1,0 +1,54 @@
+{
+  "slug": "work-diary",
+  "wish": "someone should make an app to keep a work diary",
+  "year": 2015,
+  "agreed": 69,
+  "sources": [
+    {
+      "site": "hn",
+      "url": "https://news.ycombinator.com/item?id=10417071",
+      "date": "2015-10-20",
+      "points": 28,
+      "comments": 41
+    }
+  ],
+  "spec": "Logs one-line, timestamped entries of what you worked on, grouped by day and kept on this device.\nType and press Enter; flip between Day and Week, step back through past days, or search everything.\nExports the whole diary as a Markdown file; it does not sync, share, or remind you.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#entry",
+        "text": "fixed the login bug"
+      }
+    },
+    {
+      "key": "Enter"
+    },
+    {
+      "expect": {
+        "sel": "#list li .txt",
+        "contains": "fixed the login bug"
+      }
+    },
+    {
+      "tap": "#week"
+    },
+    {
+      "type": {
+        "sel": "#search",
+        "text": "zzqx"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#list .empty",
+        "contains": "Nothing matches"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T02:04:27Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": ""
+}
