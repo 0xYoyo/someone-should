@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a grep that highlights matches instead of filtering</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+main { max-width: 900px; }
+textarea { min-height: 140px; resize: vertical; font: 16px/1.45 var(--mono); }
+#pattern { font: 16px/1.45 var(--mono); }
+button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+button { min-width: var(--tap); }
+.opts button { padding: 0 14px; font-family: var(--mono); font-size: 16px; }
+.nav { justify-content: space-between; }
+#count { font: 16px/1.4 var(--mono); color: var(--meta); }
+#count.err { color: var(--no); }
+#out { margin: 0; padding: 12px 0 12px 0; border-top: 1.5px solid var(--line); font: 16px/1.55 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; min-height: 120px; counter-reset: ln; }
+#out .ln { display: block; padding-left: 3.2em; position: relative; }
+#out .ln::before { counter-increment: ln; content: counter(ln); position: absolute; left: 0; width: 2.6em; text-align: right; color: var(--meta); }
+#out.nonum .ln { padding-left: 0; }
+#out.nonum .ln::before { content: none; }
+#out .ln.hit::before { color: var(--ink); font-weight: 600; }
+mark { background: var(--ink); color: var(--paper); border-radius: 2px; padding: 0 1px; }
+mark.cur { background: var(--no); color: #fff; }
+#out .empty { padding: 12px 0; font-family: var(--sans); }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a grep that highlights matches instead of filtering</h1>
+
+<main id="app" class="stack">
+  <textarea id="text" spellcheck="false" autocomplete="off" placeholder="Paste text here" aria-label="Text"></textarea>
+  <input id="pattern" type="text" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="Pattern" aria-label="Pattern">
+  <div class="row opts">
+    <button id="regex" type="button" aria-pressed="false" title="Regular expression">.*</button>
+    <button id="icase" type="button" aria-pressed="true" title="Ignore case">Aa</button>
+    <button id="word" type="button" aria-pressed="false" title="Whole word">\b</button>
+    <button id="nums" type="button" aria-pressed="true" title="Line numbers">#</button>
+  </div>
+  <div class="row nav">
+    <span id="count" aria-live="polite">Paste text and type a pattern.</span>
+    <span class="row">
+      <button id="prev" type="button" aria-label="Previous match">&uarr;</button>
+      <button id="next" type="button" aria-label="Next match">&darr;</button>
+    </span>
+  </div>
+  <pre id="out"></pre>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  const text = $('#text'), pattern = $('#pattern'), out = $('#out'), count = $('#count');
+  const toggles = ['regex', 'icase', 'word', 'nums'];
+  const MAX_MATCHES = 20000;
+  let cur = -1;
+
+  const saved = store.get('hl-state', null);
+  if (saved) {
+    text.value = saved.text || '';
+    pattern.value = saved.pattern || '';
+    toggles.forEach(id => { if (id in saved) $('#' + id).setAttribute('aria-pressed', String(!!saved[id])); });
+  }
+  const on = id => $('#' + id).getAttribute('aria-pressed') === 'true';
+
+  const esc = s => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]);
+  const escRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+  function build() {
+    const p = pattern.value;
+    if (!p) return null;
+    let src = on('regex') ? p : escRe(p);
+    if (on('word')) src = '\\b(?:' + src + ')\\b';
+    return new RegExp(src, 'g' + (on('icase') ? 'i' : '') + 'm');
+  }
+
+  function render() {
+    const t = text.value;
+    out.classList.toggle('nonum', !on('nums'));
+    count.classList.remove('err');
+    cur = -1;
+    if (!t) {
+      out.innerHTML = '<div class="empty">Nothing to search yet.</div>';
+      count.textContent = 'Paste text and type a pattern.';
+      return save();
+    }
+    let re = null;
+    try { re = build(); } catch {
+      count.textContent = 'Invalid pattern.';
+      count.classList.add('err');
+    }
+    const lines = t.split('\n');
+    let html = '', n = 0, hitLines = 0;
+    for (const line of lines) {
+      let body = '', last = 0, hit = false;
+      if (re && n < MAX_MATCHES) {
+        re.lastIndex = 0;
+        let m;
+        while ((m = re.exec(line)) && n < MAX_MATCHES) {
+          if (m[0] === '') { re.lastIndex++; continue; }
+          body += esc(line.slice(last, m.index)) + '<mark>' + esc(m[0]) + '</mark>';
+          last = m.index + m[0].length;
+          n++; hit = true;
+        }
+      }
+      body += esc(line.slice(last));
+      if (hit) hitLines++;
+      html += '<span class="ln' + (hit ? ' hit' : '') + '">' + (body || ' ') + '</span>';
+    }
+    out.innerHTML = html;
+    if (re) {
+      count.textContent = n === 0 ? 'No matches.'
+        : n + (n === 1 ? ' match' : ' matches') + ' on ' + hitLines + ' of ' + lines.length + (lines.length === 1 ? ' line' : ' lines') + (n >= MAX_MATCHES ? ' (stopped)' : '');
+    } else if (!count.classList.contains('err')) {
+      count.textContent = lines.length + (lines.length === 1 ? ' line.' : ' lines.') + ' Type a pattern.';
+    }
+    save();
+  }
+
+  function save() {
+    const s = { text: text.value.length < 200000 ? text.value : '', pattern: pattern.value };
+    toggles.forEach(id => { s[id] = on(id); });
+    store.set('hl-state', s);
+  }
+
+  function jump(d) {
+    const marks = $$('mark', out);
+    if (!marks.length) return;
+    if (marks[cur]) marks[cur].classList.remove('cur');
+    cur = (cur + d + marks.length) % marks.length;
+    const m = marks[cur];
+    m.classList.add('cur');
+    m.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    const base = count.textContent.replace(/^\d+ \/ /, '');
+    count.textContent = (cur + 1) + ' / ' + base;
+  }
+
+  let timer;
+  const later = () => { clearTimeout(timer); timer = setTimeout(render, text.value.length > 50000 ? 200 : 0); };
+  text.addEventListener('input', later);
+  pattern.addEventListener('input', later);
+  pattern.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); jump(e.shiftKey ? -1 : 1); } });
+  toggles.forEach(id => $('#' + id).addEventListener('click', e => {
+    e.currentTarget.setAttribute('aria-pressed', String(!on(id)));
+    render();
+  }));
+  $('#prev').addEventListener('click', () => jump(-1));
+  $('#next').addEventListener('click', () => jump(1));
+
+  render();
+})();
+</script>
+</body>
+</html>

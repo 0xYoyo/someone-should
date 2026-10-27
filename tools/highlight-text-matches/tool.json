@@ -1,0 +1,57 @@
+{
+  "slug": "highlight-text-matches",
+  "wish": "someone should make a grep that highlights matches instead of filtering",
+  "year": 2014,
+  "agreed": 46,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/14413/grep-that-highlights-instead-of-filter",
+      "date": "2014-12-05",
+      "points": 32,
+      "comments": 14
+    }
+  ],
+  "spec": "Shows every line of pasted text with each match of a pattern highlighted in place, plus a match and line count.\nPaste text, type a pattern; toggle regex, ignore case, whole word, line numbers; step through matches with the arrows or Enter.\nDoes not filter lines, read files from disk, or follow piped input; text stays in this browser.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#text",
+        "text": "foo one\nkeep this line\nfoooo two"
+      }
+    },
+    {
+      "type": {
+        "sel": "#pattern",
+        "text": "fo+"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#count",
+        "contains": "No matches"
+      }
+    },
+    {
+      "tap": "#regex"
+    },
+    {
+      "expect": {
+        "sel": "#out mark",
+        "count": 2
+      }
+    },
+    {
+      "expect": {
+        "sel": "#out",
+        "contains": "keep this line"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:43:13Z",
+  "model": "opus-5.5",
+  "minutes": 5,
+  "approved": false,
+  "notes": ""
+}
