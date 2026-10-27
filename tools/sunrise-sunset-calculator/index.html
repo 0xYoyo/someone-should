@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that shows sunrise and sunset times</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+h1 { font-size: 16px; }
+label { display: grid; gap: 4px; font-size: 16px; color: var(--meta); }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.presets { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+.presets button { flex: 0 0 auto; padding: 0 12px; border-color: var(--line); }
+.facts { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 10px; }
+.facts .k { font-size: 16px; color: var(--meta); }
+.facts .v { font-size: 22px; font-variant-numeric: tabular-nums; }
+.facts .big { font-size: 40px; }
+#msg { color: var(--meta); min-height: 1.45em; }
+#msg.err { color: var(--no); }
+table { width: 100%; border-collapse: collapse; font-size: 16px; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 8px 4px; border-bottom: 1px solid var(--line); }
+th { color: var(--meta); font-weight: 500; }
+tr.today td { font-weight: 600; }
+#result[hidden] { display: none; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that shows sunrise and sunset times</h1>
+
+<main id="app" class="stack">
+  <div class="presets" id="presets"></div>
+  <div class="two">
+    <label>Latitude<input id="lat" inputmode="decimal" placeholder="51.48" autocomplete="off"></label>
+    <label>Longitude<input id="lon" inputmode="decimal" placeholder="-0.01" autocomplete="off"></label>
+  </div>
+  <div class="two">
+    <label>Date<input id="date" type="date"></label>
+    <label>Time zone<select id="tz"></select></label>
+  </div>
+  <div class="row">
+    <button id="go" class="primary">Show times</button>
+    <button id="here">Use my location</button>
+  </div>
+  <div id="msg">Pick a city or enter coordinates.</div>
+
+  <section id="result" class="stack" hidden>
+    <div class="facts">
+      <div><div class="k">Sunrise</div><div class="big" id="rise">--</div></div>
+      <div><div class="k">Sunset</div><div class="big" id="set">--</div></div>
+      <div><div class="k">Day length</div><div class="v" id="len">--</div></div>
+      <div><div class="k">Solar noon</div><div class="v" id="noon">--</div></div>
+      <div><div class="k">Civil dawn</div><div class="v" id="dawn">--</div></div>
+      <div><div class="k">Civil dusk</div><div class="v" id="dusk">--</div></div>
+    </div>
+    <table id="month">
+      <thead><tr><th>Day</th><th>Rise</th><th>Set</th><th>Length</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const CITIES = [
+    ['London', 51.5074, -0.1278, 'Europe/London'],
+    ['New York', 40.7128, -74.006, 'America/New_York'],
+    ['Los Angeles', 34.0522, -118.2437, 'America/Los_Angeles'],
+    ['Tokyo', 35.6762, 139.6503, 'Asia/Tokyo'],
+    ['Sydney', -33.8688, 151.2093, 'Australia/Sydney'],
+    ['Paris', 48.8566, 2.3522, 'Europe/Paris'],
+    ['Delhi', 28.6139, 77.209, 'Asia/Kolkata'],
+    ['Tel Aviv', 32.0853, 34.7818, 'Asia/Jerusalem'],
+    ['Reykjavik', 64.1466, -21.9426, 'Atlantic/Reykjavik'],
+    ['Sao Paulo', -23.5505, -46.6333, 'America/Sao_Paulo']
+  ];
+
+  const deviceTz = (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'; } catch { return 'UTC'; } })();
+  let zones = [];
+  try { zones = Intl.supportedValuesOf('timeZone'); } catch { zones = []; }
+  const tzSet = new Set([deviceTz, 'UTC', ...CITIES.map(c => c[3]), ...zones]);
+  const tzSel = $('#tz');
+  tzSel.innerHTML = [...tzSet].map(z => `<option value="${z}">${z === deviceTz ? z + ' (this device)' : z}</option>`).join('');
+
+  // NOAA solar position. Returns UTC minutes after 0h of the given UTC date.
+  const rad = d => d * Math.PI / 180, deg = r => r * 180 / Math.PI;
+  function sunAt(jd) {
+    const t = (jd - 2451545) / 36525;
+    const L0 = (280.46646 + t * (36000.76983 + t * 0.0003032)) % 360;
+    const M = 357.52911 + t * (35999.05029 - 0.0001537 * t);
+    const e = 0.016708634 - t * (0.000042037 + 0.0000001267 * t);
+    const C = Math.sin(rad(M)) * (1.914602 - t * (0.004817 + 0.000014 * t)) + Math.sin(rad(2 * M)) * (0.019993 - 0.000101 * t) + Math.sin(rad(3 * M)) * 0.000289;
+    const omega = 125.04 - 1934.136 * t;
+    const lambda = L0 + C - 0.00569 - 0.00478 * Math.sin(rad(omega));
+    const eps0 = 23 + (26 + (21.448 - t * (46.815 + t * (0.00059 - t * 0.001813))) / 60) / 60;
+    const eps = eps0 + 0.00256 * Math.cos(rad(omega));
+    const decl = deg(Math.asin(Math.sin(rad(eps)) * Math.sin(rad(lambda))));
+    const y = Math.tan(rad(eps / 2)) ** 2;
+    const eqTime = 4 * deg(y * Math.sin(2 * rad(L0)) - 2 * e * Math.sin(rad(M)) + 4 * e * y * Math.sin(rad(M)) * Math.cos(2 * rad(L0)) - 0.5 * y * y * Math.sin(4 * rad(L0)) - 1.25 * e * e * Math.sin(2 * rad(M)));
+    return { decl, eqTime };
+  }
+  // zenith 90.833 = sunrise/sunset, 96 = civil twilight. Returns minutes, or 'up' / 'down' for polar days.
+  function event(jd0, lat, lon, zenith, rising) {
+    let m = 720 - 4 * lon;
+    for (let i = 0; i < 3; i++) {
+      const { decl, eqTime } = sunAt(jd0 + m / 1440);
+      const cosH = Math.cos(rad(zenith)) / (Math.cos(rad(lat)) * Math.cos(rad(decl))) - Math.tan(rad(lat)) * Math.tan(rad(decl));
+      if (cosH < -1) return 'up';
+      if (cosH > 1) return 'down';
+      const ha = deg(Math.acos(cosH));
+      m = 720 - 4 * (lon + (rising ? ha : -ha)) - eqTime;
+    }
+    return m;
+  }
+  function noon(jd0, lon) {
+    let m = 720 - 4 * lon;
+    for (let i = 0; i < 2; i++) m = 720 - 4 * lon - sunAt(jd0 + m / 1440).eqTime;
+    return m;
+  }
+
+  const fmt = (ms, tz) => new Date(ms).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: tz });
+  const dur = min => `${Math.floor(min / 60)}h ${String(Math.round(min % 60)).padStart(2, '0')}m`;
+
+  function day(y, mo, d, lat, lon) {
+    // Minutes are counted from UTC midnight of the date; the solar formula centres events on that day's local solar noon.
+    const utc0 = Date.UTC(y, mo, d);
+    const jd0 = utc0 / 86400000 + 2440587.5;
+    const rel = m => utc0 + Math.round(m * 60000);
+    const ev = (z, r) => {
+      const m = event(jd0, lat, lon, z, r);
+      return typeof m === 'number' ? rel(m) : m;
+    };
+    const rise = ev(90.833, true), set = ev(90.833, false);
+    const dawn = ev(96, true), dusk = ev(96, false);
+    const n = rel(noon(jd0, lon));
+    let len;
+    if (rise === 'up' || set === 'up') len = 1440;
+    else if (rise === 'down' || set === 'down') len = 0;
+    else len = (set - rise) / 60000;
+    if (len < 0) len += 1440;
+    return { rise, set, dawn, dusk, noon: n, len };
+  }
+
+  const show = (v, tz) => v === 'up' ? 'sun up' : v === 'down' ? 'sun down' : fmt(v, tz);
+
+  function msg(text, err) { const el = $('#msg'); el.textContent = text; el.className = err ? 'err' : ''; }
+
+  function run() {
+    const lat = parseFloat($('#lat').value.replace(',', '.'));
+    const lon = parseFloat($('#lon').value.replace(',', '.'));
+    const tz = tzSel.value;
+    if (!isFinite(lat) || lat < -90 || lat > 90) { msg('Latitude must be between -90 and 90.', true); return; }
+    if (!isFinite(lon) || lon < -180 || lon > 180) { msg('Longitude must be between -180 and 180.', true); return; }
+    const parts = ($('#date').value || '').split('-').map(Number);
+    if (parts.length !== 3 || parts.some(isNaN)) { msg('Pick a date.', true); return; }
+    const [y, m, d] = parts;
+    store.set('sunrise-sunset', { lat, lon, tz });
+
+    const r = day(y, m - 1, d, lat, lon);
+    $('#rise').textContent = show(r.rise, tz);
+    $('#set').textContent = show(r.set, tz);
+    $('#len').textContent = dur(r.len);
+    $('#noon').textContent = fmt(r.noon, tz);
+    $('#dawn').textContent = show(r.dawn, tz);
+    $('#dusk').textContent = show(r.dusk, tz);
+
+    const days = new Date(Date.UTC(y, m, 0)).getUTCDate();
+    const rows = [];
+    for (let i = 1; i <= days; i++) {
+      const x = day(y, m - 1, i, lat, lon);
+      rows.push(`<tr${i === d ? ' class="today"' : ''}><td>${i}</td><td>${show(x.rise, tz)}</td><td>${show(x.set, tz)}</td><td>${dur(x.len)}</td></tr>`);
+    }
+    $('#month tbody').innerHTML = rows.join('');
+    $('#result').hidden = false;
+    msg(`${lat.toFixed(4)}, ${lon.toFixed(4)} · times in ${tz}`);
+  }
+
+  // presets
+  $('#presets').innerHTML = CITIES.map((c, i) => `<button type="button" data-i="${i}" id="city-${c[0].toLowerCase().replace(/\s+/g, '-')}">${c[0]}</button>`).join('');
+  $('#presets').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    const c = CITIES[+b.dataset.i];
+    $('#lat').value = c[1]; $('#lon').value = c[2]; tzSel.value = c[3];
+    run();
+  });
+
+  $('#here').addEventListener('click', () => {
+    if (!navigator.geolocation) { msg('Location is not available here. Enter coordinates.', true); return; }
+    msg('Finding you…');
+    navigator.geolocation.getCurrentPosition(p => {
+      $('#lat').value = p.coords.latitude.toFixed(4);
+      $('#lon').value = p.coords.longitude.toFixed(4);
+      tzSel.value = deviceTz;
+      run();
+    }, () => msg('Location was denied. Enter coordinates.', true), { timeout: 10000 });
+  });
+
+  $('#go').addEventListener('click', run);
+  ['#lat', '#lon'].forEach(s => $(s).addEventListener('keydown', e => { if (e.key === 'Enter') run(); }));
+  $('#date').addEventListener('change', () => { if ($('#lat').value && $('#lon').value) run(); });
+  tzSel.addEventListener('change', () => { if ($('#lat').value && $('#lon').value) run(); });
+
+  // initial state
+  const now = new Date();
+  $('#date').value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const saved = store.get('sunrise-sunset', null);
+  tzSel.value = saved && tzSet.has(saved.tz) ? saved.tz : deviceTz;
+  if (saved && isFinite(saved.lat) && isFinite(saved.lon)) { $('#lat').value = saved.lat; $('#lon').value = saved.lon; run(); }
+})();
+</script>
+</body>
+</html>

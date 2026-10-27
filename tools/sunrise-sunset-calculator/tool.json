@@ -1,0 +1,57 @@
+{
+  "slug": "sunrise-sunset-calculator",
+  "wish": "someone should make a tool that shows sunrise and sunset times",
+  "year": 2015,
+  "agreed": 13,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/16588/public-api-for-sunrise-sunset-data",
+      "date": "2015-01-24",
+      "points": 9,
+      "comments": 4
+    }
+  ],
+  "spec": "Computes sunrise, sunset, solar noon, civil dawn/dusk and day length for any latitude, longitude and date, plus a table for the whole month.\nPick a city, tap Use my location, or type coordinates; choose the date and time zone and tap Show times.\nDoes not look up places by name or guess the time zone from coordinates; everything is calculated offline.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#lat",
+        "text": "51.4769"
+      }
+    },
+    {
+      "type": {
+        "sel": "#lon",
+        "text": "-0.0005"
+      }
+    },
+    {
+      "tap": "#go"
+    },
+    {
+      "expect": {
+        "sel": "#rise",
+        "matches": "^\\d{2}:\\d{2}$"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#len",
+        "matches": "^\\d+h \\d{2}m$"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#month tbody tr",
+        "visible": true
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:37:18Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Offline NOAA solar algorithm; times shown in the chosen IANA time zone (device zone by default). Geolocation only on tap."
+}
