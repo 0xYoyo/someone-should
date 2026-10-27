@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T01:33:56.509Z",
+ "updated": "2026-10-27T01:34:25.564Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -88,6 +88,54 @@
    "built": "2026-10-27T01:30:02Z",
    "minutes": 9,
    "approved": false
+  },
+  {
+   "slug": "packet-header-diagram",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "frame-step-video-player",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "text-to-timeline",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "html-css-scratchpad",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "pixel-icon-editor",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "one-word-speed-reader",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "audio-bpm-detector",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "remove-passersby-from-photos",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
   }
  ]
 }
