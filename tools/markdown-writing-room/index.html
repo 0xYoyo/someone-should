@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a beautiful markdown editor</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+body { display: flex; flex-direction: column; }
+main#app { flex: 1; min-height: 0; }
+.bar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.bar input#name { flex: 1 1 140px; width: auto; min-width: 0; }
+label.btn { display: inline-flex; align-items: center; min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); border-radius: var(--radius); cursor: pointer; }
+label.btn input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.panes { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+#src { min-height: 45dvh; resize: vertical; font: 16px/1.6 var(--mono); padding: 14px; tab-size: 2; }
+#out { min-height: 120px; border-top: 1.5px solid var(--line); padding-top: 8px; overflow-wrap: anywhere; line-height: 1.65; }
+#status { font: 14px/1.4 var(--mono); color: var(--meta); min-height: 20px; }
+@media (min-width: 820px) {
+  body { height: 100dvh; }
+  .panes { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); flex: 1; min-height: 0; }
+  main#app { display: flex; flex-direction: column; }
+  #src { height: 100%; min-height: 0; resize: none; }
+  #out { border-top: 0; border-left: 1.5px solid var(--line); padding: 0 8px 0 24px; overflow-y: auto; height: 100%; }
+}
+body.read .panes { grid-template-columns: minmax(0, 1fr); }
+body.read #src { display: none; }
+body.read #out { border: 0; padding-left: 0; }
+#out > :first-child { margin-top: 0; }
+#out .doc { max-width: 68ch; }
+#out h1, #out h2, #out h3, #out h4, #out h5, #out h6 { font-family: var(--sans); color: var(--ink); text-transform: none; line-height: 1.25; margin: 1.4em 0 .5em; font-weight: 600; letter-spacing: -0.01em; }
+#out h1 { font-size: 30px; } #out h2 { font-size: 24px; } #out h3 { font-size: 20px; } #out h4, #out h5, #out h6 { font-size: 17px; }
+#out p, #out ul, #out ol, #out blockquote, #out pre, #out table { margin: 0 0 1em; }
+#out ul, #out ol { padding-left: 1.4em; }
+#out li { margin: .2em 0; }
+#out li.task { list-style: none; margin-left: -1.4em; }
+#out li.task input { width: auto; min-height: 0; margin: 0 .5em 0 0; vertical-align: middle; }
+#out blockquote { border-left: 3px solid var(--line); padding-left: 14px; color: var(--meta); }
+#out code { font: 15px/1.5 var(--mono); background: color-mix(in srgb, var(--line) 55%, transparent); padding: 1px 4px; border-radius: 3px; }
+#out pre { background: color-mix(in srgb, var(--line) 40%, transparent); padding: 12px 14px; border-radius: var(--radius); overflow-x: auto; }
+#out pre code { background: none; padding: 0; }
+#out hr { border: 0; border-top: 1.5px solid var(--line); margin: 1.6em 0; }
+#out a { color: var(--ink); text-underline-offset: 3px; }
+#out img { max-width: 100%; }
+#out .tw { overflow-x: auto; }
+#out table { border-collapse: collapse; }
+#out th, #out td { border: 1px solid var(--line); padding: 6px 10px; text-align: left; }
+#out .empty { padding: 8px 0; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a beautiful markdown editor</h1>
+
+<main id="app" class="stack">
+  <div class="bar">
+    <input id="name" aria-label="File name" value="untitled.md" spellcheck="false" autocomplete="off">
+    <label class="btn" id="open">Open<input id="file" type="file" accept=".md,.markdown,.txt,text/markdown,text/plain"></label>
+    <button id="save" class="primary">Save .md</button>
+    <button id="view" aria-pressed="false">Read</button>
+    <button id="new">New</button>
+  </div>
+  <div class="panes">
+    <textarea id="src" aria-label="Markdown" spellcheck="true" placeholder="Write in Markdown."></textarea>
+    <article id="out" aria-live="off"></article>
+  </div>
+  <div id="status" aria-live="polite"></div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  // storage helper — never throws
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  // ---------- Markdown -> HTML (escapes all raw HTML) ----------
+  const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const safeUrl = u => {
+    u = u.trim().replace(/^<|>$/g, '');
+    if (/^(javascript|vbscript|data):/i.test(u) && !/^data:image\//i.test(u)) return '#';
+    return u;
+  };
+
+  function inline(src) {
+    const slots = [];
+    const hold = html => '\u0000' + (slots.push(html) - 1) + '\u0000';
+    let s = src.replace(/\\([\\`*_{}\[\]()#+\-.!~|>])/g, (_, c) => hold(esc(c)));
+    s = s.replace(/(`+)([\s\S]*?[^`])\1(?!`)/g, (_, __, c) => hold('<code>' + esc(c.trim()) + '</code>'));
+    // images: only inline data: images can show (zero network); anything else becomes a link
+    s = s.replace(/!\[([^\]]*)\]\(\s*(<[^>]*>|[^)\s]+)(?:\s+"[^"]*")?\s*\)/g, (_, alt, u) => {
+      u = safeUrl(u);
+      return hold(/^data:image\//i.test(u)
+        ? '<img alt="' + esc(alt) + '" src="' + esc(u) + '">'
+        : '<a href="' + esc(u) + '" target="_blank" rel="noopener noreferrer">' + esc(alt || u) + '</a>');
+    });
+    s = s.replace(/\[([^\]]+)\]\(\s*(<[^>]*>|[^)\s]+)(?:\s+"[^"]*")?\s*\)/g, (_, t, u) =>
+      hold('<a href="' + esc(safeUrl(u)) + '" target="_blank" rel="noopener noreferrer">') + t + hold('</a>'));
+    s = s.replace(/<((?:https?:\/\/|mailto:)[^>\s]+)>/g, (_, u) =>
+      hold('<a href="' + esc(u) + '" target="_blank" rel="noopener noreferrer">' + esc(u) + '</a>'));
+    s = esc(s);
+    s = s.replace(/(\*\*|__)(?=\S)([\s\S]*?\S)\1/g, '<strong>$2</strong>')
+         .replace(/(^|[^\w*])\*(?=\S)([\s\S]*?\S)\*(?!\*)/g, '$1<em>$2</em>')
+         .replace(/(^|[^\w])_(?=\S)([\s\S]*?\S)_(?!\w)/g, '$1<em>$2</em>')
+         .replace(/~~(?=\S)([\s\S]*?\S)~~/g, '<del>$1</del>')
+         .replace(/( {2,}|\\)\n/g, '<br>\n');
+    return s.replace(/\u0000(\d+)\u0000/g, (_, i) => slots[i]);
+  }
+
+  const RE = {
+    fence: /^ {0,3}(`{3,}|~{3,})\s*([\w+-]*)/,
+    head: /^ {0,3}(#{1,6})\s+(.*?)\s*#*\s*$/,
+    hr: /^ {0,3}([-*_])(?:\s*\1){2,}\s*$/,
+    quote: /^ {0,3}>\s?/,
+    item: /^( *)([-*+]|\d{1,9}[.)])\s+(.*)$/,
+    tsep: /^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)*\|?\s*$/,
+    setext: /^ {0,3}(=+|-+)\s*$/
+  };
+  const cells = l => l.trim().replace(/^\||\|$/g, '').split(/(?<!\\)\|/).map(c => c.trim());
+  const indentOf = l => l.match(/^ */)[0].length;
+  const startsBlock = (l, next) => RE.fence.test(l) || RE.head.test(l) || RE.hr.test(l) || RE.quote.test(l) || RE.item.test(l) ||
+    (l.includes('|') && next != null && RE.tsep.test(next) && next.includes('-'));
+
+  function blocks(lines) {
+    const out = [];
+    let i = 0;
+    while (i < lines.length) {
+      const l = lines[i].replace(/\t/g, '    ');
+      let m;
+      if (!l.trim()) { i++; continue; }
+      if ((m = l.match(RE.fence))) {
+        const mark = m[1], lang = m[2], body = [];
+        i++;
+        while (i < lines.length && !lines[i].trim().startsWith(mark)) body.push(lines[i++]);
+        i++;
+        out.push('<pre><code' + (lang ? ' data-lang="' + esc(lang) + '"' : '') + '>' + esc(body.join('\n')) + '</code></pre>');
+        continue;
+      }
+      if (/^ {4,}\S/.test(l)) {
+        const body = [];
+        while (i < lines.length && (/^ {4}/.test(lines[i]) || (!lines[i].trim() && /^ {4}/.test(lines[i + 1] || '')))) body.push(lines[i++].slice(4));
+        out.push('<pre><code>' + esc(body.join('\n')) + '</code></pre>');
+        continue;
+      }
+      if ((m = l.match(RE.head))) { const n = m[1].length; out.push(`<h${n}>${inline(m[2])}</h${n}>`); i++; continue; }
+      if (RE.hr.test(l)) { out.push('<hr>'); i++; continue; }
+      if (RE.quote.test(l)) {
+        const body = [];
+        while (i < lines.length && lines[i].trim() && (RE.quote.test(lines[i]) || !startsBlock(lines[i]))) body.push(lines[i++].replace(RE.quote, ''));
+        out.push('<blockquote>' + blocks(body) + '</blockquote>');
+        continue;
+      }
+      if (l.includes('|') && i + 1 < lines.length && RE.tsep.test(lines[i + 1]) && lines[i + 1].includes('-')) {
+        const head = cells(l);
+        const align = cells(lines[i + 1]).map(c => /^:-+:$/.test(c) ? 'center' : /-:$/.test(c) ? 'right' : /^:/.test(c) ? 'left' : '');
+        const st = k => align[k] ? ` style="text-align:${align[k]}"` : '';
+        i += 2;
+        let h = '<div class="tw"><table><thead><tr>' + head.map((c, k) => `<th${st(k)}>${inline(c)}</th>`).join('') + '</tr></thead><tbody>';
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) {
+          const r = cells(lines[i++]);
+          h += '<tr>' + head.map((_, k) => `<td${st(k)}>${inline(r[k] || '')}</td>`).join('') + '</tr>';
+        }
+        out.push(h + '</tbody></table></div>');
+        continue;
+      }
+      if ((m = l.match(RE.item))) { i = list(lines, i, out); continue; }
+      // paragraph (with setext headings)
+      const para = [l];
+      i++;
+      while (i < lines.length && lines[i].trim()) {
+        const sm = lines[i].match(RE.setext);
+        if (sm) { para.level = sm[1][0] === '=' ? 1 : 2; i++; break; }
+        if (startsBlock(lines[i], lines[i + 1])) break;
+        para.push(lines[i++]);
+      }
+      if (para.level) {
+        out.push(`<h${para.level}>${inline(para.join('\n').trim())}</h${para.level}>`);
+      } else out.push('<p>' + inline(para.join('\n').trim()) + '</p>');
+    }
+    return out.join('\n');
+  }
+
+  function list(lines, i, out) {
+    const first = lines[i].match(RE.item);
+    const base = first[1].length;
+    const ordered = /\d/.test(first[2]);
+    const items = [];
+    let loose = false, cur = null;
+    while (i < lines.length) {
+      const l = lines[i].replace(/\t/g, '    ');
+      const m = l.match(RE.item);
+      if (m && m[1].length === base && /\d/.test(m[2]) === ordered) {
+        cur = { lines: [m[3]], pad: m[1].length + m[2].length + 1 };
+        items.push(cur); i++; continue;
+      }
+      if (!l.trim()) {
+        const nx = lines[i + 1];
+        if (nx != null && nx.trim() && (indentOf(nx) > base || (RE.item.test(nx) && indentOf(nx) === base))) {
+          if (indentOf(nx) > base) cur.lines.push('');
+          loose = loose || indentOf(nx) === base;
+          i++; continue;
+        }
+        break;
+      }
+      if (indentOf(l) > base) { cur.lines.push(l.slice(Math.min(indentOf(l), cur.pad + 1))); i++; continue; }
+      if (m || startsBlock(l, lines[i + 1])) break;
+      cur.lines.push(l.trim()); i++; // lazy continuation
+    }
+    const start = ordered ? parseInt(first[2], 10) : 1;
+    let h = ordered ? `<ol${start !== 1 ? ` start="${start}"` : ''}>` : '<ul>';
+    for (const it of items) {
+      let text = it.lines, cls = '', box = '';
+      const t = text[0].match(/^\[([ xX])\]\s+(.*)$/);
+      if (t) { cls = ' class="task"'; box = `<input type="checkbox" disabled${t[1] !== ' ' ? ' checked' : ''}>`; text = [t[2], ...text.slice(1)]; }
+      const nested = text.length > 1 && text.slice(1).some(x => x.trim());
+      let body;
+      if (!nested && !loose) body = inline(text[0]);
+      else {
+        body = blocks(text);
+        if (!loose) body = body.replace(/^<p>([\s\S]*?)<\/p>/, '$1');
+      }
+      h += `<li${cls}>${box}${body}</li>`;
+    }
+    out.push(h + (ordered ? '</ol>' : '</ul>'));
+    return i;
+  }
+
+  const render = md => blocks(md.replace(/\r\n?/g, '\n').split('\n'));
+
+  // ---------- editor ----------
+  const src = $('#src'), out = $('#out'), status = $('#status'), nameEl = $('#name');
+  let saveTimer = 0, rafId = 0, note = '';
+
+  function stats(t) {
+    const words = (t.match(/[^\s#>*_`~\-|]+/g) || []).length;
+    const mins = Math.max(1, Math.round(words / 230));
+    return words + (words === 1 ? ' word' : ' words') + (words ? ' · ' + mins + ' min read' : '');
+  }
+  function paint() {
+    rafId = 0;
+    const t = src.value;
+    out.innerHTML = t.trim() ? '<div class="doc">' + render(t) + '</div>' : '<p class="empty">Nothing written yet.</p>';
+    status.textContent = stats(t) + (note ? ' · ' + note : '');
+  }
+  function changed() {
+    note = '';
+    if (!rafId) rafId = requestAnimationFrame(paint);
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => { store.set('mwr.doc', { text: src.value, name: nameEl.value }); }, 300);
+  }
+  function flash(msg) { note = msg; paint(); }
+
+  const saved = store.get('mwr.doc', null);
+  if (saved && typeof saved.text === 'string') { src.value = saved.text; nameEl.value = saved.name || 'untitled.md'; }
+  paint();
+
+  src.addEventListener('input', changed);
+  nameEl.addEventListener('input', changed);
+
+  // Tab indents; Enter continues lists
+  src.addEventListener('keydown', e => {
+    const { selectionStart: a, selectionEnd: b, value: v } = src;
+    if (e.key === 'Tab' && !e.altKey && !e.ctrlKey && !e.metaKey) {
+      e.preventDefault();
+      const ls = v.lastIndexOf('\n', a - 1) + 1;
+      if (e.shiftKey) {
+        if (v.startsWith('  ', ls)) { src.setRangeText('', ls, ls + 2, 'end'); src.setSelectionRange(Math.max(ls, a - 2), Math.max(ls, b - 2)); }
+      } else src.setRangeText('  ', a, a, 'end');
+      changed();
+    } else if (e.key === 'Enter' && !e.shiftKey && a === b) {
+      const ls = v.lastIndexOf('\n', a - 1) + 1;
+      const line = v.slice(ls, a);
+      const m = line.match(/^(\s*)([-*+]|(\d+)([.)]))(\s+)(\[[ xX]\]\s+)?(.*)$/);
+      if (!m) return;
+      e.preventDefault();
+      if (!m[7].trim()) { src.setRangeText('', ls, a, 'end'); changed(); return; }
+      const mark = m[3] ? (parseInt(m[3], 10) + 1) + m[4] : m[2];
+      src.setRangeText('\n' + m[1] + mark + m[5] + (m[6] ? '[ ] ' : ''), a, a, 'end');
+      changed();
+    } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+      e.preventDefault(); save();
+    }
+  });
+
+  function save() {
+    let n = nameEl.value.trim() || 'untitled.md';
+    if (!/\.(md|markdown|txt)$/i.test(n)) n += '.md';
+    try {
+      const url = URL.createObjectURL(new Blob([src.value], { type: 'text/markdown;charset=utf-8' }));
+      const a = document.createElement('a');
+      a.href = url; a.download = n;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+      flash('saved ' + n);
+    } catch { flash('could not save this file'); }
+  }
+  $('#save').addEventListener('click', save);
+
+  $('#file').addEventListener('change', e => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    if (f.size > 5e6) { flash('that file is too large'); e.target.value = ''; return; }
+    const r = new FileReader();
+    r.onload = () => { src.value = String(r.result); nameEl.value = f.name; changed(); flash('opened ' + f.name); };
+    r.onerror = () => flash('could not read that file');
+    r.readAsText(f);
+    e.target.value = '';
+  });
+
+  const viewBtn = $('#view');
+  viewBtn.addEventListener('click', () => {
+    const on = document.body.classList.toggle('read');
+    viewBtn.textContent = on ? 'Write' : 'Read';
+    viewBtn.setAttribute('aria-pressed', String(on));
+    if (!on) src.focus();
+  });
+
+  // New asks once: second tap within 3 s clears
+  const newBtn = $('#new');
+  let armed = 0;
+  newBtn.addEventListener('click', () => {
+    if (!src.value.trim() || Date.now() - armed < 3000) {
+      src.value = ''; nameEl.value = 'untitled.md'; armed = 0; newBtn.textContent = 'New';
+      changed(); src.focus(); return;
+    }
+    armed = Date.now(); newBtn.textContent = 'Clear?';
+    setTimeout(() => { if (armed && Date.now() - armed >= 3000) { armed = 0; newBtn.textContent = 'New'; } }, 3100);
+  });
+})();
+</script>
+</body>
+</html>

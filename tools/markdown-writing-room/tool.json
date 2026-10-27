@@ -1,0 +1,85 @@
+{
+  "slug": "markdown-writing-room",
+  "wish": "someone should make a beautiful markdown editor",
+  "year": 2014,
+  "agreed": 265,
+  "sources": [
+    {
+      "site": "hn",
+      "url": "https://news.ycombinator.com/item?id=32797711",
+      "date": "2022-09-11",
+      "points": 45,
+      "comments": 56
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/5746/markdown-editor-for-windows-with-live-rendering-in-the-editing-pane-not-in-a-se",
+      "date": "2014-06-07",
+      "points": 61,
+      "comments": 18
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/25/markdown-editor-for-osx-that-includes-a-preview-ideally-in-real-time",
+      "date": "2014-02-04",
+      "points": 50,
+      "comments": 9
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/545/is-there-a-markdown-editor-for-ios",
+      "date": "2014-02-06",
+      "points": 11,
+      "comments": 2
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/27867/free-markdown-editor-for-windows-with-tabs-live-view-tables",
+      "date": "2016-01-08",
+      "points": 12,
+      "comments": 1
+    }
+  ],
+  "spec": "A Markdown editor with a live rendered preview beside it (below it on a phone), including tables, task lists, code blocks and quotes.\nType on the left; open a .md file from disk, save it back as .md, switch to a clean Read view; the draft is kept in this browser between visits.\nIt does not sync, collaborate, upload anywhere or load remote images (only inline data: images show; other images become links).",
+  "tests": [
+    {
+      "expect": {
+        "sel": "#out",
+        "contains": "Nothing written yet"
+      }
+    },
+    {
+      "type": {
+        "sel": "#src",
+        "text": "# Field notes\n\nSome **bold** words.\n\n- [x] done\n- todo\n\n| a | b |\n|---|---|\n| 1 | 2 |"
+      }
+    },
+    {
+      "wait": 200
+    },
+    {
+      "expect": {
+        "sel": "#out h1",
+        "contains": "Field notes"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#out td",
+        "count": 2
+      }
+    },
+    {
+      "expect": {
+        "sel": "#status",
+        "matches": "\\d+ words"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:30:02Z",
+  "model": "opus-5.5",
+  "minutes": 9,
+  "approved": false,
+  "notes": "Zero-network: remote image URLs render as links instead of loading. Raw HTML in the Markdown is escaped, not rendered."
+}
