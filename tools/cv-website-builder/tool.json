@@ -1,0 +1,54 @@
+{
+  "slug": "cv-website-builder",
+  "wish": "someone should make a site that builds a personal CV website",
+  "year": 2025,
+  "agreed": 27,
+  "sources": [
+    {
+      "site": "hn",
+      "url": "https://news.ycombinator.com/item?id=44219898",
+      "date": "2025-06-08",
+      "points": 8,
+      "comments": 19
+    }
+  ],
+  "spec": "Builds a one-page personal CV website from your name, links, about, jobs, schools, projects and skills.\nFill the fields and watch the live preview; tap Download site to save it as a single self-contained index.html you can host anywhere.\nIt does not host the site for you, import from LinkedIn, or send your details anywhere; drafts stay in this browser.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#name",
+        "text": "Ada Lovelace"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#preview h1",
+        "contains": "Ada Lovelace"
+      }
+    },
+    {
+      "tap": "#add-exp"
+    },
+    {
+      "type": {
+        "sel": "#exp input[data-f=a]",
+        "text": "Analyst"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#preview .cv-item b",
+        "contains": "Analyst"
+      }
+    },
+    {
+      "tap": "#download"
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T02:04:27Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Download uses a local blob link; the exported page has no external requests."
+}
