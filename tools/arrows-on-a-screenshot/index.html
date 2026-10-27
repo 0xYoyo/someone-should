@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that adds text and arrows to a screenshot</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+.drop { border: 1.5px dashed var(--line); border-radius: var(--radius); padding: 32px 16px; text-align: center; display: grid; gap: 16px; justify-items: center; }
+.drop.over { border-color: var(--ink); }
+.drop p { margin: 0; }
+#file { display: none; }
+.bar { display: flex; flex-wrap: wrap; gap: 8px; }
+.bar button { padding: 0 12px; min-width: 44px; }
+.bar button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.sw { width: 44px; padding: 0; position: relative; }
+.sw::after { content: ""; position: absolute; inset: 9px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 1px var(--line); }
+.sw[aria-pressed="true"] { background: transparent !important; outline: 2px solid var(--ink); outline-offset: 2px; }
+.stage { display: flex; justify-content: center; }
+#cv { display: block; touch-action: none; cursor: crosshair; border: 1px solid var(--line); background: #fff; max-width: 100%; }
+#textbar { display: flex; gap: 8px; }
+#textbar[hidden] { display: none; }
+#textbar input { flex: 1; min-width: 0; }
+#msg { color: var(--meta); font-size: 16px; min-height: 1.45em; margin: 0; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that adds text and arrows to a screenshot</h1>
+
+<main id="app" class="stack">
+  <section id="start" class="drop">
+    <p>Paste, drop, or choose a screenshot.</p>
+    <div class="row" style="justify-content:center">
+      <button id="pick" class="primary" type="button">Choose image</button>
+      <button id="blank" type="button">Blank canvas</button>
+    </div>
+    <input id="file" type="file" accept="image/*">
+  </section>
+
+  <section id="editor" class="stack" hidden>
+    <div class="bar" role="toolbar" aria-label="Tools">
+      <button type="button" data-tool="arrow" id="tool-arrow">Arrow</button>
+      <button type="button" data-tool="box" id="tool-box">Box</button>
+      <button type="button" data-tool="text" id="tool-text">Text</button>
+      <button type="button" data-tool="blur" id="tool-blur">Blur</button>
+      <button type="button" id="size" aria-label="Stroke size">M</button>
+    </div>
+    <div class="bar" role="toolbar" aria-label="Colors">
+      <button type="button" class="sw" data-color="#e5322d" style="--c:#e5322d" aria-label="Red"></button>
+      <button type="button" class="sw" data-color="#ffd21f" style="--c:#ffd21f" aria-label="Yellow"></button>
+      <button type="button" class="sw" data-color="#1f6fff" style="--c:#1f6fff" aria-label="Blue"></button>
+      <button type="button" class="sw" data-color="#141414" style="--c:#141414" aria-label="Black"></button>
+      <button type="button" class="sw" data-color="#ffffff" style="--c:#ffffff" aria-label="White"></button>
+    </div>
+    <div id="textbar" hidden>
+      <input id="label" type="text" placeholder="Label" aria-label="Label text" enterkeyhint="done">
+      <button id="add-text" type="button" class="primary">Add</button>
+    </div>
+    <div class="stage"><canvas id="cv"></canvas></div>
+    <p id="msg"></p>
+    <div class="bar">
+      <button id="undo" type="button">Undo</button>
+      <button id="save" type="button" class="primary">Save PNG</button>
+      <button id="copy" type="button" hidden>Copy</button>
+      <button id="new" type="button">New</button>
+      <span id="count" class="meta" style="align-self:center;font-size:16px">0 marks</span>
+    </div>
+  </section>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  const cv = $('#cv'), ctx = cv.getContext('2d');
+  const SIZES = { S: 0.6, M: 1, L: 1.6 };
+  const HINT = { arrow: 'Drag to draw an arrow.', box: 'Drag to draw a box.', text: 'Tap where the label goes.', blur: 'Drag over what to hide.' };
+  const prefs = store.get('arrows-prefs', {});
+  let tool = HINT[prefs.tool] ? prefs.tool : 'arrow';
+  let color = prefs.color || '#e5322d';
+  let size = SIZES[prefs.size] ? prefs.size : 'M';
+  let base = null;       // HTMLImageElement or null for blank
+  let marks = [];
+  let draft = null;      // mark being dragged
+  let pending = null;    // {x, y} waiting for label text
+  let unit = 4;
+
+  const msg = t => { $('#msg').textContent = t; };
+  const savePrefs = () => store.set('arrows-prefs', { tool, color, size });
+
+  function syncUI() {
+    $$('[data-tool]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.tool === tool)));
+    $$('[data-color]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.color === color)));
+    $('#size').textContent = size;
+    const n = marks.length;
+    $('#count').textContent = n + (n === 1 ? ' mark' : ' marks');
+    $('#undo').disabled = n === 0;
+  }
+
+  function fit() {
+    if (!cv.width) return;
+    const maxW = $('#app').clientWidth;
+    const maxH = Math.max(240, window.innerHeight * 0.7);
+    const s = Math.min(maxW / cv.width, maxH / cv.height, 1);
+    cv.style.width = Math.floor(cv.width * s) + 'px';
+    cv.style.height = Math.floor(cv.height * s) + 'px';
+  }
+
+  function open(img) {
+    const MAX = 4096;
+    let w = img ? img.naturalWidth : 1200, h = img ? img.naturalHeight : 800;
+    const k = Math.min(1, MAX / Math.max(w, h));
+    w = Math.round(w * k); h = Math.round(h * k);
+    cv.width = w; cv.height = h;
+    base = img; marks = []; draft = null; pending = null;
+    unit = Math.max(2, Math.max(w, h) / 200);
+    $('#start').hidden = true; $('#editor').hidden = false;
+    $('#textbar').hidden = true;
+    fit(); render(); syncUI(); msg(HINT[tool]);
+  }
+
+  function loadFile(file) {
+    if (!file || !/^image\//.test(file.type)) { msg('That is not an image.'); return; }
+    const r = new FileReader();
+    r.onload = () => {
+      const img = new Image();
+      img.onload = () => open(img);
+      img.onerror = () => msg('Could not read that image.');
+      img.src = r.result;
+    };
+    r.onerror = () => msg('Could not read that file.');
+    r.readAsDataURL(file);
+  }
+
+  // ---- drawing ----
+  const contrast = c => (c === '#ffffff' || c === '#ffd21f') ? 'rgba(0,0,0,.85)' : 'rgba(255,255,255,.9)';
+
+  function drawArrow(m) {
+    const lw = 1.6 * unit * m.k, head = Math.max(lw * 3.6, 10);
+    const dx = m.x2 - m.x1, dy = m.y2 - m.y1, len = Math.hypot(dx, dy);
+    if (len < 1) return;
+    const a = Math.atan2(dy, dx);
+    const sx = m.x2 - Math.cos(a) * head * 0.8, sy = m.y2 - Math.sin(a) * head * 0.8;
+    ctx.save();
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    for (const pass of [0, 1]) {
+      ctx.strokeStyle = ctx.fillStyle = pass ? m.color : contrast(m.color);
+      ctx.lineWidth = pass ? lw : lw + unit * 0.8;
+      ctx.beginPath(); ctx.moveTo(m.x1, m.y1); ctx.lineTo(sx, sy); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(m.x2, m.y2);
+      ctx.lineTo(m.x2 - head * Math.cos(a - 0.45), m.y2 - head * Math.sin(a - 0.45));
+      ctx.lineTo(m.x2 - head * Math.cos(a + 0.45), m.y2 - head * Math.sin(a + 0.45));
+      ctx.closePath(); ctx.fill();
+      if (!pass) ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function rect(m) {
+    return { x: Math.min(m.x1, m.x2), y: Math.min(m.y1, m.y2), w: Math.abs(m.x2 - m.x1), h: Math.abs(m.y2 - m.y1) };
+  }
+
+  function drawBox(m) {
+    const r = rect(m);
+    ctx.save();
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = m.color; ctx.lineWidth = 1.3 * unit * m.k;
+    ctx.strokeRect(r.x, r.y, r.w, r.h);
+    ctx.restore();
+  }
+
+  function drawBlur(m) {
+    const r = rect(m);
+    const x = Math.max(0, Math.floor(r.x)), y = Math.max(0, Math.floor(r.y));
+    const w = Math.min(cv.width - x, Math.ceil(r.w)), h = Math.min(cv.height - y, Math.ceil(r.h));
+    if (w < 2 || h < 2) return;
+    const blk = Math.max(6, unit * 3 * m.k);
+    const sw = Math.max(1, Math.round(w / blk)), sh = Math.max(1, Math.round(h / blk));
+    const tmp = document.createElement('canvas');
+    tmp.width = sw; tmp.height = sh;
+    const t = tmp.getContext('2d');
+    t.imageSmoothingEnabled = true;
+    t.drawImage(cv, x, y, w, h, 0, 0, sw, sh);
+    ctx.save();
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(tmp, 0, 0, sw, sh, x, y, w, h);
+    ctx.restore();
+  }
+
+  function drawText(m) {
+    const fs = Math.round(9 * unit * m.k);
+    ctx.save();
+    ctx.font = '600 ' + fs + 'px -apple-system, "Segoe UI", Roboto, system-ui, sans-serif';
+    ctx.textBaseline = 'middle';
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = Math.max(3, fs / 5);
+    ctx.strokeStyle = contrast(m.color);
+    ctx.fillStyle = m.color;
+    const lines = m.text.split('\n');
+    lines.forEach((ln, i) => {
+      const y = m.y + i * fs * 1.2;
+      ctx.strokeText(ln, m.x, y);
+      ctx.fillText(ln, m.x, y);
+    });
+    ctx.restore();
+  }
+
+  function drawMark(m) {
+    if (m.type === 'arrow') drawArrow(m);
+    else if (m.type === 'box') drawBox(m);
+    else if (m.type === 'blur') drawBlur(m);
+    else if (m.type === 'text') drawText(m);
+  }
+
+  function render() {
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, cv.width, cv.height);
+    if (base) ctx.drawImage(base, 0, 0, cv.width, cv.height);
+    marks.forEach(drawMark);
+    if (draft) {
+      drawMark(draft);
+      if (draft.type === 'blur') {
+        const r = rect(draft);
+        ctx.save(); ctx.setLineDash([unit * 2, unit * 2]); ctx.lineWidth = Math.max(1, unit / 2);
+        ctx.strokeStyle = '#888'; ctx.strokeRect(r.x, r.y, r.w, r.h); ctx.restore();
+      }
+    }
+    if (pending) {
+      ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = Math.max(2, unit / 1.5);
+      const s = unit * 4;
+      ctx.beginPath();
+      ctx.moveTo(pending.x - s, pending.y); ctx.lineTo(pending.x + s, pending.y);
+      ctx.moveTo(pending.x, pending.y - s); ctx.lineTo(pending.x, pending.y + s);
+      ctx.stroke(); ctx.restore();
+    }
+  }
+
+  function addMark(m) { marks.push(m); render(); syncUI(); }
+
+  // ---- input ----
+  function point(e) {
+    const b = cv.getBoundingClientRect();
+    return { x: (e.clientX - b.left) * cv.width / b.width, y: (e.clientY - b.top) * cv.height / b.height };
+  }
+
+  cv.addEventListener('pointerdown', e => {
+    if (tool === 'text') return;
+    e.preventDefault();
+    const p = point(e);
+    try { cv.setPointerCapture(e.pointerId); } catch {}
+    draft = { type: tool, color, k: SIZES[size], x1: p.x, y1: p.y, x2: p.x, y2: p.y };
+  });
+  cv.addEventListener('pointermove', e => {
+    if (!draft) return;
+    const p = point(e);
+    draft.x2 = p.x; draft.y2 = p.y;
+    render();
+  });
+  const endDraft = () => {
+    if (!draft) return;
+    const d = draft; draft = null;
+    const min = unit * 3;
+    const r = rect(d);
+    const ok = d.type === 'arrow' ? Math.hypot(d.x2 - d.x1, d.y2 - d.y1) >= min : r.w >= min && r.h >= min;
+    if (ok) { addMark(d); msg(''); } else { render(); msg(HINT[d.type]); }
+  };
+  cv.addEventListener('pointerup', endDraft);
+  cv.addEventListener('pointercancel', () => { draft = null; render(); });
+
+  cv.addEventListener('click', e => {
+    if (tool !== 'text') return;
+    pending = point(e);
+    $('#textbar').hidden = false;
+    render();
+    const inp = $('#label');
+    inp.focus({ preventScroll: true });
+    msg('Type the label, then Add.');
+  });
+
+  function commitText() {
+    const text = $('#label').value.trim();
+    if (!pending) { msg(HINT.text); return; }
+    if (!text) { msg('Type something first.'); return; }
+    const fs = 9 * unit * SIZES[size];
+    addMark({ type: 'text', color, k: SIZES[size], text, x: Math.min(pending.x, cv.width - fs), y: pending.y });
+    pending = null;
+    $('#label').value = '';
+    $('#textbar').hidden = true;
+    render();
+    msg('');
+  }
+  function cancelText() { pending = null; $('#textbar').hidden = true; render(); msg(HINT[tool]); }
+
+  $('#add-text').addEventListener('click', commitText);
+  $('#label').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); commitText(); }
+    else if (e.key === 'Escape') cancelText();
+  });
+
+  $$('[data-tool]').forEach(b => b.addEventListener('click', () => {
+    tool = b.dataset.tool;
+    if (tool !== 'text' && pending) cancelText();
+    savePrefs(); syncUI(); msg(HINT[tool]);
+  }));
+  $$('[data-color]').forEach(b => b.addEventListener('click', () => {
+    color = b.dataset.color; savePrefs(); syncUI(); if (pending) render();
+  }));
+  $('#size').addEventListener('click', () => {
+    const keys = Object.keys(SIZES);
+    size = keys[(keys.indexOf(size) + 1) % keys.length];
+    savePrefs(); syncUI();
+  });
+
+  function undo() {
+    if (!marks.length) return;
+    marks.pop(); render(); syncUI(); msg(marks.length ? '' : HINT[tool]);
+  }
+  $('#undo').addEventListener('click', undo);
+
+  $('#new').addEventListener('click', () => {
+    base = null; marks = []; pending = null; draft = null;
+    $('#editor').hidden = true; $('#start').hidden = false;
+    $('#file').value = '';
+  });
+
+  function exportBlob(cb) {
+    const was = pending; pending = null; render();
+    cv.toBlob(b => { pending = was; render(); cb(b); }, 'image/png');
+  }
+
+  $('#save').addEventListener('click', () => {
+    exportBlob(blob => {
+      if (!blob) { msg('Could not export the image.'); return; }
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'screenshot-annotated.png';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      msg('Saved.');
+    });
+  });
+
+  if (window.ClipboardItem && navigator.clipboard && navigator.clipboard.write) {
+    $('#copy').hidden = false;
+    $('#copy').addEventListener('click', () => {
+      exportBlob(blob => {
+        if (!blob) { msg('Could not export the image.'); return; }
+        navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
+          .then(() => msg('Copied to clipboard.'), () => msg('Copy blocked here. Use Save PNG.'));
+      });
+    });
+  }
+
+  $('#pick').addEventListener('click', () => $('#file').click());
+  $('#blank').addEventListener('click', () => open(null));
+  $('#file').addEventListener('change', e => loadFile(e.target.files[0]));
+
+  document.addEventListener('paste', e => {
+    const items = [...(e.clipboardData ? e.clipboardData.items : [])];
+    const it = items.find(i => i.kind === 'file' && /^image\//.test(i.type));
+    if (!it) return;
+    e.preventDefault();
+    loadFile(it.getAsFile());
+  });
+  const drop = $('#start');
+  ['dragenter', 'dragover'].forEach(t => document.addEventListener(t, e => { e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach(t => document.addEventListener(t, () => drop.classList.remove('over')));
+  document.addEventListener('drop', e => {
+    e.preventDefault();
+    const f = e.dataTransfer && e.dataTransfer.files[0];
+    if (f) loadFile(f);
+  });
+
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && document.activeElement !== $('#label')) { e.preventDefault(); undo(); }
+  });
+  window.addEventListener('resize', fit);
+
+  syncUI();
+})();
+</script>
+</body>
+</html>

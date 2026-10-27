@@ -1,0 +1,62 @@
+{
+  "slug": "arrows-on-a-screenshot",
+  "wish": "someone should make a tool that adds text and arrows to a screenshot",
+  "year": 2014,
+  "agreed": 96,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/3069/simple-program-to-edit-screenshots-add-texts-and-arrows-mark-stuff-on-linux",
+      "date": "2014-04-08",
+      "points": 57,
+      "comments": 7
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/2331/windows-application-for-circling-pointing-highlighting-and-writing-comments-on",
+      "date": "2014-03-14",
+      "points": 17,
+      "comments": 5
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/21486/online-library-for-image-annotation-with-arrows",
+      "date": "2015-07-26",
+      "points": 6,
+      "comments": 4
+    }
+  ],
+  "spec": "Marks up a screenshot with arrows, boxes, text labels and pixelated blur, then saves it as a PNG.\nPaste, drop or choose an image (or start blank), pick a tool and color, drag on the image; tap to place a label; Undo removes the last mark.\nIt does not upload anything, crop or resize the image, or move marks after they are placed.",
+  "tests": [
+    {
+      "tap": "#blank"
+    },
+    {
+      "tap": "#tool-text"
+    },
+    {
+      "tap": "#cv"
+    },
+    {
+      "type": {
+        "sel": "#label",
+        "text": "click here"
+      }
+    },
+    {
+      "key": "Enter"
+    },
+    {
+      "expect": {
+        "sel": "#count",
+        "contains": "1 mark"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:30:02Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Everything stays in the browser. Copy button appears only where the clipboard image API exists."
+}
