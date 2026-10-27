@@ -46,213 +46,625 @@ ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: fl
 .built { color: var(--built); }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 
-.q{font-size:28px;line-height:1.2;font-weight:500;margin:8px 0 4px}
-.answers{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.answers button{font-size:19px}
-.answers .wide{grid-column:1/-1;border-color:var(--line);color:var(--meta)}
-.dish{font-size:34px;line-height:1.1;font-weight:500;margin:8px 0}
-.bar{height:4px;background:var(--line);border-radius:2px;overflow:hidden}
-.bar i{display:block;height:100%;background:var(--ink);width:0}
-.chips{display:flex;gap:6px;flex-wrap:wrap}
-.chips span{border:1px solid var(--line);border-radius:var(--radius);padding:2px 8px;font:13px/1.4 var(--mono);color:var(--meta)}
+:root{--accent:#d4431b;--dot:#e2ddd0}
+@media (prefers-color-scheme: dark){:root{--accent:#ff7b4f;--dot:#2c2c2c}}
+body{max-width:520px;margin:0 auto;overflow-x:hidden}
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+#left{font-size:56px;line-height:1;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.cap{font:13px/1.3 var(--mono);color:var(--meta);margin-top:4px}
+#stepbox{font:13px/1.3 var(--mono);color:var(--meta);text-align:right;padding-bottom:4px}
+#dots{display:flex;flex-wrap:wrap;gap:3px;margin:14px 0 6px}
+#dots i{width:7px;height:7px;border-radius:50%;background:var(--accent);transition:background .5s,transform .5s,opacity .5s;animation:pop .25s backwards}
+#dots i.off{background:var(--dot);transform:scale(.55)}
+@keyframes pop{from{transform:scale(0);opacity:0}}
+#peek{display:flex;justify-content:space-between;font-size:30px;height:44px;margin:14px 0 0;overflow:hidden}
+#peek span{display:inline-block;animation:bob 3s ease-in-out infinite}
+#peek span:nth-child(2n){animation-delay:-1s}#peek span:nth-child(3n){animation-delay:-2s}
+@keyframes bob{50%{transform:translateY(-6px)}}
+#peek span.new{animation:drop .5s backwards,bob 3s ease-in-out .5s infinite}
+@keyframes drop{from{transform:translateY(-14px) scale(.6);opacity:0}}
+#q{font-size:34px;line-height:1.12;font-weight:600;letter-spacing:-.015em;margin:18px 0 20px;min-height:48px;animation:qin .38s cubic-bezier(.2,.8,.3,1)}
+@keyframes qin{from{opacity:0;transform:translateY(16px)}}
+.ans{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ans button{min-height:58px;font-size:20px;font-weight:500}
+.ans #yes{background:var(--accent);border-color:var(--accent);color:#fff}
+.ans #skip,.ans #maybe{border-color:var(--line)}
+.ans #skip{color:var(--meta)}
+.tools{display:flex;justify-content:space-between;margin-top:14px}
+.tools button{border:0;color:var(--meta);padding:0 4px;font-size:16px;text-decoration:underline;text-underline-offset:3px}
+.tools button:disabled{opacity:.35;text-decoration:none}
+#done{text-align:center}
+#big{font-size:104px;line-height:1.1;margin:18px 0 4px;animation:boom .6s cubic-bezier(.2,1.6,.4,1)}
+@keyframes boom{from{transform:scale(.2) rotate(-12deg);opacity:0}}
+#dish{font-size:36px;line-height:1.1;font-weight:600;letter-spacing:-.015em;animation:qin .4s .15s backwards}
+#cu{margin:6px 0 18px}
+.ru{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}
+.ru button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 8px;min-height:80px;border-color:var(--line);font-size:16px;line-height:1.2}
+.ru button b{font-size:30px;font-weight:400}
+.ru:empty{display:none}
+#done .ans button{font-size:19px}
+#msg{color:var(--no);margin:14px 0}
 [hidden]{display:none!important}
 </style>
 <style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
 </head>
 <body>
-<h1 id="wish">someone should make a 20 questions tool that helps you work out what you want to eat</h1>
-<main id="app" class="stack">
-  <div class="bar"><i id="bar"></i></div>
-  <section id="ask" class="stack">
-    <div class="meta"><span id="step">1</span> of 20 &middot; <span id="left">0</span> dishes left</div>
-    <div class="q" id="q"></div>
-    <div class="answers">
-      <button class="primary" id="yes">Yes</button>
-      <button id="no">No</button>
-      <button class="wide" id="skip">Don't care</button>
-    </div>
-  </section>
-  <section id="done" class="stack" hidden>
-    <div class="meta" id="lead">Tonight</div>
-    <div class="dish" id="dish"></div>
-    <div class="chips" id="chips"></div>
-    <div class="row"><button class="primary" id="another">Something else</button><button id="restart">Start over</button></div>
-  </section>
-  <div class="row"><button id="back">Back</button></div>
-  <p class="meta" id="msg" hidden></p>
+<h1>someone should make a 20 questions tool that helps you work out what you want to eat</h1>
+<main>
+<div class="top"><div><div id="left">0</div><div class="cap">dishes still possible</div></div><div id="stepbox">question <span id="step">1</span></div></div>
+<div id="dots" aria-hidden="true"></div>
+<div id="peek" aria-hidden="true"></div>
+<section id="ask">
+<div id="q" role="status"></div>
+<div class="ans">
+<button id="yes" class="primary">Yes</button>
+<button id="no">No</button>
+<button id="maybe">Kind of</button>
+<button id="skip">Don't care</button>
+</div>
+</section>
+<section id="done" hidden>
+<div class="cap" id="lead">tonight, eat</div>
+<div id="big"></div>
+<div id="dish"></div>
+<div id="cu" class="cap"></div>
+<div class="ans"><button id="yep" class="primary">That's it</button><button id="nope">Not that</button></div>
+<div class="cap" id="runlead" style="margin-top:20px">or maybe</div>
+<div class="ru" id="ru"></div>
+</section>
+<div id="msg" hidden></div>
+<div class="tools"><button id="back" disabled>Undo</button><button id="restart">Start over</button></div>
 </main>
 <script>
-(() => {
+(function () {
   'use strict';
-  const store = {
-    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
-    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
-  };
-  const $ = (s, r = document) => r.querySelector(s);
+  const $ = s => document.querySelector(s);
+  // name|cuisine|emoji|flags, one dish per line
+  const RAW = `Margherita pizza|I|🍕|hbykatzj
+Pepperoni pizza|I|🍕|hmbykatzj
+Spaghetti carbonara|I|🍝|hmnyekz
+Spaghetti bolognese|I|🍝|hmnokz
+Lasagna|I|🍝|hmnyokz
+Fettuccine alfredo|I|🍝|hnyekz
+Penne arrabbiata|I|🍝|hsngq
+Cacio e pepe|I|🍝|hnykq
+Mushroom risotto|I|🍚|hryk
+Gnocchi gorgonzola|I|🥟|hpnykz
+Cheese ravioli|I|🥟|hnykz
+Tortellini in brodo|I|🍲|hnmo
+Minestrone|I|🥣|hogl
+Caprese salad|I|🥗|ylq
+Bruschetta|I|🍅|bgqal
+Chicken Caesar salad|I|🥗|mylq
+Arancini|I|🍘|hrxyak
+Eggplant parmesan|I|🍆|hykz
+Chicken parmesan|I|🍗|hmxnykz
+Focaccia|I|🥖|bga
+Calzone|I|🥟|hbykatz
+Tiramisu|I|🍰|uwye
+Panna cotta|I|🍮|uw
+Gelato|I|🍨|uwa
+Cannoli|I|🥐|uwxa
+Osso buco|I|🍖|hmoz
+Pesto pasta|I|🍝|hnyq
+Aglio e olio|I|🍝|hsngq
+Pasta pomodoro|I|🍝|hngq
+Panzanella|I|🥗|bgl
+Fritto misto|I|🍤|hfxa
+Antipasto platter|I|🧀|myal
+Pizza bianca|I|🍕|hbyaqt
+Spaghetti vongole|I|🍝|hfn
+Sicilian pizza slice|I|🍕|hbyajz
+Sushi nigiri|J|🍣|frltq
+Salmon sashimi|J|🍣|fl
+Cucumber maki|J|🍙|rgla
+Tonkotsu ramen|J|🍜|hmnokz
+Spicy miso ramen|J|🍜|hsmnoz
+Kake udon|J|🍜|hnok
+Cold soba|J|🍜|nlq
+Tempura|J|🍤|hfxt
+Katsu curry|J|🍛|hmrxkz
+Tonkatsu|J|🥩|hmxz
+Chicken karaage|J|🍗|hmxatj
+Gyoza|J|🥟|hmbxaj
+Okonomiyaki|J|🥞|hmbxez
+Takoyaki|J|🐙|hfxaj
+Yakitori|J|🍢|hmatj
+Teriyaki chicken bowl|J|🍱|hmrqt
+Oyakodon|J|🍚|hmrek
+Gyudon|J|🍚|hmrkq
+Onigiri|J|🍙|rqtal
+Miso soup|J|🥣|hgolq
+Tamagoyaki|J|🍳|heai
+Katsu sando|J|🥪|hmbxat
+Mochi|J|🍡|uwa
+Dorayaki|J|🥞|uwba
+Matcha ice cream|J|🍨|uw
+Chirashi bowl|J|🍱|frl
+Unagi don|J|🍱|hfrz
+Yaki udon|J|🍜|hmnz
+Edamame|J|🫛|hgqal
+Japanese curry rice|J|🍛|hmrk
+Shabu shabu|J|🍲|hmol
+Salmon avocado roll|J|🍣|frlt
+Spicy tuna roll|J|🍣|fsrt
+Tacos al pastor|M|🌮|hmsbatj
+Fish tacos|M|🌮|hfbatj
+Veggie tacos|M|🌮|hbgat
+Burrito|M|🌯|hmrbztk
+Quesadilla|M|🧀|hbykatq
+Nachos|M|🧀|hbyxak
+Guacamole and chips|M|🥑|bxgal
+Enchiladas|M|🌯|hmsbyz
+Chilaquiles|M|🍳|hbsxiey
+Huevos rancheros|M|🍳|hsbei
+Tamales|M|🫔|hmbaz
+Pozole|M|🍲|hmso
+Burrito bowl|M|🥙|hmrlt
+Elote|M|🌽|hyatj
+Churros|M|🥨|hwxuaj
+Tres leches cake|M|🍰|uw
+Fajitas|M|🌮|hmsbz
+Ceviche|M|🍋|fsl
+Quesabirria tacos|M|🌮|hmbyoaz
+Carnitas|M|🥩|hmz
+Chiles rellenos|M|🌶️|hyxz
+Guacamole tostada|M|🥑|bgxl
+Butter chicken|N|🍛|hmbokz
+Chicken tikka masala|N|🍛|hmsbz
+Palak paneer|N|🥬|hyk
+Chana masala|N|🍛|hsgol
+Dal tadka|N|🍲|hsgo
+Samosa|N|🥟|hxbgsaj
+Chicken biryani|N|🍚|hmrsz
+Paneer tikka|N|🍢|hysal
+Masala dosa|N|🥞|hbxsg
+Idli sambar|N|⚪|hbgoli
+Lamb vindaloo|N|🌶️|hmsz
+Chicken korma|N|🍛|hmoz
+Aloo gobi|N|🥔|hpsgl
+Garlic naan|N|🫓|hbaq
+Tandoori chicken|N|🍗|hmsl
+Pani puri|N|🥟|sgaj
+Vada pav|N|🍔|hxpbaj
+Onion pakora|N|🧅|hxgaj
+Chole bhature|N|🍛|hsxbz
+Rogan josh|N|🍖|hmsoz
+Rajma chawal|N|🍛|hrgo
+Kheer|N|🍮|uwr
+Gulab jamun|N|🍩|uwx
+Mango lassi|N|🥭|uw
+Pav bhaji|N|🍛|hpbsk
+Poha|N|🍚|hrgli
+Upma|N|🍚|hgli
+Paratha|N|🫓|hbxi
+Kathi roll|N|🌯|hmbatj
+Shakshuka|E|🍳|hesobik
+Sabich|E|🥙|hbxepatzj
+Hummus and pita|E|🫓|gbql
+Falafel in pita|E|🧆|hxgbatj
+Chicken shawarma|E|🥙|hmbatzj
+Israeli salad|E|🥗|glq
+Beef kebab|E|🍢|hmaz
+Kofta|E|🍢|hma
+Baba ganoush|E|🍆|gl
+Tabbouleh|E|🥗|gl
+Fattoush|E|🥗|gbl
+Shish tawook|E|🍗|hmrt
+Mujaddara|E|🍚|hrgk
+Jachnun|E|🥐|hbikz
+Malawach|E|🥞|hbxi
+Kubbeh soup|E|🍲|hmoz
+Cholent|E|🍲|hmoz
+Chicken soup with matzo balls|E|🍲|hmok
+Labneh toast|E|🍞|ybli
+Burekas|E|🥟|hybxaj
+Knafeh|E|🍰|huwy
+Baklava|E|🍯|uwba
+Halva|E|🍬|uwa
+Za'atar manakish|E|🫓|hbgiq
+Stuffed grape leaves|E|🍃|rgal
+Lahmacun|E|🍕|hmbatj
+Mezze platter|E|🧆|yal
+Sambusak|E|🥟|hyxa
+Fatteh|E|🍲|hbyz
+Kibbeh|E|🥟|hmxaz
+Maqluba|E|🍚|hmrz
+Jerusalem mixed grill|E|🍖|hmz
+Rugelach|E|🥐|uwba
+Sufganiyah|E|🍩|uwxba
+Chicken schnitzel|E|🍗|hmxzk
+Schnitzel in pita|E|🥙|hmxbatz
+Hummus with meat|E|🥙|hmz
+Egg sandwich with tahini|E|🥪|hbeiq
+Shakshuka with feta|E|🍳|hesoyi
+Cheeseburger|A|🍔|hmbyazkt
+Veggie burger|A|🍔|hbalt
+Hot dog|A|🌭|hmbatj
+French fries|A|🍟|hpxgakt
+Mac and cheese|A|🧀|hnykz
+Grilled cheese|A|🥪|hbykaq
+BBQ ribs|A|🍖|hmaz
+Pulled pork sandwich|A|🥪|hmbaz
+Fried chicken|A|🍗|hmxzkt
+Buffalo wings|A|🍗|hmsxakt
+Chicken tenders|A|🍗|hmxqat
+Philly cheesesteak|A|🥪|hmbyzat
+Club sandwich|A|🥪|mbaq
+BLT|A|🥪|mbaq
+Tuna melt|A|🥪|hfbyk
+Pancakes|A|🥞|hwbik
+Waffles|A|🧇|hwbik
+French toast|A|🍞|hwbeik
+Scrambled eggs on toast|A|🍳|heqbi
+Cheese omelette|A|🍳|heqiy
+Eggs benedict|A|🍳|hbeiz
+Bacon and eggs|A|🥓|hmeiq
+Breakfast burrito|A|🌯|hmebit
+Cobb salad|A|🥗|mel
+Clam chowder|A|🍲|hfozk
+Chicken noodle soup|A|🍲|hmnok
+Tomato soup with grilled cheese|A|🍅|hobyk
+Chili con carne|A|🌶️|hmsoz
+Meatloaf|A|🍖|hmzk
+Pot roast|A|🍖|hmzk
+Steak|A|🥩|hmz
+Baked potato|A|🥔|hpyk
+Loaded fries|A|🍟|hpxyz
+Onion rings|A|🧅|hxga
+Corn dog|A|🌭|hmxaj
+Lobster roll|A|🦞|fba
+Buffalo cauliflower|A|🥦|hxgsa
+Cheesecake|A|🍰|uwy
+Apple pie|A|🥧|uwb
+Brownie|A|🍫|uw
+Chocolate chip cookies|A|🍪|uwba
+Ice cream sundae|A|🍨|uw
+Milkshake|A|🥤|uw
+Donut|A|🍩|uwxba
+Cupcake|A|🧁|uwba
+Popcorn|A|🍿|gua
+Soft pretzel|A|🥨|bua
+Peanut butter and jelly sandwich|A|🥪|bqak
+Cereal with milk|A|🥣|wiq
+Oatmeal|A|🥣|hgli
+Granola and yogurt|A|🥣|wli
+Avocado toast|A|🥑|bgli
+Smoothie bowl|A|🍓|wgli
+Poke bowl|A|🍣|frlt
+Sloppy joe|A|🥪|hmbokz
+Chicken pot pie|A|🥧|hmbkz
+Mashed potatoes and gravy|A|🥔|hpok
+Pad thai|T|🍜|hfnez
+Green curry|T|🍛|hmsro
+Red curry|T|🍛|hmsro
+Massaman curry|T|🍛|hmpoz
+Tom yum soup|T|🍲|hfsol
+Tom kha gai|T|🍲|hmo
+Som tam|T|🥗|sgl
+Pad kra pao|T|🍳|hmrseq
+Thai basil fried rice|T|🍚|hmrsq
+Mango sticky rice|T|🥭|uwrg
+Larb|T|🥬|hmsl
+Pad see ew|T|🍜|hmnez
+Drunken noodles|T|🍜|hmnsz
+Thai fried rice|T|🍚|hmrqt
+Chicken satay|T|🍢|hmaqj
+Khao soi|T|🍜|hmnsoz
+Fried banana|T|🍌|uwxaj
+Thai green papaya salad with shrimp|T|🥗|fsl
+Kung pao chicken|C|🥜|hmsr
+Sweet and sour pork|C|🍖|hmwxr
+General Tso's chicken|C|🍗|hmwxsrt
+Egg fried rice|C|🍚|hrekq
+Chow mein|C|🍜|hnmt
+Steamed dumplings|C|🥟|hmba
+Xiao long bao|C|🥟|hmboa
+Peking duck|C|🦆|hmbz
+Mapo tofu|C|🌶️|hmsor
+Hot pot|C|🍲|hmsoz
+Dan dan noodles|C|🍜|hmns
+Wonton soup|C|🥟|hmo
+Hot and sour soup|C|🥣|hso
+Egg drop soup|C|🥣|heoq
+Beef and broccoli|C|🥦|hmrl
+Char siu bao|C|🥟|hmba
+Spring rolls|C|🥠|hmxaj
+Congee|C|🥣|hroi
+Scallion pancake|C|🥞|hbxgiaj
+Szechuan beef|C|🌶️|hmsx
+Tomato and egg stir-fry|C|🍅|herq
+Bubble tea|C|🧋|uw
+Egg tart|C|🥧|uwb
+Mango pudding|C|🥭|uw
+Cashew chicken|C|🥜|hmrl
+Salt and pepper squid|C|🦑|hfxa
+Har gow|C|🥟|hfbal
+Orange chicken|C|🍊|hmwxrt
+Lo mein|C|🍜|hnmt
+Bibimbap|K|🍚|hmrel
+Bulgogi|K|🥩|hmr
+Korean fried chicken|K|🍗|hmsxaztj
+Kimchi jjigae|K|🍲|hmso
+Tteokbokki|K|🌶️|hsbokj
+Japchae|K|🍜|hmn
+Korean BBQ|K|🔥|hmaz
+Kimbap|K|🍙|rqtalj
+Sundubu jjigae|K|🍲|hseo
+Budae jjigae|K|🍲|hmsoz
+Kimchi fried rice|K|🍚|hmrsq
+Naengmyeon|K|🍜|mn
+Hotteok|K|🥞|uwbxj
+Bingsu|K|🍧|uw
+Mandu|K|🥟|hmba
+Galbi|K|🍖|hmaz
+Greek salad|G|🥗|yl
+Gyros|G|🥙|hmbatzj
+Souvlaki|G|🍢|hmaq
+Moussaka|G|🍆|hmpzk
+Spanakopita|G|🥬|hybaj
+Tzatziki and pita|G|🫓|byl
+Dolmades|G|🍃|rgal
+Pastitsio|G|🍝|hmnyz
+Saganaki|G|🧀|hyxa
+Lamb kleftiko|G|🍖|hmz
+Avgolemono|G|🍲|hero
+Fasolada|G|🍲|hgol
+Loukoumades|G|🍩|uwxa
+Greek yogurt with honey|G|🍯|wli
+Gemista|G|🫑|hrgl
+Croissant|F|🥐|bwia
+Pain au chocolat|F|🥐|bwia
+Sweet crepes|F|🥞|hwbi
+Savory galette|F|🥞|hbyei
+Quiche Lorraine|F|🥧|hmybe
+French onion soup|F|🧅|hboyk
+Ratatouille|F|🍆|hgl
+Coq au vin|F|🍷|hmoz
+Beef bourguignon|F|🥘|hmoz
+Croque monsieur|F|🥪|hmbyz
+Steak frites|F|🥩|hmpz
+Moules frites|F|🦪|hfpo
+Duck confit|F|🦆|hmz
+Baguette and cheese|F|🥖|bya
+Creme brulee|F|🍮|uw
+Macarons|F|🍬|uwa
+Eclair|F|🍫|uwb
+Tarte tatin|F|🍎|uwb
+Salade nicoise|F|🥗|fel
+Bouillabaisse|F|🐟|hfoz
+Cassoulet|F|🥘|hmoz
+Cheese fondue|F|🫕|hyoaz
+Banh mi|V|🥖|hmbatqj
+Pho|V|🍜|hmnol
+Bun cha|V|🍜|hmnl
+Fresh spring rolls|V|🥬|fal
+Com tam|V|🍚|hmr
+Banh xeo|V|🥞|hmxbe
+Vietnamese vermicelli bowl|V|🍜|gnl
+Paella|O|🥘|hfrz
+Spanish tortilla|O|🍳|hpe
+Patatas bravas|O|🥔|hpxs
+Gazpacho|O|🍅|gol
+Jamon bocadillo|O|🥪|mba
+Pan con tomate|O|🍅|bgq
+Croquetas|O|🍘|hxa
+Albondigas|O|🍝|hmo
+Beef empanada|O|🥟|hmxba
+Bratwurst|O|🌭|hmbaj
+Currywurst|O|🌭|hmpxsj
+Spaetzle|O|🍝|hny
+Pierogi|O|🥟|hpyb
+Goulash|O|🥘|hmok
+Borscht|O|🥣|hgol
+Fish and chips|O|🐟|hfxpzt
+Full English breakfast|O|🍳|hmepizk
+Shepherd's pie|O|🥧|hmpk
+Bangers and mash|O|🌭|hmpk
+Doner kebab|O|🥙|hmbatzj
+Menemen|O|🍳|hesi
+Pide|O|🥖|hbym
+Moroccan tagine|O|🥘|hmo
+Couscous with vegetables|O|🍚|hrgl
+Feijoada|O|🍲|hmroz
+Pao de queijo|O|🧀|hbyaj
+Acai bowl|O|🫐|wli
+Lomo saltado|O|🥩|hmrpx
+Injera with lentils|O|🫓|hbgo
+Jerk chicken|O|🍗|hmsr
+Chicken adobo|O|🍗|hmro
+Jollof rice|O|🍚|hrsg
+Arepa|O|🫓|hbyaj
+Cuban sandwich|O|🥪|hmbyat
+Stroopwafel|O|🧇|uwba
+Pierogi ruskie|O|🥟|hpyb
+Blini with smoked salmon|O|🥞|fb
+Toast with butter and jam|A|🍞|bwiq
+Yogurt and fruit|A|🍓|wlig
+Fruit salad|A|🍉|wglu
+Cheese and crackers|A|🧀|byqu
+Hummus and carrots|E|🥕|glqa
+Mixed nuts|A|🥜|gqu
+Trail mix|A|🥜|wgqu
+Potato chips|A|🥔|pxgqu
+Instant noodles|A|🍜|hnoqk
+Cup of ramen with egg|J|🍜|hnoeq
+Rice cakes|A|🍘|rqu
+Banana|A|🍌|wgqu
+Hard-boiled eggs|A|🥚|eqlt
+Cottage cheese and veggies|A|🥒|yql
+Tuna salad|A|🐟|fql
+Chicken salad sandwich|A|🥪|mbq
+Vegetable stir-fry|C|🥦|hgrql
+Garden salad|A|🥗|glq
+Lentil soup|E|🥣|hgolk
+Roasted vegetables|A|🥕|hgl
+Baked salmon|A|🐟|hfl
+Grilled chicken with rice|A|🍗|hmrl
+Chocolate bar|A|🍫|wuqg
+Pretzel sticks|O|🥨|bgu
+Frozen yogurt|A|🍦|wu
+Pizza rolls|A|🍕|hbyxaq
+Garlic bread|I|🥖|hbyak
+Bagel with cream cheese|A|🥯|byiaq
+Bagel with lox|A|🥯|fbyia
+Egg salad sandwich|A|🥪|ebq
+Chocolate croissant sandwich|F|🥐|wb
+Pasta salad|I|🥗|nql
+Tuna sushi bowl|J|🍱|frl
+Beef tacos|M|🌮|hmbatq
+Chicken burrito bowl|M|🥙|hmrlt
+Chicken wrap|A|🌯|hmbaqt
+Falafel salad|E|🥗|gl
+Shrimp scampi|I|🍤|hfn
+Chicken fajita quesadilla|M|🌮|hmbyaq`;
+  const CUISINE = { I: 'Italian', J: 'Japanese', M: 'Mexican', N: 'Indian', E: 'Middle Eastern', A: 'American', T: 'Thai', C: 'Chinese', K: 'Korean', G: 'Greek', F: 'French', V: 'Vietnamese', O: 'World' };
+  const dishes = RAW.trim().split('\n').map((l, i) => {
+    const p = l.split('|'), f = p[3], has = c => f.indexOf(c) > -1;
+    const o = { i, n: p[0], c: p[1], e: p[2], f: new Set(f) };
+    if (!has('m') && !has('f')) o.f.add('v');
+    if (has('r') || has('n') || has('b') || has('p')) o.f.add('c');
+    if (!has('h')) o.f.add('d');       // cold or room temperature
+    o.f.add('@' + p[1]);
+    if ('JTCKNV'.indexOf(p[1]) > -1) o.f.add('@Asia');
+    return o;
+  });
+  // [flag, question as a friend would ask it]
+  const Q = [
+    ['h', 'Something hot?'], ['d', 'Something cold or room temperature?'], ['s', 'Want it spicy?'],
+    ['m', 'Is there meat in it?'], ['f', 'Fish or seafood?'], ['v', 'Totally vegetarian?'], ['g', 'Vegan?'],
+    ['r', 'Rice involved?'], ['n', 'Noodles or pasta?'], ['b', 'Bread, dough or pastry?'], ['p', 'Potatoes?'], ['c', 'Any carbs at all?'],
+    ['o', 'Soupy or saucy?'], ['y', 'Craving cheese?'], ['w', 'Something sweet?'], ['x', 'Fried?'],
+    ['l', 'Healthy-ish?'], ['k', 'Proper comfort food?'], ['q', 'Quick to make, under 20 minutes?'], ['t', 'Easy to get as takeaway?'],
+    ['a', 'Something you eat with your hands?'], ['z', 'Heavy and filling?'], ['i', 'Breakfast-y?'], ['u', 'More of a snack or a dessert?'],
+    ['e', 'Eggs in there?'], ['j', 'Street food vibes?'],
+    ['@I', 'Italian?'], ['@J', 'Japanese?'], ['@M', 'Mexican?'], ['@N', 'Indian?'], ['@E', 'Middle Eastern or Israeli?'], ['@A', 'American?'],
+    ['@T', 'Thai?'], ['@C', 'Chinese?'], ['@K', 'Korean?'], ['@G', 'Greek?'], ['@F', 'French?'], ['@Asia', 'Something from Asia?']
+  ];
+  const MAXQ = 14;
+  let ans = [];        // {q, a} with a = y n m d
+  let banned = new Set();
+  let shown = null;    // dish index currently revealed
+  let order = [];      // reveal candidates
+  let shownCount = dishes.length;
 
-  // tag -> question
-  const Q = {
-    H: 'Do you want something hot?',
-    S: 'Do you want it spicy?',
-    M: 'Do you want meat?',
-    F: 'Fish or seafood?',
-    V: 'Should it be vegetarian?',
-    B: 'Something you can eat with your hands?',
-    R: 'Rice on the plate?',
-    N: 'Noodles or pasta?',
-    O: 'Something soupy?',
-    X: 'Fried is fine?',
-    L: 'Keep it light?',
-    Q: 'Ready in 20 minutes or less?',
-    C: 'Cheesy or creamy?',
-    Z: 'Something sweet?'
-  };
-  // name | tags
-  const DISHES = `Pad thai|HNQXS
-Ramen|HNOM
-Pho|HNOM
-Spaghetti carbonara|HNMCQ
-Spaghetti with tomato sauce|HNVQ
-Mac and cheese|HNVC
-Lasagna|HNMC
-Pesto pasta|HNVQ
-Fried rice|HRQXM
-Egg fried rice|HRQXV
-Chicken curry with rice|HRMS
-Chickpea curry|HRVS
-Burrito|HBRMS
-Quesadilla|HBCQ
-Tacos|HBMS
-Falafel wrap|BVX
-Chicken shawarma|HBM
-Cheeseburger|HBMXC
-Veggie burger|HBVX
-Margherita pizza|HBVC
-Pepperoni pizza|HBMC
-Grilled cheese sandwich|HBVCQX
-Club sandwich|BMQ
-Tuna sandwich|BFQ
-Hot dog|HBMQ
-Fish and chips|HFX
-Sushi|RF
-Poke bowl|RFL
-Grilled salmon|HFL
-Shrimp stir fry|HRFQS
-Fish tacos|HBFX
-Tomato soup|HOVL
-Chicken noodle soup|HNOM
-Lentil soup|HOVL
-Miso soup with tofu|HOVLQ
-Chili|HOMS
-Caesar salad|MLQC
-Greek salad|VLQC
-Garden salad|VLQ
-Poke-style tuna salad|FLQ
-Cobb salad|MLC
-Omelette|HVQC
-Scrambled eggs on toast|HVQB
-Pancakes|HVZ
-French toast|HVZB
-Waffles|HZVX
-Oatmeal with fruit|HVLZ
-Yogurt with granola|VLQZ
-Fruit bowl|VLQZ
-Ice cream|ZCQ
-Chocolate cake|Z
-Steak and potatoes|HM
-Roast chicken|HML
-Chicken nuggets|HMXQ
-Fried chicken|HMX
-Meatballs and pasta|HNM
-Stir-fried beef with rice|HRMQ
-Bibimbap|HRMS
-Dumplings|HXM
-Veggie stir fry|HRVLQ
-Tofu scramble|HVLQ
-Hummus plate with pita|VBLQ
-Baked potato|HVC
-Nachos|HVXCS
-Cheese and crackers|VCQ
-Bagel with cream cheese|VBCQ
-Peanut butter toast|VBQ
-Shakshuka|HVS
-Tikka masala|HRMCS
-Dal with rice|HRVS`.split('\n').map(l => { const [n, t] = l.split('|'); return { n, t }; });
-
-  const MAX = 20;
-  // history: [{tag, ans}] ans = 1 yes, 0 no, -1 skip
-  let hist = store.get('tqd-hist', []);
-  let pool = [], pick = 0;
-  if (!Array.isArray(hist)) hist = [];
-
-  const matches = () => DISHES.filter(d => hist.every(h => h.ans < 0 || (h.ans ? d.t.includes(h.tag) : !d.t.includes(h.tag))));
-
-  // choose the tag that splits remaining dishes closest to half
-  function nextTag(list) {
-    const asked = new Set(hist.map(h => h.tag));
-    let best = null, bestScore = 1;
-    for (const tag of Object.keys(Q)) {
-      if (asked.has(tag)) continue;
-      const yes = list.filter(d => d.t.includes(tag)).length;
-      if (yes === 0 || yes === list.length) continue;
-      const score = Math.abs(yes / list.length - 0.5);
-      if (score < bestScore) { bestScore = score; best = tag; }
+  function penalty(d) {
+    let p = 0;
+    for (const x of ans) {
+      const hit = d.f.has(Q[x.q][0]);
+      if (x.a === 'y' && !hit) p += 1;
+      else if (x.a === 'n' && hit) p += 1;
+      else if (x.a === 'm' && !hit) p += 0.4;
+    }
+    return p;
+  }
+  function possible() {
+    const out = [];
+    for (const d of dishes) { if (banned.has(d.i)) continue; const p = penalty(d); if (p < 1) out.push({ d, p }); }
+    return out;
+  }
+  function nextQuestion(list) {
+    const asked = new Set(ans.map(x => x.q));
+    let best = -1, bestScore = 9, total = 0;
+    for (const x of list) total += 1 - x.p;
+    for (let q = 0; q < Q.length; q++) {
+      if (asked.has(q)) continue;
+      let k = 0;
+      for (const x of list) if (x.d.f.has(Q[q][0])) k += 1 - x.p;
+      if (k < 0.5 || total - k < 0.5) continue;
+      const s = Math.abs(k / total - 0.5);
+      if (s < bestScore) { bestScore = s; best = q; }
     }
     return best;
   }
 
-  function show(dish, list) {
-    $('#ask').hidden = true; $('#done').hidden = false;
-    $('#lead').textContent = list.length > 1 ? list.length + ' dishes fit. Start with' : 'You want';
-    $('#dish').textContent = dish.n;
-    $('#chips').innerHTML = '';
-    hist.filter(h => h.ans > 0).forEach(h => {
-      const s = document.createElement('span'); s.textContent = Q[h.tag].replace(/\?$/, '').toLowerCase(); $('#chips').appendChild(s);
-    });
-    $('#another').hidden = list.length < 2;
+  // counter that visibly counts down
+  let tweenId = 0;
+  function setCount(n) {
+    const el = $('#left'), from = shownCount, id = ++tweenId, t0 = performance.now();
+    shownCount = n;
+    if (from === n) { el.textContent = n; return; }
+    (function tick(t) {
+      if (id !== tweenId) return;
+      const k = Math.min(1, (t - t0) / 450);
+      el.textContent = Math.round(from + (n - from) * (1 - Math.pow(1 - k, 3)));
+      if (k < 1) requestAnimationFrame(tick);
+    })(t0);
+  }
+
+  const dotsEl = $('#dots');
+  dishes.forEach((d, i) => { const e = document.createElement('i'); e.style.animationDelay = Math.min(i, 200) + 'ms'; dotsEl.appendChild(e); });
+  function paint(list) {
+    const on = new Set(list.map(x => x.d.i));
+    for (let i = 0; i < dishes.length; i++) dotsEl.children[i].classList.toggle('off', !on.has(i));
+    setCount(list.length);
+    // a few emoji from what is still possible
+    const pk = $('#peek'), want = [], step = Math.max(1, list.length / 8);
+    for (let k = 0; k < list.length && want.length < 8; k += step) want.push(list[Math.floor(k)].d.e);
+    if (pk.dataset.k !== want.join('')) {
+      pk.dataset.k = want.join(''); pk.innerHTML = '';
+      want.forEach(e => { const s = document.createElement('span'); s.textContent = e; s.className = 'new'; pk.appendChild(s); });
+    }
   }
 
   function render() {
-    const msg = $('#msg'); msg.hidden = true;
-    const list = matches();
-    $('#bar').style.width = (hist.length / MAX * 100) + '%';
-    $('#back').hidden = hist.length === 0 && $('#ask').hidden === false;
-    $('#back').disabled = hist.length === 0;
+    $('#msg').hidden = true;
+    const list = possible();
+    paint(list);
+    $('#back').disabled = ans.length === 0;
     if (!list.length) {
-      msg.textContent = 'Nothing fits all of that. Go back one answer.'; msg.hidden = false;
-      $('#ask').hidden = true; $('#done').hidden = true; $('#back').hidden = false; $('#back').disabled = hist.length === 0;
+      $('#ask').hidden = true; $('#done').hidden = true;
+      $('#msg').textContent = 'Nothing fits all of that. Undo one answer or start over.'; $('#msg').hidden = false;
       return;
     }
-    const tag = hist.length >= MAX ? null : nextTag(list);
-    if (list.length === 1 || !tag) {
-      pool = list; pick = Math.min(pick, pool.length - 1);
-      show(pool[pick], list); return;
-    }
+    list.sort((a, b) => a.p - b.p || a.d.i - b.d.i);
+    const q = nextQuestion(list);
+    const guess = list.length === 1 || q < 0 || ans.length >= MAXQ || (ans.length >= 5 && list.length <= 3);
+    if (guess) { order = list.map(x => x.d); reveal(0); return; }
     $('#done').hidden = true; $('#ask').hidden = false;
-    $('#step').textContent = hist.length + 1;
-    $('#left').textContent = list.length;
-    $('#q').textContent = Q[tag];
-    $('#q').dataset.tag = tag;
+    $('#step').textContent = ans.length + 1;
+    const qe = $('#q');
+    qe.textContent = Q[q][1]; qe.dataset.q = q;
+    qe.style.animation = 'none'; void qe.offsetWidth; qe.style.animation = '';
   }
 
-  function answer(ans) {
-    const tag = $('#q').dataset.tag;
-    if (!tag) return;
-    hist.push({ tag, ans }); pick = 0;
-    store.set('tqd-hist', hist); render();
+  function reveal(k) {
+    const d = order[k]; shown = k;
+    $('#ask').hidden = true; $('#done').hidden = false;
+    $('#lead').textContent = order.length > 1 ? 'you want' : 'the last one standing';
+    const big = $('#big'); big.textContent = d.e;
+    big.style.animation = 'none'; void big.offsetWidth; big.style.animation = '';
+    $('#dish').textContent = d.n; $('#cu').textContent = CUISINE[d.c];
+    const ru = $('#ru'); ru.innerHTML = '';
+    const rest = order.filter((_, i) => i !== k).slice(0, 2);
+    rest.forEach(r => {
+      const b = document.createElement('button');
+      b.innerHTML = '<b></b><span></span>'; b.firstChild.textContent = r.e; b.lastChild.textContent = r.n;
+      b.addEventListener('click', () => reveal(order.indexOf(r)));
+      ru.appendChild(b);
+    });
+    $('#runlead').hidden = rest.length === 0;
+    $('#yep').hidden = false; $('#nope').hidden = false;
   }
 
-  $('#yes').addEventListener('click', () => answer(1));
-  $('#no').addEventListener('click', () => answer(0));
-  $('#skip').addEventListener('click', () => answer(-1));
-  $('#back').addEventListener('click', () => { hist.pop(); pick = 0; store.set('tqd-hist', hist); render(); });
-  $('#restart').addEventListener('click', () => { hist = []; pick = 0; store.set('tqd-hist', hist); render(); });
-  $('#another').addEventListener('click', () => {
-    const list = matches(); pick = (pick + 1) % list.length; pool = list; show(pool[pick], list);
+  function answer(a) {
+    const q = $('#q').dataset.q;
+    if (q === undefined || $('#ask').hidden) return;
+    ans.push({ q: +q, a }); render();
+  }
+  $('#yes').addEventListener('click', () => answer('y'));
+  $('#no').addEventListener('click', () => answer('n'));
+  $('#maybe').addEventListener('click', () => answer('m'));
+  $('#skip').addEventListener('click', () => answer('d'));
+  $('#back').addEventListener('click', () => { ans.pop(); render(); });
+  $('#restart').addEventListener('click', () => { ans = []; banned = new Set(); render(); });
+  $('#nope').addEventListener('click', () => {
+    banned.add(order[shown].i);
+    render();
   });
-
-  // first frame: a restored run only if unfinished, else start fresh
-  if (matches().length < 2 || !nextTag(matches())) { hist = []; }
+  $('#yep').addEventListener('click', () => {
+    $('#lead').textContent = 'good choice'; $('#yep').hidden = true; $('#nope').hidden = true; $('#runlead').hidden = true; $('#ru').innerHTML = '';
+  });
   render();
 })();
 </script>

@@ -40,7 +40,7 @@
       "comments": 6
     }
   ],
-  "spec": "Asks up to 20 yes/no/don't-care questions, each chosen to split the remaining dishes closest to half, from a built-in list of about 70 dishes.\nTap yes, no or don't care; it narrows to one dish and offers 'something else' to cycle the rest.\nIt does not know your pantry, allergies or what is open nearby.",
+  "spec": "Akinator for food: about 400 dishes from a dozen cuisines, each tagged with 25 attributes, and a live count of dishes still possible that shrinks with every answer.\nAnswer yes, no, kind of or don't care; each question is the one that splits what is left closest to half, and it names a dish in 6 to 12 questions with two runners-up.\n\"Not that\" removes the dish and keeps going. It does not know your pantry, allergies or what is open nearby.",
   "tests": [
     {
       "expect": {
@@ -52,28 +52,28 @@
       "tap": "#yes"
     },
     {
+      "wait": 700
+    },
+    {
       "expect": {
-        "sel": "#step",
-        "contains": "2"
+        "sel": "#left",
+        "matches": "^([123]\\d\\d|\\d{1,2})$"
       }
     },
     {
       "tap": "#no"
     },
     {
-      "tap": "#back"
-    },
-    {
       "expect": {
         "sel": "#step",
-        "contains": "2"
+        "contains": "3"
       }
     }
   ],
   "status": "pass",
-  "built": "2026-10-27T08:39:30Z",
+  "built": "2026-10-27T12:24:04Z",
   "model": "sonnet-5.5",
-  "minutes": 5,
+  "minutes": 25,
   "approved": false,
   "notes": ""
 }
