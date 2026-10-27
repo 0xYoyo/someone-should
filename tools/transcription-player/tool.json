@@ -1,0 +1,48 @@
+{
+  "slug": "transcription-player",
+  "wish": "someone should make an app that plays audio with easy rewind and speed control for transcribing",
+  "year": 2014,
+  "agreed": 11,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/1930/audio-player-on-android-suitable-for-manual-transcription",
+      "date": "2014-03-03",
+      "points": 9,
+      "comments": 2
+    }
+  ],
+  "spec": "Opens an audio file from your device and plays it with big jump-back/forward buttons, speed from 0.5x to 2x, and an automatic step back on resume.\nType the transcript in the box below; Esc plays/pauses and Alt+J/L/T jump or insert a [m:ss] timestamp; notes, speed and position are remembered.\nIt does not transcribe for you, upload anything, or stream audio from a URL.",
+  "tests": [
+    {
+      "tap": "#faster"
+    },
+    {
+      "expect": {
+        "sel": "#speed",
+        "contains": "1.1×"
+      }
+    },
+    {
+      "type": {
+        "sel": "#notes",
+        "text": "hello"
+      }
+    },
+    {
+      "tap": "#stamp"
+    },
+    {
+      "expect": {
+        "sel": "#status",
+        "contains": "2 words"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:50:10Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Audio is read as a data: URL because the CSP allows only data: media; very large files use more memory."
+}
