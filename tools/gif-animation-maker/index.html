@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that animates GIFs</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+.stage { position: relative; width: 100%; max-width: 480px; border: 1.5px solid var(--line); border-radius: var(--radius); background: #fff; touch-action: none; }
+.stage canvas { display: block; width: 100%; height: auto; }
+#onion { position: absolute; inset: 0; opacity: .28; pointer-events: none; }
+.swatch { width: var(--tap); padding: 0; border-color: var(--line); }
+.swatch[aria-pressed="true"] { border: 3px solid var(--ink); }
+button[aria-pressed="true"].toggle { background: var(--ink); color: var(--paper); }
+select { width: auto; }
+#frames li { padding: 8px 0; justify-content: flex-start; gap: 8px; }
+#frames li.on .thumb { border-color: var(--ink); border-width: 3px; }
+.thumb { padding: 0; width: 60px; height: 60px; border-color: var(--line); background: #fff; display: grid; place-items: center; overflow: hidden; }
+.thumb canvas { max-width: 100%; max-height: 100%; display: block; }
+.delay { width: 84px; }
+.unit { color: var(--meta); }
+.icon { width: var(--tap); padding: 0; }
+.push { margin-left: auto; }
+#out { max-width: 100%; image-rendering: auto; border: 1.5px solid var(--line); background: #fff; }
+a.btn { display: inline-flex; align-items: center; min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); border-radius: var(--radius); color: var(--ink); text-decoration: none; }
+#msg { min-height: 1.45em; color: var(--meta); }
+#msg.err { color: var(--no); }
+#result { font-variant-numeric: tabular-nums; }
+.hide { display: none !important; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that animates GIFs</h1>
+
+<main id="app" class="stack">
+  <div class="stage" id="stage">
+    <canvas id="cv" width="240" height="240" aria-label="drawing area for the current frame"></canvas>
+    <canvas id="onion" width="240" height="240"></canvas>
+  </div>
+  <div class="row" id="pens">
+    <button class="swatch" data-c="#141414" style="background:#141414" aria-label="black"></button>
+    <button class="swatch" data-c="#c8321e" style="background:#c8321e" aria-label="red"></button>
+    <button class="swatch" data-c="#1f5fbf" style="background:#1f5fbf" aria-label="blue"></button>
+    <button class="swatch" data-c="#2e7d4f" style="background:#2e7d4f" aria-label="green"></button>
+    <button class="swatch" data-c="#f2c230" style="background:#f2c230" aria-label="yellow"></button>
+    <button class="swatch" data-c="#ffffff" style="background:#ffffff" aria-label="white, eraser"></button>
+    <select id="brush" aria-label="brush size">
+      <option value="3">thin</option><option value="7" selected>pen</option><option value="16">thick</option><option value="36">fill</option>
+    </select>
+  </div>
+  <div class="row">
+    <button id="add" class="primary">+ copy frame</button>
+    <button id="blank">+ blank</button>
+    <button id="pick">+ images</button>
+    <input id="file" type="file" accept="image/*" multiple class="hide">
+  </div>
+  <div class="row">
+    <button id="clear">clear frame</button>
+    <button id="onionbtn" class="toggle" aria-pressed="true">onion skin</button>
+    <select id="size" aria-label="gif size">
+      <option>240x240</option><option>320x240</option><option>240x320</option><option>320x320</option><option>480x360</option>
+    </select>
+  </div>
+  <ul id="frames" class="plain"></ul>
+  <div class="row">
+    <input id="all" class="delay" type="number" min="20" step="10" value="200" inputmode="numeric" aria-label="delay for every frame in ms">
+    <span class="unit">ms</span>
+    <button id="setall">set all</button>
+  </div>
+  <div class="row">
+    <button id="make" class="primary">make gif</button>
+    <a id="save" class="btn hide" download="animation.gif" href="#">download</a>
+  </div>
+  <div id="msg" role="status"></div>
+  <div id="result"></div>
+  <img id="out" class="hide" alt="your animated gif">
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  const cv = $('#cv'), ctx = cv.getContext('2d', { willReadFrequently: true });
+  const onion = $('#onion'), octx = onion.getContext('2d');
+  const sizeSel = $('#size');
+  let size = store.get('gif.size', '240x240');
+  if (![...sizeSel.options].some(o => o.value === size)) size = '240x240';
+  sizeSel.value = size;
+  let [W, H] = size.split('x').map(Number);
+  let color = store.get('gif.color', '#141414');
+  let onionOn = store.get('gif.onion', true);
+  const brushSel = $('#brush');
+  brushSel.value = String(store.get('gif.brush', 7));
+  if (!brushSel.value) brushSel.value = '7';
+
+  let frames = [];   // { img: ImageData, delay: ms, touched: bool }
+  let cur = 0;
+
+  const msg = (t, err) => { const m = $('#msg'); m.textContent = t || ''; m.className = err ? 'err' : ''; };
+  const defDelay = () => Math.max(20, parseInt($('#all').value, 10) || 200);
+
+  function blankImage() {
+    const c = document.createElement('canvas'); c.width = W; c.height = H;
+    const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, W, H);
+    return x.getImageData(0, 0, W, H);
+  }
+  function setSize() {
+    cv.width = onion.width = W; cv.height = onion.height = H;
+  }
+  // draw any source onto a white W×H frame, scaled to fit
+  function fitImage(src, sw, sh) {
+    const c = document.createElement('canvas'); c.width = W; c.height = H;
+    const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, W, H);
+    const s = Math.min(W / sw, H / sh), dw = sw * s, dh = sh * s;
+    x.imageSmoothingQuality = 'high';
+    x.drawImage(src, (W - dw) / 2, (H - dh) / 2, dw, dh);
+    return x.getImageData(0, 0, W, H);
+  }
+
+  function show() {
+    ctx.putImageData(frames[cur].img, 0, 0);
+    octx.clearRect(0, 0, W, H);
+    if (onionOn && cur > 0) octx.putImageData(frames[cur - 1].img, 0, 0);
+    $('#onionbtn').setAttribute('aria-pressed', String(onionOn));
+    $$('.swatch').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.c === color)));
+    renderList();
+  }
+
+  function renderList() {
+    const ul = $('#frames'); ul.textContent = '';
+    frames.forEach((f, i) => {
+      const li = document.createElement('li');
+      li.className = 'frame' + (i === cur ? ' on' : '');
+      const t = document.createElement('button');
+      t.className = 'thumb'; t.setAttribute('aria-label', 'edit frame ' + (i + 1));
+      const tc = document.createElement('canvas'); tc.width = W; tc.height = H;
+      tc.getContext('2d').putImageData(f.img, 0, 0);
+      t.append(tc);
+      t.onclick = () => { cur = i; show(); };
+      const d = document.createElement('input');
+      d.type = 'number'; d.min = '20'; d.step = '10'; d.className = 'delay'; d.value = f.delay;
+      d.inputMode = 'numeric'; d.setAttribute('aria-label', 'frame ' + (i + 1) + ' delay in ms');
+      d.onchange = () => { f.delay = Math.max(20, parseInt(d.value, 10) || 200); d.value = f.delay; };
+      const u = document.createElement('span'); u.className = 'unit'; u.textContent = 'ms';
+      const up = document.createElement('button');
+      up.className = 'icon push'; up.textContent = '↑'; up.setAttribute('aria-label', 'move frame ' + (i + 1) + ' earlier');
+      up.disabled = i === 0;
+      up.onclick = () => { [frames[i - 1], frames[i]] = [frames[i], frames[i - 1]]; cur = i - 1; show(); };
+      const del = document.createElement('button');
+      del.className = 'icon del'; del.textContent = '×'; del.setAttribute('aria-label', 'delete frame ' + (i + 1));
+      del.onclick = () => {
+        if (frames.length === 1) { frames[0] = { img: blankImage(), delay: f.delay, touched: false }; }
+        else { frames.splice(i, 1); if (cur >= frames.length) cur = frames.length - 1; else if (cur > i) cur--; }
+        show();
+      };
+      li.append(t, d, u, up, del);
+      ul.append(li);
+    });
+  }
+
+  function insertFrame(img, touched) {
+    // replace a lone untouched blank frame instead of keeping it
+    if (frames.length === 1 && !frames[0].touched) { frames[0] = { img, delay: defDelay(), touched }; cur = 0; return; }
+    frames.splice(cur + 1, 0, { img, delay: defDelay(), touched });
+    cur++;
+  }
+
+  // drawing
+  let last = null;
+  const pt = e => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) * W / r.width, (e.clientY - r.top) * H / r.height]; };
+  function stroke(a, b) {
+    ctx.strokeStyle = ctx.fillStyle = color; ctx.lineWidth = +brushSel.value; ctx.lineCap = ctx.lineJoin = 'round';
+    ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
+  }
+  cv.addEventListener('pointerdown', e => {
+    e.preventDefault(); try { cv.setPointerCapture(e.pointerId); } catch {}
+    last = pt(e); stroke(last, [last[0] + 0.01, last[1]]);
+  });
+  cv.addEventListener('pointermove', e => { if (!last) return; const p = pt(e); stroke(last, p); last = p; });
+  const end = () => {
+    if (!last) return; last = null;
+    const f = frames[cur]; f.img = ctx.getImageData(0, 0, W, H); f.touched = true; renderList();
+  };
+  cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end);
+
+  $('#pens').addEventListener('click', e => {
+    const b = e.target.closest('.swatch'); if (!b) return;
+    color = b.dataset.c; store.set('gif.color', color); show();
+  });
+  brushSel.onchange = () => store.set('gif.brush', +brushSel.value);
+
+  $('#add').onclick = () => {
+    const src = frames[cur].img, copy = new ImageData(new Uint8ClampedArray(src.data), W, H);
+    frames.splice(cur + 1, 0, { img: copy, delay: frames[cur].delay, touched: true });
+    frames[cur].touched = true; cur++; show(); msg('');
+  };
+  $('#blank').onclick = () => { frames[cur].touched = true; frames.splice(cur + 1, 0, { img: blankImage(), delay: defDelay(), touched: true }); cur++; show(); msg(''); };
+  $('#clear').onclick = () => { frames[cur].img = blankImage(); show(); };
+  $('#onionbtn').onclick = () => { onionOn = !onionOn; store.set('gif.onion', onionOn); show(); };
+  $('#setall').onclick = () => { const d = defDelay(); $('#all').value = d; frames.forEach(f => f.delay = d); renderList(); };
+
+  $('#pick').onclick = () => $('#file').click();
+  $('#file').onchange = async e => {
+    const files = [...e.target.files].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+    e.target.value = '';
+    let bad = 0;
+    for (const file of files) {
+      try {
+        const url = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(file); });
+        const im = new Image();
+        await new Promise((res, rej) => { im.onload = res; im.onerror = rej; im.src = url; });
+        insertFrame(fitImage(im, im.naturalWidth, im.naturalHeight), true);
+      } catch { bad++; }
+    }
+    show();
+    msg(bad ? bad + ' file' + (bad > 1 ? 's' : '') + ' could not be read as an image.' : '', !!bad);
+  };
+
+  sizeSel.onchange = () => {
+    const [nw, nh] = sizeSel.value.split('x').map(Number);
+    const old = frames.map(f => { const c = document.createElement('canvas'); c.width = W; c.height = H; c.getContext('2d').putImageData(f.img, 0, 0); return c; });
+    const ow = W, oh = H;
+    W = nw; H = nh; setSize(); store.set('gif.size', sizeSel.value);
+    frames.forEach((f, i) => { f.img = fitImage(old[i], ow, oh); });
+    show();
+  };
+
+  // ---- GIF encoding: median-cut palette shared by all frames, LZW, looping ----
+  function buildPalette(datas) {
+    const n = 32768, cnt = new Float64Array(n), sr = new Float64Array(n), sg = new Float64Array(n), sb = new Float64Array(n);
+    for (const d of datas) for (let i = 0; i < d.length; i += 4) {
+      const r = d[i], g = d[i + 1], b = d[i + 2], k = (r >> 3) << 10 | (g >> 3) << 5 | (b >> 3);
+      cnt[k]++; sr[k] += r; sg[k] += g; sb[k] += b;
+    }
+    const bins = []; for (let k = 0; k < n; k++) if (cnt[k]) bins.push(k);
+    const ch = (k, c) => c === 0 ? k >> 10 : c === 1 ? (k >> 5) & 31 : k & 31;
+    const boxes = [bins];
+    while (boxes.length < 256) {
+      let best = -1, bestRange = 0, bestCh = 0;
+      boxes.forEach((bx, i) => {
+        if (bx.length < 2) return;
+        for (let c = 0; c < 3; c++) {
+          let lo = 31, hi = 0; for (const k of bx) { const v = ch(k, c); if (v < lo) lo = v; if (v > hi) hi = v; }
+          if (hi - lo > bestRange) { bestRange = hi - lo; best = i; bestCh = c; }
+        }
+      });
+      if (best < 0) break;
+      const bx = boxes[best].sort((a, b) => ch(a, bestCh) - ch(b, bestCh));
+      let total = 0; for (const k of bx) total += cnt[k];
+      let acc = 0, cut = 1;
+      for (let i = 0; i < bx.length - 1; i++) { acc += cnt[bx[i]]; if (acc >= total / 2) { cut = i + 1; break; } cut = i + 1; }
+      boxes.splice(best, 1, bx.slice(0, cut), bx.slice(cut));
+    }
+    const map = new Uint8Array(n), pal = new Uint8Array(768);
+    boxes.forEach((bx, i) => {
+      let c = 0, r = 0, g = 0, b = 0;
+      for (const k of bx) { c += cnt[k]; r += sr[k]; g += sg[k]; b += sb[k]; map[k] = i; }
+      if (c) { pal[i * 3] = Math.round(r / c); pal[i * 3 + 1] = Math.round(g / c); pal[i * 3 + 2] = Math.round(b / c); }
+    });
+    return { map, pal };
+  }
+
+  function lzw(idx, out) {
+    const min = 8, clear = 256, eoi = 257;
+    const table = new Int16Array(4096 * 256);
+    let size = min + 1, next = eoi + 1, acc = 0, bits = 0;
+    const block = [];
+    const flushBlock = () => { if (block.length) { out.push(block.length, ...block); block.length = 0; } };
+    const emit = code => {
+      acc |= code << bits; bits += size;
+      while (bits >= 8) { block.push(acc & 255); acc >>>= 8; bits -= 8; if (block.length === 255) flushBlock(); }
+    };
+    out.push(min);
+    emit(clear);
+    let prefix = idx[0];
+    for (let i = 1; i < idx.length; i++) {
+      const k = idx[i], key = prefix * 256 + k, hit = table[key];
+      if (hit) { prefix = hit; continue; }
+      emit(prefix);
+      if (next === 4096) { emit(clear); table.fill(0); size = min + 1; next = eoi + 1; }
+      else { if (next >= 1 << size) size++; table[key] = next++; }
+      prefix = k;
+    }
+    emit(prefix); emit(eoi);
+    if (bits > 0) { block.push(acc & 255); if (block.length === 255) flushBlock(); }
+    flushBlock();
+    out.push(0);
+  }
+
+  function encodeGif() {
+    const { map, pal } = buildPalette(frames.map(f => f.img.data));
+    const out = [];
+    const u16 = v => out.push(v & 255, v >> 8 & 255);
+    const str = s => { for (const ch of s) out.push(ch.charCodeAt(0)); };
+    str('GIF89a'); u16(W); u16(H); out.push(0xF7, 0, 0);
+    for (let i = 0; i < 768; i++) out.push(pal[i]);
+    out.push(0x21, 0xFF, 11); str('NETSCAPE2.0'); out.push(3, 1, 0, 0, 0);
+    for (const f of frames) {
+      out.push(0x21, 0xF9, 4, 0x04); u16(Math.max(2, Math.round(f.delay / 10))); out.push(0, 0);
+      out.push(0x2C); u16(0); u16(0); u16(W); u16(H); out.push(0);
+      const d = f.img.data, idx = new Uint8Array(W * H);
+      for (let p = 0, i = 0; p < idx.length; p++, i += 4) idx[p] = map[(d[i] >> 3) << 10 | (d[i + 1] >> 3) << 5 | (d[i + 2] >> 3)];
+      lzw(idx, out);
+    }
+    out.push(0x3B);
+    return new Uint8Array(out);
+  }
+
+  $('#make').onclick = () => {
+    msg('encoding…');
+    setTimeout(() => {
+      try {
+        const bytes = encodeGif();
+        let bin = ''; for (let i = 0; i < bytes.length; i += 8192) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 8192));
+        const url = 'data:image/gif;base64,' + btoa(bin);
+        const img = $('#out'); img.src = url; img.width = W; img.classList.remove('hide');
+        const a = $('#save'); a.href = url; a.classList.remove('hide');
+        const n = frames.length, total = frames.reduce((s, f) => s + Math.max(2, Math.round(f.delay / 10)) * 10, 0);
+        $('#result').textContent = n + (n === 1 ? ' frame' : ' frames') + ' · ' + (total / 1000).toFixed(2) + ' s loop · ' + (bytes.length / 1024).toFixed(1) + ' kB · ' + W + '×' + H;
+        msg('');
+      } catch (err) { msg('Could not encode the gif.', true); }
+    }, 20);
+  };
+
+  setSize();
+  frames = [{ img: blankImage(), delay: defDelay(), touched: false }];
+  show();
+})();
+</script>
+</body>
+</html>

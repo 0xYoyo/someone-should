@@ -1,0 +1,48 @@
+{
+  "slug": "gif-animation-maker",
+  "wish": "someone should make a tool that animates GIFs",
+  "year": 2014,
+  "agreed": 25,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/3237/free-gif-animator",
+      "date": "2014-04-14",
+      "points": 20,
+      "comments": 5
+    }
+  ],
+  "spec": "Draw frames with onion skin or add your own images, set a delay per frame, reorder and delete frames.\nTap make gif to encode a looping animated GIF on the device, preview it, and download it.\nIt does not edit the frames of an existing GIF (only its first frame is imported) and uploads nothing.",
+  "tests": [
+    {
+      "tap": "#add"
+    },
+    {
+      "tap": "#blank"
+    },
+    {
+      "expect": {
+        "sel": ".frame",
+        "count": 3
+      }
+    },
+    {
+      "tap": "#make"
+    },
+    {
+      "wait": 600
+    },
+    {
+      "expect": {
+        "sel": "#result",
+        "matches": "^3 frames .* kB"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:56:52Z",
+  "model": "opus-5.5",
+  "minutes": 9,
+  "approved": false,
+  "notes": ""
+}
