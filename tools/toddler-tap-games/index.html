@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make computer games for 4 year old children</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+body { display: flex; flex-direction: column; height: 100dvh; overflow: hidden; touch-action: manipulation; -webkit-user-select: none; user-select: none; }
+h1 { margin-bottom: 12px; }
+#app { flex: 1; display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+nav { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+nav button { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 8px; min-height: 56px; }
+nav button svg { width: 26px; height: 26px; flex: none; }
+nav button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.game { flex: 1; position: relative; min-height: 0; border: 1.5px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+[hidden] { display: none !important; }
+.tally { position: absolute; top: 8px; right: 12px; font: 500 28px/1 var(--mono); color: var(--meta); pointer-events: none; font-variant-numeric: tabular-nums; }
+.shape { position: absolute; width: 96px; height: 96px; padding: 0; border: 0; background: none; min-height: 0; border-radius: 50%; touch-action: manipulation; }
+.shape svg { width: 100%; height: 100%; display: block; pointer-events: none; }
+.shape.in { animation: grow .35s ease-out; }
+.shape.pop { animation: pop .3s ease-in forwards; pointer-events: none; }
+@keyframes grow { from { transform: scale(0); } to { transform: scale(1); } }
+@keyframes pop { 50% { transform: scale(1.35); opacity: 1; } to { transform: scale(1.6); opacity: 0; } }
+#match { display: flex; flex-direction: column; align-items: center; justify-content: space-around; padding: 12px; }
+#target { width: 132px; height: 132px; }
+#target svg, .choice svg { width: 100%; height: 100%; display: block; pointer-events: none; }
+#target.yay { animation: yay .6s ease-in-out; }
+@keyframes yay { 30% { transform: scale(1.25) rotate(-8deg); } 60% { transform: scale(1.15) rotate(8deg); } }
+#choices { display: flex; gap: 14px; justify-content: center; width: 100%; }
+.choice { width: 30%; max-width: 110px; aspect-ratio: 1; padding: 10px; border: 1.5px solid var(--line); border-radius: 12px; }
+.choice.nope { animation: nope .4s; }
+@keyframes nope { 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+#music { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 8px; border: 0; }
+.key { min-height: 0; height: 100%; border: 0; border-radius: 12px; padding: 0; }
+.key.on { filter: brightness(1.25); transform: scale(.94); }
+
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make computer games for 4 year old children</h1>
+
+<main id="app">
+<nav>
+<button id="tab-pop" aria-pressed="true" data-game="pop"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#e8463c"/></svg>pop</button>
+<button id="tab-match" aria-pressed="false" data-game="match"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" fill="#2f7fd8"/></svg>match</button>
+<button id="tab-music" aria-pressed="false" data-game="music"><svg viewBox="0 0 24 24"><path d="M9 18V5l11-2v13" fill="none" stroke="#2e9e5b" stroke-width="2.5"/><circle cx="6.5" cy="18" r="3" fill="#2e9e5b"/><circle cx="17.5" cy="16" r="3" fill="#2e9e5b"/></svg>music</button>
+</nav>
+<section id="pop" class="game" aria-label="tap the shapes"><div id="popCount" class="tally">0</div></section>
+<section id="match" class="game" aria-label="find the same one" hidden><div id="matchCount" class="tally">0</div><div id="target"></div><div id="choices"></div></section>
+<section id="music" class="game" aria-label="play notes" hidden></section>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  // storage helper — never throws
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+
+  const COLORS = ['#e8463c', '#f2a516', '#f5d90a', '#2e9e5b', '#2f7fd8', '#8a4fd1', '#ec6aa8', '#1fb5b0'];
+  const SHAPES = {
+    circle: '<circle cx="50" cy="50" r="44"/>',
+    square: '<rect x="8" y="8" width="84" height="84" rx="8"/>',
+    triangle: '<path d="M50 6 95 90H5Z"/>',
+    star: '<path d="M50 4l13 30 32 3-24 21 7 32-28-17-28 17 7-32L5 37l32-3z"/>',
+    heart: '<path d="M50 90 10 52C-6 34 8 6 30 10c10 2 16 10 20 18 4-8 10-16 20-18 22-4 36 24 20 42z"/>'
+  };
+  const NAMES = Object.keys(SHAPES);
+  const NOTES = [261.6, 293.7, 329.6, 392, 440, 523.3, 587.3, 659.3];
+  const pick = a => a[Math.floor(Math.random() * a.length)];
+  const svg = (shape, color) => `<svg viewBox="0 0 100 100" fill="${color}">${SHAPES[shape]}</svg>`;
+
+  // sound: built on first tap, synthesized, nothing loaded
+  let ctx = null;
+  function tone(freq, dur = 0.35, type = 'triangle', vol = 0.25) {
+    try {
+      if (!ctx) { const A = window.AudioContext || window.webkitAudioContext; if (!A) return; ctx = new A(); }
+      if (ctx.state === 'suspended') ctx.resume();
+      const o = ctx.createOscillator(), g = ctx.createGain(), t = ctx.currentTime;
+      o.type = type; o.frequency.setValueAtTime(freq, t);
+      g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + dur);
+    } catch {}
+  }
+  const cheer = () => [0, 1, 2].forEach(i => setTimeout(() => tone([523.3, 659.3, 784][i], 0.3), i * 110));
+
+  const totals = store.get('ttg', { pop: 0, match: 0 });
+  const save = () => store.set('ttg', totals);
+
+  // pop: tap shapes, they burst with a note and a new one appears
+  const pop = $('#pop'), popCount = $('#popCount');
+  popCount.textContent = totals.pop;
+  function placeShape(el) {
+    const w = pop.clientWidth || 300, h = pop.clientHeight || 400, s = 96;
+    const others = $$('.shape', pop).filter(o => o !== el && !o.classList.contains('pop'));
+    let x = 0, y = 0;
+    for (let i = 0; i < 30; i++) {
+      x = Math.random() * Math.max(1, w - s); y = 40 + Math.random() * Math.max(1, h - s - 40);
+      if (others.every(o => Math.hypot(parseFloat(o.style.left) - x, parseFloat(o.style.top) - y) > s)) break;
+    }
+    el.style.left = x + 'px'; el.style.top = y + 'px';
+  }
+  function spawn() {
+    const i = Math.floor(Math.random() * COLORS.length), shape = pick(NAMES);
+    const b = document.createElement('button');
+    b.className = 'shape in'; b.dataset.note = NOTES[i];
+    b.setAttribute('aria-label', 'pop'); b.innerHTML = svg(shape, COLORS[i]);
+    pop.appendChild(b); placeShape(b);
+  }
+  pop.addEventListener('pointerdown', e => {
+    const b = e.target.closest('.shape');
+    if (!b || b.classList.contains('pop')) return;
+    tone(+b.dataset.note, 0.4, 'sine', 0.3);
+    b.classList.remove('in'); b.classList.add('pop');
+    popCount.textContent = ++totals.pop; save();
+    setTimeout(() => { b.remove(); spawn(); }, 320);
+  });
+  const fillPop = () => { const n = Math.max(4, Math.min(7, Math.floor(pop.clientWidth * pop.clientHeight / 26000))); while ($$('.shape:not(.pop)', pop).length < n) spawn(); };
+
+  // match: find the same shape and color, wrong taps just wiggle
+  const target = $('#target'), choices = $('#choices'), matchCount = $('#matchCount');
+  matchCount.textContent = totals.match;
+  let busy = false;
+  function round() {
+    const right = { s: pick(NAMES), c: pick(COLORS) };
+    const opts = [right];
+    while (opts.length < 3) {
+      const o = Math.random() < 0.5 ? { s: pick(NAMES), c: right.c } : { s: right.s, c: pick(COLORS) };
+      if (!opts.some(p => p.s === o.s && p.c === o.c)) opts.push(o);
+    }
+    opts.sort(() => Math.random() - 0.5);
+    target.className = ''; target.innerHTML = svg(right.s, right.c);
+    choices.innerHTML = opts.map(o => `<button class="choice" aria-label="choice" data-ok="${o === right ? 1 : 0}">${svg(o.s, o.c)}</button>`).join('');
+    busy = false;
+  }
+  choices.addEventListener('click', e => {
+    const b = e.target.closest('.choice');
+    if (!b || busy) return;
+    if (b.dataset.ok === '1') {
+      busy = true; cheer(); target.classList.add('yay');
+      matchCount.textContent = ++totals.match; save();
+      setTimeout(round, 750);
+    } else {
+      tone(196, 0.25, 'sine', 0.15);
+      b.classList.remove('nope'); void b.offsetWidth; b.classList.add('nope');
+    }
+  });
+
+  // music: eight colored keys
+  const music = $('#music');
+  music.innerHTML = COLORS.map((c, i) => `<button class="key" aria-label="note ${i + 1}" style="background:${c}" data-note="${NOTES[i]}"></button>`).join('');
+  music.addEventListener('pointerdown', e => {
+    const k = e.target.closest('.key'); if (!k) return;
+    tone(+k.dataset.note, 0.6, 'triangle', 0.3);
+    k.classList.add('on'); setTimeout(() => k.classList.remove('on'), 150);
+  });
+
+  function show(name) {
+    $$('nav button').forEach(b => b.setAttribute('aria-pressed', b.dataset.game === name));
+    $$('.game').forEach(g => { g.hidden = g.id !== name; });
+    if (name === 'pop') fillPop();
+    if (name === 'match' && !choices.children.length) round();
+  }
+  $('nav').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { tone(440, 0.12, 'sine', 0.1); show(b.dataset.game); } });
+  addEventListener('resize', () => $$('.shape', pop).forEach(placeShape));
+  show('pop');
+})();
+</script>
+</body>
+</html>

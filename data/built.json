@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T02:02:00.546Z",
+ "updated": "2026-10-27T02:02:05.476Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -736,9 +736,14 @@
   },
   {
    "slug": "toddler-tap-games",
-   "status": "pending",
+   "status": "pass",
    "attempts": 1,
-   "model": "opus-5.5"
+   "model": "opus-5.5",
+   "kb": 11.8,
+   "tests": "6/6",
+   "built": "2026-10-27T02:00:21Z",
+   "minutes": 6,
+   "approved": false
   },
   {
    "slug": "picture-swap-storybook",

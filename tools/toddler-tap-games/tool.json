@@ -1,0 +1,51 @@
+{
+  "slug": "toddler-tap-games",
+  "wish": "someone should make computer games for 4 year old children",
+  "year": 2015,
+  "agreed": 12,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/16823/computer-games-for-4-year-old-children",
+      "date": "2015-02-01",
+      "points": 9,
+      "comments": 3
+    }
+  ],
+  "spec": "Three no-reading games for small children: pop big colored shapes, find the matching shape, play eight colored note keys.\nTap a shape to burst it with a sound; in match, tap the one that looks like the big one; wrong taps only wiggle.\nNo losing, no timers, no ads, no links out; sounds are synthesized on the device and nothing is downloaded.",
+  "tests": [
+    {
+      "tap": "#pop .shape"
+    },
+    {
+      "expect": {
+        "sel": "#popCount",
+        "contains": "1"
+      }
+    },
+    {
+      "tap": "#tab-match"
+    },
+    {
+      "expect": {
+        "sel": "#choices .choice",
+        "count": 3
+      }
+    },
+    {
+      "tap": "#choices [data-ok=\"1\"]"
+    },
+    {
+      "expect": {
+        "sel": "#matchCount",
+        "contains": "1"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T02:00:21Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Sound uses the Web Audio API, started on the first tap. Tallies remembered in localStorage."
+}
