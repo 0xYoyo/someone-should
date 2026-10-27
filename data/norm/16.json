@@ -1,0 +1,2502 @@
+[
+ {
+  "k": "hn:46731305",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:46209279",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:460750",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:4592976",
+  "drop": "joke",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:45837863",
+  "drop": null,
+  "wish": "someone should make a site like archive.is that summarizes the saved page with an LLM",
+  "topic": "llm-page-summarizer",
+  "category": "media",
+  "buildable": false,
+  "why": "needs fetching pages and a model",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:45591343",
+  "drop": "joke",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:45529773",
+  "drop": null,
+  "wish": "someone should make a social media site where light posters count as the influential users",
+  "topic": "inverted-social-media",
+  "category": "social",
+  "buildable": false,
+  "why": "needs shared accounts and posts",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:45526245",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:45161338",
+  "drop": "hardware",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:45000042",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:44783046",
+  "drop": null,
+  "wish": "someone should make a static-site social media platform",
+  "topic": "static-social-platform",
+  "category": "social",
+  "buildable": false,
+  "why": "needs shared posts across people",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:44782875",
+  "drop": null,
+  "wish": "someone should make a static-site social media platform",
+  "topic": "static-social-platform",
+  "category": "social",
+  "buildable": false,
+  "why": "needs shared posts across people",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:44780728",
+  "drop": null,
+  "wish": "someone should make a static-site social media platform",
+  "topic": "static-social-platform",
+  "category": "social",
+  "buildable": false,
+  "why": "needs shared posts across people",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:44733959",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:43942647",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:43557127",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:42939081",
+  "drop": null,
+  "wish": "someone should make a website that tracks tech companies' broken moral promises",
+  "topic": "broken-promises-tracker",
+  "category": "data",
+  "buildable": false,
+  "why": "needs a maintained shared record",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "hn:42476713",
+  "drop": null,
+  "wish": "someone should make a tool that improves unclear project requirements",
+  "topic": "improve-requirements",
+  "category": "work",
+  "buildable": false,
+  "why": "needs language understanding, unclear scope",
+  "no": "too vague"
+ },
+ {
+  "k": "hn:42422618",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:42378677",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:42349581",
+  "drop": null,
+  "wish": "someone should make a site where EV owners list themselves for emergency charging",
+  "topic": "ev-emergency-charging",
+  "category": "everyday",
+  "buildable": false,
+  "why": "needs listings from other people",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "hn:42114169",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:41228453",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:4120550",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:4104918",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:40939922",
+  "drop": "joke",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:40618285",
+  "drop": null,
+  "wish": "someone should make a game where you design indoor RC car tracks",
+  "topic": "rc-track-designer",
+  "category": "games",
+  "buildable": true,
+  "why": "canvas track editor, saved locally",
+  "no": null
+ },
+ {
+  "k": "hn:40062646",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:40007954",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:39883742",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:39696227",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:39610670",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:39609471",
+  "drop": null,
+  "wish": "someone should make a website that lists basic pricing tiers for companies that hide it",
+  "topic": "hidden-pricing-list",
+  "category": "data",
+  "buildable": false,
+  "why": "needs collected pricing from others",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "hn:3957903",
+  "drop": null,
+  "wish": "someone should make a website with famous declarations by high-ups in various industries",
+  "topic": "famous-declarations",
+  "category": "media",
+  "buildable": false,
+  "why": "needs a curated shared collection",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "hn:39453580",
+  "drop": null,
+  "wish": "someone should make a dating app where LLM clones of you date other clones and matches follow",
+  "topic": "llm-clone-dating",
+  "category": "social",
+  "buildable": false,
+  "why": "needs accounts, models and other users",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:39415522",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:39222312",
+  "drop": "unsafe",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:3919357",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:39181884",
+  "drop": null,
+  "wish": "someone should make a tool to invest against prediction market overconfidence",
+  "topic": "prediction-market-hedge",
+  "category": "money",
+  "buildable": false,
+  "why": "needs live market data",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "hn:38995592",
+  "drop": null,
+  "wish": "someone should make a guess-the-LLM game",
+  "topic": "guess-the-llm",
+  "category": "games",
+  "buildable": false,
+  "why": "needs real model outputs to quiz on",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "hn:3894172",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:38647597",
+  "drop": null,
+  "wish": "someone should make a website to track changes",
+  "topic": "website-change-tracker",
+  "category": "data",
+  "buildable": false,
+  "why": "needs fetching pages over time",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:38645816",
+  "drop": null,
+  "wish": "someone should make a website to track changes",
+  "topic": "website-change-tracker",
+  "category": "data",
+  "buildable": false,
+  "why": "needs fetching pages over time",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:38122196",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:37428967",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:37311594",
+  "drop": null,
+  "wish": "someone should make an app to bet on how long until a Google product shuts down",
+  "topic": "google-shutdown-betting",
+  "category": "money",
+  "buildable": false,
+  "why": "needs accounts and shared bets",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:37233451",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:37216781",
+  "drop": null,
+  "wish": "someone should make an extension that blocks the whole site when it detects an ad",
+  "topic": "block-site-with-ads",
+  "category": "privacy",
+  "buildable": false,
+  "why": "browser extension, not a single page",
+  "no": "too vague"
+ },
+ {
+  "k": "hn:3718740",
+  "drop": null,
+  "wish": "someone should make a JS framework that maps next and previous page to a universal keyboard shortcut",
+  "topic": "page-nav-shortcut",
+  "category": "dev",
+  "buildable": false,
+  "why": "a library for other sites, not a page",
+  "no": "too vague"
+ },
+ {
+  "k": "hn:36369794",
+  "drop": null,
+  "wish": "someone should make a death app",
+  "topic": "death-app",
+  "category": "other",
+  "buildable": false,
+  "why": "no stated function",
+  "no": "too vague"
+ },
+ {
+  "k": "hn:36341641",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:3623017",
+  "drop": "unsafe",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:35647827",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:35574735",
+  "drop": null,
+  "wish": "someone should make a social media site where anyone can delete any post",
+  "topic": "delete-any-post-social",
+  "category": "social",
+  "buildable": false,
+  "why": "needs shared posts across people",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:35540504",
+  "drop": null,
+  "wish": "someone should make a Harry Potter paintings webapp where you talk with LLM-powered figures",
+  "topic": "hp-paintings-chat",
+  "category": "games",
+  "buildable": false,
+  "why": "needs a language model",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:35255610",
+  "drop": null,
+  "wish": "someone should make a family authentication app",
+  "topic": "family-authentication",
+  "category": "privacy",
+  "buildable": false,
+  "why": "no stated function",
+  "no": "too vague"
+ },
+ {
+  "k": "hn:35220583",
+  "drop": null,
+  "wish": "someone should make a match-three game that shows flash cards instead of ads",
+  "topic": "flashcard-match-three",
+  "category": "games",
+  "buildable": true,
+  "why": "canvas puzzle game with typed cards",
+  "no": null
+ },
+ {
+  "k": "hn:34527104",
+  "drop": null,
+  "wish": "someone should make a single-use website for where to incorporate",
+  "topic": "where-to-incorporate",
+  "category": "work",
+  "buildable": false,
+  "why": "needs legal data kept current",
+  "no": "too vague"
+ },
+ {
+  "k": "hn:34192837",
+  "drop": null,
+  "wish": "someone should make an app that routes complaints to the top of a company via crowdsourced contacts",
+  "topic": "complaint-escalation",
+  "category": "everyday",
+  "buildable": false,
+  "why": "needs crowdsourced contact data",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "hn:3402777",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:3395788",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:33950697",
+  "drop": null,
+  "wish": "someone should make a game where you pick the real image from a real and generated pair",
+  "topic": "real-or-generated-game",
+  "category": "games",
+  "buildable": false,
+  "why": "needs a bank of real and generated images",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "hn:3383233",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:337486",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:33354822",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:33324439",
+  "drop": null,
+  "wish": "someone should make an OpenStreetMap editor and viewer that looks like Google Maps",
+  "topic": "osm-map-viewer",
+  "category": "travel",
+  "buildable": false,
+  "why": "needs map tiles and data",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:32902930",
+  "drop": null,
+  "wish": "someone should make a global map where you place a protected email and location to meet for coffee",
+  "topic": "coffee-meetup-map",
+  "category": "social",
+  "buildable": false,
+  "why": "needs shared map of other people",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:32543621",
+  "drop": null,
+  "wish": "someone should make a game like Papers Please where you are an app store reviewer",
+  "topic": "app-reviewer-game",
+  "category": "games",
+  "buildable": true,
+  "why": "canvas game with built-in cases",
+  "no": null
+ },
+ {
+  "k": "hn:32481522",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:32411401",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:32306089",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:32268584",
+  "drop": "joke",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:32241863",
+  "drop": null,
+  "wish": "someone should make a site with a checklist of what to ask for the type of car you are buying",
+  "topic": "car-buying-checklist",
+  "category": "everyday",
+  "buildable": true,
+  "why": "static checklist with local ticking",
+  "no": null
+ },
+ {
+  "k": "hn:31738901",
+  "drop": null,
+  "wish": "someone should make a betting or prediction-market site",
+  "topic": "prediction-market-site",
+  "category": "money",
+  "buildable": false,
+  "why": "needs accounts and payments",
+  "no": "not safe"
+ },
+ {
+  "k": "hn:31366050",
+  "drop": "unsafe",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:31221671",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:3101051",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:30801864",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:30769695",
+  "drop": null,
+  "wish": "someone should make a game where you choose which of two GPU names is faster",
+  "topic": "faster-gpu-game",
+  "category": "games",
+  "buildable": false,
+  "why": "needs a sourced GPU benchmark list",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "hn:30752255",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:30475669",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:30426905",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:29837757",
+  "drop": null,
+  "wish": "someone should make a site where employees post salary information and others pay to see it",
+  "topic": "paid-salary-info",
+  "category": "work",
+  "buildable": false,
+  "why": "needs accounts, payments and shared data",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:29777478",
+  "drop": null,
+  "wish": "someone should make a tool that parses mailing lists and shows them in a GitHub-like frontend",
+  "topic": "mailing-list-viewer",
+  "category": "dev",
+  "buildable": false,
+  "why": "needs fetching the lists",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:29489073",
+  "drop": null,
+  "wish": "someone should make a racing game where the vertices get more unstable the faster you go",
+  "topic": "unstable-vertices-racer",
+  "category": "games",
+  "buildable": true,
+  "why": "canvas game with jitter scaled by speed",
+  "no": null
+ },
+ {
+  "k": "hn:29254956",
+  "drop": null,
+  "wish": "someone should make a browser extension that replaces faces with pictures of kittens",
+  "topic": "face-to-kitten",
+  "category": "photo",
+  "buildable": false,
+  "why": "needs face recognition in an extension",
+  "no": "too vague"
+ },
+ {
+  "k": "hn:28864393",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:2875754",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:2843642",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:9861514",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:9223137",
+  "drop": null,
+  "wish": "someone should make a job search site that gives blind interviews by scrubbing applications of gender, race and age",
+  "topic": "blind-hiring-site",
+  "category": "work",
+  "buildable": false,
+  "why": "needs employers, candidates and a backend",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:8225904",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:6828539",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:6484251",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:6273527",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:5896318",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:5762399",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:5762260",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:49651055",
+  "drop": null,
+  "wish": "someone should make a service that tracks when AI models get worse",
+  "topic": "model-nerf-tracker",
+  "category": "data",
+  "buildable": false,
+  "why": "needs ongoing measurement of models",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:49648872",
+  "drop": null,
+  "wish": "someone should make a nerf tracker that shows when AI models get substantially worse",
+  "topic": "model-nerf-tracker",
+  "category": "data",
+  "buildable": false,
+  "why": "needs ongoing measurement of models",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:4836094",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:46620045",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:4640968",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:45704982",
+  "drop": null,
+  "wish": "someone should make a tool that walks a reviewer through a pull request with an LLM",
+  "topic": "pr-walkthrough",
+  "category": "dev",
+  "buildable": false,
+  "why": "needs repo access and a model",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:45416402",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:44585566",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:4327629",
+  "drop": "unsafe",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:42541776",
+  "drop": null,
+  "wish": "someone should make an engineer-matchmaking service that can challenge LinkedIn",
+  "topic": "engineer-matchmaking",
+  "category": "work",
+  "buildable": false,
+  "why": "needs accounts and other users",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:40495660",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:39787019",
+  "drop": "joke",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:39736152",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:37458677",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:3732340",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:3731552",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:37011882",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:35708762",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:34306238",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:33398500",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:33223236",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:33193047",
+  "drop": null,
+  "wish": "someone should make GDPR compliance as a service",
+  "topic": "gdpr-compliance",
+  "category": "privacy",
+  "buildable": false,
+  "why": "needs ongoing legal service",
+  "no": "too vague"
+ },
+ {
+  "k": "hn:3268308",
+  "drop": null,
+  "wish": "someone should make a website that maintains all the projects Google killed",
+  "topic": "google-graveyard",
+  "category": "data",
+  "buildable": false,
+  "why": "a maintained list already exists",
+  "no": "exists: Killed by Google"
+ },
+ {
+  "k": "hn:32379772",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:31752394",
+  "drop": "joke",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:31749479",
+  "drop": "joke",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:30683444",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:30169110",
+  "drop": "hardware",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:28260743",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:27259793",
+  "drop": "joke",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:27246588",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:25250059",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:25222935",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:23081313",
+  "drop": "joke",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:22906186",
+  "drop": "joke",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:22582984",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:2151048",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:21206528",
+  "drop": null,
+  "wish": "someone should make a phone app that removes eyeball reflections and exif data from photos",
+  "topic": "photo-exif-scrub",
+  "category": "photo",
+  "buildable": false,
+  "why": "reflection removal needs image recognition",
+  "no": "too vague"
+ },
+ {
+  "k": "hn:2047242",
+  "drop": "unsafe",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:2009828",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:17652552",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:16850084",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:16241827",
+  "drop": null,
+  "wish": "someone should make an app that replaces one actor's face with the viewer's own face",
+  "topic": "face-swap-viewer",
+  "category": "photo",
+  "buildable": false,
+  "why": "needs face recognition and a camera",
+  "no": "needs: camera hardware"
+ },
+ {
+  "k": "hn:16198674",
+  "drop": null,
+  "wish": "someone should make an interview tool that sets up a real-time conference with better call quality",
+  "topic": "interview-call-tool",
+  "category": "work",
+  "buildable": false,
+  "why": "needs live connections between people",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:15781320",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:14910759",
+  "drop": "unsafe",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:1478941",
+  "drop": null,
+  "wish": "someone should make a generic webapp to host and vote on laws to repeal",
+  "topic": "repeal-law-voting",
+  "category": "social",
+  "buildable": false,
+  "why": "needs shared votes across people",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:1444833",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:1396524",
+  "drop": null,
+  "wish": "someone should make a site to anonymously post photos on",
+  "topic": "anonymous-photo-site",
+  "category": "photo",
+  "buildable": false,
+  "why": "needs hosting shared photos",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:13748897",
+  "drop": "unsafe",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:12296398",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:11291549",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:11281799",
+  "drop": null,
+  "wish": "someone should make a p2p service to share bandwidth and streaming content",
+  "topic": "p2p-bandwidth-share",
+  "category": "data",
+  "buildable": false,
+  "why": "needs a network of peers",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:11203903",
+  "drop": null,
+  "wish": "someone should make an OpenSSL vulnerability catchy name generator",
+  "topic": "vulnerability-name-generator",
+  "category": "dev",
+  "buildable": true,
+  "why": "combines word lists in the browser",
+  "no": null
+ },
+ {
+  "k": "hn:1048161",
+  "drop": null,
+  "wish": "someone should make a site for videos that watch the watchers",
+  "topic": "watchers-videos-site",
+  "category": "media",
+  "buildable": false,
+  "why": "needs a collected video index",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "hn:8479338",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:6537472",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:5514780",
+  "drop": null,
+  "wish": "someone should make a game where everybody can invest in companies",
+  "topic": "invest-in-companies-game",
+  "category": "games",
+  "buildable": false,
+  "why": "needs shared players and market data",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:5057528",
+  "drop": null,
+  "wish": "someone should make a website for arranging ad hoc day trips with strangers",
+  "topic": "day-trips-strangers",
+  "category": "travel",
+  "buildable": false,
+  "why": "needs accounts and other people",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:48638689",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:47667863",
+  "drop": "joke",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:42893817",
+  "drop": "joke",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:41230174",
+  "drop": "joke",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:40074634",
+  "drop": null,
+  "wish": "someone should make a long list of the most commonly used words for learning",
+  "topic": "common-words-list",
+  "category": "learning",
+  "buildable": false,
+  "why": "needs a sourced frequency list",
+  "no": "too vague"
+ },
+ {
+  "k": "hn:37807047",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:37073959",
+  "drop": null,
+  "wish": "someone should make a Tetris game where speed does not increase but dimensions do",
+  "topic": "growing-board-tetris",
+  "category": "games",
+  "buildable": true,
+  "why": "canvas game with growing grid",
+  "no": null
+ },
+ {
+  "k": "hn:36149057",
+  "drop": null,
+  "wish": "someone should make a Coltrane AI-generator",
+  "topic": "coltrane-ai",
+  "category": "music",
+  "buildable": false,
+  "why": "needs a trained music model",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:35309125",
+  "drop": null,
+  "wish": "someone should make an AI service that automatically files appeals",
+  "topic": "auto-file-appeals",
+  "category": "everyday",
+  "buildable": false,
+  "why": "needs a model and filing access",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:34282763",
+  "drop": null,
+  "wish": "someone should make a Perfect Square game so you can draw a nice circle with the same result",
+  "topic": "draw-perfect-circle",
+  "category": "games",
+  "buildable": true,
+  "why": "canvas drawing scorer",
+  "no": null
+ },
+ {
+  "k": "hn:3285377",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:29180022",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:28297936",
+  "drop": "joke",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:26867079",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:26766215",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:23325232",
+  "drop": null,
+  "wish": "someone should make an accurate product problems site where only legitimate users can vote on issues",
+  "topic": "product-problems-site",
+  "category": "everyday",
+  "buildable": false,
+  "why": "needs accounts and verified users",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:22031149",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:19081533",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:1774791",
+  "drop": null,
+  "wish": "someone should make a tool that reformats crappy websites into something pleasant to read",
+  "topic": "readable-page-reformatter",
+  "category": "text",
+  "buildable": false,
+  "why": "needs fetching the live page",
+  "no": "your phone does this"
+ },
+ {
+  "k": "hn:1771538",
+  "drop": null,
+  "wish": "someone should make a tool that reformats crappy websites into something pleasant to read",
+  "topic": "readable-page-reformatter",
+  "category": "text",
+  "buildable": false,
+  "why": "needs fetching the live page",
+  "no": "your phone does this"
+ },
+ {
+  "k": "hn:13592265",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:10821423",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:9771885",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:968729",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:9380001",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:9275287",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:9256922",
+  "drop": null,
+  "wish": "someone should make a tool that analyzes website privacy policies and scores them",
+  "topic": "privacy-policy-scorer",
+  "category": "privacy",
+  "buildable": false,
+  "why": "needs fetching policies from sites",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:9254781",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:9156878",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:8936755",
+  "drop": "hardware",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:8896555",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:8851233",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:8830761",
+  "drop": null,
+  "wish": "someone should make a tool that makes transcripts from audio",
+  "topic": "audio-transcriber",
+  "category": "text",
+  "buildable": false,
+  "why": "needs speech recognition model",
+  "no": "exists: Whisper"
+ },
+ {
+  "k": "hn:8806298",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:8806101",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:8805952",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:8776628",
+  "drop": null,
+  "wish": "someone should make a tool that helps me stay in contact with customers when not selling",
+  "topic": "customer-contact-keeper",
+  "category": "work",
+  "buildable": false,
+  "why": "needs email and customer data",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:8600235",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:8502641",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:8409176",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:8349931",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:8243716",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:8133402",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:7921600",
+  "drop": "unsafe",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:7710352",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:7598881",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:7537285",
+  "drop": null,
+  "wish": "someone should make a tool that generates a regex from highlighted portions of a string",
+  "topic": "regex-from-highlight",
+  "category": "dev",
+  "buildable": true,
+  "why": "pure text matching in the browser",
+  "no": null
+ },
+ {
+  "k": "hn:7346374",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:7199490",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:7125372",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:6990423",
+  "drop": null,
+  "wish": "someone should make a tool that checks whether every package in requirements.txt is Python 3 compatible",
+  "topic": "py3-compat-checker",
+  "category": "dev",
+  "buildable": false,
+  "why": "needs looking up PyPI",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:6553659",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:6540915",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:6440836",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:6427588",
+  "drop": null,
+  "wish": "someone should make a tool that benchmarks public DNS servers against your ISP's",
+  "topic": "dns-benchmark",
+  "category": "dev",
+  "buildable": false,
+  "why": "needs real network requests",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:5993983",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:5935522",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:5897746",
+  "drop": null,
+  "wish": "someone should make a tool that finds bottlenecks on my website",
+  "topic": "website-bottleneck-finder",
+  "category": "dev",
+  "buildable": false,
+  "why": "needs loading the live site",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:5591907",
+  "drop": null,
+  "wish": "someone should make a tool to back up your whole Google account",
+  "topic": "google-backup",
+  "category": "files",
+  "buildable": false,
+  "why": "needs account access",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:5231284",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:5206680",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:5191990",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:49751471",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:49494799",
+  "drop": null,
+  "wish": "someone should make a tool to map and track glaciers at risk of failure",
+  "topic": "glacier-risk-tracker",
+  "category": "outdoors",
+  "buildable": false,
+  "why": "needs satellite and survey data",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "hn:4943066",
+  "drop": null,
+  "wish": "someone should make a tool that evaluates a live page for typography basics",
+  "topic": "typography-checker",
+  "category": "design",
+  "buildable": false,
+  "why": "needs loading the live page",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:49219501",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:48824680",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:4862275",
+  "drop": null,
+  "wish": "someone should make a tool that cuts each icon out of a sheet as an individual image",
+  "topic": "sprite-sheet-slicer",
+  "category": "design",
+  "buildable": true,
+  "why": "canvas slicing of an uploaded image",
+  "no": null
+ },
+ {
+  "k": "hn:48267796",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:47818409",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:47743298",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:47720321",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:47714893",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:47539741",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:47503574",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:47501116",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:47436574",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:47041535",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:47030964",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:46836908",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:46763616",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:4653269",
+  "drop": null,
+  "wish": "someone should make a tool that generates a CSS sprite animation",
+  "topic": "css-sprite-animator",
+  "category": "design",
+  "buildable": true,
+  "why": "canvas and CSS preview of a sprite sheet",
+  "no": null
+ },
+ {
+  "k": "hn:46425971",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:46377395",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:46316411",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:46306577",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:45970257",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:45808185",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:45801769",
+  "drop": null,
+  "wish": "someone should make a tool that dithers images to named colors",
+  "topic": "dither-to-named-colors",
+  "category": "photo",
+  "buildable": true,
+  "why": "canvas pixel work against a color list",
+  "no": null
+ },
+ {
+  "k": "hn:45501205",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:4531351",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:45184234",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": false,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:44950201",
+  "drop": null,
+  "wish": "someone should make a tool that detects whether an image is AI generated",
+  "topic": "ai-image-detector",
+  "category": "photo",
+  "buildable": false,
+  "why": "needs a detection model",
+  "no": "too vague"
+ }
+]
