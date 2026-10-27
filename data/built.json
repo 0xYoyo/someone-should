@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T02:10:11.600Z",
+ "updated": "2026-10-27T02:10:22.805Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -1082,9 +1082,14 @@
   },
   {
    "slug": "qr-contact-card",
-   "status": "pending",
+   "status": "pass",
    "attempts": 1,
-   "model": "opus-5.5"
+   "model": "opus-5.5",
+   "kb": 16.3,
+   "tests": "6/6",
+   "built": "2026-10-27T02:08:17Z",
+   "minutes": 6,
+   "approved": false
   }
  ]
 }

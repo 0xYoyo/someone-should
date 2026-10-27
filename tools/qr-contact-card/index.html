@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app that makes QR codes to swap contact info</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+main { max-width: 480px; margin: 0 auto; }
+label { display: grid; gap: 4px; font-size: 16px; color: var(--meta); }
+#card { display: grid; gap: 8px; justify-items: center; }
+#qr { width: 100%; max-width: 320px; aspect-ratio: 1; background: #fff; border-radius: var(--radius); padding: 0; cursor: zoom-in; border: 0; min-height: 0; }
+#qr svg { display: block; width: 100%; height: 100%; }
+#qr[hidden] { display: none; }
+#who { font-size: 20px; font-weight: 500; text-align: center; overflow-wrap: anywhere; }
+#msg { font-size: 16px; text-align: center; }
+#info { font-size: 16px; }
+body.show { padding: 0; }
+body.show #wish, body.show #form, body.show #info, body.show #actions { display: none; }
+body.show main { max-width: none; min-height: 100dvh; display: grid; place-items: center; background: #fff; color: #141414; padding: var(--gutter); }
+body.show #qr { max-width: min(92vw, 80dvh); cursor: zoom-out; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make an app that makes QR codes to swap contact info</h1>
+
+<main id="app" class="stack">
+  <div id="form" class="stack">
+    <label>Name<input id="name" autocomplete="name" autocapitalize="words"></label>
+    <label>Phone<input id="phone" type="tel" autocomplete="tel" inputmode="tel"></label>
+    <label>Email<input id="email" type="email" autocomplete="email" inputmode="email" autocapitalize="off"></label>
+    <label>Company<input id="org" autocomplete="organization"></label>
+  </div>
+
+  <div id="card">
+    <button id="qr" type="button" aria-label="QR code, tap to enlarge" hidden></button>
+    <div id="who"></div>
+    <div id="msg" class="empty">Type a name, phone or email.</div>
+  </div>
+
+  <div id="actions" class="row" hidden>
+    <button id="show" class="primary" type="button">Show to scan</button>
+    <button id="clear" type="button">Clear</button>
+  </div>
+  <div id="info" class="meta"></div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  // ---------- QR encoder: byte mode, error correction level M, versions 1–40 ----------
+  const ECC_PER_BLOCK = [0, 10, 16, 26, 18, 24, 16, 18, 22, 22, 26, 30, 22, 22, 24, 24, 28, 28, 26, 26, 26, 26, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28];
+  const NUM_BLOCKS = [0, 1, 1, 1, 2, 2, 4, 4, 4, 5, 5, 5, 8, 9, 9, 10, 10, 11, 13, 14, 16, 17, 17, 18, 20, 21, 23, 25, 26, 28, 29, 31, 33, 35, 37, 38, 40, 43, 45, 47, 49];
+  const FORMAT_M = 0;
+
+  function rawModules(ver) {
+    let r = (16 * ver + 128) * ver + 64;
+    if (ver >= 2) {
+      const n = Math.floor(ver / 7) + 2;
+      r -= (25 * n - 10) * n - 55;
+      if (ver >= 7) r -= 36;
+    }
+    return r;
+  }
+  const dataCodewords = ver => Math.floor(rawModules(ver) / 8) - ECC_PER_BLOCK[ver] * NUM_BLOCKS[ver];
+
+  function gfMul(x, y) {
+    let z = 0;
+    for (let i = 7; i >= 0; i--) {
+      z = (z << 1) ^ ((z >>> 7) * 0x11d);
+      z ^= ((y >>> i) & 1) * x;
+    }
+    return z & 0xff;
+  }
+  function rsDivisor(deg) {
+    const r = new Array(deg).fill(0);
+    r[deg - 1] = 1;
+    let root = 1;
+    for (let i = 0; i < deg; i++) {
+      for (let j = 0; j < deg; j++) {
+        r[j] = gfMul(r[j], root);
+        if (j + 1 < deg) r[j] ^= r[j + 1];
+      }
+      root = gfMul(root, 2);
+    }
+    return r;
+  }
+  function rsRemainder(data, div) {
+    const r = new Array(div.length).fill(0);
+    for (const b of data) {
+      const f = b ^ r.shift();
+      r.push(0);
+      for (let i = 0; i < div.length; i++) r[i] ^= gfMul(div[i], f);
+    }
+    return r;
+  }
+
+  function alignPositions(ver) {
+    if (ver === 1) return [];
+    const n = Math.floor(ver / 7) + 2;
+    const step = ver === 32 ? 26 : Math.ceil((ver * 4 + 4) / (n * 2 - 2)) * 2;
+    const out = [6];
+    for (let pos = ver * 4 + 10; out.length < n; pos -= step) out.splice(1, 0, pos);
+    return out;
+  }
+
+  function encode(bytes) {
+    let ver = 0;
+    for (let v = 1; v <= 40; v++) {
+      const need = 4 + (v < 10 ? 8 : 16) + bytes.length * 8;
+      if (need <= dataCodewords(v) * 8) { ver = v; break; }
+    }
+    if (!ver) return null;
+
+    // data bits
+    const bits = [];
+    const put = (val, len) => { for (let i = len - 1; i >= 0; i--) bits.push((val >>> i) & 1); };
+    put(4, 4);
+    put(bytes.length, ver < 10 ? 8 : 16);
+    for (const b of bytes) put(b, 8);
+    const cap = dataCodewords(ver) * 8;
+    put(0, Math.min(4, cap - bits.length));
+    put(0, (8 - bits.length % 8) % 8);
+    for (let pad = 0xec; bits.length < cap; pad ^= 0xec ^ 0x11) put(pad, 8);
+    const data = [];
+    for (let i = 0; i < bits.length; i += 8) {
+      let b = 0;
+      for (let j = 0; j < 8; j++) b = (b << 1) | bits[i + j];
+      data.push(b);
+    }
+
+    // split into blocks, add error correction, interleave
+    const nb = NUM_BLOCKS[ver], ecLen = ECC_PER_BLOCK[ver];
+    const raw = Math.floor(rawModules(ver) / 8);
+    const nShort = nb - raw % nb;
+    const shortLen = Math.floor(raw / nb);
+    const div = rsDivisor(ecLen);
+    const blocks = [];
+    for (let i = 0, k = 0; i < nb; i++) {
+      const dat = data.slice(k, k + shortLen - ecLen + (i < nShort ? 0 : 1));
+      k += dat.length;
+      const ecc = rsRemainder(dat, div);
+      if (i < nShort) dat.push(0);
+      blocks.push(dat.concat(ecc));
+    }
+    const words = [];
+    for (let i = 0; i < blocks[0].length; i++) {
+      for (let j = 0; j < nb; j++) {
+        if (i !== shortLen - ecLen || j >= nShort) words.push(blocks[j][i]);
+      }
+    }
+
+    // matrix
+    const size = ver * 4 + 17;
+    const mod = Array.from({ length: size }, () => new Array(size).fill(false));
+    const fn = Array.from({ length: size }, () => new Array(size).fill(false));
+    const set = (x, y, dark) => { mod[y][x] = dark; fn[y][x] = true; };
+
+    for (let i = 0; i < size; i++) { set(6, i, i % 2 === 0); set(i, 6, i % 2 === 0); }
+    const finder = (cx, cy) => {
+      for (let dy = -4; dy <= 4; dy++) for (let dx = -4; dx <= 4; dx++) {
+        const x = cx + dx, y = cy + dy;
+        if (x < 0 || y < 0 || x >= size || y >= size) continue;
+        const d = Math.max(Math.abs(dx), Math.abs(dy));
+        set(x, y, d !== 2 && d !== 4);
+      }
+    };
+    finder(3, 3); finder(size - 4, 3); finder(3, size - 4);
+    const al = alignPositions(ver);
+    for (let i = 0; i < al.length; i++) for (let j = 0; j < al.length; j++) {
+      if ((i === 0 && j === 0) || (i === 0 && j === al.length - 1) || (i === al.length - 1 && j === 0)) continue;
+      for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) {
+        set(al[i] + dx, al[j] + dy, Math.max(Math.abs(dx), Math.abs(dy)) !== 1);
+      }
+    }
+    const drawFormat = mask => {
+      const d = (FORMAT_M << 3) | mask;
+      let r = d;
+      for (let i = 0; i < 10; i++) r = (r << 1) ^ ((r >>> 9) * 0x537);
+      const b = ((d << 10) | r) ^ 0x5412;
+      const bit = i => ((b >>> i) & 1) === 1;
+      for (let i = 0; i <= 5; i++) set(8, i, bit(i));
+      set(8, 7, bit(6)); set(8, 8, bit(7)); set(7, 8, bit(8));
+      for (let i = 9; i < 15; i++) set(14 - i, 8, bit(i));
+      for (let i = 0; i < 8; i++) set(size - 1 - i, 8, bit(i));
+      for (let i = 8; i < 15; i++) set(8, size - 15 + i, bit(i));
+      set(8, size - 8, true);
+    };
+    drawFormat(0);
+    if (ver >= 7) {
+      let r = ver;
+      for (let i = 0; i < 12; i++) r = (r << 1) ^ ((r >>> 11) * 0x1f25);
+      const b = (ver << 12) | r;
+      for (let i = 0; i < 18; i++) {
+        const dark = ((b >>> i) & 1) === 1;
+        const a = size - 11 + i % 3, c = Math.floor(i / 3);
+        set(a, c, dark); set(c, a, dark);
+      }
+    }
+
+    // place codewords in the zigzag
+    let i = 0;
+    for (let right = size - 1; right >= 1; right -= 2) {
+      if (right === 6) right = 5;
+      for (let v = 0; v < size; v++) for (let j = 0; j < 2; j++) {
+        const x = right - j;
+        const up = ((right + 1) & 2) === 0;
+        const y = up ? size - 1 - v : v;
+        if (!fn[y][x] && i < words.length * 8) {
+          mod[y][x] = ((words[i >>> 3] >>> (7 - (i & 7))) & 1) === 1;
+          i++;
+        }
+      }
+    }
+
+    const masks = [
+      (x, y) => (x + y) % 2 === 0,
+      (x, y) => y % 2 === 0,
+      (x, y) => x % 3 === 0,
+      (x, y) => (x + y) % 3 === 0,
+      (x, y) => (Math.floor(x / 3) + Math.floor(y / 2)) % 2 === 0,
+      (x, y) => (x * y) % 2 + (x * y) % 3 === 0,
+      (x, y) => ((x * y) % 2 + (x * y) % 3) % 2 === 0,
+      (x, y) => ((x + y) % 2 + (x * y) % 3) % 2 === 0
+    ];
+    const applyMask = m => {
+      for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+        if (!fn[y][x] && masks[m](x, y)) mod[y][x] = !mod[y][x];
+      }
+    };
+
+    // pick the mask with the lowest penalty (runs, 2x2 boxes, finder-like patterns, balance)
+    const penalty = () => {
+      let p = 0, dark = 0;
+      const line = get => {
+        let run = 1;
+        for (let k = 1; k <= size; k++) {
+          if (k < size && get(k) === get(k - 1)) run++;
+          else { if (run >= 5) p += run - 2; run = 1; }
+        }
+        for (let k = 0; k + 7 <= size; k++) {
+          if (get(k) && !get(k + 1) && get(k + 2) && get(k + 3) && get(k + 4) && !get(k + 5) && get(k + 6)) {
+            const before = k >= 4 && !get(k - 1) && !get(k - 2) && !get(k - 3) && !get(k - 4);
+            const after = k + 11 <= size && !get(k + 7) && !get(k + 8) && !get(k + 9) && !get(k + 10);
+            if (before || after) p += 40;
+          }
+        }
+      };
+      for (let y = 0; y < size; y++) line(x => mod[y][x]);
+      for (let x = 0; x < size; x++) line(y => mod[y][x]);
+      for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+        if (mod[y][x]) dark++;
+        if (x < size - 1 && y < size - 1) {
+          const c = mod[y][x];
+          if (c === mod[y][x + 1] && c === mod[y + 1][x] && c === mod[y + 1][x + 1]) p += 3;
+        }
+      }
+      const total = size * size;
+      p += (Math.ceil(Math.abs(dark * 20 - total * 10) / total) - 1) * 10;
+      return p;
+    };
+    let best = 0, bestP = Infinity;
+    for (let m = 0; m < 8; m++) {
+      applyMask(m); drawFormat(m);
+      const p = penalty();
+      if (p < bestP) { bestP = p; best = m; }
+      applyMask(m);
+    }
+    applyMask(best); drawFormat(best);
+    return { ver, size, mod };
+  }
+
+  function toSvg(qr) {
+    const q = 4, n = qr.size + q * 2;
+    let d = '';
+    for (let y = 0; y < qr.size; y++) for (let x = 0; x < qr.size; x++) {
+      if (qr.mod[y][x]) d += `M${x + q} ${y + q}h1v1h-1z`;
+    }
+    return `<svg viewBox="0 0 ${n} ${n}" shape-rendering="crispEdges" role="img" aria-label="QR code"><rect width="${n}" height="${n}" fill="#fff"/><path d="${d}" fill="#000"/></svg>`;
+  }
+
+  // ---------- vCard ----------
+  const esc = s => s.replace(/\\/g, '\\\\').replace(/[,;]/g, m => '\\' + m).replace(/\r?\n/g, '\\n');
+  function vcard(f) {
+    const parts = f.name.trim().split(/\s+/).filter(Boolean);
+    const last = parts.length > 1 ? parts.pop() : '';
+    const first = parts.join(' ');
+    const lines = ['BEGIN:VCARD', 'VERSION:3.0'];
+    if (f.name.trim()) lines.push(`N:${esc(last)};${esc(first)};;;`, `FN:${esc(f.name.trim())}`);
+    else lines.push('N:;;;;', `FN:${esc(f.email.trim() || f.phone.trim() || f.org.trim())}`);
+    if (f.org.trim()) lines.push(`ORG:${esc(f.org.trim())}`);
+    if (f.phone.trim()) lines.push(`TEL;TYPE=CELL:${f.phone.trim().replace(/[^\d+*#,;pPwW]/g, '')}`);
+    if (f.email.trim()) lines.push(`EMAIL:${esc(f.email.trim())}`);
+    lines.push('END:VCARD');
+    return lines.join('\r\n');
+  }
+
+  // ---------- UI ----------
+  const ids = ['name', 'phone', 'email', 'org'];
+  const saved = store.get('qr-contact-card', {});
+  for (const id of ids) $('#' + id).value = typeof saved[id] === 'string' ? saved[id] : '';
+
+  function render() {
+    const f = {};
+    for (const id of ids) f[id] = $('#' + id).value;
+    store.set('qr-contact-card', f);
+
+    const empty = !f.name.trim() && !f.phone.trim() && !f.email.trim();
+    $('#actions').hidden = empty && !f.org.trim();
+    if (empty) {
+      $('#qr').hidden = true;
+      $('#who').textContent = '';
+      $('#info').textContent = '';
+      $('#msg').hidden = false;
+      $('#msg').textContent = 'Type a name, phone or email.';
+      return;
+    }
+    if (f.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim())) {
+      $('#msg').hidden = false;
+      $('#msg').textContent = 'That email looks incomplete.';
+    } else {
+      $('#msg').hidden = true;
+    }
+    const text = vcard(f);
+    const bytes = new TextEncoder().encode(text);
+    const qr = encode(bytes);
+    if (!qr) {
+      $('#qr').hidden = true;
+      $('#msg').hidden = false;
+      $('#msg').textContent = 'Too long for one QR code.';
+      return;
+    }
+    $('#qr').innerHTML = toSvg(qr);
+    $('#qr').hidden = false;
+    $('#who').textContent = f.name.trim() || f.email.trim() || f.phone.trim();
+    $('#info').textContent = `vCard, ${bytes.length} bytes, ${qr.size}×${qr.size}. Scan with any phone camera to save the contact.`;
+  }
+
+  for (const id of ids) $('#' + id).addEventListener('input', render);
+
+  const toggleShow = on => {
+    document.body.classList.toggle('show', on);
+    $('#show').textContent = on ? 'Back' : 'Show to scan';
+    $('#qr').setAttribute('aria-label', on ? 'QR code, tap to go back' : 'QR code, tap to enlarge');
+  };
+  $('#qr').addEventListener('click', () => toggleShow(!document.body.classList.contains('show')));
+  $('#show').addEventListener('click', () => toggleShow(true));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') toggleShow(false); });
+  $('#clear').addEventListener('click', () => {
+    for (const id of ids) $('#' + id).value = '';
+    toggleShow(false);
+    render();
+    $('#name').focus();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

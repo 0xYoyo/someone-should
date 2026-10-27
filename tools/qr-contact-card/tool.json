@@ -1,0 +1,60 @@
+{
+  "slug": "qr-contact-card",
+  "wish": "someone should make an app that makes QR codes to swap contact info",
+  "year": 2023,
+  "agreed": 11,
+  "sources": [
+    {
+      "site": "hn",
+      "url": "https://news.ycombinator.com/item?id=35227730",
+      "date": "2023-03-20",
+      "points": 3,
+      "comments": 8
+    }
+  ],
+  "spec": "Turns your name, phone, email and company into a vCard QR code, drawn on the device as you type.\nFill in the fields once (they are remembered), tap Show to scan, and the other person points their phone camera at it to save you as a contact.\nIt does not scan codes, send anything anywhere, or keep a list of other people's contacts.",
+  "tests": [
+    {
+      "expect": {
+        "sel": "#msg",
+        "contains": "Type a name"
+      }
+    },
+    {
+      "type": {
+        "sel": "#name",
+        "text": "Ada Lovelace"
+      }
+    },
+    {
+      "type": {
+        "sel": "#phone",
+        "text": "+44 20 7946 0000"
+      }
+    },
+    {
+      "type": {
+        "sel": "#email",
+        "text": "ada@example.com"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#who",
+        "contains": "Ada Lovelace"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#info",
+        "matches": "vCard, \\d+ bytes, \\d+×\\d+"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T02:08:17Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "QR encoder (byte mode, level M, versions 1-40) is inline; output round-trip checked against jsQR for 1-2000 byte payloads."
+}
