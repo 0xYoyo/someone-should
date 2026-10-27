@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that wraps screenshots in a browser window</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+.seg { display: flex; gap: 0; }
+.seg button { flex: 1; border-radius: 0; margin-left: -1.5px; min-width: 44px; padding: 0 10px; }
+.seg button:first-child { border-radius: var(--radius) 0 0 var(--radius); margin-left: 0; }
+.seg button:last-child { border-radius: 0 var(--radius) var(--radius) 0; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.field { display: grid; gap: 6px; }
+.field > span { color: var(--meta); font-size: 16px; }
+#drop { border: 1.5px dashed var(--line); border-radius: var(--radius); padding: 12px; display: grid; gap: 10px; justify-items: center; text-align: center; }
+#drop.over { border-color: var(--ink); }
+#pick { display: inline-flex; align-items: center; justify-content: center; }
+#file { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+#preview { display: block; max-width: 100%; height: auto; max-height: 70vh; margin: 0 auto; }
+#preview[hidden] { display: none; }
+#msg { color: var(--meta); min-height: 1.45em; }
+.actions button { flex: 1; }
+.chk { background-image: linear-gradient(45deg, var(--line) 25%, transparent 25%, transparent 75%, var(--line) 75%), linear-gradient(45deg, var(--line) 25%, transparent 25%, transparent 75%, var(--line) 75%); background-size: 16px 16px; background-position: 0 0, 8px 8px; }
+
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that wraps screenshots in a browser window</h1>
+
+<main id="app" class="stack">
+  <div id="drop">
+    <img id="preview" alt="Framed screenshot" hidden>
+    <div class="row" style="justify-content:center">
+      <button id="pick" class="primary" type="button">Choose screenshot</button>
+      <button id="sample" type="button">Sample</button>
+    </div>
+    <div id="hint" class="empty" style="padding:0">or paste / drop an image here</div>
+    <input id="file" type="file" accept="image/*" tabindex="-1" aria-hidden="true">
+  </div>
+  <div class="row">
+    <div class="field" style="flex:1 1 140px"><span>Window</span>
+      <div class="seg" id="theme">
+        <button type="button" id="frame-light" data-v="light">Light</button>
+        <button type="button" id="frame-dark" data-v="dark">Dark</button>
+      </div>
+    </div>
+    <div class="field" style="flex:1 1 180px"><span>Background</span>
+      <div class="seg" id="bg">
+        <button type="button" id="bg-none" data-v="none">None</button>
+        <button type="button" id="bg-soft" data-v="soft">Soft</button>
+        <button type="button" id="bg-ink" data-v="ink">Ink</button>
+      </div>
+    </div>
+  </div>
+  <label class="field"><span>Address bar</span>
+    <input id="url" type="text" inputmode="url" autocomplete="off" spellcheck="false" placeholder="example.com">
+  </label>
+  <div class="row actions">
+    <button id="export" class="primary" type="button">Save PNG</button>
+    <button id="copy" type="button">Copy</button>
+  </div>
+  <div id="msg" role="status"></div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  // storage helper — never throws
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  const prefs = Object.assign({ theme: 'light', bg: 'soft', url: '' }, store.get('ssf.prefs', {}));
+  let shot = null;    // HTMLImageElement or canvas of the source screenshot
+  let dataUrl = '';
+  let timer = 0;
+
+  const preview = $('#preview'), msg = $('#msg'), url = $('#url');
+  const say = t => { msg.textContent = t; };
+
+  function syncButtons() {
+    $$('#theme button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === prefs.theme));
+    $$('#bg button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === prefs.bg));
+    preview.classList.toggle('chk', prefs.bg === 'none');
+  }
+
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function render() {
+    if (!shot) return;
+    const w = shot.naturalWidth || shot.width, h = shot.naturalHeight || shot.height;
+    // scale chrome with the screenshot so retina captures get a retina frame
+    const s = w >= 1800 ? 2 : w < 700 ? 0.75 : 1;
+    const bar = Math.round(40 * s), pad = Math.round(64 * s), r = Math.round(10 * s);
+    const dark = prefs.theme === 'dark';
+    const W = w + pad * 2, H = h + bar + pad * 2;
+    canvas.width = W; canvas.height = H;
+    ctx.clearRect(0, 0, W, H);
+    if (prefs.bg === 'soft') {
+      const g = ctx.createLinearGradient(0, 0, W, H);
+      g.addColorStop(0, '#e9e4d8'); g.addColorStop(1, '#cfd8dc');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    } else if (prefs.bg === 'ink') {
+      ctx.fillStyle = '#1b1b1d'; ctx.fillRect(0, 0, W, H);
+    }
+    // window with shadow
+    ctx.save();
+    ctx.shadowColor = prefs.bg === 'ink' ? 'rgba(0,0,0,.6)' : 'rgba(0,0,0,.28)';
+    ctx.shadowBlur = 40 * s; ctx.shadowOffsetY = 14 * s;
+    roundRect(pad, pad, w, h + bar, r);
+    ctx.fillStyle = dark ? '#2a2a2c' : '#ebe9e6';
+    ctx.fill();
+    ctx.restore();
+    ctx.save();
+    roundRect(pad, pad, w, h + bar, r);
+    ctx.clip();
+    ctx.fillStyle = dark ? '#2a2a2c' : '#ebe9e6';
+    ctx.fillRect(pad, pad, w, bar);
+    ctx.drawImage(shot, pad, pad + bar, w, h);
+    ctx.fillStyle = dark ? '#000' : '#cfccc6';
+    ctx.fillRect(pad, pad + bar - Math.max(1, s), w, Math.max(1, s));
+    ctx.restore();
+    // traffic lights
+    const cy = pad + bar / 2;
+    ['#ff5f57', '#febc2e', '#28c840'].forEach((c, i) => {
+      ctx.beginPath(); ctx.arc(pad + 20 * s + i * 20 * s, cy, 6 * s, 0, Math.PI * 2);
+      ctx.fillStyle = c; ctx.fill();
+    });
+    // address pill
+    const left = pad + 84 * s, right = pad + w - 20 * s;
+    const pw = Math.min(right - left, Math.max(0, w * 0.6)), px = Math.max(left, pad + (w - pw) / 2);
+    if (pw > 40 * s) {
+      const ph = 24 * s;
+      roundRect(px, cy - ph / 2, Math.min(pw, right - px), ph, 6 * s);
+      ctx.fillStyle = dark ? '#3a3a3c' : '#fff'; ctx.fill();
+      const text = prefs.url.trim();
+      if (text) {
+        ctx.font = `${13 * s}px -apple-system, "Segoe UI", Roboto, system-ui, sans-serif`;
+        ctx.fillStyle = dark ? '#d0d0d0' : '#3c3c3c';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        let t = text; const max = Math.min(pw, right - px) - 20 * s;
+        while (t.length > 1 && ctx.measureText(t).width > max) t = t.slice(0, -2) + '…';
+        ctx.fillText(t, px + Math.min(pw, right - px) / 2, cy + s);
+      }
+    }
+    dataUrl = canvas.toDataURL('image/png');
+    preview.src = dataUrl;
+    preview.hidden = false;
+    $('#hint').textContent = 'paste / drop to replace';
+    say(`${W}×${H} PNG`);
+  }
+
+  const rerender = () => { clearTimeout(timer); timer = setTimeout(render, 120); };
+
+  function loadBlob(blob) {
+    if (!blob || !/^image\//.test(blob.type)) { say('That is not an image.'); return; }
+    const fr = new FileReader();
+    fr.onload = () => {
+      const img = new Image();
+      img.onload = () => { shot = img; render(); };
+      img.onerror = () => say('Could not read that image.');
+      img.src = fr.result;
+    };
+    fr.onerror = () => say('Could not read that file.');
+    fr.readAsDataURL(blob);
+  }
+
+  function makeSample() {
+    const c = document.createElement('canvas'); c.width = 1200; c.height = 750;
+    const x = c.getContext('2d');
+    x.fillStyle = '#fafafa'; x.fillRect(0, 0, 1200, 750);
+    x.fillStyle = '#141414'; x.fillRect(0, 0, 1200, 64);
+    x.fillStyle = '#e4e1da'; x.fillRect(80, 120, 620, 48); x.fillRect(80, 190, 480, 24); x.fillRect(80, 230, 540, 24);
+    x.fillStyle = '#c8321e'; x.fillRect(80, 290, 180, 52);
+    [0, 1, 2].forEach(i => { x.fillStyle = '#ece9e2'; x.fillRect(80 + i * 360, 420, 320, 240); });
+    return c;
+  }
+
+  $('#pick').addEventListener('click', () => $('#file').click());
+  $('#file').addEventListener('change', e => { loadBlob(e.target.files[0]); e.target.value = ''; });
+  $('#sample').addEventListener('click', () => { shot = makeSample(); render(); });
+
+  const drop = $('#drop');
+  drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
+  drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+  drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); loadBlob(e.dataTransfer.files[0]); });
+  document.addEventListener('paste', e => {
+    const item = [...(e.clipboardData?.items || [])].find(i => i.type.startsWith('image/'));
+    if (item) { e.preventDefault(); loadBlob(item.getAsFile()); }
+  });
+
+  $('#theme').addEventListener('click', e => {
+    const v = e.target.closest('button')?.dataset.v; if (!v) return;
+    prefs.theme = v; store.set('ssf.prefs', prefs); syncButtons(); render();
+  });
+  $('#bg').addEventListener('click', e => {
+    const v = e.target.closest('button')?.dataset.v; if (!v) return;
+    prefs.bg = v; store.set('ssf.prefs', prefs); syncButtons(); render();
+  });
+  url.value = prefs.url;
+  url.addEventListener('input', () => { prefs.url = url.value; store.set('ssf.prefs', prefs); rerender(); });
+
+  $('#export').addEventListener('click', () => {
+    if (!shot) { say('Choose a screenshot first.'); return; }
+    clearTimeout(timer); render();
+    const a = document.createElement('a');
+    a.href = dataUrl; a.download = 'framed-screenshot.png';
+    document.body.appendChild(a); a.click(); a.remove();
+    say(`Saved framed-screenshot.png, ${canvas.width}×${canvas.height}. On a phone, long-press the image to save.`);
+  });
+
+  $('#copy').addEventListener('click', () => {
+    if (!shot) { say('Choose a screenshot first.'); return; }
+    clearTimeout(timer); render();
+    if (!navigator.clipboard || !window.ClipboardItem) { say('Copy is not supported here. Use Save PNG.'); return; }
+    canvas.toBlob(b => {
+      navigator.clipboard.write([new ClipboardItem({ 'image/png': b })])
+        .then(() => say('Copied to clipboard.'))
+        .catch(() => say('Copy was blocked. Use Save PNG.'));
+    }, 'image/png');
+  });
+
+  syncButtons();
+})();
+</script>
+</body>
+</html>
