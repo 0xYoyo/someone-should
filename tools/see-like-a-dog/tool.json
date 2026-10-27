@@ -1,0 +1,45 @@
+{
+ "slug": "see-like-a-dog",
+ "wish": "someone should make an app that shows what the camera sees the way a dog sees it",
+ "year": 2021,
+ "agreed": 62,
+ "sources": [
+  {
+   "site": "reddit",
+   "url": "https://www.reddit.com/r/Lightbulb/comments/ol6uf7/",
+   "date": "2021-07-16",
+   "points": 55,
+   "comments": 7
+  }
+ ],
+ "spec": "Shows the camera or a chosen photo twice: normal and as a dog sees it (two-colour blue-yellow vision, reduced detail).\nTap Use camera for live view, Choose photo for a picture, or Sample for a built-in scene; Dog only hides the normal view.\nIt does not model dog night vision, motion sensitivity or field of view, and sends nothing anywhere.",
+ "tests": [
+  {
+   "expect": {
+    "sel": "#status",
+    "contains": "sample"
+   }
+  },
+  {
+   "tap": "#view"
+  },
+  {
+   "expect": {
+    "sel": "#status",
+    "contains": "dog only"
+   }
+  },
+  {
+   "expect": {
+    "sel": "#dog",
+    "visible": true
+   }
+  }
+ ],
+ "status": "pending",
+ "built": "2026-10-27T11:18:47Z",
+ "model": "sonnet-5.5",
+ "minutes": 5,
+ "approved": false,
+ "notes": "Camera and photo need browser permission/file; the sample scene is shown by default."
+}

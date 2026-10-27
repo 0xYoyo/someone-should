@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app that quizzes you on the titles of your own songs</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+.q { font-size: 24px; line-height: 1.3; font-weight: 500; margin: 4px 0; overflow-wrap: anywhere; }
+.mask { font: 22px/1.4 var(--mono); letter-spacing: 0.08em; overflow-wrap: anywhere; }
+.small { font: 16px/1.4 var(--mono); color: var(--meta); }
+.choices { display: grid; gap: 10px; }
+.choices button { text-align: left; padding: 10px 14px; height: auto; overflow-wrap: anywhere; }
+.choices button.right { border-color: var(--built); color: var(--built); }
+.choices button.wrong { border-color: var(--no); color: var(--no); }
+.tabs button { flex: 1; }
+.tabs button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.fb { min-height: 28px; font-weight: 500; }
+textarea { min-height: 160px; font: 16px/1.4 var(--mono); }
+details summary { min-height: var(--tap); display: flex; align-items: center; cursor: pointer; }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make an app that quizzes you on the titles of your own songs</h1>
+
+<main id="app" class="stack">
+  <div class="row tabs" role="group" aria-label="mode">
+    <button id="m-pick" aria-pressed="true">pick</button>
+    <button id="m-type" aria-pressed="false">type</button>
+  </div>
+  <div class="small"><span id="qn">question 1</span> &middot; score <span id="score">0 / 0</span></div>
+  <div>
+    <div class="small" id="label">artist</div>
+    <div class="q" id="clue"></div>
+    <div class="mask" id="mask"></div>
+  </div>
+  <div class="choices" id="choices"></div>
+  <form id="typeform" class="stack" hidden>
+    <input id="guess" type="text" autocomplete="off" autocapitalize="off" aria-label="title">
+    <button id="check" class="primary" type="submit">check</button>
+  </form>
+  <div class="fb" id="fb" aria-live="polite"></div>
+  <button id="next" class="primary" hidden>next</button>
+
+  <details id="listbox">
+    <summary><span id="count"></span></summary>
+    <div class="stack">
+      <textarea id="list" spellcheck="false" aria-label="song list"></textarea>
+      <div class="small">one per line: title - artist</div>
+      <button id="save">save list</button>
+      <div class="small" id="err"></div>
+    </div>
+  </details>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const SAMPLE = [
+    'Yesterday - The Beatles', 'Bohemian Rhapsody - Queen', 'Hey Jude - The Beatles',
+    'Billie Jean - Michael Jackson', 'Purple Rain - Prince', 'Imagine - John Lennon',
+    'Hotel California - Eagles', 'Wonderwall - Oasis', 'Smells Like Teen Spirit - Nirvana'
+  ].join('\n');
+
+  let songs = [];
+  let cur = null, answered = false;
+  let mode = store.get('nsq-mode', 'pick');
+  let right = 0, total = 0, qn = 1;
+
+  // "Title - Artist", also accepts en/em dash or tab; artist optional
+  function parse(text) {
+    const seen = new Set(), out = [];
+    text.split(/\r?\n/).forEach(line => {
+      line = line.trim();
+      if (!line) return;
+      const m = line.split(/\s+[-\u2013\u2014]\s+|\t/);
+      const title = m[0].trim();
+      const artist = m.slice(1).join(' - ').trim();
+      const key = title.toLowerCase();
+      if (!title || seen.has(key)) return;
+      seen.add(key);
+      out.push({ title, artist });
+    });
+    return out;
+  }
+
+  const norm = s => s.toLowerCase().replace(/[^\p{L}\p{N} ]/gu, '').replace(/\s+/g, ' ').trim();
+  const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  // first letter of each word, the rest as underscores
+  const mask = t => t.split(' ').map(w => w[0] + '_'.repeat(Math.max(0, w.length - 1))).join('  ');
+
+  function updateCount() {
+    $('#count').textContent = songs.length + (songs.length === 1 ? ' song' : ' songs') + ' - edit list';
+  }
+
+  function next() {
+    answered = false;
+    $('#fb').textContent = ''; $('#fb').className = 'fb';
+    $('#next').hidden = true;
+    $('#qn').textContent = 'question ' + qn;
+    if (songs.length < 2) {
+      cur = null;
+      $('#clue').textContent = 'add at least two songs below';
+      $('#mask').textContent = ''; $('#label').textContent = '';
+      $('#choices').innerHTML = ''; $('#typeform').hidden = true;
+      $('#listbox').open = true;
+      return;
+    }
+    let pick;
+    do { pick = songs[Math.floor(Math.random() * songs.length)]; } while (songs.length > 1 && cur && pick === cur);
+    cur = pick;
+    // with an artist: show the artist; without: show the masked title
+    if (cur.artist) {
+      $('#label').textContent = 'artist';
+      $('#clue').textContent = cur.artist;
+      $('#mask').textContent = mask(cur.title);
+    } else {
+      $('#label').textContent = 'title';
+      $('#clue').textContent = '';
+      $('#mask').textContent = mask(cur.title);
+    }
+    renderInput();
+  }
+
+  function renderInput() {
+    $('#m-pick').setAttribute('aria-pressed', mode === 'pick');
+    $('#m-type').setAttribute('aria-pressed', mode === 'type');
+    const box = $('#choices');
+    box.innerHTML = '';
+    $('#typeform').hidden = mode !== 'type';
+    if (!cur) return;
+    if (mode === 'pick') {
+      const others = shuffle(songs.filter(s => s !== cur)).slice(0, 3);
+      shuffle([cur, ...others]).forEach(s => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.textContent = s.title;
+        b.addEventListener('click', () => answer(s === cur, b));
+        box.appendChild(b);
+      });
+    } else {
+      $('#guess').value = '';
+      $('#guess').disabled = false;
+      $('#check').disabled = false;
+    }
+  }
+
+  function answer(ok, btn) {
+    if (answered || !cur) return;
+    answered = true;
+    total++; if (ok) right++;
+    $('#score').textContent = right + ' / ' + total;
+    $('#fb').textContent = ok ? 'right' : 'it was ' + cur.title;
+    $('#fb').className = 'fb ' + (ok ? 'built' : 'no');
+    if (mode === 'pick') {
+      [...$('#choices').children].forEach(b => {
+        if (b.textContent === cur.title) b.classList.add('right');
+        else if (b === btn) b.classList.add('wrong');
+        b.disabled = true;
+      });
+    } else {
+      $('#guess').disabled = true; $('#check').disabled = true;
+    }
+    qn++;
+    $('#next').hidden = false;
+    $('#next').focus();
+  }
+
+  $('#typeform').addEventListener('submit', e => {
+    e.preventDefault();
+    if (answered || !cur) return;
+    const g = norm($('#guess').value);
+    if (!g) return;
+    answer(g === norm(cur.title), null);
+  });
+  $('#next').addEventListener('click', next);
+  $('#m-pick').addEventListener('click', () => setMode('pick'));
+  $('#m-type').addEventListener('click', () => setMode('type'));
+  function setMode(m) {
+    mode = m; store.set('nsq-mode', m);
+    if (!answered) renderInput(); else { $('#m-pick').setAttribute('aria-pressed', m === 'pick'); $('#m-type').setAttribute('aria-pressed', m === 'type'); }
+  }
+
+  $('#save').addEventListener('click', () => {
+    const list = parse($('#list').value);
+    if (list.length < 2) { $('#err').textContent = 'need at least two songs'; return; }
+    $('#err').textContent = '';
+    songs = list;
+    store.set('nsq-list', $('#list').value);
+    right = 0; total = 0; qn = 1; cur = null;
+    $('#score').textContent = '0 / 0';
+    updateCount();
+    next();
+  });
+
+  const saved = store.get('nsq-list', null);
+  $('#list').value = typeof saved === 'string' && saved.trim() ? saved : SAMPLE;
+  songs = parse($('#list').value);
+  if (songs.length < 2) { $('#list').value = SAMPLE; songs = parse(SAMPLE); }
+  updateCount();
+  next();
+})();
+</script>
+</body>
+</html>

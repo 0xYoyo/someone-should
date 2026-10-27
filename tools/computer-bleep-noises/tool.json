@@ -1,0 +1,58 @@
+{
+ "slug": "computer-bleep-noises",
+ "wish": "someone should make an app that makes computer bleeping noises when you do things",
+ "year": 2010,
+ "agreed": 59,
+ "sources": [
+  {
+   "site": "reddit",
+   "url": "https://www.reddit.com/r/SomebodyMakeThis/comments/bxm8j/",
+   "date": "2010-04-29",
+   "points": 21,
+   "comments": 10
+  },
+  {
+   "site": "reddit",
+   "url": "https://www.reddit.com/r/SomebodyMakeThis/comments/cklwd/",
+   "date": "2010-06-30",
+   "points": 9,
+   "comments": 19
+  }
+ ],
+ "spec": "Plays short synthesized retro bleeps on every tap, key press and toggle.\nTap the pads, type in the field or flip the checkbox; pick one of four sound sets and set the volume.\nIt only reacts inside its own page and does not play sound for other apps.",
+ "tests": [
+  {
+   "tap": ".pad"
+  },
+  {
+   "wait": 100
+  },
+  {
+   "expect": {
+    "sel": "#count",
+    "matches": "^1$"
+   }
+  },
+  {
+   "type": {
+    "sel": "#field",
+    "text": "hi"
+   }
+  },
+  {
+   "expect": {
+    "sel": "#count",
+    "matches": "^[2-9]"
+   }
+  },
+  {
+   "tap": "[data-set=scifi]"
+  }
+ ],
+ "status": "pending",
+ "built": "2026-10-27T11:18:41Z",
+ "model": "sonnet-5.5",
+ "minutes": 5,
+ "approved": false,
+ "notes": "Works only within this page; browsers do not allow a web page to make sound on actions in other apps."
+}

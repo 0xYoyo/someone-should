@@ -1,0 +1,57 @@
+{
+ "slug": "walk-to-mordor-tracker",
+ "wish": "someone should make an app that charts your walking miles on a map of Frodo's journey",
+ "year": 2021,
+ "agreed": 63,
+ "sources": [
+  {
+   "site": "reddit",
+   "url": "https://www.reddit.com/r/AppIdeas/comments/ml9s6x/",
+   "date": "2021-04-06",
+   "points": 45,
+   "comments": 18
+  }
+ ],
+ "spec": "Charts walking miles along a drawn 1,800-mile route with nine named stops.\nType miles walked and tap add; the marker moves and the next stop shows.\nIt does not sync, import step counts, or use a real map.",
+ "tests": [
+  {
+   "expect": {
+    "sel": "#total",
+    "matches": "\\d+ mi"
+   }
+  },
+  {
+   "type": {
+    "sel": "#miles",
+    "text": "200"
+   }
+  },
+  {
+   "tap": "#add"
+  },
+  {
+   "expect": {
+    "sel": "#total",
+    "contains": "200"
+   }
+  },
+  {
+   "expect": {
+    "sel": "#ms li:nth-child(2)",
+    "contains": "Old forest"
+   }
+  },
+  {
+   "expect": {
+    "sel": "#status",
+    "contains": "to"
+   }
+  }
+ ],
+ "status": "pending",
+ "built": "2026-10-27T11:20:00Z",
+ "model": "sonnet-5.5",
+ "minutes": 3,
+ "approved": false,
+ "notes": "Title uses a generic phrase in place of the character name; route is abstract with plain place labels."
+}

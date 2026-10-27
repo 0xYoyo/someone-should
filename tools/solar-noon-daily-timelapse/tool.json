@@ -1,0 +1,54 @@
+{
+ "slug": "solar-noon-daily-timelapse",
+ "wish": "someone should make an app that takes one picture a day facing south at solar noon and makes a time-lapse",
+ "year": 2016,
+ "agreed": 63,
+ "sources": [
+  {
+   "site": "reddit",
+   "url": "https://www.reddit.com/r/Lightbulb/comments/46t1ex/",
+   "date": "2016-02-21",
+   "points": 52,
+   "comments": 11
+  }
+ ],
+ "spec": "Shows today's solar noon from your longitude (or location, or time zone as an estimate).\nTap start camera, face south, take the day's photo; the previous day shows as a faint ghost for alignment.\nPlays saved days back as a time-lapse. Frames stay on the device; no reminders or cloud backup.",
+ "tests": [
+  {
+   "type": {
+    "sel": "#lon",
+    "text": "35.2"
+   }
+  },
+  {
+   "expect": {
+    "sel": "#noon",
+    "matches": "^\\d\\d:\\d\\d$"
+   }
+  },
+  {
+   "type": {
+    "sel": "#lat",
+    "text": "-33"
+   }
+  },
+  {
+   "expect": {
+    "sel": "#dir",
+    "contains": "north"
+   }
+  },
+  {
+   "expect": {
+    "sel": "#count",
+    "contains": "0 frames"
+   }
+  }
+ ],
+ "status": "pending",
+ "built": "2026-10-27T11:20:00Z",
+ "model": "sonnet-5.5",
+ "minutes": 4,
+ "approved": false,
+ "notes": "Solar noon is computed offline from longitude with an equation-of-time approximation. Photos stored in localStorage at 480px max; oldest dropped if storage fills."
+}

@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app that shows what the camera sees the way a dog sees it</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+.views { display: grid; grid-template-columns: 1fr; gap: 12px; }
+@media (min-width: 560px) { .views { grid-template-columns: 1fr 1fr; } }
+.views.one { grid-template-columns: 1fr; }
+.views.one figure.normal { display: none; }
+figure { margin: 0; }
+canvas { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; border: 1.5px solid var(--line); border-radius: var(--radius); background: var(--line); }
+figcaption { margin-top: 6px; }
+label.btn { display: inline-flex; align-items: center; min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); border-radius: var(--radius); cursor: pointer; }
+label.btn:focus-within { outline: 2px solid var(--ink); outline-offset: 2px; }
+#file { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+#cam { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+#status { min-height: 24px; }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make an app that shows what the camera sees the way a dog sees it</h1>
+
+<main id="app" class="stack">
+  <div class="views" id="views">
+    <figure class="normal"><canvas id="normal" width="256" height="192"></canvas><figcaption class="meta">human</figcaption></figure>
+    <figure class="dog"><canvas id="dog" width="256" height="192"></canvas><figcaption class="meta">dog</figcaption></figure>
+  </div>
+  <div class="row">
+    <button id="camBtn" class="primary">Use camera</button>
+    <label class="btn" for="file">Choose photo</label>
+    <input id="file" type="file" accept="image/*">
+    <button id="sample">Sample</button>
+    <button id="view">Dog only</button>
+  </div>
+  <p id="status" class="meta">sample scene</p>
+  <video id="cam" playsinline muted></video>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (s, r = document) => r.querySelector(s);
+  const W = 256, H = 192, SW = 64, SH = 48; // dogs see less detail: process at 1/4 resolution
+  const normal = $('#normal'), dog = $('#dog');
+  const nctx = normal.getContext('2d'), dctx = dog.getContext('2d');
+  const small = document.createElement('canvas');
+  small.width = SW; small.height = SH;
+  const sctx = small.getContext('2d', { willReadFrequently: true });
+  const status = $('#status'), video = $('#cam');
+  let stream = null, raf = 0;
+
+  // sRGB <-> linear lookup tables
+  const toLin = new Float32Array(256);
+  for (let i = 0; i < 256; i++) { const c = i / 255; toLin[i] = c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); }
+  const toSrgb = v => {
+    v = v < 0 ? 0 : v > 1 ? 1 : v;
+    return Math.round(255 * (v <= 0.0031308 ? v * 12.92 : 1.055 * Math.pow(v, 1 / 2.4) - 0.055));
+  };
+
+  // Dogs have two cone types (blue-violet and yellow): red and green merge into yellowish tones.
+  // Deuteranopia matrix (Machado et al. 2009) applied in linear RGB.
+  function dogFilter() {
+    const img = sctx.getImageData(0, 0, SW, SH), d = img.data;
+    for (let i = 0; i < d.length; i += 4) {
+      const r = toLin[d[i]], g = toLin[d[i + 1]], b = toLin[d[i + 2]];
+      d[i]     = toSrgb(0.367 * r + 0.861 * g - 0.228 * b);
+      d[i + 1] = toSrgb(0.280 * r + 0.673 * g + 0.047 * b);
+      d[i + 2] = toSrgb(-0.012 * r + 0.043 * g + 0.969 * b);
+    }
+    sctx.putImageData(img, 0, 0);
+  }
+
+  // Draw any source into the normal canvas (cover crop), then the dog view from it.
+  function render(src, sw, sh) {
+    const k = Math.max(W / sw, H / sh), w = sw * k, h = sh * k;
+    nctx.drawImage(src, (W - w) / 2, (H - h) / 2, w, h);
+    sctx.imageSmoothingEnabled = true;
+    sctx.drawImage(normal, 0, 0, SW, SH);
+    dogFilter();
+    dctx.imageSmoothingEnabled = true;
+    dctx.imageSmoothingQuality = 'high';
+    dctx.drawImage(small, 0, 0, W, H);
+  }
+
+  // Built-in scene so the first frame already shows the effect.
+  function drawSample() {
+    const c = document.createElement('canvas'); c.width = W; c.height = H;
+    const x = c.getContext('2d');
+    x.fillStyle = '#7ec8f0'; x.fillRect(0, 0, W, 100);
+    x.fillStyle = '#ffffff'; x.beginPath(); x.arc(60, 36, 16, 0, 7); x.arc(78, 40, 14, 0, 7); x.arc(44, 42, 12, 0, 7); x.fill();
+    x.fillStyle = '#3f9b3a'; x.fillRect(0, 100, W, 92);
+    x.fillStyle = '#2f7d2c'; for (let i = 0; i < 40; i++) x.fillRect((i * 37) % W, 104 + (i * 23) % 84, 3, 10);
+    x.fillStyle = '#d8402a'; x.beginPath(); x.arc(180, 150, 22, 0, 7); x.fill();
+    x.fillStyle = '#f08a1c'; for (const [a, b] of [[40, 140], [70, 165], [100, 130], [220, 120]]) { x.beginPath(); x.arc(a, b, 9, 0, 7); x.fill(); }
+    x.fillStyle = '#2a58c8'; x.fillRect(120, 60, 30, 40); x.fillStyle = '#e8d020'; x.fillRect(150, 60, 30, 40);
+    x.fillStyle = '#f4f1ea'; x.fillRect(128, 110, 4, 6);
+    return c;
+  }
+
+  function stopCamera() {
+    cancelAnimationFrame(raf);
+    if (stream) stream.getTracks().forEach(t => t.stop());
+    stream = null; video.srcObject = null;
+    $('#camBtn').textContent = 'Use camera';
+  }
+
+  function show(src, sw, sh, msg) {
+    stopCamera();
+    render(src, sw, sh);
+    status.textContent = msg;
+  }
+
+  function loop() {
+    if (!stream) return;
+    if (video.videoWidth) render(video, video.videoWidth, video.videoHeight);
+    raf = requestAnimationFrame(loop);
+  }
+
+  async function startCamera() {
+    if (stream) { stopCamera(); status.textContent = 'camera stopped'; return; }
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      status.textContent = 'no camera here, choose a photo instead'; return;
+    }
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+      video.srcObject = stream;
+      await video.play();
+      $('#camBtn').textContent = 'Stop camera';
+      status.textContent = 'live camera';
+      loop();
+    } catch (e) {
+      stopCamera();
+      status.textContent = 'camera blocked, choose a photo instead';
+    }
+  }
+
+  $('#camBtn').addEventListener('click', startCamera);
+  $('#sample').addEventListener('click', () => { const c = drawSample(); show(c, W, H, 'sample scene'); });
+  $('#view').addEventListener('click', () => {
+    const one = $('#views').classList.toggle('one');
+    $('#view').textContent = one ? 'Both' : 'Dog only';
+    status.textContent = one ? 'dog only' : 'both views';
+  });
+  $('#file').addEventListener('change', async e => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    try {
+      const bmp = await createImageBitmap(f);
+      show(bmp, bmp.width, bmp.height, 'your photo');
+    } catch (err) {
+      status.textContent = 'could not read that file';
+    }
+  });
+
+  const s = drawSample(); render(s, W, H);
+})();
+</script>
+</body>
+</html>

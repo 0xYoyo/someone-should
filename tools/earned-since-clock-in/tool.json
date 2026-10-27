@@ -1,0 +1,54 @@
+{
+ "slug": "earned-since-clock-in",
+ "wish": "someone should make an app where you enter your hourly pay and see what you have made since clocking in",
+ "year": 2022,
+ "agreed": 62,
+ "sources": [
+  {
+   "site": "reddit",
+   "url": "https://www.reddit.com/r/AppIdeas/comments/y5u2pp/",
+   "date": "2022-10-16",
+   "points": 33,
+   "comments": 29
+  }
+ ],
+ "spec": "Shows what you have earned this shift from your hourly pay, counting up live.\nType hourly pay, optionally minutes already worked, tap Clock in; the shift survives reloads until you clock out.\nIt does not handle breaks, overtime rates, tax or multiple jobs.",
+ "tests": [
+  {
+   "type": {
+    "sel": "#rate",
+    "text": "30"
+   }
+  },
+  {
+   "type": {
+    "sel": "#ago",
+    "text": "60"
+   }
+  },
+  {
+   "tap": "#start"
+  },
+  {
+   "wait": 600
+  },
+  {
+   "expect": {
+    "sel": "#earned",
+    "matches": "^30\\.0\\d$"
+   }
+  },
+  {
+   "expect": {
+    "sel": "#elapsed",
+    "matches": "^1:00:0\\d$"
+   }
+  }
+ ],
+ "status": "pending",
+ "built": "2026-10-27T11:18:52Z",
+ "model": "sonnet-5.5",
+ "minutes": 6,
+ "approved": false,
+ "notes": ""
+}

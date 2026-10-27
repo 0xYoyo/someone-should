@@ -1,0 +1,51 @@
+{
+ "slug": "name-that-song-quiz",
+ "wish": "someone should make an app that quizzes you on the titles of your own songs",
+ "year": 2016,
+ "agreed": 58,
+ "sources": [
+  {
+   "site": "reddit",
+   "url": "https://www.reddit.com/r/Lightbulb/comments/4clvy4/",
+   "date": "2016-03-30",
+   "points": 51,
+   "comments": 7
+  }
+ ],
+ "spec": "Quizzes you on the titles of a song list you type or paste, one per line as title - artist.\nYou get the artist and the initials of the title, then pick from four titles or type it; a score is kept.\nIt does not play audio, bundle any songs or lyrics, or send anything anywhere.",
+ "tests": [
+  {
+   "tap": "#choices button"
+  },
+  {
+   "expect": {
+    "sel": "#score",
+    "matches": "\\d / 1"
+   }
+  },
+  {
+   "tap": "#next"
+  },
+  {
+   "expect": {
+    "sel": "#qn",
+    "contains": "question 2"
+   }
+  },
+  {
+   "tap": "#m-type"
+  },
+  {
+   "expect": {
+    "sel": "#guess",
+    "visible": true
+   }
+  }
+ ],
+ "status": "pending",
+ "built": "2026-10-27T11:18:47Z",
+ "model": "sonnet-5.5",
+ "minutes": 6,
+ "approved": false,
+ "notes": "Offline version: no audio playback; the player supplies their own list of titles."
+}
