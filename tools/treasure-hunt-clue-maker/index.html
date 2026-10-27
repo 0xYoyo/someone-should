@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that generates treasure hunts</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+main { max-width: 640px; }
+label { display: grid; gap: 4px; }
+label span { font: 15px/1.3 var(--mono); color: var(--meta); }
+.row > * { flex: 1 1 auto; }
+.row > button { flex: 0 0 auto; }
+#stops li { align-items: flex-start; }
+.stop-text { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.stop-text small { display: block; font-size: 15px; color: var(--meta); }
+.ctrls { display: flex; gap: 6px; flex: 0 0 auto; }
+.ctrls button { min-width: var(--tap); padding: 0 8px; }
+#cards { display: grid; gap: 12px; }
+.card { border: 1.5px dashed var(--ink); border-radius: var(--radius); padding: 14px 16px; break-inside: avoid; page-break-inside: avoid; }
+.card .where { font: 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 8px; }
+.card .clue { font-size: 21px; line-height: 1.35; margin: 0; overflow-wrap: anywhere; }
+.card .num { font: 500 15px/1 var(--mono); float: right; color: var(--meta); }
+#play { border-top: 1px solid var(--line); padding-top: 16px; }
+#msg { min-height: 1.45em; margin: 0; }
+h2 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 8px 0 0; }
+@media print {
+  body { padding: 0; background: #fff; color: #000; }
+  h1, .noprint { display: none !important; }
+  #cards { grid-template-columns: 1fr 1fr; gap: 8mm; }
+  .card { border-color: #000; min-height: 60mm; }
+}
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that generates treasure hunts</h1>
+
+<main id="app" class="stack">
+  <form id="form" class="stack noprint" autocomplete="off">
+    <label><span>next hiding place</span><input id="place" maxlength="60" placeholder="fridge, under the sofa, mailbox…"></label>
+    <label><span>clue for it (blank = one is written for you)</span><input id="hint" maxlength="160" placeholder="optional"></label>
+    <div class="row"><button id="add" class="primary" type="submit">Add stop</button><button id="clear" type="button">Clear all</button></div>
+    <p id="err" class="no" hidden></p>
+  </form>
+
+  <ul id="stops" class="plain noprint"></ul>
+  <p id="empty" class="empty">Add the hiding places in the order they should be found. The treasure goes at the last one.</p>
+
+  <h2 id="cards-title" class="noprint" hidden>clue cards — print, cut, hide each one where it says</h2>
+  <div id="cards"></div>
+  <div class="row noprint" id="actions" hidden><button id="print" type="button">Print cards</button><button id="start" type="button">Play on this phone</button></div>
+
+  <section id="play" class="stack noprint" hidden>
+    <p id="pclue" class="clue" style="font-size:21px;margin:0"></p>
+    <div class="row"><input id="guess" placeholder="where is it?" aria-label="your answer"><button id="check" class="primary" type="button">Check</button></div>
+    <p id="msg"></p>
+    <div class="row"><button id="giveup" type="button">Show answer</button><button id="stop" type="button">Stop</button></div>
+  </section>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const KEY = 'treasure-hunt-clue-maker:stops';
+
+  // Riddles for common hiding places. First keyword match wins.
+  const RIDDLES = [
+    [['fridge', 'refrigerator'], 'I hum all day and keep things cold. Open my door and look inside.'],
+    [['freezer'], 'Colder than winter, full of ice. Your next clue is chilling in me.'],
+    [['oven'], 'I get very hot when something is baking, but right now I am cool. Look inside.'],
+    [['microwave'], 'I spin your food and go beep when I am done.'],
+    [['washing machine', 'washer'], 'Dirty clothes go in, clean clothes come out. Look inside my round door.'],
+    [['dryer'], 'Wet clothes tumble in me until they are warm and dry.'],
+    [['dishwasher'], 'I clean the plates so you do not have to.'],
+    [['sink'], 'I have a tap but I am not a dancer. Look under me.'],
+    [['bath', 'tub'], 'Fill me with water and bubbles, then climb in.'],
+    [['shower'], 'I rain indoors, but only when you turn me on.'],
+    [['toilet'], 'Everyone sits on me, but nobody stays long.'],
+    [['mirror'], 'Look at me and you will see yourself.'],
+    [['sofa', 'couch'], 'I have cushions and arms but no hands. Look under my cushions.'],
+    [['bed'], 'You sleep on me every night. Check under the pillow.'],
+    [['pillow'], 'Soft and fluffy, I hold your head while you dream.'],
+    [['tv', 'television'], 'I have lots of channels but I am not a river.'],
+    [['bookshelf', 'bookcase', 'book'], 'I am full of stories but I cannot speak. Look between the pages.'],
+    [['piano'], 'I have keys but open no locks.'],
+    [['clock'], 'I have hands and a face, and I tell you when it is time to go.'],
+    [['shoe'], 'I have a tongue but cannot talk. Look where your feet go.'],
+    [['boot'], 'Muddy days are what I am made for. Look inside me.'],
+    [['coat', 'jacket'], 'I keep you warm when you go out. Check my pockets.'],
+    [['drawer'], 'Pull me out and look inside, then push me back in.'],
+    [['closet', 'wardrobe', 'cupboard'], 'Open my doors and you will find what hangs inside.'],
+    [['door'], 'I open and close all day long. Look behind me.'],
+    [['window'], 'I let in light but keep out the rain.'],
+    [['plant', 'pot', 'flower'], 'I am green and grow in a pot. Look around my roots.'],
+    [['tree'], 'I have bark but I do not bite.'],
+    [['mailbox', 'letterbox', 'post box'], 'Letters come to me every day.'],
+    [['car'], 'I have four wheels and take you places.'],
+    [['bike', 'bicycle'], 'Two wheels, two pedals, one bell.'],
+    [['garage'], 'The car sleeps here at night.'],
+    [['trash', 'bin', 'garbage'], 'Everything you throw away ends up in me.'],
+    [['stairs', 'staircase', 'step'], 'Go up me or down me, one step at a time.'],
+    [['rug', 'mat', 'doormat', 'carpet'], 'You walk on me every day. Look underneath.'],
+    [['lamp', 'light'], 'Switch me on when it gets dark.'],
+    [['table'], 'You eat your dinner on me. Look underneath.'],
+    [['chair'], 'I have four legs but I cannot walk. Look under my seat.'],
+    [['desk'], 'Homework gets done on top of me.'],
+    [['bag', 'backpack', 'schoolbag'], 'I carry your things to school and back.'],
+    [['toy box', 'toybox', 'toys'], 'All your toys go to sleep in me.'],
+    [['kettle'], 'I whistle or click when the water is ready.'],
+    [['toaster'], 'Bread goes in, toast pops up.'],
+    [['sandbox', 'sandpit'], 'Dig in me and build a castle.'],
+    [['swing'], 'Sit on me and fly back and forth.'],
+    [['fence'], 'I stand around the garden to keep things in.'],
+    [['dog bed', 'kennel'], 'The dog sleeps here.'],
+    [['umbrella'], 'Open me when it rains.'],
+    [['fireplace'], 'In winter a fire crackles inside me.'],
+    [['computer', 'laptop'], 'I have a keyboard and a mouse but no cheese.']
+  ];
+
+  function scramble(word) {
+    const letters = word.toUpperCase().replace(/[^A-Z]/g, '').split('');
+    if (letters.length < 3) return word.toUpperCase();
+    const orig = letters.join('');
+    let seed = [...orig].reduce((a, c) => a * 31 + c.charCodeAt(0) >>> 0, 7);
+    for (let tries = 0; tries < 5; tries++) {
+      for (let i = letters.length - 1; i > 0; i--) {
+        seed = (seed * 1103515245 + 12345) >>> 0;
+        const j = seed % (i + 1);
+        [letters[i], letters[j]] = [letters[j], letters[i]];
+      }
+      if (letters.join('') !== orig) break;
+    }
+    return letters.join('');
+  }
+
+  function autoClue(place) {
+    const p = place.toLowerCase();
+    for (const [keys, riddle] of RIDDLES) {
+      if (keys.some(k => new RegExp('\\b' + k + 's?\\b').test(p))) return riddle;
+    }
+    const words = place.split(/\s+/).filter(Boolean);
+    const main = words.reduce((a, b) => (b.replace(/[^a-z]/gi, '').length > a.replace(/[^a-z]/gi, '').length ? b : a), '');
+    return 'Unscramble this to find where to look: ' + scramble(main) +
+      (words.length > 1 ? ' (' + place.replace(main, '_'.repeat(Math.max(3, main.replace(/[^a-z]/gi, '').length))) + ')' : '');
+  }
+
+  let stops = store.get(KEY, []);
+  if (!Array.isArray(stops)) stops = [];
+  const save = () => store.set(KEY, stops);
+  const clueFor = s => s.hint || autoClue(s.place);
+
+  function el(tag, attrs = {}, text) {
+    const e = document.createElement(tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  function render() {
+    const ul = $('#stops');
+    ul.textContent = '';
+    stops.forEach((s, i) => {
+      const li = el('li');
+      const t = el('div', { class: 'stop-text' }, (i + 1) + '. ' + s.place + (i === stops.length - 1 ? ' (treasure)' : ''));
+      t.appendChild(el('small', {}, clueFor(s)));
+      const c = el('div', { class: 'ctrls' });
+      [['up', '↑', 'move up'], ['down', '↓', 'move down'], ['del', '×', 'remove']].forEach(([act, sym, lab]) => {
+        const b = el('button', { type: 'button', 'data-act': act, 'data-i': i, 'aria-label': lab + ' ' + s.place }, sym);
+        c.appendChild(b);
+      });
+      li.append(t, c);
+      ul.appendChild(li);
+    });
+    $('#empty').hidden = stops.length > 0;
+
+    const cards = $('#cards');
+    cards.textContent = '';
+    stops.forEach((s, i) => {
+      const card = el('div', { class: 'card', id: 'card-' + (i + 1) });
+      card.appendChild(el('span', { class: 'num' }, (i + 1) + '/' + stops.length));
+      card.appendChild(el('p', { class: 'where' }, i === 0 ? 'Give this one to the players' : 'Hide at: ' + stops[i - 1].place));
+      card.appendChild(el('p', { class: 'clue' }, clueFor(s)));
+      cards.appendChild(card);
+    });
+    const any = stops.length > 0;
+    $('#cards-title').hidden = !any;
+    $('#actions').hidden = !any;
+    if (!any) $('#play').hidden = true;
+  }
+
+  function showErr(t) { const e = $('#err'); e.textContent = t; e.hidden = !t; }
+
+  $('#form').addEventListener('submit', e => {
+    e.preventDefault();
+    const place = $('#place').value.trim();
+    if (!place) { showErr('Type a hiding place first.'); $('#place').focus(); return; }
+    showErr('');
+    stops.push({ place, hint: $('#hint').value.trim() });
+    $('#place').value = '';
+    $('#hint').value = '';
+    save(); render();
+    $('#place').focus();
+  });
+
+  $('#stops').addEventListener('click', e => {
+    const b = e.target.closest('button[data-act]');
+    if (!b) return;
+    const i = +b.dataset.i, act = b.dataset.act;
+    if (act === 'del') stops.splice(i, 1);
+    else {
+      const j = act === 'up' ? i - 1 : i + 1;
+      if (j < 0 || j >= stops.length) return;
+      [stops[i], stops[j]] = [stops[j], stops[i]];
+    }
+    save(); render();
+  });
+
+  $('#clear').addEventListener('click', () => {
+    if (!stops.length) return;
+    stops = []; save(); render(); showErr('');
+  });
+
+  $('#print').addEventListener('click', () => window.print());
+
+  // Play mode: solve each clue in order by typing the place.
+  let step = 0;
+  const norm = s => s.toLowerCase().replace(/\b(the|a|an|under|in|inside|behind|on|top|of|my|your)\b/g, ' ').replace(/[^a-z0-9]+/g, ' ').trim();
+  function showStep() {
+    $('#pclue').textContent = (step + 1) + '/' + stops.length + ' — ' + clueFor(stops[step]);
+    $('#guess').value = '';
+  }
+  $('#start').addEventListener('click', () => {
+    step = 0; $('#play').hidden = false; $('#msg').textContent = ''; showStep(); $('#guess').focus();
+  });
+  function advance(prefix) {
+    step++;
+    if (step >= stops.length) {
+      $('#msg').textContent = prefix + 'The treasure is at: ' + stops[stops.length - 1].place + '.';
+      $('#pclue').textContent = 'Hunt complete.';
+      return;
+    }
+    $('#msg').textContent = prefix + 'Next clue:';
+    showStep();
+  }
+  $('#check').addEventListener('click', () => {
+    if (step >= stops.length) return;
+    const g = norm($('#guess').value), a = norm(stops[step].place);
+    if (!g) { $('#msg').textContent = 'Type a guess.'; return; }
+    const ok = g === a || a.split(' ').some(w => w.length > 2 && g.split(' ').includes(w));
+    if (ok) advance('Yes, ' + stops[step].place + '. ');
+    else $('#msg').textContent = 'Not there. Try again.';
+  });
+  $('#guess').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('#check').click(); } });
+  $('#giveup').addEventListener('click', () => { if (step < stops.length) advance('It was: ' + stops[step].place + '. '); });
+  $('#stop').addEventListener('click', () => { $('#play').hidden = true; });
+
+  render();
+})();
+</script>
+</body>
+</html>

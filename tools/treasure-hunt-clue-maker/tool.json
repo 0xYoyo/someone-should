@@ -1,0 +1,54 @@
+{
+  "slug": "treasure-hunt-clue-maker",
+  "wish": "someone should make a tool that generates treasure hunts",
+  "year": 2014,
+  "agreed": 7,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/706/application-which-can-generate-online-treasure-hunts-or-progressive-qa",
+      "date": "2014-02-08",
+      "points": 6,
+      "comments": 1
+    }
+  ],
+  "spec": "Turns an ordered list of hiding places into a chain of numbered clue cards, each saying where to hide it and pointing to the next spot.\nType places in order with an optional clue (blank gets a built-in riddle or a letter scramble), reorder them, then print the cards or play the hunt as progressive Q&A on the phone.\nIt does not hide anything for you, share hunts online, or use any network; stops are saved only on this device.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#place",
+        "text": "fridge"
+      }
+    },
+    {
+      "tap": "#add"
+    },
+    {
+      "type": {
+        "sel": "#place",
+        "text": "under the sofa"
+      }
+    },
+    {
+      "tap": "#add"
+    },
+    {
+      "expect": {
+        "sel": ".card",
+        "count": 2
+      }
+    },
+    {
+      "expect": {
+        "sel": "#card-2",
+        "contains": "Hide at: fridge"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:43:13Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": ""
+}
