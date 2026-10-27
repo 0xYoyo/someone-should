@@ -1,0 +1,48 @@
+{
+  "slug": "two-player-faceless-hunt",
+  "wish": "someone should make a 2 player game where one player is Slenderman and hunts the other",
+  "year": 2013,
+  "agreed": 86,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/CrazyIdeas/comments/1b8l9k/",
+      "date": "2013-03-29",
+      "points": 77,
+      "comments": 9
+    }
+  ],
+  "spec": "Two players share one phone: one runs through dark woods collecting 5 pages, the other plays the tall faceless figure and tries to catch them within 75 seconds.\\nEach player has a four-way pad (runner WASD and hunter arrows on a keyboard); the runner only sees a small circle of light, and the hunter shows only when near.\\nIt does not do online play, computer opponents or sound.",
+  "tests": [
+    {
+      "tap": "#start"
+    },
+    {
+      "tap": "#runner .rt"
+    },
+    {
+      "wait": 300
+    },
+    {
+      "tap": "#hunter .lt"
+    },
+    {
+      "expect": {
+        "sel": "#pages",
+        "contains": "pages 0 / 5"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#state",
+        "contains": "Run"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:46:36Z",
+  "model": "sonnet-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": ""
+}

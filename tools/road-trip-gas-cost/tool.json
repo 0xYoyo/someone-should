@@ -1,0 +1,57 @@
+{
+  "slug": "road-trip-gas-cost",
+  "wish": "someone should make a tool that figures out gas expenses for a road trip",
+  "year": 2014,
+  "agreed": 76,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/1zexj9/",
+      "date": "2014-03-03",
+      "points": 71,
+      "comments": 5
+    }
+  ],
+  "spec": "Works out the fuel cost of a road trip and each person's share.\\nEnter distance, fuel economy, fuel price and people; tick round trip; switch miles/mpg or km/L per 100 km.\\nIt does not look up prices, routes or tolls.",
+  "tests": [
+    {
+      "expect": {
+        "sel": "#total",
+        "contains": "37.50"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#each",
+        "contains": "9.38"
+      }
+    },
+    {
+      "tap": "#round"
+    },
+    {
+      "expect": {
+        "sel": "#total",
+        "contains": "75.00"
+      }
+    },
+    {
+      "type": {
+        "sel": "#ppl",
+        "text": "5"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#each",
+        "contains": "15.00"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:50:00Z",
+  "model": "sonnet-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": ""
+}

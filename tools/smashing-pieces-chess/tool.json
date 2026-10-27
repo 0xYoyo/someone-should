@@ -1,0 +1,48 @@
+{
+  "slug": "smashing-pieces-chess",
+  "wish": "someone should make an animated wizard's chess app",
+  "year": 2021,
+  "agreed": 133,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/l223fk/",
+      "date": "2021-01-21",
+      "points": 111,
+      "comments": 22
+    }
+  ],
+  "spec": "Chess against a computer opponent, you play white on a phone-sized board. Tap a piece, tap a highlighted square; every capture stops the board for a short animated duel between the two pieces. Undo takes back your last move and the reply; it does not offer levels, underpromotion or online play.",
+  "tests": [
+    {
+      "tap": "#s-e4"
+    },
+    {
+      "tap": "#s-d5"
+    },
+    {
+      "expect": {
+        "sel": "#log",
+        "contains": "exd5"
+      }
+    },
+    {
+      "wait": 1400
+    },
+    {
+      "wait": 1400
+    },
+    {
+      "expect": {
+        "sel": "#status",
+        "contains": "your move"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:47:29Z",
+  "model": "sonnet-5.5",
+  "minutes": 12,
+  "approved": false,
+  "notes": "Offline. Opens on 1.e4 d5 with the e4 pawn selected so the first capture is one tap away; new game resets to the standard start. Promotion is always to a queen."
+}

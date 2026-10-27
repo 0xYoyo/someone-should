@@ -1,0 +1,51 @@
+{
+  "slug": "lasting-scars-rpg",
+  "wish": "someone should make an rpg where your character gets permanent injuries",
+  "year": 2022,
+  "agreed": 82,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/tefhsq/",
+      "date": "2022-03-15",
+      "points": 54,
+      "comments": 28
+    }
+  ],
+  "spec": "A turn-based dungeon crawl: strike, guard or drink a potion against one foe per floor.\nHeavy blows, and any hit over a third of your max hp, can leave a permanent scar that changes your stats and abilities for the rest of the run.\nIt has no story, no loot and no saves between characters; death ends the run.",
+  "tests": [
+    {
+      "tap": "#potion"
+    },
+    {
+      "expect": {
+        "sel": "#potions",
+        "contains": "1"
+      }
+    },
+    {
+      "tap": "#guard"
+    },
+    {
+      "expect": {
+        "sel": "#last",
+        "matches": "\\S"
+      }
+    },
+    {
+      "tap": "#strike"
+    },
+    {
+      "expect": {
+        "sel": "#floor",
+        "matches": "Floor \\d+"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:46:04Z",
+  "model": "sonnet-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": ""
+}

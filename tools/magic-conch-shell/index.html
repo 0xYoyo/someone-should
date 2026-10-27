@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a bot that answers questions like the magic conch</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+#q{margin-bottom:4px}
+#shell{display:block;margin:8px auto;width:150px;height:130px}
+#shell.pull{animation:wob .6s ease}
+@keyframes wob{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg)}60%{transform:rotate(6deg)}}
+#answer{font-size:32px;line-height:1.15;font-weight:500;text-align:center;min-height:2.4em;display:flex;align-items:center;justify-content:center;padding:4px 0}
+#pull{width:100%}
+#clear{border-color:var(--line);color:var(--meta)}
+.hq{color:var(--meta);min-width:0;overflow-wrap:anywhere}
+.ha{font-weight:500;white-space:nowrap}
+#sound{border-color:var(--line);color:var(--meta)}
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a bot that answers questions like the magic conch</h1>
+<main id="app" class="stack">
+  <label for="q" class="meta">Ask the shell a question</label>
+  <input id="q" type="text" maxlength="120" value="Should I have another slice?" autocomplete="off">
+  <svg id="shell" viewBox="0 0 150 130" aria-hidden="true">
+    <path d="M20 90 C10 50 40 15 80 12 C120 10 142 45 130 80 C122 105 90 122 58 118 C38 115 24 106 20 90Z" fill="none" stroke="currentColor" stroke-width="3"/>
+    <path d="M80 12 C70 40 74 70 58 118 M80 12 C95 40 100 70 130 80 M45 30 C60 50 55 80 40 108" fill="none" stroke="currentColor" stroke-width="2" opacity=".5"/>
+    <path d="M20 90 C35 78 55 82 70 100" fill="none" stroke="currentColor" stroke-width="2" opacity=".5"/>
+  </svg>
+  <div id="answer" aria-live="polite">Maybe someday.</div>
+  <button id="pull" class="primary" type="button">Pull the string</button>
+  <div class="row"><button id="sound" type="button" aria-pressed="true">sound on</button><button id="clear" type="button">clear</button></div>
+  <ul id="history" class="plain"></ul>
+</main>
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const ANSWERS = ["Maybe someday.", "Nothing.", "Neither.", "Follow the seahorse.", "I don't think so.", "No.", "Yes.", "Try asking again."];
+  let history = store.get('conch-history', []);
+  let soundOn = store.get('conch-sound', true);
+  let last = 0;
+  let ctx = null;
+
+  function beep() {
+    if (!soundOn) return;
+    try {
+      ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(330, ctx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(180, ctx.currentTime + 0.5);
+      g.gain.setValueAtTime(0.25, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(); o.stop(ctx.currentTime + 0.6);
+    } catch {}
+  }
+
+  function render() {
+    const ul = $('#history');
+    ul.textContent = '';
+    history.forEach(h => {
+      const li = document.createElement('li');
+      const q = document.createElement('span'); q.className = 'hq'; q.textContent = h.q || '(no question)';
+      const a = document.createElement('span'); a.className = 'ha'; a.textContent = h.a;
+      li.append(q, a);
+      ul.append(li);
+    });
+    $('#sound').textContent = soundOn ? 'sound on' : 'sound off';
+    $('#sound').setAttribute('aria-pressed', String(soundOn));
+  }
+
+  function pull() {
+    let i;
+    do { i = Math.floor(Math.random() * ANSWERS.length); } while (i === last && ANSWERS.length > 1);
+    last = i;
+    const a = ANSWERS[i];
+    const shell = $('#shell');
+    shell.classList.remove('pull'); void shell.getBoundingClientRect(); shell.classList.add('pull');
+    $('#answer').textContent = a;
+    beep();
+    history.unshift({ q: $('#q').value.trim(), a });
+    history = history.slice(0, 20);
+    store.set('conch-history', history);
+    render();
+  }
+
+  $('#pull').addEventListener('click', pull);
+  $('#q').addEventListener('keydown', e => { if (e.key === 'Enter') pull(); });
+  $('#sound').addEventListener('click', () => { soundOn = !soundOn; store.set('conch-sound', soundOn); render(); });
+  $('#clear').addEventListener('click', () => { history = []; store.set('conch-history', history); render(); });
+  render();
+})();
+</script>
+</body>
+</html>

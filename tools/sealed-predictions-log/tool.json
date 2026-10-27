@@ -1,0 +1,48 @@
+{
+  "slug": "sealed-predictions-log",
+  "wish": "someone should make an app to record private predictions",
+  "year": 2017,
+  "agreed": 77,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/6qvle3/",
+      "date": "2017-08-01",
+      "points": 10,
+      "comments": 67
+    }
+  ],
+  "spec": "Records private predictions with a confidence and a check date, stored on the device.\nWrite one, seal it, later mark it right or wrong.\nShows how your confidence compares to your hit rate; it does not sync, share or remind.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#text",
+        "text": "I will finish the book"
+      }
+    },
+    {
+      "tap": "#add"
+    },
+    {
+      "expect": {
+        "sel": ".item p",
+        "contains": "I will finish the book"
+      }
+    },
+    {
+      "tap": "button[data-act=right]"
+    },
+    {
+      "expect": {
+        "sel": "#score",
+        "contains": "1 of 1 right"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:47:26Z",
+  "model": "sonnet-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": ""
+}

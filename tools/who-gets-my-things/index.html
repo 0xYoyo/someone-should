@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app to photograph belongings and assign who gets them after you die</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+.meta { font-size: 16px; }
+h2 { font: 500 16px/1.3 var(--mono); margin: 18px 0 0; padding-bottom: 6px; border-bottom: 1.5px solid var(--ink); display: flex; justify-content: space-between; }
+.thumb { width: 56px; height: 56px; flex: none; border: 1px solid var(--line); border-radius: var(--radius); object-fit: cover; background: var(--line); display: block; }
+ul.plain li { justify-content: flex-start; }
+ul.plain li .txt { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.photo { display: inline-flex; align-items: center; justify-content: center; min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); border-radius: var(--radius); cursor: pointer; }
+.photo input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.preview { width: 44px; height: 44px; }
+.rm { min-width: var(--tap); padding: 0; }
+#msg { min-height: 1.45em; }
+@media print { form, .row, #msg { display: none; } body { padding: 0; } }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make an app to photograph belongings and assign who gets them after you die</h1>
+<main id="app" class="stack">
+  <form id="form" class="stack">
+    <div class="row">
+      <label class="photo" id="photolabel">Photo<input type="file" id="photo" accept="image/*"></label>
+      <img id="preview" class="thumb preview" alt="" hidden>
+      <input id="desc" placeholder="What it is" aria-label="What it is" style="flex:1;min-width:140px">
+    </div>
+    <div class="row">
+      <input id="who" list="people" placeholder="Who gets it" aria-label="Who gets it" style="flex:1;min-width:140px">
+      <datalist id="people"></datalist>
+      <button type="submit" id="add" class="primary">Add</button>
+    </div>
+  </form>
+  <div id="msg" class="meta" role="status"></div>
+  <div id="groups"></div>
+  <div class="row">
+    <button id="copy" type="button">Copy list</button>
+    <button id="print" type="button">Print</button>
+  </div>
+  <textarea id="plain" rows="6" readonly hidden aria-label="List as text"></textarea>
+</main>
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const KEY = 'wgmt.items';
+  const NONE = 'Nobody yet';
+  let items = store.get(KEY, null);
+  if (!Array.isArray(items)) {
+    items = [
+      { id: 1, d: 'Grandfather\u2019s watch', w: 'Dana', ex: true },
+      { id: 2, d: 'Record collection', w: 'Sam', ex: true },
+      { id: 3, d: 'Blue armchair', w: 'Dana', ex: true },
+      { id: 4, d: 'Garden tools', w: '', ex: true }
+    ];
+  }
+  let photo = '';
+
+  const msg = t => { $('#msg').textContent = t || ''; };
+  const save = () => { if (!store.set(KEY, items)) msg('Could not save on this device. Copy the list before leaving.'); };
+  const grouped = () => {
+    const g = {};
+    items.forEach(i => { const k = i.w || NONE; (g[k] = g[k] || []).push(i); });
+    return Object.keys(g).sort((a, b) => a === NONE ? 1 : b === NONE ? -1 : a.localeCompare(b)).map(k => [k, g[k]]);
+  };
+
+  function render() {
+    const box = $('#groups');
+    box.textContent = '';
+    if (!items.length) {
+      const p = document.createElement('p');
+      p.className = 'empty';
+      p.textContent = 'Nothing listed yet. Add a photo, a name for it, and who gets it.';
+      box.appendChild(p);
+    }
+    grouped().forEach(([who, list]) => {
+      const h = document.createElement('h2');
+      h.className = 'grp';
+      h.innerHTML = '<span></span><span></span>';
+      h.firstChild.textContent = who;
+      h.lastChild.textContent = list.length;
+      const ul = document.createElement('ul');
+      ul.className = 'plain';
+      list.forEach(i => {
+        const li = document.createElement('li');
+        li.className = 'item';
+        const img = document.createElement('img');
+        img.className = 'thumb';
+        img.alt = '';
+        if (i.p) img.src = i.p; else img.style.visibility = 'hidden';
+        const t = document.createElement('span');
+        t.className = 'txt';
+        t.textContent = i.d;
+        const b = document.createElement('button');
+        b.className = 'rm';
+        b.type = 'button';
+        b.setAttribute('aria-label', 'Remove ' + i.d);
+        b.textContent = '\u00d7';
+        b.onclick = () => { items = items.filter(x => x.id !== i.id); save(); render(); };
+        li.append(img, t, b);
+        ul.appendChild(li);
+      });
+      box.append(h, ul);
+    });
+    const names = [...new Set(items.map(i => i.w).filter(Boolean))];
+    const dl = $('#people');
+    dl.textContent = '';
+    names.forEach(n => { const o = document.createElement('option'); o.value = n; dl.appendChild(o); });
+  }
+
+  const asText = () => grouped().map(([w, l]) => w + '\n' + l.map(i => '  - ' + i.d).join('\n')).join('\n\n');
+
+  // shrink the photo so it fits in localStorage
+  $('#photo').addEventListener('change', e => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    const url = URL.createObjectURL(f);
+    const im = new Image();
+    im.onload = () => {
+      const s = Math.min(1, 240 / Math.max(im.width, im.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(im.width * s); c.height = Math.round(im.height * s);
+      c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+      photo = c.toDataURL('image/jpeg', 0.6);
+      URL.revokeObjectURL(url);
+      const p = $('#preview'); p.src = photo; p.hidden = false;
+    };
+    im.onerror = () => { URL.revokeObjectURL(url); msg('That file could not be read as a photo.'); };
+    im.src = url;
+  });
+
+  $('#form').addEventListener('submit', e => {
+    e.preventDefault();
+    const d = $('#desc').value.trim();
+    if (!d) { msg('Say what it is first.'); return; }
+    if (items.some(i => i.ex)) items = items.filter(i => !i.ex);
+    items.push({ id: Date.now(), d, w: $('#who').value.trim(), p: photo });
+    photo = '';
+    $('#preview').hidden = true;
+    $('#photo').value = '';
+    $('#desc').value = '';
+    msg('');
+    save(); render();
+  });
+
+  $('#copy').onclick = async () => {
+    const t = asText();
+    if (!t) { msg('Nothing to copy yet.'); return; }
+    try { await navigator.clipboard.writeText(t); msg('Copied.'); }
+    catch { const a = $('#plain'); a.hidden = false; a.value = t; a.select(); msg('Select and copy the text below.'); }
+  };
+  $('#print').onclick = () => { try { window.print(); } catch { msg('Printing is not available here.'); } };
+
+  render();
+})();
+</script>
+</body>
+</html>

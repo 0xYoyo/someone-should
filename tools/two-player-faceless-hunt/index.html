@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a 2 player game where one player is Slenderman and hunts the other</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+h1 { margin-bottom: 12px; }
+#board { display: block; width: 100%; max-width: 420px; aspect-ratio: 1; background: #0e0e0e; border-radius: var(--radius); touch-action: none; margin: 0 auto; }
+#bar { display: flex; justify-content: space-between; gap: 12px; max-width: 420px; margin: 0 auto; width: 100%; font: 16px/1.4 var(--mono); }
+#state { max-width: 420px; margin: 0 auto; width: 100%; min-height: 24px; }
+#state.no { color: var(--no); }
+#state.built { color: var(--built); }
+#start { max-width: 420px; margin: 0 auto; width: 100%; }
+.pads { display: flex; justify-content: space-between; gap: 12px; max-width: 420px; margin: 0 auto; width: 100%; }
+.pad { display: grid; grid-template-columns: repeat(3, 50px); grid-template-rows: auto 50px 50px; gap: 4px; touch-action: none; user-select: none; -webkit-user-select: none; }
+.pad .who { grid-column: 1 / 4; font: 16px/1.4 var(--mono); color: var(--meta); }
+.pad button { width: 50px; padding: 0; font-size: 20px; }
+.pad .up { grid-column: 2; grid-row: 2; }
+.pad .lt { grid-column: 1; grid-row: 3; }
+.pad .dn { grid-column: 2; grid-row: 3; }
+.pad .rt { grid-column: 3; grid-row: 3; }
+#hunter .who { color: var(--no); }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a 2 player game where one player is Slenderman and hunts the other</h1>
+
+<main id="app" class="stack">
+  <div id="bar"><span id="pages">pages 0 / 5</span><span id="time">75s</span><span id="score">0 : 0</span></div>
+  <canvas id="board" width="330" height="330" aria-label="woods"></canvas>
+  <div id="state">Runner collects 5 pages. Hunter catches the runner.</div>
+  <button id="start" class="primary" type="button">tap to start</button>
+  <div class="pads">
+    <div class="pad" id="runner"><span class="who">runner (WASD)</span>
+      <button class="up" data-d="u" aria-label="runner up">&uarr;</button>
+      <button class="lt" data-d="l" aria-label="runner left">&larr;</button>
+      <button class="dn" data-d="d" aria-label="runner down">&darr;</button>
+      <button class="rt" data-d="r" aria-label="runner right">&rarr;</button>
+    </div>
+    <div class="pad" id="hunter"><span class="who">hunter (arrows)</span>
+      <button class="up" data-d="u" aria-label="hunter up">&uarr;</button>
+      <button class="lt" data-d="l" aria-label="hunter left">&larr;</button>
+      <button class="dn" data-d="d" aria-label="hunter down">&darr;</button>
+      <button class="rt" data-d="r" aria-label="hunter right">&rarr;</button>
+    </div>
+  </div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  const MAP = [
+    '###########',
+    '#.........#',
+    '#.##.#.##.#',
+    '#.#.....#.#',
+    '#...#.#...#',
+    '#.#.....#.#',
+    '#...#.#...#',
+    '#.#.....#.#',
+    '#.##.#.##.#',
+    '#.........#',
+    '###########'
+  ];
+  const N = MAP.length, PAGES = 5, SECONDS = 75;
+  const RUN_MS = 150, HUNT_MS = 190;
+  const DIR = { u: [0, -1], d: [0, 1], l: [-1, 0], r: [1, 0] };
+  const cv = $('#board'), ctx = cv.getContext('2d');
+  const C = cv.width / N;
+  const wins = store.get('faceless-hunt-wins', { runner: 0, hunter: 0 });
+
+  let run, hunt, pages, got, left, playing, last = { r: 0, h: 0 };
+  const held = { r: new Set(), h: new Set() };
+
+  const open = (x, y) => MAP[y] && MAP[y][x] === '.';
+
+  function reset() {
+    run = { x: 1, y: 1 }; hunt = { x: 9, y: 9 }; got = 0; left = SECONDS;
+    pages = [];
+    const cells = [];
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++)
+      if (open(x, y) && Math.abs(x - 1) + Math.abs(y - 1) > 3 && Math.abs(x - 9) + Math.abs(y - 9) > 1) cells.push([x, y]);
+    while (pages.length < PAGES) {
+      const i = Math.floor(Math.random() * cells.length);
+      pages.push(cells.splice(i, 1)[0]);
+    }
+  }
+
+  function setState(msg, cls) { const s = $('#state'); s.textContent = msg; s.className = cls || ''; }
+
+  function hud() {
+    $('#pages').textContent = 'pages ' + got + ' / ' + PAGES;
+    $('#time').textContent = Math.ceil(left) + 's';
+    $('#score').textContent = wins.runner + ' : ' + wins.hunter;
+  }
+
+  function move(who, d) {
+    if (!playing) return;
+    const now = performance.now();
+    if (now - last[who] < (who === 'r' ? RUN_MS : HUNT_MS)) return;
+    const p = who === 'r' ? run : hunt, v = DIR[d];
+    const nx = p.x + v[0], ny = p.y + v[1];
+    if (!open(nx, ny)) return;
+    last[who] = now; p.x = nx; p.y = ny;
+    if (who === 'r') {
+      const i = pages.findIndex(q => q[0] === nx && q[1] === ny);
+      if (i > -1) { pages.splice(i, 1); got++; }
+    }
+    if (run.x === hunt.x && run.y === hunt.y) return end('h', 'Caught. Hunter wins.');
+    if (got >= PAGES) return end('r', 'All pages found. Runner wins.');
+    hud();
+  }
+
+  function end(w, msg) {
+    playing = false;
+    wins[w === 'r' ? 'runner' : 'hunter']++;
+    store.set('faceless-hunt-wins', wins);
+    setState(msg, w === 'r' ? 'built' : 'no');
+    $('#start').hidden = false; $('#start').textContent = 'play again';
+    hud();
+  }
+
+  const near = (a, b, r) => Math.hypot(a.x - b.x, a.y - b.y) <= r;
+
+  function draw() {
+    ctx.fillStyle = '#0e0e0e'; ctx.fillRect(0, 0, cv.width, cv.height);
+    const all = !playing && left === SECONDS && got === 0; // idle preview shows the whole wood
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+      const lit = all || near(run, { x, y }, 3.2);
+      const dim = near(run, { x, y }, 4.5);
+      if (MAP[y][x] === '#') {
+        ctx.fillStyle = lit ? '#2f4a33' : dim ? '#17241a' : '#111712';
+        ctx.beginPath(); ctx.moveTo(x * C + C / 2, y * C + 2); ctx.lineTo(x * C + C - 3, y * C + C - 3); ctx.lineTo(x * C + 3, y * C + C - 3); ctx.fill();
+      } else if (lit) {
+        ctx.fillStyle = '#1b1b17'; ctx.fillRect(x * C, y * C, C, C);
+      }
+    }
+    for (const q of pages) if (all || near(run, { x: q[0], y: q[1] }, 5)) {
+      ctx.fillStyle = '#f4f1ea'; ctx.fillRect(q[0] * C + C * 0.3, q[1] * C + C * 0.25, C * 0.4, C * 0.5);
+    }
+    if (all || near(run, hunt, 4)) {
+      const hx = hunt.x * C + C / 2;
+      ctx.fillStyle = '#e8e8e8';
+      ctx.fillRect(hx - 3, hunt.y * C - C * 0.35, 6, C * 1.3); // tall body
+      ctx.beginPath(); ctx.arc(hx, hunt.y * C - C * 0.35, 5, 0, 7); ctx.fill(); // blank head
+    }
+    ctx.fillStyle = '#e9b84a';
+    ctx.beginPath(); ctx.arc(run.x * C + C / 2, run.y * C + C / 2, C * 0.3, 0, 7); ctx.fill();
+  }
+
+  let prev = 0;
+  function frame(t) {
+    const dt = Math.min(0.1, (t - prev) / 1000); prev = t;
+    if (playing) {
+      left -= dt;
+      for (const d of held.r) move('r', d);
+      for (const d of held.h) move('h', d);
+      if (playing && left <= 0) { left = 0; end('h', 'Time is up. Hunter wins.'); }
+      else if (playing) hud();
+    }
+    draw();
+    requestAnimationFrame(frame);
+  }
+
+  function start() {
+    reset(); playing = true; last = { r: 0, h: 0 };
+    $('#start').hidden = true;
+    setState('Run. Pages glow when near.');
+    hud();
+  }
+
+  $('#start').addEventListener('click', start);
+  $$('.pad').forEach(pad => {
+    const who = pad.id === 'runner' ? 'r' : 'h';
+    $$('button', pad).forEach(b => {
+      const d = b.dataset.d;
+      b.addEventListener('pointerdown', e => { e.preventDefault(); held[who].add(d); move(who, d); });
+      for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) b.addEventListener(ev, () => held[who].delete(d));
+    });
+  });
+
+  const KEYS = { w: ['r', 'u'], a: ['r', 'l'], s: ['r', 'd'], d: ['r', 'r'], ArrowUp: ['h', 'u'], ArrowLeft: ['h', 'l'], ArrowDown: ['h', 'd'], ArrowRight: ['h', 'r'] };
+  addEventListener('keydown', e => {
+    const k = KEYS[e.key]; if (!k) return;
+    e.preventDefault(); held[k[0]].add(k[1]); move(k[0], k[1]);
+  });
+  addEventListener('keyup', e => { const k = KEYS[e.key]; if (k) held[k[0]].delete(k[1]); });
+
+  reset(); left = SECONDS; playing = false; hud();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

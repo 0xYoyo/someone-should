@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that figures out gas expenses for a road trip</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+label { display: grid; gap: 4px; }
+label > span, .chk span { font: 16px/1.3 var(--sans); color: var(--meta); }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.chk { display: flex; align-items: center; gap: 10px; min-height: var(--tap); }
+.chk input { width: 44px; min-height: 44px; height: 44px; margin: 0; accent-color: var(--ink); }
+.out { border-top: 1.5px solid var(--ink); padding-top: 14px; }
+.out .meta { font-size: 16px; }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that figures out gas expenses for a road trip</h1>
+<main id="app" class="stack">
+  <label><span>units</span>
+    <select id="units"><option value="mi">miles, mpg, price per gallon</option><option value="km">km, L/100 km, price per litre</option></select>
+  </label>
+  <div class="grid">
+    <label><span id="l-dist">distance (mi)</span><input id="dist" type="number" inputmode="decimal" min="0" step="any" value="300"></label>
+    <label><span id="l-eco">fuel economy (mpg)</span><input id="eco" type="number" inputmode="decimal" min="0" step="any" value="28"></label>
+    <label><span id="l-price">fuel price (per gal)</span><input id="price" type="number" inputmode="decimal" min="0" step="any" value="3.50"></label>
+    <label><span>people sharing</span><input id="ppl" type="number" inputmode="numeric" min="1" step="1" value="4"></label>
+  </div>
+  <label class="chk"><input id="round" type="checkbox"><span>round trip</span></label>
+  <div class="out" aria-live="polite">
+    <div class="meta">total fuel</div>
+    <div class="big" id="total">37.50</div>
+    <div class="meta" style="margin-top:12px">each person</div>
+    <div class="big" id="each">9.38</div>
+    <div class="meta" id="detail" style="margin-top:12px"></div>
+    <div class="meta no" id="err"></div>
+  </div>
+</main>
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const ids = ['units', 'dist', 'eco', 'price', 'ppl'];
+  const saved = store.get('rtgc', null);
+  if (saved) {
+    ids.forEach(i => { if (saved[i] != null) $('#' + i).value = saved[i]; });
+    $('#round').checked = !!saved.round;
+  }
+  const labels = {
+    mi: ['distance (mi)', 'fuel economy (mpg)', 'fuel price (per gal)'],
+    km: ['distance (km)', 'fuel use (L/100 km)', 'fuel price (per litre)']
+  };
+  const money = n => n.toFixed(2);
+
+  function calc() {
+    const u = $('#units').value;
+    $('#l-dist').textContent = labels[u][0];
+    $('#l-eco').textContent = labels[u][1];
+    $('#l-price').textContent = labels[u][2];
+    const dist = parseFloat($('#dist').value), eco = parseFloat($('#eco').value);
+    const price = parseFloat($('#price').value), ppl = Math.floor(parseFloat($('#ppl').value));
+    const round = $('#round').checked;
+    const state = { round };
+    ids.forEach(i => state[i] = $('#' + i).value);
+    store.set('rtgc', state);
+    let err = '';
+    if (!(dist >= 0) || !(eco > 0) || !(price >= 0)) err = 'Enter distance, fuel economy and price.';
+    else if (!(ppl >= 1)) err = 'At least 1 person.';
+    if (err) {
+      $('#err').textContent = err;
+      $('#total').textContent = '-'; $('#each').textContent = '-'; $('#detail').textContent = '';
+      return;
+    }
+    $('#err').textContent = '';
+    const d = round ? dist * 2 : dist;
+    const fuel = u === 'mi' ? d / eco : d * eco / 100;
+    const total = fuel * price;
+    $('#total').textContent = money(total);
+    $('#each').textContent = money(total / ppl);
+    $('#detail').textContent = fuel.toFixed(1) + (u === 'mi' ? ' gal' : ' L') + ' over ' + d + (u === 'mi' ? ' mi' : ' km');
+  }
+  $('#units').addEventListener('change', () => {
+    const u = $('#units').value;
+    const d = {mi: [300, 28, '3.50'], km: [500, 8.4, '1.80']}[u];
+    $('#dist').value = d[0]; $('#eco').value = d[1]; $('#price').value = d[2];
+    calc();
+  });
+  [...ids.slice(1), 'round'].forEach(i => $('#' + i).addEventListener('input', calc));
+  calc();
+})();
+</script>
+</body>
+</html>

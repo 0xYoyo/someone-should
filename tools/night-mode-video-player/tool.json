@@ -1,0 +1,51 @@
+{
+  "slug": "night-mode-video-player",
+  "wish": "someone should make a night mode for video players that evens out loud and quiet volume",
+  "year": 2015,
+  "agreed": 86,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/3ahkf0/",
+      "date": "2015-06-20",
+      "points": 81,
+      "comments": 5
+    }
+  ],
+  "spec": "Plays a video from your device through a compressor that lifts quiet dialogue and holds down loud scenes.\nChoose a file, pick Off, Light, Medium or Strong, and watch input and output loudness; a built-in loud and quiet demo shows the effect.\nIt does not save or upload the file, and works only on files the browser can play.",
+  "tests": [
+    {
+      "tap": "#lvl-strong"
+    },
+    {
+      "expect": {
+        "sel": "#mode",
+        "contains": "strong"
+      }
+    },
+    {
+      "tap": "#lvl-off"
+    },
+    {
+      "expect": {
+        "sel": "#mode",
+        "contains": "Night mode off"
+      }
+    },
+    {
+      "tap": "#demo"
+    },
+    {
+      "expect": {
+        "sel": "#msg",
+        "matches": "Quiet|not available|cannot"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:46:10Z",
+  "model": "sonnet-5.5",
+  "minutes": 5,
+  "approved": false,
+  "notes": "CSP media-src adds blob: so a chosen local file can play; no network."
+}

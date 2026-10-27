@@ -1,0 +1,54 @@
+{
+  "slug": "magic-conch-shell",
+  "wish": "someone should make a bot that answers questions like the magic conch",
+  "year": 2016,
+  "agreed": 80,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/4g9vby/",
+      "date": "2016-04-24",
+      "points": 74,
+      "comments": 6
+    }
+  ],
+  "spec": "Answers a question with a random classic conch reply.\nType a question, pull the string; the shell wobbles, hums and answers, and recent pulls are kept.\nIt does not understand the question, and the answer is random.",
+  "tests": [
+    {
+      "tap": "#pull"
+    },
+    {
+      "expect": {
+        "sel": "#answer",
+        "matches": "\\S"
+      }
+    },
+    {
+      "type": {
+        "sel": "#q",
+        "text": "Will it rain"
+      }
+    },
+    {
+      "key": "Enter"
+    },
+    {
+      "expect": {
+        "sel": "#history li",
+        "contains": "Will it rain"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#history li",
+        "count": 2
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:46:54Z",
+  "model": "sonnet-5.5",
+  "minutes": 3,
+  "approved": false,
+  "notes": "Sound is a synthesized WebAudio tone; no network."
+}

@@ -1,0 +1,57 @@
+{
+  "slug": "caps-lock-shouting-reader",
+  "wish": "someone should make a text-to-speech tool that yells when text is in all caps",
+  "year": 2014,
+  "agreed": 85,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/2c5oeq/",
+      "date": "2014-07-30",
+      "points": 81,
+      "comments": 4
+    }
+  ],
+  "spec": "Reads pasted text aloud with the browser's built-in voice, louder, higher and faster on all-caps words.\nType or paste text, pick a yell level, tap read aloud; shouted words are marked in red.\nIt does not use the network or pick voices; speech needs a browser that supports it.",
+  "tests": [
+    {
+      "expect": {
+        "sel": "#status",
+        "contains": "1 shout"
+      }
+    },
+    {
+      "expect": {
+        "sel": ".y",
+        "contains": "SAID STOP THAT RIGHT NOW."
+      }
+    },
+    {
+      "type": {
+        "sel": "#text",
+        "text": "hello WORLD and FRIENDS"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#status",
+        "contains": "2 shouts"
+      }
+    },
+    {
+      "tap": "#speak"
+    },
+    {
+      "expect": {
+        "sel": "#out",
+        "contains": "hello"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:46:34Z",
+  "model": "sonnet-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": ""
+}

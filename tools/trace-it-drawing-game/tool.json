@@ -1,0 +1,51 @@
+{
+  "slug": "trace-it-drawing-game",
+  "wish": "someone should make a game that teaches drawing by tracing an image for speed and accuracy points",
+  "year": 2014,
+  "agreed": 84,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/CrazyIdeas/comments/23oby3/",
+      "date": "2014-04-22",
+      "points": 71,
+      "comments": 13
+    }
+  ],
+  "spec": "Shows a dotted shape with a green start dot; you trace it with a finger or mouse.\nOn release it scores accuracy (coverage and staying on the line) plus speed, out of 100, and keeps your best per shape.\nEight shapes from line to spiral via the arrows; it does not load your own images.",
+  "tests": [
+    {
+      "tap": "#next"
+    },
+    {
+      "expect": {
+        "sel": "#shape",
+        "contains": "triangle"
+      }
+    },
+    {
+      "tap": "#board"
+    },
+    {
+      "expect": {
+        "sel": "#detail",
+        "contains": "Too short"
+      }
+    },
+    {
+      "tap": "#prev"
+    },
+    {
+      "expect": {
+        "sel": "#shape",
+        "contains": "circle"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:47:00Z",
+  "model": "sonnet-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Offline; shapes are built in. Loading a custom image to trace is not included because accuracy needs a known path."
+}

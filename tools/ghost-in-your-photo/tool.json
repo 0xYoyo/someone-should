@@ -1,0 +1,54 @@
+{
+  "slug": "ghost-in-your-photo",
+  "wish": "someone should make an app that randomly adds ghostly figures to photos you take",
+  "year": 2022,
+  "agreed": 79,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/vkohco/",
+      "date": "2022-06-25",
+      "points": 62,
+      "comments": 17
+    }
+  ],
+  "spec": "Adds a faint ghostly figure at a random spot, size and opacity to a photo.\nChoose a photo (a sample shows first), tap haunt again to reroll, tap save to download the PNG.\nIt does not upload anything, use the live camera, or edit the photo otherwise.",
+  "tests": [
+    {
+      "expect": {
+        "sel": "#info",
+        "matches": "ghost"
+      }
+    },
+    {
+      "tap": "#reroll"
+    },
+    {
+      "expect": {
+        "sel": "#info",
+        "matches": "haunting #2"
+      }
+    },
+    {
+      "tap": "#reroll"
+    },
+    {
+      "expect": {
+        "sel": "#info",
+        "matches": "haunting #3"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#stage",
+        "visible": true
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:47:30Z",
+  "model": "sonnet-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": "Photo is read locally via createImageBitmap; save downloads a PNG."
+}

@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a game that teaches drawing by tracing an image for speed and accuracy points</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+.t16 { font: 16px/1.4 var(--mono); color: var(--meta); }
+#board { width: 100%; display: block; border: 1.5px solid var(--line); border-radius: var(--radius); touch-action: none; background: transparent; }
+#score { min-height: 1.1em; }
+#detail { min-height: 46px; }
+.nav { justify-content: space-between; }
+.nav button { flex: 1; }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a game that teaches drawing by tracing an image for speed and accuracy points</h1>
+<main id="app" class="stack">
+  <div class="row nav">
+    <button id="prev" aria-label="previous shape">&lt;</button>
+    <div class="t16" id="shape" style="flex:3;text-align:center">level 1 &middot; circle</div>
+    <button id="next" aria-label="next shape">&gt;</button>
+  </div>
+  <canvas id="board" aria-label="drawing area"></canvas>
+  <div class="big" id="score">&nbsp;</div>
+  <div class="t16" id="detail">Start at the green dot and trace the dotted line.</div>
+  <div class="row">
+    <button id="retry" class="primary">Try again</button>
+    <span class="t16" id="best"></span>
+  </div>
+</main>
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  // Shapes as unit-square polylines, ordered easy to hard.
+  const poly = pts => pts;
+  const circle = n => Array.from({ length: n + 1 }, (_, i) => { const a = -Math.PI / 2 + i / n * 2 * Math.PI; return [.5 + .36 * Math.cos(a), .5 + .36 * Math.sin(a)]; });
+  const heart = n => Array.from({ length: n + 1 }, (_, i) => { const t = i / n * 2 * Math.PI; const x = 16 * Math.pow(Math.sin(t), 3); const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t); return [.5 + x / 38, .46 - y / 38]; });
+  const spiral = n => Array.from({ length: n + 1 }, (_, i) => { const t = i / n; const a = t * 5.2 * Math.PI - Math.PI / 2; const r = .06 + t * .34; return [.5 + r * Math.cos(a), .5 + r * Math.sin(a)]; });
+  const wave = n => Array.from({ length: n + 1 }, (_, i) => { const t = i / n; return [.08 + t * .84, .5 + .22 * Math.sin(t * 4 * Math.PI)]; });
+  const SHAPES = [
+    { name: 'line', pts: poly([[.1, .75], [.9, .25]]) },
+    { name: 'circle', pts: circle(60) },
+    { name: 'triangle', pts: poly([[.5, .14], [.88, .8], [.12, .8], [.5, .14]]) },
+    { name: 'house', pts: poly([[.18, .82], [.18, .46], [.5, .16], [.82, .46], [.82, .82], [.18, .82]]) },
+    { name: 'wave', pts: wave(80) },
+    { name: 'heart', pts: heart(90) },
+    { name: 'star', pts: poly([[.5, .1], [.62, .4], [.94, .4], [.68, .6], [.78, .9], [.5, .72], [.22, .9], [.32, .6], [.06, .4], [.38, .4], [.5, .1]]) },
+    { name: 'spiral', pts: spiral(140) }
+  ];
+
+  const cv = $('#board'), ctx = cv.getContext('2d');
+  let W = 300, H = 300, dpr = 1;
+  let idx = Math.min(SHAPES.length - 1, Math.max(0, store.get('trace.idx', 1) | 0));
+  let best = store.get('trace.best', {});
+  let guide = [], par = 1, drawn = [], drawing = false, t0 = 0, done = false, demo = true;
+
+  // Evenly spaced samples along the polyline, in pixels.
+  function sample(pts, step) {
+    const P = pts.map(p => [p[0] * W, p[1] * H]);
+    const out = [P[0]]; let carry = 0, len = 0;
+    for (let i = 1; i < P.length; i++) {
+      const [x0, y0] = P[i - 1], [x1, y1] = P[i];
+      const d = Math.hypot(x1 - x0, y1 - y0); len += d;
+      let s = step - carry;
+      while (s <= d) { const f = s / d; out.push([x0 + (x1 - x0) * f, y0 + (y1 - y0) * f]); s += step; }
+      carry = d - (s - step);
+    }
+    out.push(P[P.length - 1]);
+    return { pts: out, len };
+  }
+
+  function layout() {
+    const w = Math.max(200, Math.floor(cv.parentElement.clientWidth));
+    W = w; H = Math.min(w, Math.floor(window.innerHeight * 0.55) || w); H = Math.max(H, 240);
+    dpr = window.devicePixelRatio || 1;
+    cv.style.height = H + 'px';
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const g = sample(SHAPES[idx].pts, 3);
+    guide = g.pts; par = g.len / 260; // seconds for a calm trace at 260 px/s
+    paint();
+  }
+
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+  function paint() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    // guide: dotted
+    ctx.strokeStyle = css('--meta'); ctx.lineWidth = 3; ctx.setLineDash([2, 9]);
+    ctx.beginPath();
+    SHAPES[idx].pts.forEach((p, i) => i ? ctx.lineTo(p[0] * W, p[1] * H) : ctx.moveTo(p[0] * W, p[1] * H));
+    ctx.stroke(); ctx.setLineDash([]);
+    // start dot
+    ctx.fillStyle = css('--built');
+    ctx.beginPath(); ctx.arc(guide[0][0], guide[0][1], 9, 0, 7); ctx.fill();
+    // example partial trace on a fresh board
+    let line = drawn;
+    if (demo && !drawn.length) line = guide.slice(0, Math.floor(guide.length * .45)).map((p, i) => [p[0] + Math.sin(i * .7) * 2.5, p[1] + Math.cos(i * .5) * 2.5]);
+    if (line.length) {
+      ctx.strokeStyle = demo && !drawn.length ? css('--line') : css('--ink');
+      ctx.lineWidth = 5;
+      ctx.beginPath(); line.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); ctx.stroke();
+    }
+  }
+
+  const near = (p, set, r) => { const r2 = r * r; for (let i = 0; i < set.length; i++) { const dx = p[0] - set[i][0], dy = p[1] - set[i][1]; if (dx * dx + dy * dy <= r2) return true; } return false; };
+
+  function finish() {
+    const secs = (performance.now() - t0) / 1000;
+    if (drawn.length < 8) { show('', 'Too short. Trace the whole line.'); return; }
+    const tol = Math.max(14, W * 0.055);
+    const covered = guide.filter(g => near(g, drawn, tol)).length / guide.length;
+    const ends = near(guide[guide.length - 1], drawn, tol * 1.5);
+    const onLine = drawn.filter(p => near(p, guide, tol * 1.3)).length / drawn.length;
+    let acc = covered * onLine;
+    if (!ends) acc *= .7;
+    const speed = Math.max(0, Math.min(1, par / Math.max(secs, .1)));
+    const pts = Math.round(acc * 70 + (acc > .3 ? speed * 30 * acc : 0));
+    const name = SHAPES[idx].name;
+    const isBest = pts > (best[name] || 0);
+    if (isBest) { best[name] = pts; store.set('trace.best', best); }
+    done = true;
+    show(pts + ' pts', 'accuracy ' + Math.round(acc * 100) + '%, time ' + secs.toFixed(1) + 's, speed ' + Math.round(speed * 100) + '%' + (isBest ? ', new best' : ''));
+  }
+
+  function show(score, detail) {
+    $('#score').innerHTML = score || '&nbsp;';
+    $('#detail').textContent = detail;
+    label();
+  }
+
+  function label() {
+    const n = SHAPES[idx].name;
+    $('#shape').textContent = 'level ' + (idx + 1) + ' \u00b7 ' + n;
+    $('#best').textContent = best[n] ? 'best ' + best[n] : '';
+  }
+
+  function reset(msg) {
+    drawn = []; drawing = false; done = false; demo = false;
+    paint();
+    show('', msg || 'Start at the green dot and trace the dotted line.');
+  }
+
+  function go(i) {
+    idx = (i + SHAPES.length) % SHAPES.length;
+    store.set('trace.idx', idx);
+    layout(); reset();
+  }
+
+  function pos(e) { const r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
+
+  cv.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    try { cv.setPointerCapture(e.pointerId); } catch {}
+    demo = false; done = false; drawing = true; drawn = [pos(e)]; t0 = performance.now();
+    show('', 'Tracing...');
+    paint();
+  });
+  cv.addEventListener('pointermove', e => {
+    if (!drawing) return;
+    drawn.push(pos(e)); paint();
+  });
+  const up = e => { if (!drawing) return; drawing = false; paint(); finish(); };
+  cv.addEventListener('pointerup', up);
+  cv.addEventListener('pointercancel', up);
+
+  $('#retry').addEventListener('click', () => reset());
+  $('#next').addEventListener('click', () => go(idx + 1));
+  $('#prev').addEventListener('click', () => go(idx - 1));
+  window.addEventListener('resize', () => { layout(); });
+
+  layout(); label();
+})();
+</script>
+</body>
+</html>

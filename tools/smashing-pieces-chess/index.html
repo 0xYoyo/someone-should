@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an animated wizard's chess app</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+h1 { margin-bottom: 12px; }
+#status { font: 500 17px/1.3 var(--mono); min-height: 24px; margin-bottom: 10px; }
+#wrap { margin: 0 calc(-1 * var(--gutter)); }
+#bd { position: relative; max-width: 520px; margin: 0 auto; }
+#board { display: grid; grid-template-columns: repeat(8, 1fr); aspect-ratio: 1; }
+.sq { position: relative; min-height: 0; width: 100%; aspect-ratio: 1; padding: 0; border: 0; border-radius: 0; font-size: clamp(30px, 8.2vw, 44px); line-height: 1; font-family: "Segoe UI Symbol", "Noto Sans Symbols 2", "Apple Symbols", system-ui, sans-serif; }
+.sq.l { background: #ece5d3; }
+.sq.d { background: #a99f86; }
+.sq.last::before { content: ""; position: absolute; inset: 0; background: rgba(46, 125, 79, .35); }
+.sq.chk { box-shadow: inset 0 0 0 100px rgba(200, 50, 30, .55); }
+.sq.sel { box-shadow: inset 0 0 0 3px #141414; }
+.sq.go::after { content: ""; position: absolute; left: 50%; top: 50%; width: 30%; height: 30%; margin: -15% 0 0 -15%; border-radius: 50%; background: rgba(20, 20, 20, .38); }
+.sq.go.hit::after { width: 100%; height: 100%; margin: 0; left: 0; top: 0; background: none; border-radius: 0; box-shadow: inset 0 0 0 4px #c8321e; }
+.pc { position: relative; z-index: 1; paint-order: stroke fill; }
+.pc.w { color: #fff; -webkit-text-stroke: 1.4px #1a1a1a; }
+.pc.k { color: #1a1a1a; -webkit-text-stroke: 1px #1a1a1a; }
+.bar { margin-top: 12px; }
+#log { margin-top: 10px; font: 16px/1.5 var(--mono); color: var(--meta); max-height: 72px; overflow-y: auto; }
+
+/* the duel that plays on every capture */
+#battle { position: absolute; inset: 0; background: rgba(10, 10, 10, .78); display: none; overflow: hidden; pointer-events: none; font-family: "Segoe UI Symbol", "Noto Sans Symbols 2", "Apple Symbols", system-ui, sans-serif; }
+#battle.on { display: block; animation: dim 1s both; }
+#battle .a, #battle .d { position: absolute; left: 50%; top: 50%; font-size: clamp(72px, 24vw, 120px); line-height: 1; opacity: 0; }
+#battle .a { animation: lunge 1s both; }
+#battle .d { animation: fall 1s both; }
+#battle .fx { position: absolute; left: 50%; top: 50%; width: 50%; aspect-ratio: 1; border-radius: 50%; opacity: 0; transform: translate(-50%, -50%) scale(0); background: radial-gradient(circle, #fff 0, #ffd27a 25%, rgba(200, 50, 30, .65) 55%, transparent 70%); animation: burst 1s both; }
+#battle.slam .a { animation-name: slam; }
+#battle.beam .a { animation-name: hold; }
+#battle.beam .fx { width: 70%; aspect-ratio: 6; border-radius: 0; background: linear-gradient(90deg, transparent, #fff 20%, #8fc7ff 50%, #fff 80%, transparent); animation-name: beamfx; }
+@keyframes dim { 0% { opacity: 0; } 10%, 88% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes lunge {
+  0% { opacity: 0; transform: translate(-300%, -50%) scale(.7); }
+  25% { opacity: 1; transform: translate(-125%, -50%); }
+  45% { opacity: 1; transform: translate(-150%, -50%); }
+  58% { opacity: 1; transform: translate(-45%, -50%) scale(1.2); }
+  100% { opacity: 1; transform: translate(-60%, -50%); }
+}
+@keyframes slam {
+  0% { opacity: 0; transform: translate(-100%, -400%); }
+  30% { opacity: 1; transform: translate(-100%, -150%); }
+  55% { opacity: 1; transform: translate(-45%, -50%) scale(1.25); }
+  100% { opacity: 1; transform: translate(-60%, -50%); }
+}
+@keyframes hold {
+  0% { opacity: 0; transform: translate(-300%, -50%) scale(.7); }
+  25%, 100% { opacity: 1; transform: translate(-125%, -50%); }
+  60% { opacity: 1; transform: translate(-125%, -50%) scale(1.2); }
+}
+@keyframes fall {
+  0% { opacity: 0; transform: translate(200%, -50%) scale(.7); }
+  25%, 56% { opacity: 1; transform: translate(25%, -50%); }
+  62% { opacity: 1; transform: translate(60%, -50%) rotate(12deg); filter: brightness(2.5); }
+  100% { opacity: 0; transform: translate(260%, -110%) rotate(220deg) scale(.2); }
+}
+@keyframes burst {
+  0%, 55% { opacity: 0; transform: translate(-50%, -50%) scale(0); }
+  62% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(2.4); }
+}
+@keyframes beamfx {
+  0%, 40% { opacity: 0; transform: translate(-50%, -50%) scaleX(0); }
+  55% { opacity: 1; transform: translate(-50%, -50%) scaleX(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scaleX(1.4) scaleY(.2); }
+}
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make an animated wizard's chess app</h1>
+
+<main id="app">
+  <div id="status" role="status" aria-live="polite"></div>
+  <div id="wrap"><div id="bd">
+    <div id="board"></div>
+    <div id="battle" aria-hidden="true"><div class="fx"></div><span class="a"></span><span class="d"></span></div>
+  </div></div>
+  <div class="row bar">
+    <button id="new" class="primary">new game</button>
+    <button id="undo">undo</button>
+  </div>
+  <div id="log"></div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  /* ---------- chess rules ---------- */
+  // Board: 64 chars, index = row*8+col, row 0 is rank 8. Capitals are white, ' ' is empty.
+  const START = 'rnbqkbnrpppppppp' + ' '.repeat(32) + 'PPPPPPPPRNBQKBNR';
+  const ROOK = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+  const BISH = [[1, 1], [1, -1], [-1, 1], [-1, -1]];
+  const KING = ROOK.concat(BISH);
+  const KNIGHT = [[1, 2], [2, 1], [-1, 2], [-2, 1], [1, -2], [2, -1], [-1, -2], [-2, -1]];
+  const isW = p => p !== ' ' && p < 'a';
+  const sqName = n => 'abcdefgh'[n & 7] + (8 - (n >> 3));
+
+  function newState() { return { b: START.split(''), t: 'w', c: 'KQkq', ep: -1, h: 0 }; }
+
+  function attacked(b, sq, by) {
+    const r = sq >> 3, c = sq & 7, w = by === 'w';
+    const pr = w ? r + 1 : r - 1;
+    if (pr >= 0 && pr < 8) for (const dc of [-1, 1]) if (c + dc >= 0 && c + dc < 8 && b[pr * 8 + c + dc] === (w ? 'P' : 'p')) return true;
+    const hop = (list, ch) => list.some(([dr, dc]) => { const rr = r + dr, cc = c + dc; return rr >= 0 && rr < 8 && cc >= 0 && cc < 8 && b[rr * 8 + cc] === ch; });
+    if (hop(KNIGHT, w ? 'N' : 'n') || hop(KING, w ? 'K' : 'k')) return true;
+    const slide = (dirs, a, q) => dirs.some(([dr, dc]) => {
+      for (let rr = r + dr, cc = c + dc; rr >= 0 && rr < 8 && cc >= 0 && cc < 8; rr += dr, cc += dc) {
+        const p = b[rr * 8 + cc];
+        if (p !== ' ') return p === a || p === q;
+      }
+      return false;
+    });
+    return slide(ROOK, w ? 'R' : 'r', w ? 'Q' : 'q') || slide(BISH, w ? 'B' : 'b', w ? 'Q' : 'q');
+  }
+
+  function pseudo(s) {
+    const b = s.b, w = s.t === 'w', out = [];
+    for (let i = 0; i < 64; i++) {
+      const p = b[i];
+      if (p === ' ' || isW(p) !== w) continue;
+      const k = p.toUpperCase(), r = i >> 3, c = i & 7;
+      const add = (to, cap, flag) => out.push({ f: i, to, p, cap: cap || '', flag: flag || '' });
+      const step = (dr, dc) => { const rr = r + dr, cc = c + dc; if (rr < 0 || rr > 7 || cc < 0 || cc > 7) return false; const q = b[rr * 8 + cc]; if (q === ' ') { add(rr * 8 + cc); return true; } if (isW(q) !== w) add(rr * 8 + cc, q); return false; };
+      if (k === 'P') {
+        const d = w ? -1 : 1, r1 = r + d, pro = (r1 === 0 || r1 === 7) ? 'q' : '';
+        if (b[r1 * 8 + c] === ' ') {
+          add(r1 * 8 + c, '', pro);
+          if (r === (w ? 6 : 1) && b[(r + 2 * d) * 8 + c] === ' ') add((r + 2 * d) * 8 + c, '', 'dbl');
+        }
+        for (const dc of [-1, 1]) {
+          if (c + dc < 0 || c + dc > 7) continue;
+          const q = r1 * 8 + c + dc;
+          if (b[q] !== ' ' && isW(b[q]) !== w) add(q, b[q], pro);
+          else if (q === s.ep) add(q, w ? 'p' : 'P', 'ep');
+        }
+      } else if (k === 'N') KNIGHT.forEach(([dr, dc]) => step(dr, dc));
+      else if (k === 'K') {
+        KING.forEach(([dr, dc]) => step(dr, dc));
+        if (i === (w ? 60 : 4)) {
+          const base = w ? 56 : 0, opp = w ? 'b' : 'w', rook = w ? 'R' : 'r';
+          const safe = (...q) => q.every(x => !attacked(b, base + x, opp));
+          if (s.c.includes(w ? 'K' : 'k') && b[base + 5] === ' ' && b[base + 6] === ' ' && b[base + 7] === rook && safe(4, 5, 6)) add(base + 6, '', 'cs');
+          if (s.c.includes(w ? 'Q' : 'q') && b[base + 1] === ' ' && b[base + 2] === ' ' && b[base + 3] === ' ' && b[base] === rook && safe(4, 3, 2)) add(base + 2, '', 'cl');
+        }
+      } else {
+        for (const [dr, dc] of (k === 'R' ? ROOK : k === 'B' ? BISH : KING)) {
+          for (let rr = r + dr, cc = c + dc; rr >= 0 && rr < 8 && cc >= 0 && cc < 8; rr += dr, cc += dc) {
+            const q = b[rr * 8 + cc];
+            if (q === ' ') { add(rr * 8 + cc); continue; }
+            if (isW(q) !== w) add(rr * 8 + cc, q);
+            break;
+          }
+        }
+      }
+    }
+    return out;
+  }
+
+  const RIGHTS = { 60: 'KQ', 63: 'K', 56: 'Q', 4: 'kq', 7: 'k', 0: 'q' };
+  function apply(s, m) {
+    const b = s.b.slice(), w = s.t === 'w';
+    b[m.f] = ' ';
+    b[m.to] = m.flag === 'q' ? (w ? 'Q' : 'q') : m.p;
+    if (m.flag === 'ep') b[m.to + (w ? 8 : -8)] = ' ';
+    if (m.flag === 'cs') { b[m.to - 1] = b[m.to + 1]; b[m.to + 1] = ' '; }
+    if (m.flag === 'cl') { b[m.to + 1] = b[m.to - 2]; b[m.to - 2] = ' '; }
+    let c = s.c;
+    for (const sq of [m.f, m.to]) if (RIGHTS[sq]) for (const ch of RIGHTS[sq]) c = c.replace(ch, '');
+    return { b, t: w ? 'b' : 'w', c, ep: m.flag === 'dbl' ? (m.f + m.to) / 2 : -1, h: (m.p.toUpperCase() === 'P' || m.cap) ? 0 : s.h + 1 };
+  }
+
+  function inCheck(s) {
+    const king = s.t === 'w' ? 'K' : 'k';
+    return attacked(s.b, s.b.indexOf(king), s.t === 'w' ? 'b' : 'w');
+  }
+  function legal(s) {
+    const me = s.t === 'w' ? 'K' : 'k', opp = s.t === 'w' ? 'b' : 'w';
+    return pseudo(s).filter(m => { const n = apply(s, m); return !attacked(n.b, n.b.indexOf(me), opp); });
+  }
+
+  // Short algebraic notation, without disambiguation
+  function san(s, m) {
+    let t;
+    if (m.flag === 'cs') t = 'O-O';
+    else if (m.flag === 'cl') t = 'O-O-O';
+    else {
+      const k = m.p.toUpperCase();
+      t = (k === 'P' ? (m.cap ? 'abcdefgh'[m.f & 7] + 'x' : '') : k + (m.cap ? 'x' : '')) + sqName(m.to) + (m.flag === 'q' ? '=Q' : '');
+    }
+    const n = apply(s, m);
+    if (inCheck(n)) t += legal(n).length ? '+' : '#';
+    return t;
+  }
+
+  /* ---------- the opponent ---------- */
+  const VAL = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 0 };
+  function evaluate(s) {
+    let v = 0;
+    for (let i = 0; i < 64; i++) {
+      const p = s.b[i];
+      if (p === ' ') continue;
+      const k = p.toLowerCase(), w = isW(p), r = i >> 3, c = i & 7;
+      const cen = 6 - (Math.abs(r - 3.5) + Math.abs(c - 3.5));
+      let x = VAL[k];
+      if (k === 'n' || k === 'b') x += cen * 5;
+      else if (k === 'p') x += (w ? 6 - r : r - 1) * 7 + cen * 2;
+      else if (k === 'k' && r === (w ? 7 : 0)) x += 15;
+      v += w ? x : -x;
+    }
+    return s.t === 'w' ? v : -v;
+  }
+  const order = ms => ms.sort((x, y) => (y.cap ? VAL[y.cap.toLowerCase()] * 10 - VAL[y.p.toLowerCase()] : 0) - (x.cap ? VAL[x.cap.toLowerCase()] * 10 - VAL[x.p.toLowerCase()] : 0));
+  function qs(s, a, b, d) {
+    const stand = evaluate(s);
+    if (stand >= b) return b;
+    if (stand > a) a = stand;
+    if (d === 0) return a;
+    for (const m of order(legal(s).filter(x => x.cap))) {
+      const sc = -qs(apply(s, m), -b, -a, d - 1);
+      if (sc >= b) return b;
+      if (sc > a) a = sc;
+    }
+    return a;
+  }
+  function search(s, d, a, b) {
+    if (s.h >= 100) return 0;
+    const ms = legal(s);
+    if (!ms.length) return inCheck(s) ? -90000 - d : 0;
+    if (d === 0) return qs(s, a, b, 2);
+    for (const m of order(ms)) {
+      const sc = -search(apply(s, m), d - 1, -b, -a);
+      if (sc >= b) return b;
+      if (sc > a) a = sc;
+    }
+    return a;
+  }
+  function pickMove(s) {
+    let best = -1e9, pick = null;
+    for (const m of order(legal(s))) {
+      const sc = -search(apply(s, m), 2, -1e9, -(best - 12)) + Math.random() * 12;
+      if (sc > best) { best = sc; pick = m; }
+    }
+    return pick;
+  }
+
+  /* ---------- the game ---------- */
+  const KEY = 'someone-should:smashing-pieces-chess';
+  const GLYPH = { k: '♚', q: '♛', r: '♜', b: '♝', n: '♞', p: '♟︎' };
+  const NAMES = { k: 'king', q: 'queen', r: 'rook', b: 'bishop', n: 'knight', p: 'pawn' };
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  let hist = [newState()];   // hist[i] -> hist[i+1] by moves[i]
+  let moves = [];            // {f, to, san}
+  let sel = -1, targets = [], lm = [], busy = false, over = '';
+
+  const boardEl = $('#board'), cells = [];
+  for (let i = 0; i < 64; i++) {
+    const b = document.createElement('button');
+    b.id = 's-' + sqName(i);
+    b.className = 'sq ' + (((i >> 3) + (i & 7)) % 2 ? 'd' : 'l');
+    b.innerHTML = '<span class="pc"></span>';
+    b.addEventListener('click', () => tap(i));
+    boardEl.appendChild(b);
+    cells.push(b);
+  }
+
+  const cur = () => hist[hist.length - 1];
+  function refreshLegal() { lm = legal(cur()); }
+
+  function render() {
+    const s = cur(), last = moves.length ? moves[moves.length - 1] : null;
+    const chk = inCheck(s) ? s.b.indexOf(s.t === 'w' ? 'K' : 'k') : -1;
+    cells.forEach((el, i) => {
+      const p = s.b[i], pc = el.firstChild;
+      pc.textContent = p === ' ' ? '' : GLYPH[p.toLowerCase()];
+      pc.className = 'pc ' + (p === ' ' ? '' : isW(p) ? 'w' : 'k');
+      const go = targets.some(m => m.to === i);
+      el.className = 'sq ' + (((i >> 3) + (i & 7)) % 2 ? 'd' : 'l') +
+        (last && (i === last.f || i === last.to) ? ' last' : '') + (i === chk ? ' chk' : '') + (i === sel ? ' sel' : '') +
+        (go ? ' go' + (p !== ' ' ? ' hit' : '') : '');
+      el.setAttribute('aria-label', sqName(i) + (p === ' ' ? '' : ' ' + (isW(p) ? 'white ' : 'black ') + NAMES[p.toLowerCase()]));
+    });
+    renderLog();
+  }
+
+  function renderLog() {
+    let text = '';
+    for (let i = 0; i < moves.length; i++) text += (i % 2 ? ' ' : (i ? '  ' : '') + (i / 2 + 1) + '. ') + moves[i].san;
+    const log = $('#log');
+    log.textContent = text || 'no moves yet';
+    log.scrollTop = log.scrollHeight;
+  }
+
+  function setStatus(t) { $('#status').textContent = t; }
+
+  // Decide what happens after the board settles: game end, or the opponent's turn.
+  function settle() {
+    const s = cur();
+    refreshLegal();
+    over = '';
+    if (!lm.length) over = inCheck(s) ? (s.t === 'w' ? 'checkmate. black wins' : 'checkmate. you win') : 'stalemate. draw';
+    else if (s.h >= 100) over = 'draw. 50 moves';
+    if (over) { busy = false; setStatus(over); render(); return; }
+    if (s.t === 'b') {
+      busy = true;
+      setStatus('thinking...');
+      setTimeout(() => setTimeout(() => { const m = pickMove(cur()); if (m) play(m); }, 40), 300);
+    } else {
+      busy = false;
+      setStatus(inCheck(s) ? 'check. your move' : 'your move');
+    }
+  }
+
+  function play(m) {
+    const s = cur();
+    moves.push({ f: m.f, to: m.to, san: san(s, m) });
+    hist.push(apply(s, m));
+    sel = -1; targets = [];
+    store.set(KEY, moves.map(x => [x.f, x.to]));
+    busy = true;
+    renderLog();
+    if (m.cap && !reduced) {
+      // the board stays as it was while the two pieces fight
+      const bt = $('#battle');
+      $('.a', bt).textContent = GLYPH[m.p.toLowerCase()];
+      $('.a', bt).className = 'a pc ' + (isW(m.p) ? 'w' : 'k');
+      $('.d', bt).textContent = GLYPH[m.cap.toLowerCase()];
+      $('.d', bt).className = 'd pc ' + (isW(m.cap) ? 'w' : 'k');
+      const k = m.p.toLowerCase();
+      bt.className = 'on ' + (k === 'r' ? 'slam' : (k === 'b' || k === 'q') ? 'beam' : 'lunge');
+      setStatus(NAMES[m.p.toLowerCase()] + ' takes ' + NAMES[m.cap.toLowerCase()]);
+      setTimeout(() => { bt.className = ''; render(); settle(); }, 1000);
+    } else {
+      render();
+      settle();
+    }
+  }
+
+  function tap(i) {
+    if (busy || over || cur().t !== 'w') return;
+    const hit = targets.find(m => m.to === i);
+    if (sel >= 0 && hit) { play(hit); return; }
+    const p = cur().b[i];
+    if (p !== ' ' && isW(p)) { sel = i; targets = lm.filter(m => m.f === i); }
+    else { sel = -1; targets = []; }
+    render();
+  }
+
+  function replay(list) {
+    hist = [newState()]; moves = [];
+    for (const [f, to] of list) {
+      const m = legal(cur()).find(x => x.f === f && x.to === to);
+      if (!m) break;
+      moves.push({ f, to, san: san(cur(), m) });
+      hist.push(apply(cur(), m));
+    }
+    sel = -1; targets = [];
+  }
+
+  function newGame() {
+    if (busy && !over) return;
+    replay([]);
+    store.set(KEY, []);
+    $('#battle').className = '';
+    over = '';
+    refreshLegal(); render(); setStatus('your move');
+  }
+
+  function undo() {
+    if (busy && !over) return;
+    if (!moves.length) return;
+    do { moves.pop(); hist.pop(); } while (moves.length && cur().t !== 'w');
+    sel = -1; targets = [];
+    store.set(KEY, moves.map(x => [x.f, x.to]));
+    over = '';
+    refreshLegal(); render(); setStatus('your move');
+  }
+
+  $('#new').addEventListener('click', newGame);
+  $('#undo').addEventListener('click', undo);
+
+  // start: the saved game, or 1.e4 d5 with the e4 pawn ready to take
+  const saved = store.get(KEY, null);
+  replay(Array.isArray(saved) ? saved : [[52, 36], [11, 27]]);
+  refreshLegal();
+  if (!Array.isArray(saved) && cur().t === 'w') { sel = 36; targets = lm.filter(m => m.f === 36); }
+  render();
+  settle();
+})();
+</script>
+</body>
+</html>

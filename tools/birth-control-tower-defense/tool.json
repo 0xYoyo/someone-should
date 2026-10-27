@@ -1,0 +1,48 @@
+{
+  "slug": "birth-control-tower-defense",
+  "wish": "someone should make a tower defense game where birth control methods defend against sperm",
+  "year": 2013,
+  "agreed": 87,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/CrazyIdeas/comments/1t40q6/",
+      "date": "2013-12-17",
+      "points": 76,
+      "comments": 11
+    }
+  ],
+  "spec": "Dots cross a 5x5 board toward a goal; you spend coins on methods placed in cells, each stopping a passing dot with its typical-use effectiveness.\nPick a method, tap a cell to place it, tap Remove then a cell to sell; five dots through ends the game and waves grow.\nIt is a game, not advice: no medical guidance, nothing stored but the best wave.",
+  "tests": [
+    {
+      "tap": "#t-pil"
+    },
+    {
+      "tap": "#c-4-0"
+    },
+    {
+      "expect": {
+        "sel": ".tower",
+        "count": 4
+      }
+    },
+    {
+      "wait": 1200
+    },
+    {
+      "expect": {
+        "sel": "#coins",
+        "matches": "^\\d+$"
+      }
+    },
+    {
+      "tap": "#start"
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:46:52Z",
+  "model": "sonnet-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Effectiveness values are typical-use figures per pass; the game is a loose illustration, not guidance."
+}

@@ -1,0 +1,48 @@
+{
+  "slug": "talked-too-long-buzzer",
+  "wish": "someone should make an app that buzzes me when I've talked too long",
+  "year": 2021,
+  "agreed": 91,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/lc9wxr/",
+      "date": "2021-02-04",
+      "points": 80,
+      "comments": 11
+    }
+  ],
+  "spec": "Listens to the microphone and counts continuous speaking time; past your limit it vibrates and beeps, repeating every 10 seconds.\nTap Listen, set the limit with + and -, and talk; silence of 3 seconds resets the count. I'm talking is a hand timer when the mic is denied.\nIt does not record, transcribe or send audio anywhere; vibration works only on devices that support it.",
+  "tests": [
+    {
+      "tap": "#more"
+    },
+    {
+      "tap": "#manual"
+    },
+    {
+      "wait": 1200
+    },
+    {
+      "expect": {
+        "sel": "#elapsed",
+        "matches": "0:01"
+      }
+    },
+    {
+      "tap": "#test"
+    },
+    {
+      "expect": {
+        "sel": "#state",
+        "contains": "too long"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:46:09Z",
+  "model": "sonnet-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": "Microphone level only, no speech recognition. Vibration is unsupported on iOS Safari; the beep still plays."
+}

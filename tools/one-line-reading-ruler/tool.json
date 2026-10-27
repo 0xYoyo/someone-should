@@ -1,0 +1,61 @@
+{
+  "slug": "one-line-reading-ruler",
+  "wish": "someone should make a reader that highlights one line at a time to help you focus",
+  "year": 2015,
+  "agreed": 80,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/2ygyal/",
+      "date": "2015-03-09",
+      "points": 53,
+      "comments": 9
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/AppIdeas/comments/c5o324/",
+      "date": "2019-06-26",
+      "points": 7,
+      "comments": 11
+    }
+  ],
+  "spec": "Shows pasted text with one visual line at full strength and the rest dimmed.\nPaste text with the Paste button, then tap the text, press Down, or use arrow keys to move the highlight line by line.\nIt does not read files or send anything anywhere.",
+  "tests": [
+    {
+      "expect": {
+        "sel": "#pos",
+        "matches": "^1 / \\d+"
+      }
+    },
+    {
+      "expect": {
+        "sel": ".w.on",
+        "visible": true
+      }
+    },
+    {
+      "tap": "#next"
+    },
+    {
+      "expect": {
+        "sel": "#pos",
+        "matches": "^2 / \\d+"
+      }
+    },
+    {
+      "tap": "#prev"
+    },
+    {
+      "expect": {
+        "sel": "#pos",
+        "matches": "^1 / \\d+"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:47:17Z",
+  "model": "sonnet-5.5",
+  "minutes": 3,
+  "approved": false,
+  "notes": ""
+}

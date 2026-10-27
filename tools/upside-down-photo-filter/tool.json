@@ -1,0 +1,54 @@
+{
+  "slug": "upside-down-photo-filter",
+  "wish": "someone should make an app that adds a Stranger Things upside down filter to photos",
+  "year": 2019,
+  "agreed": 87,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/cgathu/",
+      "date": "2019-07-22",
+      "points": 78,
+      "comments": 9
+    }
+  ],
+  "spec": "Turns a photo into an Upside Down scene: drained cold blue, red glow, dark vignette, creeping vines, floating spores.\\nChoose a photo (a sample shows first), pick mild, full or deep, optionally switch flicker on, then save the result as a JPEG.\\nIt does not upload anything, detect faces, or flip the picture; everything stays on the device.",
+  "tests": [
+    {
+      "expect": {
+        "sel": "#status",
+        "contains": "sample / full"
+      }
+    },
+    {
+      "tap": "#lvl-3"
+    },
+    {
+      "expect": {
+        "sel": "#status",
+        "contains": "deep"
+      }
+    },
+    {
+      "tap": "#flicker"
+    },
+    {
+      "expect": {
+        "sel": "#flicker",
+        "contains": "flicker on"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#view",
+        "visible": true
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:46:24Z",
+  "model": "sonnet-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Works offline on a canvas; the sample picture is generated in code. Spores and vines are procedural."
+}

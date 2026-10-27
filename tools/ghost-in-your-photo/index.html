@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app that randomly adds ghostly figures to photos you take</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+canvas { width: 100%; height: auto; display: block; border-radius: var(--radius); background: var(--line); }
+.info { font: 16px/1.4 var(--mono); color: var(--meta); min-height: 24px; }
+.row button, .row label.btn { flex: 1 1 0; }
+label.btn { display: inline-flex; align-items: center; justify-content: center; min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); border-radius: var(--radius); cursor: pointer; }
+#file { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+label.btn:focus-within { outline: 2px solid var(--ink); outline-offset: 2px; }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make an app that randomly adds ghostly figures to photos you take</h1>
+
+<main id="app" class="stack">
+  <canvas id="stage" width="900" height="600" role="img" aria-label="photo with a ghost"></canvas>
+  <div id="info" class="info">loading</div>
+  <div class="row">
+    <label class="btn" for="file">choose photo</label>
+    <input id="file" type="file" accept="image/*">
+    <button id="reroll" class="primary" type="button">haunt again</button>
+    <button id="save" type="button">save</button>
+  </div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (s, r = document) => r.querySelector(s);
+  const canvas = $('#stage');
+  const ctx = canvas.getContext('2d');
+  const info = $('#info');
+  const MAX = 1200;
+  let base = null;   // offscreen canvas holding the clean photo
+  let count = 0;
+
+  const rand = (a, b) => a + Math.random() * (b - a);
+
+  // A stand-in photo so the first frame already shows a ghost.
+  function sample() {
+    const w = 900, h = 600, c = document.createElement('canvas');
+    c.width = w; c.height = h;
+    const g = c.getContext('2d');
+    let grd = g.createLinearGradient(0, 0, 0, h);
+    grd.addColorStop(0, '#6d7a86'); grd.addColorStop(1, '#3b4650');
+    g.fillStyle = grd; g.fillRect(0, 0, w, h);
+    g.fillStyle = '#2a2f35'; g.fillRect(0, h * 0.72, w, h * 0.28);
+    g.fillStyle = '#1f2327'; g.fillRect(560, 120, 170, 310);
+    g.fillStyle = '#c9b27a'; g.beginPath(); g.arc(700, 280, 7, 0, 7); g.fill();
+    g.fillStyle = '#8e9aa5'; g.fillRect(90, 150, 210, 140);
+    g.fillStyle = '#4b5661'; g.fillRect(100, 160, 90, 120); g.fillRect(200, 160, 90, 120);
+    return c;
+  }
+
+  function drawGhost(g, x, y, s) {
+    g.save();
+    g.translate(x, y);
+    g.scale(s, s);
+    g.rotate(rand(-0.12, 0.12));
+    g.shadowColor = 'rgba(230,240,255,0.9)';
+    g.shadowBlur = 28;
+    const grd = g.createLinearGradient(0, -100, 0, 110);
+    grd.addColorStop(0, 'rgba(255,255,255,0.95)');
+    grd.addColorStop(1, 'rgba(235,242,255,0.15)');
+    g.fillStyle = grd;
+    g.beginPath();
+    g.moveTo(-45, 90);
+    g.bezierCurveTo(-60, 20, -62, -70, 0, -85);
+    g.bezierCurveTo(62, -70, 60, 20, 45, 90);
+    // wavy hem
+    const n = 5, w = 90 / n;
+    for (let i = 0; i < n; i++) {
+      const x0 = 45 - i * w;
+      g.quadraticCurveTo(x0 - w / 2, 90 + (i % 2 ? -22 : 24), x0 - w, 90);
+    }
+    g.closePath();
+    g.fill();
+    // arms
+    g.lineCap = 'round'; g.lineWidth = 14;
+    g.strokeStyle = 'rgba(245,248,255,0.55)';
+    g.beginPath(); g.moveTo(-48, -5); g.quadraticCurveTo(-85, 10, -78, 45); g.stroke();
+    g.beginPath(); g.moveTo(48, -5); g.quadraticCurveTo(85, -20, 80, -50); g.stroke();
+    // hollow face
+    g.shadowBlur = 0;
+    g.fillStyle = 'rgba(10,14,22,0.75)';
+    g.beginPath(); g.ellipse(-18, -42, 8, 13, 0, 0, 7); g.fill();
+    g.beginPath(); g.ellipse(18, -42, 8, 13, 0, 0, 7); g.fill();
+    g.beginPath(); g.ellipse(0, -14, 7, 12, 0, 0, 7); g.fill();
+    g.restore();
+  }
+
+  function haunt() {
+    if (!base) return;
+    const w = base.width, h = base.height;
+    canvas.width = w; canvas.height = h;
+    ctx.drawImage(base, 0, 0);
+    const n = Math.random() < 0.25 ? 2 : 1;
+    const ghosts = [];
+    for (let i = 0; i < n; i++) {
+      const layer = document.createElement('canvas');
+      layer.width = w; layer.height = h;
+      const s = rand(0.35, 0.9) * Math.min(w, h) / 300;
+      const x = rand(0.12, 0.88) * w;
+      const y = rand(0.35, 0.8) * h;
+      const alpha = rand(0.22, 0.6);
+      drawGhost(layer.getContext('2d'), x, y, s);
+      ctx.globalAlpha = alpha;
+      ctx.drawImage(layer, 0, 0);
+      ctx.globalAlpha = 1;
+      ghosts.push(Math.round(alpha * 100));
+    }
+    count++;
+    info.textContent = (n === 1 ? '1 ghost' : '2 ghosts') + ' at ' + ghosts.join('% and ') + '% - haunting #' + count;
+  }
+
+  function setBase(src) {
+    const k = Math.min(1, MAX / Math.max(src.width, src.height));
+    const c = document.createElement('canvas');
+    c.width = Math.max(1, Math.round(src.width * k));
+    c.height = Math.max(1, Math.round(src.height * k));
+    c.getContext('2d').drawImage(src, 0, 0, c.width, c.height);
+    base = c;
+    haunt();
+  }
+
+  $('#reroll').addEventListener('click', haunt);
+
+  $('#file').addEventListener('change', async e => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    try {
+      const bmp = await createImageBitmap(f);
+      setBase(bmp);
+    } catch {
+      info.textContent = 'could not read that photo, try another';
+    }
+  });
+
+  $('#save').addEventListener('click', () => {
+    try {
+      canvas.toBlob(b => {
+        if (!b) { info.textContent = 'could not save, press and hold the photo'; return; }
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(b);
+        a.download = 'haunted.png';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      }, 'image/png');
+    } catch {
+      info.textContent = 'could not save, press and hold the photo';
+    }
+  });
+
+  setBase(sample());
+})();
+</script>
+</body>
+</html>

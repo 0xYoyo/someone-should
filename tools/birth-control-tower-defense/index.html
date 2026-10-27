@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tower defense game where birth control methods defend against sperm</title>
+<style>
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+#hud { display: flex; justify-content: space-between; gap: 8px; font: 16px/1.4 var(--mono); color: var(--meta); }
+#hud b { color: var(--ink); font-weight: 500; }
+#board { position: relative; max-width: 480px; }
+#grid { display: grid; grid-template-columns: repeat(5, 1fr) 0.8fr; grid-auto-rows: 52px; border: 1.5px solid var(--line); border-radius: var(--radius); }
+#grid button { min-height: 0; height: 52px; padding: 0; border: 0; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); border-radius: 0; font: 500 18px/1 var(--mono); position: relative; }
+#grid button.goal { cursor: default; border-right: 0; color: var(--meta); font: 16px/1 var(--mono); background: color-mix(in srgb, var(--line) 40%, transparent); }
+#grid button.tower { color: var(--ink); }
+#grid button.hit { background: color-mix(in srgb, var(--built) 25%, transparent); }
+#layer { position: absolute; inset: 1.5px; pointer-events: none; overflow: hidden; }
+.dot { position: absolute; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; background: var(--no); }
+.dot::after { content: ""; position: absolute; right: 9px; top: 5px; width: 9px; height: 2px; background: var(--no); opacity: .5; }
+#picker { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 480px; }
+#picker button { display: grid; gap: 2px; padding: 6px 4px; line-height: 1.2; font-size: 16px; justify-items: center; }
+#picker button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+#picker small { font: 16px/1.2 var(--mono); opacity: .75; }
+#status { min-height: 1.45em; }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a tower defense game where birth control methods defend against sperm</h1>
+
+<main id="app" class="stack">
+  <div id="hud"><span>wave <b id="wave">1</b></span><span>stopped <b id="stopped">0</b></span><span>through <b id="through">0</b>/5</span><span>coins <b id="coins">0</b></span></div>
+  <div id="board"><div id="grid"></div><div id="layer"></div></div>
+  <div id="status" class="meta" role="status"></div>
+  <div id="picker"></div>
+  <div class="row"><button id="start" class="primary">Pause</button></div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  // chance = typical-use effectiveness per pass
+  const TYPES = {
+    wd:  { name: 'Withdrawal', chance: 0.78, cost: 5,  mark: '\u25CB' },
+    cd:  { name: 'Condom',     chance: 0.87, cost: 10, mark: '\u25A1' },
+    pil: { name: 'Pill',       chance: 0.93, cost: 20, mark: '\u25C7' },
+    iud: { name: 'IUD',        chance: 0.99, cost: 40, mark: '\u25B3' },
+    imp: { name: 'Implant',    chance: 0.999, cost: 50, mark: '\u25A0' }
+  };
+  const ROWS = 5, COLS = 5, MAX_THROUGH = 5;
+
+  let grid, towers, dots, wave, spawned, toSpawn, spawnT, stopped, through, coins, sel, paused, over, pauseT, last;
+  const gridEl = $('#grid'), layer = $('#layer'), statusEl = $('#status');
+  const cells = [];
+
+  for (let r = 0; r < ROWS; r++) for (let c = 0; c <= COLS; c++) {
+    const b = document.createElement('button');
+    b.id = 'c-' + r + '-' + c;
+    if (c === COLS) { b.className = 'goal'; b.tabIndex = -1; b.textContent = r === 2 ? 'egg' : ''; b.setAttribute('aria-hidden', 'true'); }
+    else { b.setAttribute('aria-label', 'row ' + (r + 1) + ' column ' + (c + 1)); b.addEventListener('click', () => place(r, c)); }
+    gridEl.appendChild(b); cells.push(b);
+  }
+  const cell = (r, c) => cells[r * (COLS + 1) + c];
+
+  const picker = $('#picker');
+  for (const k of Object.keys(TYPES)) {
+    const t = TYPES[k], b = document.createElement('button');
+    b.id = 't-' + k; b.innerHTML = t.mark + ' ' + t.name + '<small>' + Math.round(t.chance * 1000) / 10 + '% \u00B7 ' + t.cost + '</small>';
+    b.addEventListener('click', () => { sel = k; drawPicker(); });
+    picker.appendChild(b);
+  }
+  const rm = document.createElement('button');
+  rm.id = 't-x'; rm.textContent = 'Remove'; rm.addEventListener('click', () => { sel = 'x'; drawPicker(); });
+  picker.appendChild(rm);
+
+  function drawPicker() {
+    for (const b of picker.children) b.setAttribute('aria-pressed', String(b.id === 't-' + sel));
+  }
+
+  function say(s) { statusEl.textContent = s; }
+
+  function put(r, c, k) {
+    towers[r + ',' + c] = k;
+    const b = cell(r, c); b.className = 'tower'; b.textContent = TYPES[k].mark;
+    b.setAttribute('aria-label', TYPES[k].name);
+  }
+
+  function place(r, c) {
+    if (over) return;
+    const key = r + ',' + c, had = towers[key];
+    if (sel === 'x') {
+      if (!had) return say('Nothing here.');
+      coins += Math.floor(TYPES[had].cost / 2); delete towers[key];
+      const b = cell(r, c); b.className = ''; b.textContent = ''; b.removeAttribute('aria-label');
+      hud(); return say('Removed. Half back.');
+    }
+    if (had) return say('Taken. Use Remove first.');
+    const t = TYPES[sel];
+    if (coins < t.cost) return say('Not enough coins.');
+    coins -= t.cost; put(r, c, sel); hud(); say(t.name + ' placed.');
+  }
+
+  function hud() {
+    $('#wave').textContent = wave; $('#stopped').textContent = stopped;
+    $('#through').textContent = through + '/' + MAX_THROUGH; $('#coins').textContent = coins;
+  }
+
+  function startWave() {
+    toSpawn = 6 + wave * 3; spawned = 0; spawnT = 0; pauseT = 0;
+  }
+
+  function reset() {
+    towers = {}; dots.forEach(d => d.el.remove()); dots = [];
+    cells.forEach(b => { if (!b.classList.contains('goal')) { b.className = ''; b.textContent = ''; b.removeAttribute('aria-label'); } });
+    wave = 1; stopped = 0; through = 0; coins = 30; over = false; paused = false; sel = 'cd';
+    put(1, 2, 'pil'); put(3, 1, 'cd'); put(2, 3, 'wd');
+    $('#start').textContent = 'Pause';
+    startWave(); hud(); drawPicker(); say('Place methods before they get through.');
+  }
+
+  function spawn() {
+    const el = document.createElement('div'); el.className = 'dot'; layer.appendChild(el);
+    dots.push({ el, row: Math.floor(Math.random() * ROWS), x: 0, seen: {}, speed: 0.45 + wave * 0.04 + Math.random() * 0.12 });
+  }
+
+  function flash(r, c) {
+    const b = cell(r, c); b.classList.add('hit'); setTimeout(() => b.classList.remove('hit'), 200);
+  }
+
+  function step(dt) {
+    if (pauseT > 0) { pauseT -= dt; if (pauseT <= 0) startWave(); return; }
+    if (spawned < toSpawn) { spawnT -= dt; if (spawnT <= 0) { spawn(); spawned++; spawnT = 0.9; } }
+    for (const d of dots) {
+      d.x += d.speed * dt;
+      for (let c = 0; c < COLS; c++) {
+        if (d.dead || d.seen[c] || d.x < c + 0.5) continue;
+        d.seen[c] = 1;
+        const k = towers[d.row + ',' + c];
+        if (k && Math.random() < TYPES[k].chance) { d.dead = true; stopped++; coins += 2; flash(d.row, c); }
+      }
+      if (!d.dead && d.x >= COLS + 0.4) { d.dead = true; through++; say('One got through.'); }
+    }
+    dots = dots.filter(d => { if (d.dead) d.el.remove(); return !d.dead; });
+    if (through >= MAX_THROUGH) { over = true; paused = true; $('#start').textContent = 'Again'; say('Wave ' + wave + ' was too much. Best: wave ' + best(wave) + '.'); }
+    else if (spawned >= toSpawn && !dots.length) { wave++; coins += 10; pauseT = 3; say('Wave cleared. +10 coins.'); }
+    hud();
+  }
+
+  function best(w) { const b = Math.max(store.get('best', 0), w); store.set('best', b); return b; }
+
+  function draw() {
+    const w = layer.clientWidth, h = layer.clientHeight, unit = w / (COLS + 0.8);
+    for (const d of dots) d.el.style.transform = 'translate(' + (d.x * (w / (COLS + 0.8))) + 'px,' + ((d.row + 0.5) * h / ROWS) + 'px)';
+  }
+
+  function loop(t) {
+    const dt = Math.min(0.1, (t - last) / 1000 || 0); last = t;
+    if (!paused) { step(dt); }
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  $('#start').addEventListener('click', () => {
+    if (over) return reset();
+    paused = !paused; $('#start').textContent = paused ? 'Resume' : 'Pause';
+    say(paused ? 'Paused.' : '');
+  });
+
+  dots = [];
+  reset();
+  requestAnimationFrame(t => { last = t; loop(t); });
+})();
+</script>
+</body>
+</html>

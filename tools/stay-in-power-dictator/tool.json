@@ -1,0 +1,54 @@
+{
+  "slug": "stay-in-power-dictator",
+  "wish": "someone should make a computer game where you are an evil dictator keeping power",
+  "year": 2013,
+  "agreed": 78,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/CrazyIdeas/comments/1rdbvr/",
+      "date": "2013-11-24",
+      "points": 57,
+      "comments": 21
+    }
+  ],
+  "spec": "Turn-based dictator game: each day an event forces a choice that moves army, people, treasury and court.\nTap one of two options per day; if any meter hits 0 or 100 you are overthrown.\nIt does not simulate a real country, has no multiplayer and no network; best reign is saved locally.",
+  "tests": [
+    {
+      "expect": {
+        "sel": "#m-army",
+        "visible": true
+      }
+    },
+    {
+      "expect": {
+        "sel": "#turn",
+        "matches": "^1$"
+      }
+    },
+    {
+      "tap": "#a"
+    },
+    {
+      "expect": {
+        "sel": "#turn",
+        "matches": "^2$"
+      }
+    },
+    {
+      "tap": "#b"
+    },
+    {
+      "expect": {
+        "sel": "#turn",
+        "matches": "^3$"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:47:36Z",
+  "model": "sonnet-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": ""
+}

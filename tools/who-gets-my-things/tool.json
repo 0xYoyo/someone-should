@@ -1,0 +1,57 @@
+{
+  "slug": "who-gets-my-things",
+  "wish": "someone should make an app to photograph belongings and assign who gets them after you die",
+  "year": 2015,
+  "agreed": 85,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/3gvc6h/",
+      "date": "2015-08-13",
+      "points": 74,
+      "comments": 11
+    }
+  ],
+  "spec": "Lists belongings with a photo and a name, each assigned to a person.\\nType what it is, pick a photo, type who gets it, tap Add; the list regroups by person.\\nIt does not make a legal will; everything stays on this device, so copy or print the list.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#desc",
+        "text": "Piano"
+      }
+    },
+    {
+      "type": {
+        "sel": "#who",
+        "text": "Maya"
+      }
+    },
+    {
+      "tap": "#add"
+    },
+    {
+      "expect": {
+        "sel": ".grp",
+        "contains": "Maya"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#groups",
+        "contains": "Piano"
+      }
+    },
+    {
+      "expect": {
+        "sel": ".item",
+        "visible": true
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:46:07Z",
+  "model": "sonnet-5.5",
+  "minutes": 5,
+  "approved": false,
+  "notes": "Photos are shrunk to ~240px and stored in localStorage; the list is not a legal will."
+}

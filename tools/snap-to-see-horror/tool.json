@@ -1,0 +1,48 @@
+{
+  "slug": "snap-to-see-horror",
+  "wish": "someone should make a horror game where finger snapping lights up the dark",
+  "year": 2022,
+  "agreed": 82,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/x2kfk9/",
+      "date": "2022-08-31",
+      "points": 63,
+      "comments": 19
+    }
+  ],
+  "spec": "A dark 7x7 room with a creature hunting you; a snap (heard by the microphone) or the flash button lights the room for under a second.\\nSteer with the arrow pad to the green exit; every flash also lets the creature step closer.\\nIt does not run anywhere but offline on this page; the microphone is optional.",
+  "tests": [
+    {
+      "tap": "#right"
+    },
+    {
+      "tap": "#right"
+    },
+    {
+      "expect": {
+        "sel": "#moves",
+        "contains": "2"
+      }
+    },
+    {
+      "tap": "#flash"
+    },
+    {
+      "expect": {
+        "sel": "#status",
+        "contains": "lit"
+      }
+    },
+    {
+      "tap": "#up"
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:46:50Z",
+  "model": "sonnet-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": "Snap detection is a loudness spike over background; flash button is the fallback."
+}

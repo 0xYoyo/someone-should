@@ -1,0 +1,48 @@
+{
+  "slug": "unsearchable-text-scrambler",
+  "wish": "someone should make an app that scrambles your text with symbols so it can't be searched",
+  "year": 2017,
+  "agreed": 91,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/6vw75m/",
+      "date": "2017-08-25",
+      "points": 69,
+      "comments": 22
+    }
+  ],
+  "spec": "Scrambles pasted text by swapping letters for look-alike Cyrillic/Greek symbols and adding invisible characters.\nPaste or type text, copy the result; a search box checks whether a word would still be found.\nIt does not encrypt anything; the text is only hidden from plain search.",
+  "tests": [
+    {
+      "expect": {
+        "sel": "#stat",
+        "matches": "\\d+ letters swapped"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#found",
+        "contains": "Not found"
+      }
+    },
+    {
+      "tap": "#look"
+    },
+    {
+      "tap": "#zw"
+    },
+    {
+      "expect": {
+        "sel": "#found",
+        "contains": "Found"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:46:01Z",
+  "model": "sonnet-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": ""
+}

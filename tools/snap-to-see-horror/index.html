@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a horror game where finger snapping lights up the dark</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+canvas { width: 100%; max-width: 360px; aspect-ratio: 1; background: #0a0a0a; border-radius: var(--radius); display: block; margin: 0 auto; }
+#status { text-align: center; min-height: 52px; }
+.pad { display: grid; grid-template-columns: repeat(3, 60px); grid-template-rows: repeat(2, 60px); gap: 8px; justify-content: center; }
+.pad button { min-height: 60px; padding: 0; font-size: 22px; }
+#up { grid-column: 2; grid-row: 1; } #left { grid-column: 1; grid-row: 2; } #down { grid-column: 2; grid-row: 2; } #right { grid-column: 3; grid-row: 2; }
+.row { justify-content: center; }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a horror game where finger snapping lights up the dark</h1>
+<main id="app" class="stack">
+<canvas id="view" width="336" height="336" aria-label="dark room"></canvas>
+<div id="status" aria-live="polite">snap to light the room. reach the exit.</div>
+<div class="pad">
+<button id="up" aria-label="up">&#9650;</button><button id="left" aria-label="left">&#9664;</button><button id="down" aria-label="down">&#9660;</button><button id="right" aria-label="right">&#9654;</button>
+</div>
+<div class="row">
+<button id="mic" class="primary">tap to start mic</button>
+<button id="flash">flash</button>
+</div>
+<div class="meta" style="text-align:center">moves <span id="moves">0</span></div>
+</main>
+<script>
+(() => {
+  'use strict';
+  const $ = (s) => document.querySelector(s);
+  const MAP = ["...#..E", ".#.#.#.", ".#...#.", ".####..", ".......", ".##.##.", "P......"];
+  const N = 7, C = 48;
+  const walls = new Set(); let exit, start;
+  MAP.forEach((r, y) => [...r].forEach((ch, x) => {
+    if (ch === '#') walls.add(x + ',' + y);
+    if (ch === 'E') exit = { x, y };
+    if (ch === 'P') start = { x, y };
+  }));
+  const cv = $('#view'), g = cv.getContext('2d');
+  const status = $('#status'), movesEl = $('#moves');
+  let me, mon, moves, over, timer, litUntil, litStart;
+
+  function setStatus(t) { status.textContent = t; }
+  function open(x, y) { return x >= 0 && y >= 0 && x < N && y < N && !walls.has(x + ',' + y); }
+
+  function reset() {
+    me = { ...start }; mon = { x: 4, y: 2 }; moves = 0; over = false;
+    movesEl.textContent = 0;
+    clearInterval(timer); timer = null;
+    // the first frame is lit so the room is visible before anyone snaps
+    lightUp(2500);
+    setStatus('snap to light the room. reach the exit.');
+  }
+
+  function lightUp(ms) { litStart = performance.now(); litUntil = litStart + ms; requestAnimationFrame(draw); }
+
+  function alpha() {
+    const t = performance.now();
+    if (t >= litUntil) return 0;
+    return Math.min(1, (litUntil - t) / 600);
+  }
+
+  function draw() {
+    const a = alpha();
+    g.clearRect(0, 0, 336, 336);
+    g.fillStyle = '#0a0a0a'; g.fillRect(0, 0, 336, 336);
+    g.globalAlpha = a;
+    g.fillStyle = '#d9d4c7'; g.fillRect(0, 0, 336, 336);
+    g.fillStyle = '#2a2a2a';
+    walls.forEach((k) => { const [x, y] = k.split(',').map(Number); g.fillRect(x * C, y * C, C, C); });
+    g.fillStyle = '#2e7d4f'; g.fillRect(exit.x * C + 8, exit.y * C + 8, C - 16, C - 16);
+    if (a > 0 || over) {
+      g.globalAlpha = over ? 1 : a;
+      g.fillStyle = '#c8321e';
+      g.beginPath(); g.arc(mon.x * C + C / 2, mon.y * C + C / 2, 15, 0, 7); g.fill();
+      g.fillStyle = '#fff';
+      g.fillRect(mon.x * C + 15, mon.y * C + 17, 5, 5); g.fillRect(mon.x * C + 28, mon.y * C + 17, 5, 5);
+    }
+    g.globalAlpha = 1;
+    // you are always a faint dot
+    g.fillStyle = '#ededed';
+    g.beginPath(); g.arc(me.x * C + C / 2, me.y * C + C / 2, 9, 0, 7); g.fill();
+    if (alpha() > 0) requestAnimationFrame(draw);
+  }
+
+  function bfsStep() {
+    // one step along the shortest path from the creature to you
+    const q = [mon], prev = new Map([[mon.x + ',' + mon.y, null]]);
+    while (q.length) {
+      const c = q.shift();
+      if (c.x === me.x && c.y === me.y) {
+        let k = c.x + ',' + c.y, p = prev.get(k), cur = c;
+        while (p && (p.x !== mon.x || p.y !== mon.y)) { cur = p; p = prev.get(p.x + ',' + p.y); }
+        return p ? cur : cur;
+      }
+      for (const [dx, dy] of [[1,0],[-1,0],[0,1],[0,-1]]) {
+        const n = { x: c.x + dx, y: c.y + dy }, k = n.x + ',' + n.y;
+        if (open(n.x, n.y) && !prev.has(k)) { prev.set(k, c); q.push(n); }
+      }
+    }
+    return mon;
+  }
+
+  function creatureMove() {
+    if (over) return;
+    const s = bfsStep();
+    mon = { x: s.x, y: s.y };
+    check();
+    requestAnimationFrame(draw);
+  }
+
+  function check() {
+    if (over) return;
+    if (me.x === mon.x && me.y === mon.y) {
+      over = true; clearInterval(timer);
+      setStatus('it found you. tap flash to try again.');
+      requestAnimationFrame(draw);
+    } else if (me.x === exit.x && me.y === exit.y) {
+      over = true; clearInterval(timer);
+      setStatus('you got out in ' + moves + ' moves. tap flash to play again.');
+      lightUp(1500);
+    }
+  }
+
+  function begin() { if (!timer && !over) timer = setInterval(creatureMove, 1400); }
+
+  function flash() {
+    if (over) { reset(); return; }
+    begin();
+    lightUp(900);
+    setStatus('lit. it heard that.');
+    creatureMove(); // a snap is noise: the creature takes a step toward you
+  }
+
+  function go(dx, dy) {
+    if (over) return;
+    const x = me.x + dx, y = me.y + dy;
+    if (!open(x, y)) return;
+    begin();
+    me = { x, y }; moves++; movesEl.textContent = moves;
+    check();
+    requestAnimationFrame(draw);
+  }
+
+  $('#up').onclick = () => go(0, -1);
+  $('#down').onclick = () => go(0, 1);
+  $('#left').onclick = () => go(-1, 0);
+  $('#right').onclick = () => go(1, 0);
+  $('#flash').onclick = flash;
+  addEventListener('keydown', (e) => {
+    const m = { ArrowUp: [0,-1], ArrowDown: [0,1], ArrowLeft: [-1,0], ArrowRight: [1,0] }[e.key];
+    if (m) go(m[0], m[1]); else if (e.key === ' ') flash();
+  });
+
+  // microphone: a snap is a sudden loud spike over the running background level
+  let listening = false;
+  $('#mic').onclick = async () => {
+    if (listening) return;
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false } });
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const an = ctx.createAnalyser(); an.fftSize = 512;
+      ctx.createMediaStreamSource(stream).connect(an);
+      const buf = new Float32Array(an.fftSize);
+      let base = 0.01, last = 0;
+      listening = true;
+      $('#mic').textContent = 'listening'; setStatus('listening. snap.');
+      (function tick() {
+        an.getFloatTimeDomainData(buf);
+        let peak = 0; for (let i = 0; i < buf.length; i++) peak = Math.max(peak, Math.abs(buf[i]));
+        const now = performance.now();
+        if (peak > 0.15 && peak > base * 4 && now - last > 500) { last = now; flash(); }
+        base = base * 0.95 + peak * 0.05;
+        requestAnimationFrame(tick);
+      })();
+    } catch {
+      setStatus('no mic. use the flash button.');
+    }
+  };
+
+  reset();
+})();
+</script>
+</body>
+</html>
