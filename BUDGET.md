@@ -25,7 +25,7 @@ Keep a running total in `LEDGER.md` after **every batch**: tokens by model, esti
 - 140 build subagents spawned → finish batch, commit, stop.
 - Running total ≥ $200 equivalent → finish batch, commit, stop.
 - The reviewer writes `STOP` as the first line of REVIEW.md → finish batch, commit, stop.
-- 09:30 Asia/Jerusalem → wrap up regardless: commit what passes, write LEDGER, stop.
+- There is **no time stop**. Run until 100 PASS or the budget cap. If the platform cuts the session, everything is committed per batch.
 - If the platform cuts the session (credit exhausted, timeout): everything is already committed per batch; the next session resumes from `data/built.json`.
 
 ## Push cadence

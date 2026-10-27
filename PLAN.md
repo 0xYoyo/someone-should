@@ -17,7 +17,7 @@ Order of work — each step commits to `main` before the next starts:
    Target: 3,000+ raw candidates. Write the real count to LEDGER.
 2. **Normalize + dedupe** → `data/wishes.json`. One `opus` pass over the raw set in chunks of 200: rewrite each into one plain-language wish sentence beginning "someone should make…" (≤120 chars, no editorializing), cluster duplicates across sources (same wish ≈ same entry; sum `agreed` = points + score + comments across duplicates; keep the earliest date as `year` and every source URL in `sources[]`). Drop: jokes, hardware, anything needing an account/login/paid API/server/other people's private data, anything unsafe (see CLAUDE.md). Classify the rest `buildable: true|false` with a one-line `why`.
 3. **Rank** → `data/top.json`: the 100 highest `agreed` that are `buildable`, plus the 40 highest `agreed` that are not, each with a `no` reason from the vocabulary in `SPEC.md`. Sanity: diversity — no more than 5 of the 100 in the same category (timer/todo/notes/calculator/converter). If the top is boring, go deeper; wanted and interesting beats wanted and generic. Write the final list to LEDGER as 100 one-liners.
-4. **Build** in batches of 8 parallel `opus` subagents, one tool each. Each subagent gets: `CONTRACT.md`, `design/tokens.css`, `design/tool-template.html`, its wish object. It writes `tools/<slug>/index.html` and `tools/<slug>/tool.json`, runs `node scripts/verify.mjs <slug>`, fixes once if red, reports PASS/FAIL in ≤5 lines. You record the result; you never open the HTML.
+4. **Build** in batches of 8 parallel subagents (raise to 12 if two batches run with no rate-limit errors), one tool each, spawned in the background so they truly run concurrently. Each subagent gets: `CONTRACT.md`, `design/tokens.css`, `design/tool-template.html`, its wish object. It writes `tools/<slug>/index.html` and `tools/<slug>/tool.json`, runs `node scripts/verify.mjs <slug>`, fixes once if red, reports PASS/FAIL in ≤5 lines. You record the result; you never open the HTML.
    After each batch: `git pull --rebase`, re-read `REVIEW.md`, commit `tools/` + an updated `data/built.json` (slug, status, verify summary), push, append LEDGER.
 5. **Drop** anything that fails verify twice. Mark it `dropped` in `data/built.json` with the reason. Never ship a red tool. 70 good beats 100 mixed.
 6. **Finish**: `data/built.json` complete; `qa/<slug>.png` screenshots for every PASS (verify.mjs writes them); LEDGER final line with counts and the three best and three weakest tools by your judgment.
@@ -38,7 +38,10 @@ Builds the site around the data. Works from `data/wishes.json` + `data/top.json`
 7. Test at 390×844 and 360×780 in headless Chromium, and in a desktop width. Screenshot the wall to `qa/wall-*.png`. Commit.
 
 ### REVIEWER (not a cloud session)
-Fable pulls hourly, reads LEDGER + commits + qa/, and writes `REVIEW.md`. Sessions obey it.
+Fable pulls every 30 minutes, reads LEDGER + commits + qa/, and writes `REVIEW.md`. Sessions obey it.
+
+### YOU OWN THE RUN (FACTORY)
+You are the orchestrator and the monitor. Nobody is watching live. After every batch you: re-pull, re-read REVIEW.md, update LEDGER with tokens/spend/PASS counts and the adaptive decision you took, re-verify that `data/built.json` and the committed `tools/` agree (`node scripts/verify.mjs --all` every 3 batches), and push. If a subagent hangs past 12 minutes, stop waiting on it, mark its slug for a fresh attempt, and move on. If pushes fail, rebase and retry; if GitHub is unreachable, keep building and push later. If harvest yields fewer buildable wishes than 140, say so in LEDGER and build everything buildable. Never ask a question in chat and wait; write the question and your decision in LEDGER and proceed with the decision.
 
 ## Morning definition of done
 - `index.html` opens on a phone, first frame is the wall, no vocabulary needed, no waiting.
