@@ -1,0 +1,54 @@
+{
+  "slug": "logo-turtle-playground",
+  "wish": "someone should make a LOGO interpreter that has a turtle",
+  "year": 2011,
+  "agreed": 60,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/3716/is-there-a-logo-interpreter-that-actually-has-a-turtle",
+      "date": "2011-02-17",
+      "points": 51,
+      "comments": 9
+    }
+  ],
+  "spec": "A LOGO interpreter with an animated turtle that draws on a canvas: FD, BK, RT, LT, PU, PD, SETXY, SETPC, ARC, REPEAT, IF, MAKE, variables, arithmetic and TO … END procedures with inputs and recursion.\nType a program, tap Run (or Ctrl+Enter), pick a speed, save the drawing as PNG; the program is remembered.\nIt does not do LOGO list processing, word primitives, multiple turtles or screen wrap.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#code",
+        "text": "TO SQ :S\nREPEAT 4 [FD :S RT 90]\nEND\nSQ 60\nRT 45 FD 20"
+      }
+    },
+    {
+      "tap": "#run"
+    },
+    {
+      "wait": 1500
+    },
+    {
+      "expect": {
+        "sel": "#status",
+        "matches": "^5 lines · turtle at 14, 14 · heading 45$"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#procs",
+        "contains": "SQ"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#turtle",
+        "visible": true
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:30:02Z",
+  "model": "opus-5.5",
+  "minutes": 9,
+  "approved": false,
+  "notes": ""
+}

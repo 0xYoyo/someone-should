@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a LOGO interpreter that has a turtle</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+#app { max-width: 560px; }
+#stage { position: relative; width: 100%; aspect-ratio: 1 / 1; border: 1.5px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+#stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+#status { font: 16px/1.4 var(--mono); color: var(--meta); min-height: 22px; }
+#status.no { color: var(--no); }
+#code { font: 16px/1.45 var(--mono); resize: vertical; min-height: 132px; }
+#out { font: 16px/1.4 var(--mono); margin: 0; white-space: pre-wrap; word-break: break-word; }
+#out:empty, #procs:empty { display: none; }
+#procs { font: 16px/1.4 var(--mono); color: var(--meta); }
+.row select { width: auto; flex: 1 1 120px; }
+.row button { flex: 0 0 auto; }
+#run { flex: 1 1 90px; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a LOGO interpreter that has a turtle</h1>
+
+<main id="app" class="stack">
+  <div id="stage"><canvas id="ink"></canvas><canvas id="turtle"></canvas></div>
+  <div id="status" aria-live="polite">Type LOGO below, then Run.</div>
+  <pre id="out"></pre>
+  <textarea id="code" rows="5" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="LOGO program" placeholder="REPEAT 4 [FD 100 RT 90]"></textarea>
+  <div class="row">
+    <button id="run" class="primary">Run</button>
+    <select id="speed" aria-label="Turtle speed">
+      <option value="3">slow</option>
+      <option value="12">normal</option>
+      <option value="60" selected>fast</option>
+      <option value="inf">instant</option>
+    </select>
+    <button id="save">Save PNG</button>
+  </div>
+  <div class="row">
+    <select id="examples" aria-label="Examples">
+      <option value="">examples…</option>
+      <option value="square">square</option>
+      <option value="star">star</option>
+      <option value="flower">flower</option>
+      <option value="spiral">spiral</option>
+      <option value="tree">tree</option>
+      <option value="wheel">color wheel</option>
+    </select>
+  </div>
+  <div id="procs"></div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  // storage helper — never throws
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const EXAMPLES = {
+    square: 'REPEAT 4 [FD 100 RT 90]',
+    star: 'PU SETXY -75 25 PD\nSETH 90\nREPEAT 5 [FD 150 RT 144]',
+    flower: 'REPEAT 36 [REPEAT 4 [FD 70 RT 90] RT 10]',
+    spiral: 'TO SPIRAL :SIZE\n  IF :SIZE > 190 [STOP]\n  FD :SIZE RT 91\n  SPIRAL :SIZE + 3\nEND\nSPIRAL 2',
+    tree: 'TO TREE :LEN\n  IF :LEN < 6 [STOP]\n  FD :LEN LT 25\n  TREE :LEN * 0.72\n  RT 50\n  TREE :LEN * 0.72\n  LT 25 BK :LEN\nEND\nPU BK 170 PD\nSETPC "green\nTREE 75',
+    wheel: 'REPEAT 15 [SETPC REPCOUNT SETPW 3 FD 150 BK 150 RT 24]\nHT'
+  };
+  const PALETTE = ['ink', '#1f5fd6', '#2ea043', '#14a3b8', '#c8321e', '#b02a9a', '#d4a514', '#ffffff',
+    '#7a4a1e', '#c8a46e', '#2e7d4f', '#3fb6c6', '#e8836b', '#6a3fb0', '#e07b14', '#8a8a8a'];
+
+  // ---------- parser ----------
+  class LogoError extends Error {}
+  class Stop { constructor(v) { this.v = v; } }
+  const fail = m => { throw new LogoError(m); };
+  const DELIM = /[\s[\]()+\-*/=<>]/;
+
+  function tokenize(src) {
+    src = src.replace(/;[^\n]*/g, '');
+    const out = [];
+    let i = 0;
+    while (i < src.length) {
+      const c = src[i];
+      if (/\s/.test(c)) { i++; continue; }
+      if (c === '-') {
+        // "-5" after a space is a negative number; "10 - 5" or "10-5" is subtraction
+        const prev = i ? src[i - 1] : ' ', next = src[i + 1] || ' ';
+        out.push({ t: 'op', v: /[\s[(]/.test(prev) && !/\s/.test(next) ? 'neg' : '-' });
+        i++; continue;
+      }
+      if ('[]()+*/=<>'.includes(c)) { out.push({ t: 'op', v: c }); i++; continue; }
+      let j = i;
+      while (j < src.length && !DELIM.test(src[j])) j++;
+      const w = src.slice(i, j); i = j;
+      if (/^(\d+\.?\d*|\.\d+)(e-?\d+)?$/i.test(w)) out.push({ t: 'num', v: parseFloat(w) });
+      else if (w[0] === ':') out.push({ t: 'var', v: w.slice(1).toLowerCase() });
+      else if (w[0] === '"') out.push({ t: 'quote', v: w.slice(1) });
+      else out.push({ t: 'word', v: w.toLowerCase() });
+    }
+    return out;
+  }
+
+  function nest(tokens) {
+    const stack = [[]];
+    for (const t of tokens) {
+      if (t.t === 'op' && t.v === '[') stack.push([]);
+      else if (t.t === 'op' && t.v === ']') {
+        if (stack.length < 2) fail('there is a ] without a [');
+        const list = stack.pop();
+        stack[stack.length - 1].push({ t: 'list', v: list });
+      } else stack[stack.length - 1].push(t);
+    }
+    if (stack.length > 1) fail('there is a [ without a ]');
+    return stack[0];
+  }
+
+  // pulls TO … END definitions out of the top level
+  function extractProcs(items, procs) {
+    const main = [];
+    for (let i = 0; i < items.length; i++) {
+      const t = items[i];
+      if (t.t === 'word' && t.v === 'to') {
+        const nameTok = items[++i];
+        if (!nameTok || nameTok.t !== 'word') fail('TO needs a name');
+        if (BUILTINS[nameTok.v]) fail(`${nameTok.v.toUpperCase()} is already a command`);
+        const params = [];
+        while (items[i + 1] && items[i + 1].t === 'var') params.push(items[++i].v);
+        const body = [];
+        while (++i < items.length && !(items[i].t === 'word' && items[i].v === 'end')) body.push(items[i]);
+        if (i >= items.length) fail(`TO ${nameTok.v.toUpperCase()} has no END`);
+        procs[nameTok.v] = { params, body };
+      } else if (t.t === 'word' && t.v === 'end') fail('END without TO');
+      else main.push(t);
+    }
+    return main;
+  }
+
+  // ---------- interpreter ----------
+  const MAX_OPS = 300000, MAX_DEPTH = 1000;
+  let procs, globals, turtle, actions, printed, ops, depth, lines, repStack;
+
+  const fmt = v => typeof v === 'number' ? String(Math.round(v * 1e4) / 1e4)
+    : Array.isArray(v) ? '[' + v.map(t => t.t === 'list' ? fmt(t.v) : t.t === 'var' ? ':' + t.v : t.v).join(' ') + ']'
+    : String(v);
+  function num(v) {
+    if (typeof v === 'number') return v;
+    if (typeof v === 'string' && v.trim() !== '' && isFinite(v)) return parseFloat(v);
+    fail(`${fmt(v)} is not a number`);
+  }
+  const asList = v => Array.isArray(v) ? v : fail(`${fmt(v)} should be a [list]`);
+  const truthy = v => v === true || String(v).toLowerCase() === 'true' ? true
+    : v === false || String(v).toLowerCase() === 'false' ? false : fail(`${fmt(v)} is not true or false`);
+
+  function lookup(scope, name) {
+    for (let s = scope; s; s = s.parent) if (name in s.vars) return s.vars[name];
+    fail(`:${name} has no value`);
+  }
+  function assign(scope, name, val) {
+    for (let s = scope; s; s = s.parent) if (name in s.vars) { s.vars[name] = val; return; }
+    globals.vars[name] = val;
+  }
+
+  function runList(items, scope) {
+    const r = { items, i: 0 };
+    while (r.i < items.length) {
+      const v = evalExpr(r, scope, 0);
+      if (v !== undefined) fail(`you didn't say what to do with ${fmt(v)}`);
+    }
+  }
+
+  const PREC = { '=': 1, '<': 1, '>': 1, '+': 2, '-': 2, '*': 3, '/': 3 };
+  function evalExpr(r, scope, minPrec) {
+    let left = primary(r, scope);
+    for (;;) {
+      const t = r.items[r.i];
+      if (!t || t.t !== 'op' || !(t.v in PREC) || PREC[t.v] <= minPrec) return left;
+      r.i++;
+      const right = evalExpr(r, scope, PREC[t.v]);
+      left = binop(t.v, left, right);
+    }
+  }
+  function binop(op, a, b) {
+    if (op === '=') {
+      if (typeof a === 'number' || typeof b === 'number') { try { return num(a) === num(b); } catch { return false; } }
+      return String(a).toLowerCase() === String(b).toLowerCase();
+    }
+    a = num(a); b = num(b);
+    switch (op) {
+      case '<': return a < b;
+      case '>': return a > b;
+      case '+': return a + b;
+      case '-': return a - b;
+      case '*': return a * b;
+      case '/': return b === 0 ? fail("can't divide by zero") : a / b;
+    }
+  }
+  function primary(r, scope) {
+    const t = r.items[r.i++];
+    if (!t) fail('not enough inputs');
+    switch (t.t) {
+      case 'num': return t.v;
+      case 'quote': return t.v;
+      case 'var': return lookup(scope, t.v);
+      case 'list': return t.v;
+      case 'word': return call(t.v, r, scope);
+      case 'op':
+        if (t.v === 'neg') return -num(evalExpr(r, scope, 3));
+        if (t.v === '(') {
+          const v = evalExpr(r, scope, 0);
+          const close = r.items[r.i++];
+          if (!close || close.t !== 'op' || close.v !== ')') fail('missing )');
+          return v;
+        }
+        fail(`unexpected ${t.v}`);
+    }
+  }
+  function args(name, n, r, scope) {
+    const a = [];
+    for (let k = 0; k < n; k++) {
+      const t = r.items[r.i];
+      if (!t || (t.t === 'op' && t.v === ')')) fail(`not enough inputs to ${name.toUpperCase()}`);
+      const v = evalExpr(r, scope, 0);
+      if (v === undefined) fail(`${name.toUpperCase()} needs a value, not a command`);
+      a.push(v);
+    }
+    return a;
+  }
+  function call(name, r, scope) {
+    if (++ops > MAX_OPS) fail('too many steps, stopped (endless loop?)');
+    const p = procs[name];
+    if (p) {
+      const a = args(name, p.params.length, r, scope);
+      if (++depth > MAX_DEPTH) fail(`${name.toUpperCase()} went too deep, add a STOP`);
+      const s = { vars: Object.create(null), parent: scope };
+      p.params.forEach((n, k) => { s.vars[n] = a[k]; });
+      try { runList(p.body, s); }
+      catch (e) { if (e instanceof Stop) return e.v; throw e; }
+      finally { depth--; }
+      return undefined;
+    }
+    const b = BUILTINS[name];
+    if (!b) fail(`I don't know how to ${name.toUpperCase()}`);
+    return b.f(args(name, b.n, r, scope), scope);
+  }
+
+  // ---------- turtle ----------
+  function snap(cost) { actions.push({ k: 'T', x: turtle.x, y: turtle.y, h: turtle.h, vis: turtle.vis, cost }); }
+  function line(x1, y1, x2, y2, keep) {
+    if (actions.length > 200000) fail('too much drawing, stopped');
+    actions.push({ k: 'L', x1, y1, x2, y2, c: turtle.color, w: turtle.width, h: turtle.h, keep });
+    lines++;
+  }
+  function move(d) {
+    const rad = turtle.h * Math.PI / 180;
+    const nx = turtle.x + d * Math.sin(rad), ny = turtle.y + d * Math.cos(rad);
+    if (turtle.pen) line(turtle.x, turtle.y, nx, ny);
+    turtle.x = nx; turtle.y = ny;
+    snap(turtle.pen ? 0 : Math.min(Math.abs(d), 40) / 4);
+  }
+  function setPos(x, y) {
+    if (turtle.pen) line(turtle.x, turtle.y, x, y);
+    turtle.x = x; turtle.y = y; snap(turtle.pen ? 0 : 4);
+  }
+  function turn(a) { turtle.h = ((turtle.h + a) % 360 + 360) % 360; snap(Math.min(Math.abs(a), 180) / 8 + 1); }
+  function setColor(v) {
+    if (Array.isArray(v)) {
+      const c = v.map(t => Math.max(0, Math.min(255, Math.round(num(t.v)))));
+      if (c.length !== 3) fail('SETPC [r g b] needs three numbers');
+      turtle.color = `rgb(${c.join(',')})`;
+    } else if (typeof v === 'number' || isFinite(v)) {
+      turtle.color = PALETTE[((Math.floor(num(v)) % 16) + 16) % 16];
+    } else {
+      const s = String(v).toLowerCase();
+      if (!CSS.supports('color', s)) fail(`I don't know the color ${v}`);
+      turtle.color = s;
+    }
+  }
+  const home = () => { setPos(0, 0); turtle.h = 0; snap(4); };
+  const clear = () => actions.push({ k: 'C' });
+  const deg = Math.PI / 180;
+
+  const BUILTINS = Object.create(null);
+  const def = (names, n, f) => names.split(' ').forEach(k => { BUILTINS[k] = { n, f }; });
+  def('fd forward', 1, ([d]) => move(num(d)));
+  def('bk back', 1, ([d]) => move(-num(d)));
+  def('rt right', 1, ([a]) => turn(num(a)));
+  def('lt left', 1, ([a]) => turn(-num(a)));
+  def('pu penup', 0, () => { turtle.pen = false; });
+  def('pd pendown', 0, () => { turtle.pen = true; });
+  def('home', 0, home);
+  def('cs clearscreen', 0, () => { clear(); const p = turtle.pen; turtle.pen = false; home(); turtle.pen = p; });
+  def('clean', 0, clear);
+  def('setxy setpos', 2, ([x, y]) => setPos(num(x), num(y)));
+  def('setx', 1, ([x]) => setPos(num(x), turtle.y));
+  def('sety', 1, ([y]) => setPos(turtle.x, num(y)));
+  def('seth setheading', 1, ([a]) => { turtle.h = ((num(a) % 360) + 360) % 360; snap(4); });
+  def('setpc setpencolor setcolor', 1, ([c]) => setColor(c));
+  def('setpw setpensize setwidth', 1, ([w]) => { turtle.width = Math.max(0.5, Math.min(40, num(w))); });
+  def('ht hideturtle', 0, () => { turtle.vis = false; snap(0); });
+  def('st showturtle', 0, () => { turtle.vis = true; snap(0); });
+  def('arc', 2, ([a, rad]) => {
+    a = num(a); rad = num(rad);
+    const steps = Math.max(2, Math.ceil(Math.abs(a) / 5));
+    let px, py;
+    for (let k = 0; k <= steps; k++) {
+      const t = (turtle.h + a * k / steps) * deg;
+      const x = turtle.x + rad * Math.sin(t), y = turtle.y + rad * Math.cos(t);
+      if (k && turtle.pen) line(px, py, x, y, true);
+      px = x; py = y;
+    }
+  });
+  def('repeat', 2, ([n, body], scope) => {
+    n = Math.floor(num(n)); body = asList(body);
+    for (let k = 1; k <= n; k++) {
+      repStack.push(k);
+      try { runList(body, scope); } finally { repStack.pop(); }
+    }
+  });
+  def('repcount', 0, () => repStack.length ? repStack[repStack.length - 1] : -1);
+  def('if', 2, ([c, body], scope) => { if (truthy(c)) runList(asList(body), scope); });
+  def('ifelse', 3, ([c, a, b], scope) => runList(asList(truthy(c) ? a : b), scope));
+  def('make', 2, ([n, v], scope) => assign(scope, String(n).toLowerCase(), v));
+  def('stop', 0, () => { throw new Stop(); });
+  def('output op', 1, ([v]) => { throw new Stop(v); });
+  def('print pr show', 1, ([v]) => { printed.push(fmt(v)); });
+  def('random', 1, ([n]) => Math.floor(Math.random() * Math.max(1, num(n))));
+  def('sqrt', 1, ([n]) => Math.sqrt(num(n)));
+  def('sin', 1, ([n]) => Math.sin(num(n) * deg));
+  def('cos', 1, ([n]) => Math.cos(num(n) * deg));
+  def('arctan', 1, ([n]) => Math.atan(num(n)) / deg);
+  def('abs', 1, ([n]) => Math.abs(num(n)));
+  def('int', 1, ([n]) => Math.trunc(num(n)));
+  def('round', 1, ([n]) => Math.round(num(n)));
+  def('sum', 2, ([a, b]) => num(a) + num(b));
+  def('difference', 2, ([a, b]) => num(a) - num(b));
+  def('product', 2, ([a, b]) => num(a) * num(b));
+  def('quotient', 2, ([a, b]) => binop('/', a, b));
+  def('remainder modulo', 2, ([a, b]) => num(a) % num(b));
+  def('power', 2, ([a, b]) => Math.pow(num(a), num(b)));
+  def('xcor', 0, () => turtle.x);
+  def('ycor', 0, () => turtle.y);
+  def('heading', 0, () => turtle.h);
+  def('and', 2, ([a, b]) => truthy(a) && truthy(b));
+  def('or', 2, ([a, b]) => truthy(a) || truthy(b));
+  def('not', 1, ([a]) => !truthy(a));
+
+  function interpret(src) {
+    procs = Object.create(null); globals = { vars: Object.create(null), parent: null };
+    turtle = { x: 0, y: 0, h: 0, pen: true, color: 'ink', width: 2, vis: true };
+    actions = []; printed = []; ops = 0; depth = 0; lines = 0; repStack = [];
+    let error = null;
+    try {
+      const main = extractProcs(nest(tokenize(src)), procs);
+      runList(main, globals);
+    } catch (e) {
+      if (e instanceof LogoError) error = e.message;
+      else if (e instanceof Stop) error = null;
+      else if (e instanceof RangeError) error = 'too much recursion, add a STOP';
+      else throw e;
+    }
+    return { actions, printed, error, lines, turtle: { ...turtle }, procs: Object.keys(procs) };
+  }
+
+  // ---------- drawing ----------
+  const inkCv = $('#ink'), tCv = $('#turtle'), stage = $('#stage');
+  const inkCtx = inkCv.getContext('2d'), tCtx = tCv.getContext('2d');
+  let size = 0, dpr = 1, inkColor = '#141414', paperColor = '#f4f1ea', turtleColor = '#2e7d4f';
+  let last = null, anim = 0, view = { x: 0, y: 0, h: 0, vis: true };
+
+  function readColors() {
+    const cs = getComputedStyle(document.documentElement);
+    inkColor = cs.getPropertyValue('--ink').trim() || inkColor;
+    paperColor = cs.getPropertyValue('--paper').trim() || paperColor;
+    turtleColor = cs.getPropertyValue('--built').trim() || turtleColor;
+  }
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 3);
+    size = stage.clientWidth;
+    for (const cv of [inkCv, tCv]) { cv.width = Math.round(size * dpr); cv.height = Math.round(size * dpr); }
+    for (const c of [inkCtx, tCtx]) { c.setTransform(dpr, 0, 0, dpr, 0, 0); c.lineCap = 'round'; c.lineJoin = 'round'; }
+  }
+  const sx = x => size / 2 + x * size / 400;
+  const sy = y => size / 2 - y * size / 400;
+
+  function strokeLine(ctx, a, x2, y2) {
+    ctx.strokeStyle = a.c === 'ink' ? inkColor : a.c;
+    ctx.lineWidth = a.w;
+    ctx.beginPath(); ctx.moveTo(sx(a.x1), sy(a.y1)); ctx.lineTo(sx(x2), sy(y2)); ctx.stroke();
+  }
+  function drawTurtle(v) {
+    tCtx.clearRect(0, 0, size, size);
+    if (!v.vis) return;
+    const x = sx(v.x), y = sy(v.y), r = v.h * deg;
+    tCtx.save();
+    tCtx.translate(x, y); tCtx.rotate(r);
+    tCtx.fillStyle = turtleColor; tCtx.strokeStyle = paperColor; tCtx.lineWidth = 1.5;
+    // shell, head and four feet
+    tCtx.beginPath(); tCtx.ellipse(0, 0, 7, 9, 0, 0, Math.PI * 2); tCtx.fill(); tCtx.stroke();
+    tCtx.beginPath(); tCtx.arc(0, -12, 3.5, 0, Math.PI * 2); tCtx.fill();
+    for (const [fx, fy] of [[-7, -6], [7, -6], [-7, 6], [7, 6]]) { tCtx.beginPath(); tCtx.arc(fx, fy, 2.6, 0, Math.PI * 2); tCtx.fill(); }
+    tCtx.restore();
+  }
+
+  function play(result, speed, done) {
+    cancelAnimationFrame(anim);
+    inkCtx.clearRect(0, 0, size, size);
+    view = { x: 0, y: 0, h: 0, vis: true };
+    const acts = result.actions;
+    let i = 0, part = 0;
+    const frame = () => {
+      let budget = speed;
+      let partial = null;
+      while (i < acts.length && budget > 0) {
+        const a = acts[i];
+        if (a.k === 'L') {
+          const len = Math.hypot(a.x2 - a.x1, a.y2 - a.y1);
+          if (len - part <= budget) {
+            budget -= Math.max(len - part, 0.5);
+            strokeLine(inkCtx, a, a.x2, a.y2);
+            if (!a.keep) view = { ...view, x: a.x2, y: a.y2, h: a.h };
+            part = 0; i++;
+          } else {
+            part += budget; budget = 0;
+            const f = part / len;
+            partial = { a, x: a.x1 + (a.x2 - a.x1) * f, y: a.y1 + (a.y2 - a.y1) * f };
+          }
+        } else if (a.k === 'T') {
+          budget -= a.cost;
+          view = { x: a.x, y: a.y, h: a.h, vis: a.vis }; i++;
+        } else { inkCtx.clearRect(0, 0, size, size); i++; }
+      }
+      if (partial) {
+        drawTurtle(partial.a.keep ? view : { ...view, x: partial.x, y: partial.y, h: partial.a.h });
+        strokeLine(tCtx, partial.a, partial.x, partial.y);
+      } else drawTurtle(view);
+      if (i < acts.length) anim = requestAnimationFrame(frame);
+      else { anim = 0; done(); }
+    };
+    frame();
+  }
+
+  // ---------- UI ----------
+  const code = $('#code'), status = $('#status'), out = $('#out'), procsEl = $('#procs'), speedSel = $('#speed');
+  const say = (msg, bad) => { status.textContent = msg; status.classList.toggle('no', !!bad); };
+
+  function run() {
+    const src = code.value;
+    store.set('logo-turtle:code', src);
+    if (!src.trim()) { say('Nothing to run yet. Try REPEAT 4 [FD 100 RT 90]'); return; }
+    const res = interpret(src);
+    last = res;
+    out.textContent = res.printed.join('\n');
+    procsEl.textContent = res.procs.length ? 'procedures: ' + res.procs.map(p => p.toUpperCase()).join(', ') : '';
+    say('drawing…');
+    const sp = speedSel.value === 'inf' ? Infinity : Number(speedSel.value);
+    play(res, sp, () => {
+      if (res.error) { say('error: ' + res.error, true); return; }
+      const t = res.turtle;
+      say(`${res.lines} line${res.lines === 1 ? '' : 's'} · turtle at ${Math.round(t.x)}, ${Math.round(t.y)} · heading ${Math.round(t.h)}`);
+    });
+  }
+
+  function savePng() {
+    if (!size) return;
+    const c = document.createElement('canvas');
+    c.width = inkCv.width; c.height = inkCv.height;
+    const x = c.getContext('2d');
+    x.fillStyle = paperColor; x.fillRect(0, 0, c.width, c.height);
+    x.drawImage(inkCv, 0, 0);
+    try {
+      c.toBlob(blob => {
+        if (!blob) { say('could not save the picture', true); return; }
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'turtle.png';
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
+      }, 'image/png');
+    } catch { say('could not save the picture', true); }
+  }
+
+  $('#run').addEventListener('click', run);
+  $('#save').addEventListener('click', savePng);
+  code.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); run(); } });
+  speedSel.addEventListener('change', () => store.set('logo-turtle:speed', speedSel.value));
+  $('#examples').addEventListener('change', e => {
+    const ex = EXAMPLES[e.target.value];
+    if (!ex) return;
+    code.value = ex; e.target.value = '';
+    run();
+  });
+
+  const savedSpeed = store.get('logo-turtle:speed', null);
+  if (savedSpeed && [...speedSel.options].some(o => o.value === savedSpeed)) speedSel.value = savedSpeed;
+  code.value = store.get('logo-turtle:code', '');
+
+  readColors(); resize(); drawTurtle(view);
+  let rt = 0;
+  window.addEventListener('resize', () => {
+    clearTimeout(rt);
+    rt = setTimeout(() => {
+      if (stage.clientWidth === size) return;
+      resize();
+      if (last) play(last, Infinity, () => {}); else drawTurtle(view);
+    }, 150);
+  });
+  try {
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+      readColors(); if (last) play(last, Infinity, () => {}); else drawTurtle(view);
+    });
+  } catch {}
+})();
+</script>
+</body>
+</html>
