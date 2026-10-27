@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T01:49:36.345Z",
+ "updated": "2026-10-27T01:49:49.162Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -440,6 +440,78 @@
    "built": "2026-10-27T01:43:14Z",
    "minutes": 6,
    "approved": false
+  },
+  {
+   "slug": "command-line-quest",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "piano-note-game",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "skip-silence-player",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "transcription-player",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "delayed-echo-recorder",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "epub-file-reader",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "mbox-email-reader",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "real-file-type-checker",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "file-checksum-checker",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "jpgs-to-one-pdf",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "hex-file-viewer",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "live-regex-tester",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
   }
  ]
 }
