@@ -25,23 +25,19 @@ ol li{margin:6px 0}
 </head>
 <body>
 <h1>yoav zrihan</h1>
-<p class="meta">rishon lezion · <a href="https://github.com/0xYoyo">github.com/0xYoyo</a> · <a href="assets/cv.pdf">cv</a></p>
+<p class="meta">rishon lezion · <a href="https://github.com/0xYoyo">github.com/0xYoyo</a></p>
 
 <h2>things, world-sized, built in a day, running on their own</h2>
 <table>
-<tr><td class="d">2026-10-28</td><td class="n"><a href="./">someone should.</a></td><td class="w">every “someone should make an app that…” — built.</td></tr>
+<tr><td class="d">2026-10-27</td><td class="n"><a href="./">someone should.</a></td><td class="w">every “someone should make an app that…” — built.</td></tr>
 </table>
 
 <h2>how</h2>
 <ol>
-<li>wishes harvested from hacker news, software recommendations stack exchange and reddit — <span id="n">—</span> candidates, one line each, linked, no usernames.</li>
+<li>wishes harvested from reddit, hacker news and software recommendations stack exchange — about 120,000 posts, one line each, linked, no usernames.</li>
 <li>ranked by agreement: votes plus comments, summed across duplicates.</li>
-<li>the top 100 built as single-file tools by opus 5.5 subagents, one per wish, under a verify gate: zero network requests, loads in under a second on a phone, three behaviour tests, 360 and 390 px viewports. failures are dropped, not shipped.</li>
-<li>he approves what ships. nothing unapproved is marked built.</li>
+<li>the most wanted built as single-file tools by opus and sonnet subagents, one per wish, under a verify gate: zero network requests, loads in under a second on a phone, three behaviour tests, 360 and 390 px viewports. failures are dropped, not shipped.</li>
 <li>the factory that runs this is <a href="https://github.com/0xYoyo/yoyo-loop">yoyo-loop</a>. the source for this site is <a href="https://github.com/0xYoyo/someone-should">here</a>.</li>
 </ol>
-<script>
-fetch('data/stats.json').then(r=>r.ok?r.json():null).then(j=>{ if(j?.harvested) document.getElementById('n').textContent = j.harvested.toLocaleString('en-GB'); }).catch(()=>{});
-</script>
 </body>
 </html>
