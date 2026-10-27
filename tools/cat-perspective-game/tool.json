@@ -19,13 +19,22 @@
       "comments": 15
     }
   ],
-  "spec": "A top-down house where you are the cat: knock five things off shelves for points, nap in the moving sunbeam for a steady trickle.\nTap the floor to walk, or use the buttons to go for the nearest object or the sun.\nThe human wanders, tidies what you drop and costs you points if they see you knock something; no sound, no levels.",
+  "spec": "A cozy top-down apartment where you are the cat: knock the mug, vase, plant and shelf mug off for chaos points, sit in the box and on the laptop, nap in the moving sunbeam, run 3am zoomies, stare at nothing.\nDrag or tap the floor to walk, tap an object to swat it, or tap a goal on the checklist to go there; sound starts on your first tap.\nThe human sleeps on the couch and sometimes wakes: if they see you knock something or sprint, you lose stealth; no levels, no saving except your best score.",
   "tests": [
     {
-      "tap": "#hunt"
+      "tap": "#g-mug"
     },
     {
-      "wait": 1000
+      "wait": 1500
+    },
+    {
+      "wait": 1500
+    },
+    {
+      "expect": {
+        "sel": "#g-mug.done",
+        "visible": true
+      }
     },
     {
       "expect": {
@@ -36,23 +45,14 @@
     {
       "expect": {
         "sel": "#msg",
-        "contains": "crash"
-      }
-    },
-    {
-      "tap": "#restart"
-    },
-    {
-      "expect": {
-        "sel": "#score",
-        "contains": "0"
+        "contains": "mug"
       }
     }
   ],
   "status": "pass",
-  "built": "2026-10-27T08:39:46Z",
+  "built": "2026-10-27T09:30:00Z",
   "model": "sonnet-5.5",
-  "minutes": 6,
+  "minutes": 14,
   "approved": false,
   "notes": ""
 }
