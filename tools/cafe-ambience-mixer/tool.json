@@ -1,0 +1,48 @@
+{
+  "slug": "cafe-ambience-mixer",
+  "wish": "someone should make an app that generates cafe or library ambience noise",
+  "year": 2014,
+  "agreed": 11,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/3507/cafe-library-ambience-noise-generator",
+      "date": "2014-04-22",
+      "points": 10,
+      "comments": 1
+    }
+  ],
+  "spec": "Synthesizes endless cafe or library background sound live: voice murmur, cup clinks, espresso steam, page turns and footsteps, rain, room hum.\nTap a preset (Cafe, Library, Rainy cafe, Just hum), press Play, then fine-tune each layer with its slider; an optional timer stops it; mix is remembered.\nNo recordings and no network: every sound is generated in the browser, so it is never a real cafe recording.",
+  "tests": [
+    {
+      "tap": "#preset-library"
+    },
+    {
+      "expect": {
+        "sel": "#val-pages",
+        "contains": "40%"
+      }
+    },
+    {
+      "tap": "#play"
+    },
+    {
+      "wait": 300
+    },
+    {
+      "expect": {
+        "sel": "#status",
+        "contains": "Playing"
+      }
+    },
+    {
+      "tap": "#play"
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:37:18Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "All layers synthesized with Web Audio; no audio files."
+}

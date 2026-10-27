@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T01:38:41.687Z",
+ "updated": "2026-10-27T01:38:43.261Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -249,9 +249,14 @@
   },
   {
    "slug": "cafe-ambience-mixer",
-   "status": "pending",
+   "status": "pass",
    "attempts": 1,
-   "model": "opus-5.5"
+   "model": "opus-5.5",
+   "kb": 15,
+   "tests": "6/6",
+   "built": "2026-10-27T01:37:18Z",
+   "minutes": 6,
+   "approved": false
   },
   {
    "slug": "spot-image-differences",

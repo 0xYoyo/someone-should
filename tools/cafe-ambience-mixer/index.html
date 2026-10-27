@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app that generates cafe or library ambience noise</title>
+<style>
+/* ---- paste design/tokens.css here, verbatim ---- */
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+main { max-width: 520px; }
+.presets { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.presets button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+#play { width: 100%; font-size: 20px; min-height: 56px; }
+.layer { display: grid; grid-template-columns: 1fr auto; gap: 0 12px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--line); }
+.layer label { font-size: 17px; }
+.layer output { font: 16px/1 var(--mono); color: var(--meta); font-variant-numeric: tabular-nums; min-width: 4ch; text-align: right; }
+.layer input[type=range] { grid-column: 1 / -1; width: 100%; min-height: var(--tap); padding: 0; border: 0; accent-color: var(--ink); margin: 0; }
+#status { font: 16px/1.4 var(--mono); color: var(--meta); min-height: 1.4em; }
+.timer { display: flex; gap: 10px; align-items: center; }
+.timer select { width: auto; flex: 1; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make an app that generates cafe or library ambience noise</h1>
+
+<main id="app" class="stack">
+  <button id="play" class="primary" type="button">Play</button>
+  <p id="status">Stopped</p>
+  <div class="presets" role="group" aria-label="Presets">
+    <button type="button" id="preset-cafe" data-preset="cafe">Cafe</button>
+    <button type="button" id="preset-library" data-preset="library">Library</button>
+    <button type="button" id="preset-rainy" data-preset="rainy">Rainy cafe</button>
+    <button type="button" id="preset-hum" data-preset="hum">Just hum</button>
+  </div>
+  <div id="layers"></div>
+  <div class="timer">
+    <label for="timer">Stop after</label>
+    <select id="timer">
+      <option value="0">never</option>
+      <option value="15">15 min</option>
+      <option value="25">25 min</option>
+      <option value="45">45 min</option>
+      <option value="60">60 min</option>
+      <option value="90">90 min</option>
+    </select>
+  </div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  // storage helper — never throws
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  const LAYERS = [
+    ['murmur', 'Murmur of voices'],
+    ['clatter', 'Cups and spoons'],
+    ['machine', 'Espresso machine'],
+    ['pages', 'Pages and footsteps'],
+    ['rain', 'Rain on the window'],
+    ['hum', 'Room hum']
+  ];
+  const PRESETS = {
+    cafe:    { murmur: 60, clatter: 45, machine: 35, pages: 0,  rain: 0,  hum: 25 },
+    library: { murmur: 10, clatter: 0,  machine: 0,  pages: 40, rain: 0,  hum: 35 },
+    rainy:   { murmur: 45, clatter: 30, machine: 20, pages: 0,  rain: 55, hum: 20 },
+    hum:     { murmur: 0,  clatter: 0,  machine: 0,  pages: 0,  rain: 0,  hum: 60 }
+  };
+  const KEY = 'cafe-ambience-mixer';
+  const saved = store.get(KEY, {});
+  const vol = Object.assign({}, PRESETS.cafe, saved.vol || {});
+  let preset = saved.preset || 'cafe';
+
+  // ---- UI ----
+  const layersEl = $('#layers');
+  for (const [id, name] of LAYERS) {
+    const row = document.createElement('div');
+    row.className = 'layer';
+    row.innerHTML = `<label for="vol-${id}">${name}</label><output id="val-${id}" for="vol-${id}"></output>` +
+      `<input type="range" id="vol-${id}" min="0" max="100" step="1">`;
+    layersEl.appendChild(row);
+    const input = $('input', row);
+    input.value = vol[id];
+    input.addEventListener('input', () => {
+      vol[id] = +input.value;
+      preset = null;
+      render();
+      applyGain(id);
+      save();
+    });
+  }
+  function render() {
+    for (const [id] of LAYERS) {
+      $('#val-' + id).textContent = vol[id] + '%';
+      $('#vol-' + id).value = vol[id];
+    }
+    $$('[data-preset]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.preset === preset)));
+  }
+  function save() { store.set(KEY, { vol, preset, timer: $('#timer').value }); }
+  $$('[data-preset]').forEach(b => b.addEventListener('click', () => {
+    preset = b.dataset.preset;
+    Object.assign(vol, PRESETS[preset]);
+    render();
+    LAYERS.forEach(([id]) => applyGain(id));
+    save();
+  }));
+  $('#timer').value = saved.timer || '0';
+  render();
+
+  // ---- audio ----
+  let ctx = null, master = null, gains = {}, tick = null, playing = false, stopAt = 0;
+  const bufs = {};
+
+  // perceptual curve so the slider feels even
+  const level = v => Math.pow(v / 100, 2);
+  function applyGain(id) {
+    if (!ctx || !gains[id]) return;
+    gains[id].gain.setTargetAtTime(level(vol[id]), ctx.currentTime, 0.08);
+  }
+
+  function makeNoise(kind, seconds) {
+    const len = Math.floor(ctx.sampleRate * seconds);
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0, last = 0;
+    for (let i = 0; i < len; i++) {
+      const w = Math.random() * 2 - 1;
+      if (kind === 'white') d[i] = w * 0.5;
+      else if (kind === 'pink') {
+        b0 = 0.99886 * b0 + w * 0.0555179; b1 = 0.99332 * b1 + w * 0.0750759;
+        b2 = 0.96900 * b2 + w * 0.1538520; b3 = 0.86650 * b3 + w * 0.3104856;
+        b4 = 0.55000 * b4 + w * 0.5329522; b5 = -0.7616 * b5 - w * 0.0168980;
+        d[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * 0.5362) * 0.11; b6 = w * 0.115926;
+      } else {
+        last = (last + 0.02 * w) / 1.02; d[i] = last * 3.5;
+      }
+    }
+    // crossfade the loop seam
+    const f = Math.min(2048, len >> 2);
+    for (let i = 0; i < f; i++) { const t = i / f; d[i] = d[i] * t + d[len - f + i] * (1 - t); }
+    return buf;
+  }
+  function loop(buf, dest) {
+    const s = ctx.createBufferSource();
+    s.buffer = buf; s.loop = true;
+    s.loopEnd = buf.duration - 2048 / ctx.sampleRate;
+    s.connect(dest); s.start(ctx.currentTime, Math.random() * buf.duration * 0.9);
+    return s;
+  }
+  function filter(type, freq, Q) {
+    const f = ctx.createBiquadFilter();
+    f.type = type; f.frequency.value = freq; if (Q != null) f.Q.value = Q;
+    return f;
+  }
+  const rand = (a, b) => a + Math.random() * (b - a);
+
+  // Voices: band-passed noise whose loudness and formant drift like syllables.
+  const voices = [];
+  function buildMurmur(out) {
+    const lp = filter('lowpass', 2200, 0.5); lp.connect(out);
+    for (let i = 0; i < 7; i++) {
+      const g = ctx.createGain(); g.gain.value = 0;
+      const bp = filter('bandpass', rand(350, 1100), rand(4, 8));
+      const pan = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
+      loop(bufs.pink, bp); bp.connect(g);
+      if (pan) { pan.pan.value = rand(-0.8, 0.8); g.connect(pan); pan.connect(lp); } else g.connect(lp);
+      voices.push({ g, bp, next: 0, talking: Math.random() < 0.5, until: 0 });
+    }
+  }
+  function tickMurmur(t) {
+    for (const v of voices) {
+      if (t >= v.until) { v.talking = !v.talking; v.until = t + (v.talking ? rand(2, 9) : rand(1, 6)); }
+      if (t < v.next) continue;
+      const syl = rand(0.12, 0.3);
+      const amp = v.talking ? rand(0.25, 0.9) : 0;
+      v.g.gain.setTargetAtTime(amp, t, 0.04);
+      v.bp.frequency.setTargetAtTime(rand(300, 1200), t, 0.08);
+      v.next = t + syl;
+    }
+  }
+
+  function clink(t, out) {
+    const g = ctx.createGain(); g.connect(out);
+    const base = rand(1800, 4200), dur = rand(0.15, 0.5), amp = rand(0.04, 0.14);
+    for (const r of [1, 2.76, 5.4]) {
+      const o = ctx.createOscillator(); const og = ctx.createGain();
+      o.frequency.value = base * r * rand(0.98, 1.02);
+      og.gain.setValueAtTime(amp / r, t); og.gain.exponentialRampToValueAtTime(0.0001, t + dur / Math.sqrt(r));
+      o.connect(og); og.connect(g); o.start(t); o.stop(t + dur + 0.05);
+    }
+  }
+  function burst(t, out, type, freq, Q, dur, amp, attack) {
+    const s = ctx.createBufferSource(); s.buffer = bufs.white;
+    const f = filter(type, freq, Q); const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(amp, t + attack);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    s.connect(f); f.connect(g); g.connect(out);
+    s.start(t, Math.random()); s.stop(t + dur + 0.05);
+    return f;
+  }
+  const next = { clatter: 0, machine: 0, pages: 0, steps: 0, drops: 0 };
+  function tickEvents(t) {
+    if (vol.clatter > 0 && t >= next.clatter) {
+      const n = Math.random() < 0.3 ? 2 + (Math.random() * 3 | 0) : 1;
+      for (let i = 0; i < n; i++) clink(t + i * rand(0.06, 0.18), gains.clatter);
+      if (Math.random() < 0.15) burst(t + 0.3, gains.clatter, 'bandpass', 900, 2, 0.12, 0.25, 0.005); // cup set down
+      next.clatter = t + rand(0.4, 3.5);
+    }
+    if (vol.machine > 0 && t >= next.machine) {
+      if (next.machine) {
+        const dur = rand(3, 7);
+        const f = burst(t, gains.machine, 'highpass', 2500, 0.7, dur, 0.35, 0.4); // steam wand
+        f.frequency.linearRampToValueAtTime(rand(3500, 5000), t + dur);
+        burst(t + dur + 0.5, gains.machine, 'lowpass', 300, 1, 1.2, 0.5, 0.05); // knock out the grounds
+      }
+      next.machine = t + rand(15, 45);
+    }
+    if (vol.pages > 0 && t >= next.pages) {
+      if (next.pages) burst(t, gains.pages, 'bandpass', rand(1800, 3500), 0.9, rand(0.25, 0.5), 0.3, rand(0.05, 0.12));
+      next.pages = t + rand(3, 14);
+    }
+    if (vol.pages > 0 && t >= next.steps) {
+      if (next.steps) {
+        const n = 4 + (Math.random() * 6 | 0), gap = rand(0.45, 0.6), amp = rand(0.15, 0.4);
+        for (let i = 0; i < n; i++) burst(t + i * gap, gains.pages, 'lowpass', 220, 1, 0.12, amp * (1 - Math.abs(i - n / 2) / n), 0.008);
+      }
+      next.steps = t + rand(12, 40);
+    }
+    if (vol.rain > 0 && t >= next.drops) {
+      for (let i = 0; i < 6; i++) burst(t + rand(0, 0.1), gains.rain, 'bandpass', rand(2000, 6000), 3, 0.03, rand(0.02, 0.08), 0.002);
+      next.drops = t + 0.1;
+    }
+  }
+
+  function start() {
+    if (!ctx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) throw new Error('no audio');
+      ctx = new AC();
+      bufs.white = makeNoise('white', 3);
+      bufs.pink = makeNoise('pink', 4);
+      bufs.brown = makeNoise('brown', 5);
+      master = ctx.createGain(); master.gain.value = 0; master.connect(ctx.destination);
+      const comp = ctx.createDynamicsCompressor(); comp.connect(master);
+      for (const [id] of LAYERS) { gains[id] = ctx.createGain(); gains[id].gain.value = level(vol[id]); gains[id].connect(comp); }
+      buildMurmur(gains.murmur);
+      const rainBed = filter('bandpass', 1800, 0.4); loop(bufs.pink, rainBed); rainBed.connect(gains.rain);
+      const humLp = filter('lowpass', 400, 0.7); loop(bufs.brown, humLp); humLp.connect(gains.hum);
+      const hvac = ctx.createOscillator(); const hg = ctx.createGain();
+      hvac.frequency.value = 60; hg.gain.value = 0.02; hvac.connect(hg); hg.connect(gains.hum); hvac.start();
+    }
+    if (ctx.state === 'suspended') ctx.resume();
+    master.gain.setTargetAtTime(0.9, ctx.currentTime, 0.3);
+    const step = () => { const t = ctx.currentTime; if (vol.murmur > 0) tickMurmur(t); tickEvents(t + 0.05); checkTimer(); };
+    step();
+    tick = setInterval(step, 80);
+    playing = true;
+    const m = +$('#timer').value;
+    stopAt = m ? Date.now() + m * 60000 : 0;
+  }
+  function stop() {
+    clearInterval(tick); tick = null; playing = false; stopAt = 0;
+    if (ctx) {
+      master.gain.setTargetAtTime(0, ctx.currentTime, 0.25);
+      setTimeout(() => { if (!playing && ctx) ctx.suspend(); }, 1500);
+    }
+  }
+  function checkTimer() {
+    if (stopAt && Date.now() >= stopAt) { stop(); status(); }
+    else if (stopAt) status();
+  }
+  function status(msg) {
+    const el = $('#status');
+    if (msg) { el.textContent = msg; return; }
+    if (!playing) { el.textContent = 'Stopped'; return; }
+    if (stopAt) {
+      const s = Math.max(0, Math.round((stopAt - Date.now()) / 1000));
+      el.textContent = `Playing, stops in ${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+    } else el.textContent = 'Playing';
+  }
+
+  $('#play').addEventListener('click', () => {
+    if (playing) stop();
+    else {
+      try { start(); } catch { status('Sound is not available in this browser.'); return; }
+    }
+    $('#play').textContent = playing ? 'Stop' : 'Play';
+    status();
+  });
+  $('#timer').addEventListener('change', () => {
+    save();
+    if (playing) { const m = +$('#timer').value; stopAt = m ? Date.now() + m * 60000 : 0; status(); }
+  });
+})();
+</script>
+</body>
+</html>
