@@ -1,0 +1,51 @@
+{
+  "slug": "plate-tectonics-sandbox",
+  "wish": "someone should make a simulator of plate tectonics",
+  "year": 2014,
+  "agreed": 14,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/4139/plate-tectonics-geography-simulator",
+      "date": "2014-05-16",
+      "points": 13,
+      "comments": 1
+    }
+  ],
+  "spec": "Simulates a wrap-around world of rigid plates drifting over time: collisions push up mountains, subduction builds arcs, rifts open new ocean floor, and land erodes.\nPress Play or +10 Myr, change speed, switch between terrain and plate views, pick 4/7/12 plates, and drag on a plate to push it a new way.\nIt does not model mantle convection, real Earth geography, or climate; it is a toy grid model, not a geophysics solver.",
+  "tests": [
+    {
+      "tap": "#step"
+    },
+    {
+      "expect": {
+        "sel": "#age",
+        "contains": "10 Myr"
+      }
+    },
+    {
+      "tap": "#play"
+    },
+    {
+      "wait": 800
+    },
+    {
+      "expect": {
+        "sel": "#play",
+        "contains": "Pause"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#land",
+        "matches": "^\\d+% land$"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:37:18Z",
+  "model": "opus-5.5",
+  "minutes": 8,
+  "approved": false,
+  "notes": ""
+}

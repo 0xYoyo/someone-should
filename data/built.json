@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T01:38:43.261Z",
+ "updated": "2026-10-27T01:38:45.346Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -202,9 +202,14 @@
   },
   {
    "slug": "plate-tectonics-sandbox",
-   "status": "pending",
+   "status": "pass",
    "attempts": 1,
-   "model": "opus-5.5"
+   "model": "opus-5.5",
+   "kb": 13.2,
+   "tests": "6/6",
+   "built": "2026-10-27T01:37:18Z",
+   "minutes": 8,
+   "approved": false
   },
   {
    "slug": "toy-climate-model",
