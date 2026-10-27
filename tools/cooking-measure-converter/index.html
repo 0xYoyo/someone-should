@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app that converts cooking measures, like 40g of sugar to mL</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+main { max-width: 560px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chips button { padding: 0 14px; border-color: var(--line); min-width: 44px; }
+.chips button[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.amt { display: grid; grid-template-columns: 1fr; gap: 10px; }
+#amount { font-size: 28px; font-variant-numeric: tabular-nums; }
+#kitchen { font-size: 20px; }
+#results li span:last-child { font-variant-numeric: tabular-nums; text-align: right; }
+label.meta { display: block; margin-bottom: 6px; }
+#more { color: var(--meta); }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make an app that converts cooking measures, like 40g of sugar to mL</h1>
+<main id="app" class="stack">
+  <div class="amt">
+    <input id="amount" type="text" inputmode="decimal" autocomplete="off" placeholder="40" aria-label="amount" value="40">
+    <div class="chips" id="units" role="group" aria-label="unit"></div>
+  </div>
+  <div>
+    <input id="find" type="search" autocomplete="off" placeholder="ingredient" aria-label="find ingredient">
+  </div>
+  <div class="chips" id="ings" role="group" aria-label="ingredient"></div>
+  <section aria-live="polite">
+    <div class="big" id="headline"></div>
+    <div id="kitchen"></div>
+    <ul class="plain" id="results"></ul>
+    <p class="empty" id="msg" hidden></p>
+  </section>
+  <p class="meta">US cup = 236.6 mL. Weights per cup are typical; spooned flour, packed brown sugar.</p>
+</main>
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  // grams per US cup (236.588 mL)
+  const INGS = [
+    ['sugar', 'granulated sugar', 200],
+    ['brown-sugar', 'brown sugar', 213],
+    ['powdered-sugar', 'powdered sugar', 120],
+    ['flour', 'all-purpose flour', 125],
+    ['bread-flour', 'bread flour', 127],
+    ['wholewheat', 'whole wheat flour', 120],
+    ['butter', 'butter', 227],
+    ['water', 'water', 236.6],
+    ['milk', 'milk', 245],
+    ['cream', 'heavy cream', 238],
+    ['oil', 'vegetable oil', 218],
+    ['honey', 'honey', 340],
+    ['maple', 'maple syrup', 320],
+    ['yogurt', 'yogurt', 245],
+    ['sour-cream', 'sour cream', 240],
+    ['oats', 'rolled oats', 90],
+    ['rice', 'white rice, raw', 185],
+    ['cocoa', 'cocoa powder', 85],
+    ['cornstarch', 'cornstarch', 128],
+    ['salt', 'table salt', 288],
+    ['baking-powder', 'baking powder', 192],
+    ['choc-chips', 'chocolate chips', 170],
+    ['nuts', 'chopped nuts', 120],
+    ['peanut-butter', 'peanut butter', 256],
+    ['parmesan', 'grated parmesan', 100],
+    ['cheese', 'shredded cheese', 113]
+  ];
+  const CUP = 236.588;
+  // [id, label, factor, kind]; mass in g, volume in mL
+  const UNITS = [
+    ['g', 'g', 1, 'm'], ['kg', 'kg', 1000, 'm'], ['oz', 'oz', 28.3495, 'm'], ['lb', 'lb', 453.592, 'm'],
+    ['ml', 'mL', 1, 'v'], ['l', 'L', 1000, 'v'], ['tsp', 'tsp', CUP / 48, 'v'], ['tbsp', 'tbsp', CUP / 16, 'v'],
+    ['cup', 'cup', CUP, 'v'], ['floz', 'fl oz', CUP / 8, 'v']
+  ];
+  const unitById = Object.fromEntries(UNITS.map(u => [u[0], u]));
+  const ingById = Object.fromEntries(INGS.map(i => [i[0], i]));
+
+  const state = {
+    unit: unitById[store.get('cmc.unit', 'g')] ? store.get('cmc.unit', 'g') : 'g',
+    ing: ingById[store.get('cmc.ing', 'sugar')] ? store.get('cmc.ing', 'sugar') : 'sugar'
+  };
+
+  const amountEl = $('#amount'), findEl = $('#find');
+
+  function chip(attr, id, label, on) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.dataset[attr] = id;
+    b.id = attr + '-' + id;
+    b.textContent = label;
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    return b;
+  }
+
+  function drawUnits() {
+    $('#units').replaceChildren(...UNITS.map(u => chip('unit', u[0], u[1], u[0] === state.unit)));
+  }
+
+  function drawIngs() {
+    const q = findEl.value.trim().toLowerCase();
+    const list = INGS.filter(i => !q || i[1].includes(q) || i[0].includes(q));
+    const box = $('#ings');
+    if (!list.length) {
+      const p = document.createElement('span'); p.id = 'more'; p.textContent = 'no match';
+      box.replaceChildren(p); return;
+    }
+    box.replaceChildren(...list.map(i => chip('ing', i[0], i[1], i[0] === state.ing)));
+  }
+
+  const parseAmount = s => {
+    s = s.trim().replace(',', '.');
+    let m = s.match(/^(\d+)\s+(\d+)\/(\d+)$/);
+    if (m) return +m[1] + m[2] / m[3];
+    m = s.match(/^(\d+)\/(\d+)$/);
+    if (m) return m[1] / m[2];
+    return /^\d*\.?\d+$/.test(s) ? parseFloat(s) : NaN;
+  };
+
+  function num(x) {
+    if (x === 0) return '0';
+    if (x >= 100) return String(Math.round(x));
+    if (x >= 10) return String(Math.round(x * 10) / 10);
+    if (x >= 1) return String(Math.round(x * 100) / 100);
+    return String(+x.toPrecision(2));
+  }
+
+  const FR = [[0, ''], [1 / 4, '¼'], [1 / 3, '⅓'], [1 / 2, '½'], [2 / 3, '⅔'], [3 / 4, '¾']];
+  const QT = ['', '¼', '½', '¾'];
+
+  // spoon-and-cup measure a person can actually scoop, e.g. "¼ cup + 3 tbsp + ½ tsp"
+  function kitchen(ml) {
+    let tsp = Math.round(ml / (CUP / 48) * 4) / 4;
+    if (tsp < 0.25) return ml > 0 ? 'less than ¼ tsp' : '';
+    const parts = [];
+    let cups = Math.floor(tsp / 48 + 1e-9);
+    tsp -= cups * 48;
+    let frac = FR[0];
+    for (const f of FR) if (f[0] * 48 <= tsp + 1e-9) frac = f;
+    tsp = Math.round((tsp - frac[0] * 48) * 4) / 4;
+    if (cups || frac[1]) {
+      const c = (cups ? cups : '') + frac[1];
+      parts.push(c + (cups + frac[0] > 1 ? ' cups' : ' cup'));
+    }
+    const tb = Math.floor(tsp / 3 + 1e-9);
+    tsp = Math.round((tsp - tb * 3) * 4) / 4;
+    if (tb) parts.push(tb + ' tbsp');
+    const whole = Math.floor(tsp), q = Math.round((tsp - whole) * 4);
+    if (whole || q) parts.push((whole || '') + QT[q] + ' tsp');
+    return parts.join(' + ');
+  }
+
+  function render() {
+    const amt = parseAmount(amountEl.value);
+    const u = unitById[state.unit], ing = ingById[state.ing];
+    const msg = $('#msg');
+    if (!amountEl.value.trim() || !isFinite(amt) || amt < 0) {
+      $('#headline').textContent = ''; $('#kitchen').textContent = ''; $('#results').replaceChildren();
+      msg.hidden = false;
+      msg.textContent = amountEl.value.trim() ? 'type a number, like 40 or 1/2' : 'enter an amount';
+      return;
+    }
+    msg.hidden = true;
+    const density = ing[2] / CUP; // g per mL
+    const grams = u[3] === 'm' ? amt * u[2] : amt * u[2] * density;
+    const ml = u[3] === 'v' ? amt * u[2] : grams / density;
+    const target = u[3] === 'm' ? unitById.ml : unitById.g;
+    const tval = target[3] === 'm' ? grams : ml;
+    $('#headline').textContent = num(amt) + ' ' + u[1] + ' = ' + num(tval) + ' ' + target[1];
+    $('#kitchen').textContent = kitchen(ml) ? '≈ ' + kitchen(ml) + ' of ' + ing[1] : '';
+    const rows = UNITS.filter(x => x[0] !== u[0]).map(x => {
+      const li = document.createElement('li');
+      li.id = 'out-' + x[0];
+      const a = document.createElement('span'); a.textContent = x[1];
+      const b = document.createElement('span'); b.textContent = num((x[3] === 'm' ? grams : ml) / x[2]);
+      li.append(a, b);
+      return li;
+    });
+    $('#results').replaceChildren(...rows);
+  }
+
+  $('#units').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    state.unit = b.dataset.unit; store.set('cmc.unit', state.unit); drawUnits(); render();
+  });
+  $('#ings').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    state.ing = b.dataset.ing; store.set('cmc.ing', state.ing); drawIngs(); render();
+  });
+  findEl.addEventListener('input', drawIngs);
+  amountEl.addEventListener('input', render);
+
+  drawUnits(); drawIngs(); render();
+})();
+</script>
+</body>
+</html>

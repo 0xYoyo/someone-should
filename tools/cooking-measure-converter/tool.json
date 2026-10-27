@@ -1,0 +1,51 @@
+{
+  "slug": "cooking-measure-converter",
+  "wish": "someone should make an app that converts cooking measures, like 40g of sugar to mL",
+  "year": 2014,
+  "agreed": 8,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/2399/cooking-measures-conversions-app-eg-40g-of-granulated-sugar-%e2%86%92-47-ml-for-andro",
+      "date": "2014-03-17",
+      "points": 6,
+      "comments": 2
+    }
+  ],
+  "spec": "Converts an amount of a chosen ingredient between weight (g, kg, oz, lb) and volume (mL, L, tsp, tbsp, cup, fl oz) using per-ingredient densities.\nType an amount, tap its unit, tap the ingredient; every other unit updates, plus a cup-and-spoon measure you can scoop.\nDoes not cover every ingredient, metric or imperial cups, or how tightly something is packed beyond the typical values listed.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#amount",
+        "text": "40"
+      }
+    },
+    {
+      "tap": "#unit-g"
+    },
+    {
+      "tap": "#ing-sugar"
+    },
+    {
+      "expect": {
+        "sel": "#headline",
+        "matches": "^40 g = 47(\\.\\d)? mL$"
+      }
+    },
+    {
+      "tap": "#unit-cup"
+    },
+    {
+      "expect": {
+        "sel": "#out-g",
+        "contains": "8000"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T02:08:16Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Densities are typical grams per US cup (spooned flour, packed brown sugar). Fractions like 1/2 and 1 1/2 are accepted as amounts."
+}
