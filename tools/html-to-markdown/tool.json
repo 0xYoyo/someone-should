@@ -1,0 +1,64 @@
+{
+  "slug": "html-to-markdown",
+  "wish": "someone should make a tool that converts HTML to Markdown",
+  "year": 2014,
+  "agreed": 15,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/7321/html-to-markdown-javascript-converter",
+      "date": "2014-06-26",
+      "points": 11,
+      "comments": 1
+    },
+    {
+      "site": "hn",
+      "url": "https://news.ycombinator.com/item?id=43240176",
+      "date": "2025-03-03",
+      "points": 1,
+      "comments": 2
+    }
+  ],
+  "spec": "Converts pasted HTML, or rich text copied from a web page or doc, into clean GitHub-flavoured Markdown as you type.\nPaste into the box, read or preview the result, tap Copy Markdown.\nDoes not fetch URLs or run the pasted page's scripts; images stay as links.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#html",
+        "text": "<h2>Notes</h2><p>A <strong>bold</strong> <a href=\"https://example.com\">link</a></p><ul><li>one<ul><li>two</li></ul></li></ul><table><tr><th>a</th><th>b</th></tr><tr><td>1</td><td>2</td></tr></table>"
+      }
+    },
+    {
+      "wait": 200
+    },
+    {
+      "expect": {
+        "sel": "#md",
+        "contains": "## Notes"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#md",
+        "contains": "A **bold** [link](https://example.com)"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#md",
+        "matches": "- one\\n  - two"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#md",
+        "contains": "| a | b |\n| --- | --- |\n| 1 | 2 |"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T02:08:16Z",
+  "model": "opus-5.5",
+  "minutes": 8,
+  "approved": false,
+  "notes": "Offline only; pasted scripts never run (DOMParser + allowlisted preview)."
+}

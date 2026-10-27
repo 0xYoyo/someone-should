@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that converts HTML to Markdown</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+
+
+textarea { min-height: 180px; resize: vertical; font: 16px/1.45 var(--mono); }
+.tabs { display: flex; gap: 0; }
+.tabs button { flex: 1; border-radius: 0; border-color: var(--line); }
+.tabs button:first-child { border-radius: var(--radius) 0 0 var(--radius); }
+.tabs button:last-child { border-radius: 0 var(--radius) var(--radius) 0; border-left: 0; }
+.tabs button[aria-selected="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+#md { margin: 0; padding: 12px; min-height: 180px; border: 1.5px solid var(--line); border-radius: var(--radius); font: 16px/1.45 var(--mono); white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere; }
+#preview { padding: 0 12px; min-height: 180px; border: 1.5px solid var(--line); border-radius: var(--radius); overflow-wrap: anywhere; overflow-x: auto; }
+#preview pre { white-space: pre-wrap; font: 16px/1.4 var(--mono); }
+#preview code { font: 16px var(--mono); }
+#preview blockquote { margin: 0 0 0 4px; padding-left: 12px; border-left: 3px solid var(--line); color: var(--meta); }
+#preview table { border-collapse: collapse; }
+#preview th, #preview td { border: 1px solid var(--line); padding: 4px 8px; text-align: left; }
+#preview a { color: inherit; }
+#status { font: 16px/1.4 var(--sans); color: var(--meta); min-height: 1.4em; }
+[hidden] { display: none !important; }
+.row button { flex: 1; }
+
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that converts HTML to Markdown</h1>
+
+<main id="app" class="stack">
+  <textarea id="html" spellcheck="false" autocapitalize="off" aria-label="HTML or rich text" placeholder="Paste HTML or copied web text here"></textarea>
+  <div class="tabs" role="tablist">
+    <button id="tab-md" role="tab" aria-selected="true">Markdown</button>
+    <button id="tab-pv" role="tab" aria-selected="false">Preview</button>
+  </div>
+  <pre id="md" aria-live="polite"></pre>
+  <div id="preview" hidden></div>
+  <div class="row">
+    <button id="copy" class="primary">Copy Markdown</button>
+    <button id="clear">Clear</button>
+  </div>
+  <div id="status">Nothing to convert yet.</div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  // storage helper — never throws
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+
+  const input = $('#html'), out = $('#md'), preview = $('#preview'), status = $('#status');
+  const BLOCK = new Set(['P','DIV','SECTION','ARTICLE','MAIN','HEADER','FOOTER','ASIDE','NAV','FIGURE','FIGCAPTION','FORM','FIELDSET','ADDRESS','DL','DT','DD','DETAILS','SUMMARY','CENTER']);
+  const SKIP = new Set(['SCRIPT','STYLE','NOSCRIPT','TEMPLATE','HEAD','TITLE','META','LINK','IFRAME','OBJECT','EMBED','SVG','CANVAS','BUTTON','SELECT','INPUT','TEXTAREA']);
+
+  const esc = s => s.replace(/([\\`*_\[\]])/g, '\\$1').replace(/^(\s*)([#>+-])(?=\s)/gm, '$1\\$2').replace(/^(\s*)(\d+)\.(?=\s)/gm, '$1$2\\.');
+  const safeUrl = u => {
+    u = (u || '').trim();
+    if (/^\s*(javascript|vbscript|data):/i.test(u)) return '';
+    return u.replace(/ /g, '%20').replace(/\)/g, '%29');
+  };
+  const fence = code => { let f = '```'; while (code.includes(f)) f += '`'; return f; };
+  const tick = code => { let t = '`'; while (code.includes(t)) t += '`'; return t; };
+
+  // inline content of an element, whitespace collapsed
+  function inline(node, ctx) {
+    let s = '';
+    for (const c of node.childNodes) s += conv(c, ctx);
+    return s;
+  }
+
+  function wrap(mark, s) {
+    const m = s.match(/^(\s*)([\s\S]*?)(\s*)$/);
+    return m[2] ? m[1] + mark + m[2] + mark + m[3] : s;
+  }
+
+  function list(el, ctx) {
+    const ordered = el.tagName === 'OL';
+    let n = parseInt(el.getAttribute('start'), 10); if (isNaN(n)) n = 1;
+    const items = [...el.children].filter(c => c.tagName === 'LI');
+    const lines = items.map(li => {
+      const marker = ordered ? (n++) + '. ' : '- ';
+      let body = blocks(li, ctx).trim().replace(/\n\n(?=(?:[-*]|\d+\.) )/g, '\n');
+      const box = li.querySelector(':scope > input[type=checkbox]');
+      if (box) body = (box.checked ? '[x] ' : '[ ] ') + body;
+      const pad = ' '.repeat(marker.length);
+      return marker + body.split('\n').map((l, i) => i && l ? pad + l : l).join('\n');
+    });
+    return '\n\n' + lines.join('\n') + '\n\n';
+  }
+
+  function table(el, ctx) {
+    const rows = [...el.querySelectorAll('tr')].filter(r => r.closest('table') === el);
+    if (!rows.length) return '';
+    const cell = c => inline(c, ctx).replace(/\s+/g, ' ').trim().replace(/\|/g, '\\|');
+    const grid = rows.map(r => [...r.children].filter(c => /^T[HD]$/.test(c.tagName)).map(cell));
+    const w = Math.max(...grid.map(r => r.length));
+    if (!w) return '';
+    const line = r => '| ' + Array.from({ length: w }, (_, i) => r[i] || '').join(' | ') + ' |';
+    const head = grid[0], rest = grid.slice(1);
+    return '\n\n' + [line(head), '| ' + Array(w).fill('---').join(' | ') + ' |', ...rest.map(line)].join('\n') + '\n\n';
+  }
+
+  function conv(node, ctx) {
+    if (node.nodeType === 3) {
+      if (ctx.pre) return node.nodeValue;
+      return esc(node.nodeValue.replace(/\s+/g, ' '));
+    }
+    if (node.nodeType !== 1) return '';
+    const t = node.tagName;
+    if (SKIP.has(t)) return '';
+    if (node.hidden) return '';
+    switch (t) {
+      case 'BR': return ctx.pre ? '\n' : '  \n';
+      case 'HR': return '\n\n---\n\n';
+      case 'H1': case 'H2': case 'H3': case 'H4': case 'H5': case 'H6': {
+        const txt = inline(node, ctx).replace(/\s+/g, ' ').trim();
+        return txt ? '\n\n' + '#'.repeat(+t[1]) + ' ' + txt + '\n\n' : '';
+      }
+      case 'STRONG': case 'B': return wrap('**', inline(node, ctx));
+      case 'EM': case 'I': case 'CITE': return wrap('*', inline(node, ctx));
+      case 'DEL': case 'S': case 'STRIKE': return wrap('~~', inline(node, ctx));
+      case 'CODE': case 'KBD': case 'SAMP': case 'TT': {
+        if (ctx.pre) return node.textContent;
+        const code = node.textContent.replace(/\s+/g, ' ');
+        if (!code.trim()) return code;
+        const q = tick(code);
+        return q + (code[0] === '`' ? ' ' : '') + code + (code.endsWith('`') ? ' ' : '') + q;
+      }
+      case 'PRE': {
+        const code = node.textContent.replace(/\n$/, '');
+        const c = node.querySelector('code');
+        const m = ((c && c.className) || node.className || '').match(/(?:lang|language)-([\w+#-]+)/);
+        const f = fence(code);
+        return '\n\n' + f + (m ? m[1] : '') + '\n' + code + '\n' + f + '\n\n';
+      }
+      case 'A': {
+        const text = inline(node, ctx).trim();
+        const href = safeUrl(node.getAttribute('href'));
+        if (!href || href[0] === '#' && !text) return text;
+        if (!text) return '<' + href + '>';
+        const title = node.getAttribute('title');
+        return '[' + text + '](' + href + (title ? ' "' + title.replace(/"/g, '\\"') + '"' : '') + ')';
+      }
+      case 'IMG': {
+        const src = safeUrl(node.getAttribute('src'));
+        if (!src) return '';
+        return '![' + esc(node.getAttribute('alt') || '') + '](' + src + ')';
+      }
+      case 'UL': case 'OL': return list(node, ctx);
+      case 'BLOCKQUOTE': {
+        const b = blocks(node, ctx).trim();
+        return '\n\n' + b.split('\n').map(l => l ? '> ' + l : '>').join('\n') + '\n\n';
+      }
+      case 'TABLE': return table(node, ctx);
+      case 'LI': return '\n\n' + blocks(node, ctx).trim() + '\n\n';
+      default:
+        if (BLOCK.has(t)) return '\n\n' + inline(node, ctx) + '\n\n';
+        return inline(node, ctx);
+    }
+  }
+
+  // convert children and tidy blank lines / trailing spaces per line
+  function blocks(node, ctx) {
+    return tidy(inline(node, ctx));
+  }
+
+  function tidy(s) {
+    const parts = s.split(/(\n *```+[^\n]*\n[\s\S]*?\n *```+\n)/);
+    return parts.map((p, i) => i % 2 ? p : p
+      .split('\n').map(l => l.replace(/^ (?! )/, '').replace(/[ \t]+$/, m => m === '  ' ? m : ''))
+      .join('\n').replace(/^ {2}$/gm, '')
+    ).join('').replace(/\n{3,}/g, '\n\n').replace(/  \n\n/g, '\n\n').trim();
+  }
+
+  function toMarkdown(html) {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    return tidy(conv(doc.body, {}));
+  }
+
+  // Safe preview: rebuild only allowlisted tags, no attributes except checked links.
+  const KEEP = new Set(['P','H1','H2','H3','H4','H5','H6','STRONG','B','EM','I','DEL','S','CODE','PRE','BLOCKQUOTE','UL','OL','LI','TABLE','THEAD','TBODY','TR','TH','TD','BR','HR','A','KBD','SUP','SUB']);
+  function clean(src, dest) {
+    for (const c of src.childNodes) {
+      if (c.nodeType === 3) { dest.append(c.nodeValue); continue; }
+      if (c.nodeType !== 1 || SKIP.has(c.tagName)) continue;
+      if (c.tagName === 'IMG') { const alt = c.getAttribute('alt'); if (alt) dest.append('[' + alt + ']'); continue; }
+      if (KEEP.has(c.tagName)) {
+        const el = document.createElement(c.tagName);
+        if (c.tagName === 'A') { const h = safeUrl(c.getAttribute('href')); if (/^(https?:|mailto:)/i.test(h)) { el.href = h; el.target = '_blank'; el.rel = 'noopener noreferrer'; } }
+        if (c.tagName === 'OL' && c.getAttribute('start')) el.start = parseInt(c.getAttribute('start'), 10) || 1;
+        clean(c, el); dest.append(el);
+      } else if (BLOCK.has(c.tagName)) { const d = document.createElement('div'); clean(c, d); dest.append(d); }
+      else clean(c, dest);
+    }
+  }
+
+  let md = '';
+  function render() {
+    const html = input.value;
+    store.set('h2m-input', html.length < 200000 ? html : '');
+    if (!html.trim()) { md = ''; out.textContent = ''; preview.textContent = ''; status.textContent = 'Nothing to convert yet.'; return; }
+    try {
+      md = toMarkdown(html);
+      out.textContent = md;
+      preview.textContent = '';
+      clean(new DOMParser().parseFromString(html, 'text/html').body, preview);
+      status.textContent = md ? md.split('\n').length + ' lines of Markdown.' : 'No text found in that HTML.';
+    } catch (e) {
+      status.textContent = 'Could not read that HTML.';
+    }
+  }
+
+  let timer;
+  input.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(render, input.value.length > 20000 ? 150 : 0); });
+
+  // Pasting rich text from a web page or doc: take the HTML flavour, not the plain text.
+  input.addEventListener('paste', e => {
+    const d = e.clipboardData;
+    const html = d && d.getData('text/html');
+    if (!html) return;
+    e.preventDefault();
+    const body = html.replace(/^[\s\S]*?<!--StartFragment-->/, '').replace(/<!--EndFragment-->[\s\S]*$/, '');
+    const s = input.selectionStart, en = input.selectionEnd;
+    input.value = input.value.slice(0, s) + body + input.value.slice(en);
+    input.selectionStart = input.selectionEnd = s + body.length;
+    render();
+  });
+
+  function tab(showMd) {
+    $('#tab-md').setAttribute('aria-selected', showMd);
+    $('#tab-pv').setAttribute('aria-selected', !showMd);
+    out.hidden = !showMd; preview.hidden = showMd;
+  }
+  $('#tab-md').addEventListener('click', () => tab(true));
+  $('#tab-pv').addEventListener('click', () => tab(false));
+
+  $('#copy').addEventListener('click', async () => {
+    if (!md) { status.textContent = 'Nothing to copy yet.'; return; }
+    try { await navigator.clipboard.writeText(md); status.textContent = 'Copied.'; }
+    catch {
+      const r = document.createRange(); r.selectNodeContents(out);
+      const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      status.textContent = 'Selected. Copy it from here.';
+    }
+  });
+  $('#clear').addEventListener('click', () => { input.value = ''; render(); input.focus(); });
+
+  input.value = store.get('h2m-input', '');
+  render();
+})();
+</script>
+</body>
+</html>
