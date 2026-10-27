@@ -1,0 +1,51 @@
+{
+  "slug": "freelance-money-ledger",
+  "wish": "someone should make an app that tracks a freelancer's finances",
+  "year": 2019,
+  "agreed": 343,
+  "sources": [
+    {
+      "site": "hn",
+      "url": "https://news.ycombinator.com/item?id=19450331",
+      "date": "2019-03-21",
+      "points": 211,
+      "comments": 132
+    }
+  ],
+  "spec": "Logs income and expenses with client or payee, category and date, and marks invoices as paid or still owed.\nShows each month's income, expenses, profit, tax to set aside at your rate, money still owed, per-client totals and the year so far; exports everything as CSV.\nIt does not connect to a bank, file taxes, or send invoices; data stays in this browser.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#amount",
+        "text": "2000"
+      }
+    },
+    {
+      "tap": "#add"
+    },
+    {
+      "tap": "#kind-out"
+    },
+    {
+      "type": {
+        "sel": "#amount",
+        "text": "500"
+      }
+    },
+    {
+      "tap": "#add"
+    },
+    {
+      "expect": {
+        "sel": "#profit",
+        "contains": "1,500.00"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:30:02Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Amounts stored as integer cents in localStorage. Tax set-aside = profit on received income x rate (default 25%). Unpaid invoices count toward 'still owed', not profit, until marked paid."
+}
