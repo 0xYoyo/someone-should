@@ -1,0 +1,48 @@
+{
+  "slug": "epub-file-reader",
+  "wish": "someone should make a tool that opens epub files",
+  "year": 2020,
+  "agreed": 11,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/75663/how-to-open-epub-files-on-windows",
+      "date": "2020-08-09",
+      "points": 6,
+      "comments": 5
+    }
+  ],
+  "spec": "Opens an .epub on the device: unzips it locally and shows the chapters with a table of contents.\nPick or drop a file, read, use Contents, Prev/Next and A-/A+; your place in each book is remembered.\nDoes not upload anything, does not open DRM-protected books, and does not keep the book itself after you close the page.",
+  "tests": [
+    {
+      "tap": "#sample"
+    },
+    {
+      "tap": "#toc-btn"
+    },
+    {
+      "expect": {
+        "sel": "#toc li",
+        "count": 3
+      }
+    },
+    {
+      "tap": "#toc li:nth-child(3) button"
+    },
+    {
+      "wait": 500
+    },
+    {
+      "expect": {
+        "sel": "#page",
+        "contains": "queer-looking party"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:52:26Z",
+  "model": "opus-5.5",
+  "minutes": 9,
+  "approved": false,
+  "notes": "Unzips with the browser DecompressionStream. Sample button builds a small deflated epub of public-domain opening lines in memory to exercise the same path."
+}

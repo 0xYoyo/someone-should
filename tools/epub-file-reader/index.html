@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that opens epub files</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+[hidden] { display: none !important; }
+#file { display: none; }
+#drop { border: 1.5px dashed var(--line); border-radius: var(--radius); padding: 28px 16px; text-align: center; }
+#drop.over { border-color: var(--ink); }
+#msg { color: var(--meta); min-height: 1.45em; margin: 0; }
+#msg.err { color: var(--no); }
+#bar { position: sticky; top: 0; z-index: 2; background: var(--paper); margin: 0 calc(-1 * var(--gutter)); padding: 8px var(--gutter); border-bottom: 1px solid var(--line); }
+#bar .row { gap: 8px; flex-wrap: nowrap; }
+#bar button { padding: 0 12px; }
+#title { font-size: 16px; color: var(--meta); margin: 0 0 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.grow { flex: 1; }
+#toc li { padding: 0; }
+#toc button { border: 0; width: 100%; text-align: left; padding: 10px 0; border-radius: 0; }
+#toc button.cur { font-weight: 600; }
+#page { max-width: 38em; margin: 0 auto; font-size: 19px; line-height: 1.6; overflow-wrap: break-word; }
+#page img, #page svg { max-width: 100%; height: auto; }
+#page small, #page sub, #page sup, #page font { font-size: inherit; }
+#page a { color: inherit; }
+#page table { display: block; overflow-x: auto; max-width: 100%; }
+#page pre { white-space: pre-wrap; }
+#nav { max-width: 38em; margin: 24px auto 0; justify-content: space-between; flex-wrap: nowrap; }
+#pos { color: var(--meta); font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that opens epub files</h1>
+
+<main id="app" class="stack">
+  <section id="start" class="stack">
+    <div id="drop" class="stack">
+      <div class="row" style="justify-content:center">
+        <button id="open" class="primary">Open an .epub</button>
+        <button id="sample">Sample book</button>
+      </div>
+      <p id="msg">Nothing leaves this device. Drop a file here too.</p>
+    </div>
+    <input id="file" type="file" accept=".epub,application/epub+zip">
+  </section>
+
+  <section id="reader" hidden>
+    <div id="bar">
+      <p id="title"></p>
+      <div class="row">
+        <button id="toc-btn">Contents</button>
+        <span class="grow"></span>
+        <button id="smaller" aria-label="Smaller text">A&minus;</button>
+        <button id="bigger" aria-label="Larger text">A+</button>
+        <button id="again">Open</button>
+      </div>
+    </div>
+    <ul id="toc" class="plain" hidden></ul>
+    <article id="page"></article>
+    <div id="nav" class="row">
+      <button id="prev">Prev</button>
+      <span id="pos"></span>
+      <button id="next">Next</button>
+    </div>
+  </section>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const utf8 = new TextDecoder('utf-8');
+
+  const oops = m => Object.assign(new Error(m), { mine: true });
+
+  // ---------- zip ----------
+  async function inflate(bytes) {
+    if (typeof DecompressionStream === 'undefined') throw oops('This browser cannot unzip compressed books.');
+    const s = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+    return new Uint8Array(await new Response(s).arrayBuffer());
+  }
+
+  function readZip(buf) {
+    const dv = new DataView(buf), u8 = new Uint8Array(buf);
+    let eocd = -1;
+    for (let i = buf.byteLength - 22; i >= Math.max(0, buf.byteLength - 65557); i--) {
+      if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+    }
+    if (eocd < 0) throw oops('That file is not an epub.');
+    const count = dv.getUint16(eocd + 10, true);
+    let p = dv.getUint32(eocd + 16, true);
+    const entries = new Map();
+    for (let n = 0; n < count; n++) {
+      if (dv.getUint32(p, true) !== 0x02014b50) break;
+      const method = dv.getUint16(p + 10, true), size = dv.getUint32(p + 20, true);
+      const nl = dv.getUint16(p + 28, true), el = dv.getUint16(p + 30, true), cl = dv.getUint16(p + 32, true);
+      const off = dv.getUint32(p + 42, true);
+      const name = utf8.decode(u8.subarray(p + 46, p + 46 + nl));
+      entries.set(name, { method, size, off });
+      p += 46 + nl + el + cl;
+    }
+    const cache = new Map();
+    return {
+      has: name => entries.has(name),
+      async bytes(name) {
+        const e = entries.get(name);
+        if (!e) throw oops('Missing part: ' + name);
+        if (cache.has(name)) return cache.get(name);
+        const start = e.off + 30 + dv.getUint16(e.off + 26, true) + dv.getUint16(e.off + 28, true);
+        const raw = u8.subarray(start, start + e.size);
+        const out = e.method === 0 ? raw : e.method === 8 ? await inflate(raw) : null;
+        if (!out) throw oops('Unsupported compression in this book.');
+        cache.set(name, out);
+        return out;
+      },
+      async text(name) { return utf8.decode(await this.bytes(name)); }
+    };
+  }
+
+  
+  // ---------- epub ----------
+  const xml = s => new DOMParser().parseFromString(s, 'application/xml');
+  const byTag = (doc, t) => [...doc.getElementsByTagNameNS('*', t)];
+  const dirOf = p => p.slice(0, p.lastIndexOf('/') + 1);
+  function resolve(base, href) {
+    if (/^[a-z][a-z0-9+.-]*:/i.test(href)) return null;
+    let h = href; try { h = decodeURIComponent(href); } catch {}
+    const parts = (h.startsWith('/') ? h.slice(1) : dirOf(base) + h).split('/');
+    const out = [];
+    for (const s of parts) { if (s === '..') out.pop(); else if (s !== '.' && s !== '') out.push(s); }
+    return out.join('/');
+  }
+  const splitHash = h => { const i = h.indexOf('#'); return i < 0 ? [h, ''] : [h.slice(0, i), h.slice(i + 1)]; };
+
+  async function openBook(buf) {
+    const zip = readZip(buf);
+    if (!zip.has('META-INF/container.xml')) throw oops('That file is not an epub.');
+    const rf = byTag(xml(await zip.text('META-INF/container.xml')), 'rootfile')[0];
+    const opfPath = rf && rf.getAttribute('full-path');
+    if (!opfPath) throw oops('This epub has no package file.');
+    const opf = xml(await zip.text(opfPath));
+    const manifest = new Map();
+    let navPath = null, ncxPath = null;
+    for (const it of byTag(opf, 'item')) {
+      const m = { path: resolve(opfPath, it.getAttribute('href') || ''), type: it.getAttribute('media-type') || '' };
+      manifest.set(it.getAttribute('id'), m);
+      if ((it.getAttribute('properties') || '').split(/\s+/).includes('nav')) navPath = m.path;
+      if (m.type === 'application/x-dtbncx+xml') ncxPath = m.path;
+    }
+    const spineEl = byTag(opf, 'spine')[0];
+    const tocId = spineEl && spineEl.getAttribute('toc');
+    if (tocId && manifest.get(tocId)) ncxPath = manifest.get(tocId).path;
+    const spine = byTag(opf, 'itemref')
+      .map(r => manifest.get(r.getAttribute('idref'))).filter(m => m && m.path && zip.has(m.path))
+      .map(m => m.path);
+    if (!spine.length) throw oops('This epub has no readable chapters.');
+    const titleEl = byTag(opf, 'title')[0];
+    const title = (titleEl && titleEl.textContent.trim()) || 'Untitled';
+
+    let toc = [];
+    try {
+      if (navPath && zip.has(navPath)) {
+        const doc = parseX(await zip.text(navPath));
+        const navs = $$('nav', doc);
+        const nav = navs.find(n => /toc/.test(n.getAttribute('epub:type') || '')) || navs[0];
+        if (nav) toc = $$('a[href]', nav).map(a => ({ label: a.textContent.replace(/\s+/g, ' ').trim(), href: resolve(navPath, a.getAttribute('href')), depth: depthIn(a, nav) }));
+      }
+      if (!toc.length && ncxPath && zip.has(ncxPath)) {
+        const ncx = xml(await zip.text(ncxPath));
+        toc = byTag(ncx, 'navPoint').map(np => {
+          const lab = byTag(np, 'text')[0], c = byTag(np, 'content')[0];
+          let d = 0; for (let e = np.parentElement; e && e.localName === 'navPoint'; e = e.parentElement) d++;
+          return { label: lab ? lab.textContent.trim() : '', href: c ? resolve(ncxPath, c.getAttribute('src') || '') : null, depth: d };
+        });
+      }
+    } catch {}
+    toc = toc.filter(t => t.href && t.label).map(t => {
+      const [path, frag] = splitHash(t.href);
+      return { label: t.label, depth: Math.min(t.depth, 3), i: spine.indexOf(path), frag };
+    }).filter(t => t.i >= 0);
+    if (!toc.length) toc = spine.map((p, i) => ({ label: 'Section ' + (i + 1), depth: 0, i, frag: '' }));
+    return { zip, title, spine, toc };
+  }
+
+  function depthIn(a, nav) { let d = -1; for (let e = a; e && e !== nav; e = e.parentElement) if (e.localName === 'ol' || e.localName === 'ul') d++; return Math.max(0, d); }
+
+  function parseX(s) {
+    let doc = new DOMParser().parseFromString(s, 'application/xhtml+xml');
+    if (doc.getElementsByTagName('parsererror').length) doc = new DOMParser().parseFromString(s, 'text/html');
+    return doc;
+  }
+
+  const MIME = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', gif: 'image/gif', svg: 'image/svg+xml', webp: 'image/webp' };
+  function toDataUrl(bytes, path) {
+    const ext = path.split('.').pop().toLowerCase();
+    let s = '';
+    for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+    return 'data:' + (MIME[ext] || 'application/octet-stream') + ';base64,' + btoa(s);
+  }
+
+  const DROP = 'script,style,link,meta,base,iframe,object,embed,form,input,textarea,select,button,audio,video,noscript,title';
+  const W3 = 'http:/' + '/www.w3.org/', XLINK = W3 + '1999/xlink';
+  function sanitize(root, chapterPath, imgs) {
+    $$(DROP, root).forEach(e => e.remove());
+    for (const el of [root, ...$$('*', root)]) {
+      for (const at of [...el.attributes]) {
+        const n = at.name.toLowerCase();
+        if (n.startsWith('on') || n === 'style' || n === 'class' || n === 'srcset') el.removeAttribute(at.name);
+        else if (n === 'id') el.setAttribute('id', 'b-' + at.value);
+      }
+      const ln = el.localName;
+      if (ln === 'img') { const s = el.getAttribute('src'); el.removeAttribute('src'); if (s) imgs.push([el, resolve(chapterPath, s), 'src']); }
+      else if (ln === 'image') {
+        const s = el.getAttributeNS(XLINK, 'href') || el.getAttribute('href');
+        el.removeAttributeNS(XLINK, 'href'); el.removeAttribute('href');
+        if (s) imgs.push([el, resolve(chapterPath, s), 'href']);
+      } else if (ln === 'a') {
+        const h = el.getAttribute('href') || '';
+        if (/^\s*javascript:/i.test(h)) el.removeAttribute('href');
+        else if (/^[a-z][a-z0-9+.-]*:/i.test(h)) { el.setAttribute('target', '_blank'); el.setAttribute('rel', 'noopener noreferrer'); }
+      }
+    }
+  }
+
+  // ---------- reader ----------
+  let book = null, cur = 0, key = '', saveTimer = 0;
+  let fs = store.get('epub:fs', 19);
+  const page = $('#page');
+
+  function setMsg(t, err) { const m = $('#msg'); m.textContent = t; m.classList.toggle('err', !!err); }
+  function applyFs() { page.style.fontSize = fs + 'px'; }
+
+  function scrollFrac() { const max = document.documentElement.scrollHeight - innerHeight; return max > 0 ? Math.min(1, scrollY / max) : 0; }
+  function savePos() { if (book) store.set(key, { i: cur, y: +scrollFrac().toFixed(4) }); }
+
+  async function show(i, frag, y) {
+    i = Math.max(0, Math.min(book.spine.length - 1, i));
+    const path = book.spine[i];
+    let doc;
+    try { doc = parseX(await book.zip.text(path)); }
+    catch (e) { page.textContent = 'This chapter could not be read.'; return; }
+    const body = doc.body || doc.getElementsByTagNameNS('*', 'body')[0] || doc.documentElement;
+    const imgs = [];
+    sanitize(body, path, imgs);
+    const frag2 = document.createDocumentFragment();
+    for (const n of [...body.childNodes]) frag2.appendChild(document.importNode(n, true));
+    cur = i;
+    page.replaceChildren(frag2);
+    // re-find imported image nodes by order
+    const live = $$('img, image', page);
+    let k = 0;
+    for (const el of live) {
+      const job = imgs[k];
+      if (!job || job[0].localName !== el.localName) continue;
+      k++;
+      if (job[1] && book.zip.has(job[1])) {
+        book.zip.bytes(job[1]).then(b => {
+          const url = toDataUrl(b, job[1]);
+          if (job[2] === 'src') el.setAttribute('src', url); else { el.setAttributeNS(XLINK, 'xlink:href', url); el.setAttribute('href', url); }
+        }).catch(() => {});
+      }
+    }
+    if (!page.textContent.trim() && !live.length) page.textContent = 'This section is empty.';
+    $('#pos').textContent = (i + 1) + ' / ' + book.spine.length;
+    $('#prev').disabled = i === 0;
+    $('#next').disabled = i === book.spine.length - 1;
+    $$('#toc button').forEach(b => b.classList.toggle('cur', +b.dataset.i === i));
+    const target = frag && document.getElementById('b-' + frag);
+    if (target) target.scrollIntoView();
+    else requestAnimationFrame(() => { const max = document.documentElement.scrollHeight - innerHeight; window.scrollTo(0, y ? y * max : 0); });
+    savePos();
+  }
+
+  function buildToc() {
+    const ul = $('#toc');
+    ul.replaceChildren(...book.toc.map(t => {
+      const li = document.createElement('li');
+      const b = document.createElement('button');
+      b.textContent = t.label;
+      b.dataset.i = t.i; b.dataset.frag = t.frag;
+      b.style.paddingLeft = (t.depth * 18) + 'px';
+      li.appendChild(b);
+      return li;
+    }));
+  }
+
+  async function load(buf, size, fresh) {
+    setMsg('Opening…');
+    try {
+      book = await openBook(buf);
+    } catch (e) {
+      book = null;
+      setMsg(e && e.mine ? e.message : 'That file could not be opened as an epub.', true);
+      return;
+    }
+    key = 'epub:pos:' + book.title + ':' + size;
+    $('#title').textContent = book.title;
+    document.title = book.title;
+    buildToc();
+    $('#toc').hidden = true;
+    $('#start').hidden = true;
+    $('#reader').hidden = false;
+    const pos = fresh ? null : store.get(key, null);
+    await show(pos ? pos.i : 0, '', pos ? pos.y : 0);
+  }
+
+  $('#open').addEventListener('click', () => $('#file').click());
+  $('#again').addEventListener('click', () => $('#file').click());
+  $('#file').addEventListener('change', async e => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    e.target.value = '';
+    savePos();
+    $('#start').hidden = false; $('#reader').hidden = true;
+    await load(await f.arrayBuffer(), f.size);
+  });
+
+  const drop = $('#drop');
+  document.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
+  document.addEventListener('dragleave', () => drop.classList.remove('over'));
+  document.addEventListener('drop', async e => {
+    e.preventDefault(); drop.classList.remove('over');
+    const f = e.dataTransfer && e.dataTransfer.files[0];
+    if (!f) return;
+    savePos();
+    $('#start').hidden = false; $('#reader').hidden = true;
+    await load(await f.arrayBuffer(), f.size);
+  });
+
+  $('#toc-btn').addEventListener('click', () => { const t = $('#toc'); t.hidden = !t.hidden; if (!t.hidden) window.scrollTo(0, 0); });
+  $('#toc').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    $('#toc').hidden = true;
+    show(+b.dataset.i, b.dataset.frag, 0);
+  });
+  $('#prev').addEventListener('click', () => show(cur - 1, '', 0));
+  $('#next').addEventListener('click', () => show(cur + 1, '', 0));
+  $('#smaller').addEventListener('click', () => { fs = Math.max(16, fs - 2); applyFs(); store.set('epub:fs', fs); });
+  $('#bigger').addEventListener('click', () => { fs = Math.min(32, fs + 2); applyFs(); store.set('epub:fs', fs); });
+  document.addEventListener('keydown', e => {
+    if (!book || $('#reader').hidden || e.target.matches('input')) return;
+    if (e.key === 'ArrowRight' && cur < book.spine.length - 1) show(cur + 1, '', 0);
+    if (e.key === 'ArrowLeft' && cur > 0) show(cur - 1, '', 0);
+  });
+
+  page.addEventListener('click', e => {
+    const a = e.target.closest('a[href]'); if (!a || !book) return;
+    const h = a.getAttribute('href');
+    if (/^[a-z][a-z0-9+.-]*:/i.test(h)) return;
+    e.preventDefault();
+    const [p, frag] = splitHash(h);
+    if (!p) { const t = document.getElementById('b-' + frag); if (t) t.scrollIntoView(); return; }
+    const i = book.spine.indexOf(resolve(book.spine[cur], p));
+    if (i >= 0) show(i, frag, 0);
+  });
+
+  addEventListener('scroll', () => { clearTimeout(saveTimer); saveTimer = setTimeout(savePos, 300); }, { passive: true });
+  addEventListener('pagehide', savePos);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) savePos(); });
+  applyFs();
+
+  // ---------- sample: a real, deflated epub built in memory (public-domain text) ----------
+  const CRC = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+  const crc32 = b => { let c = 0xffffffff; for (const x of b) c = CRC[(c ^ x) & 255] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; };
+  async function deflate(b) {
+    const s = new Blob([b]).stream().pipeThrough(new CompressionStream('deflate-raw'));
+    return new Uint8Array(await new Response(s).arrayBuffer());
+  }
+  async function makeZip(files) {
+    const enc = new TextEncoder(), parts = [], central = [];
+    let off = 0;
+    for (const [name, text] of files) {
+      const nm = enc.encode(name), raw = enc.encode(text);
+      const store0 = name === 'mimetype' || typeof CompressionStream === 'undefined';
+      const data = store0 ? raw : await deflate(raw);
+      const crc = crc32(raw), method = store0 ? 0 : 8;
+      const lh = new DataView(new ArrayBuffer(30));
+      lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(8, method, true);
+      lh.setUint32(14, crc, true); lh.setUint32(18, data.length, true); lh.setUint32(22, raw.length, true); lh.setUint16(26, nm.length, true);
+      const ch = new DataView(new ArrayBuffer(46));
+      ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(10, method, true);
+      ch.setUint32(16, crc, true); ch.setUint32(20, data.length, true); ch.setUint32(24, raw.length, true); ch.setUint16(28, nm.length, true); ch.setUint32(42, off, true);
+      parts.push(lh.buffer, nm, data); central.push(ch.buffer, nm);
+      off += 30 + nm.length + data.length;
+    }
+    const cdSize = central.reduce((s, p) => s + p.byteLength, 0);
+    const end = new DataView(new ArrayBuffer(22));
+    end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true);
+    end.setUint32(12, cdSize, true); end.setUint32(16, off, true);
+    return new Blob([...parts, ...central, end.buffer]).arrayBuffer();
+  }
+  const IDPF = 'http:/' + '/www.idpf.org/', PURL = 'http:/' + '/purl.org/dc/elements/1.1/';
+  const X = (t, body) => `<?xml version="1.0" encoding="utf-8"?><html xmlns="${W3}1999/xhtml" xmlns:epub="${IDPF}2007/ops"><head><title>${t}</title></head><body>${body}</body></html>`;
+  const CH = [
+    ['I. Down the Rabbit-Hole', 'Alice was beginning to get very tired of sitting by her sister on the bank, and of having nothing to do: once or twice she had peeped into the book her sister was reading, but it had no pictures or conversations in it, ‘and what is the use of a book,’ thought Alice ‘without pictures or conversations?’'],
+    ['II. The Pool of Tears', '‘Curiouser and curiouser!’ cried Alice (she was so much surprised, that for the moment she quite forgot how to speak good English).'],
+    ['III. A Caucus-Race and a Long Tale', 'They were indeed a queer-looking party that assembled on the bank—the birds with draggled feathers, the animals with their fur clinging close to them, and all dripping wet, cross, and uncomfortable.']
+  ];
+  $('#sample').addEventListener('click', async () => {
+    try {
+      const files = [
+        ['mimetype', 'application/epub+zip'],
+        ['META-INF/container.xml', '<?xml version="1.0"?><container version="1.0"><rootfiles><rootfile full-path="OEBPS/content.opf" media-type="application/oebps-package+xml"/></rootfiles></container>'],
+        ['OEBPS/content.opf', `<?xml version="1.0"?><package xmlns="${IDPF}2007/opf" version="3.0" unique-identifier="id"><metadata xmlns:dc="${PURL}"><dc:identifier id="id">sample-alice</dc:identifier><dc:title>Alice’s Adventures in Wonderland (opening lines)</dc:title><dc:language>en</dc:language></metadata><manifest><item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/>${CH.map((_, i) => `<item id="c${i}" href="text/c${i}.xhtml" media-type="application/xhtml+xml"/>`).join('')}</manifest><spine>${CH.map((_, i) => `<itemref idref="c${i}"/>`).join('')}</spine></package>`],
+        ['OEBPS/nav.xhtml', X('Contents', `<nav epub:type="toc"><ol>${CH.map((c, i) => `<li><a href="text/c${i}.xhtml">${c[0]}</a></li>`).join('')}</ol></nav>`)],
+        ...CH.map((c, i) => [`OEBPS/text/c${i}.xhtml`, X(c[0], `<h2>${c[0]}</h2><p>${c[1]}</p>`)])
+      ];
+      const buf = await makeZip(files);
+      await load(buf, buf.byteLength, true);
+    } catch { setMsg('The sample could not be built in this browser.', true); }
+  });
+})();
+</script>
+</body>
+</html>
