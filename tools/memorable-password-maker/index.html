@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a password generator that makes memorable passwords</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+#pass { font: 500 26px/1.3 var(--mono); word-break: break-all; min-height: 2.6em; padding: 16px 0; border-bottom: 1.5px solid var(--ink); user-select: all; -webkit-user-select: all; }
+.ctl { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 4px 0; }
+.ctl > span { color: var(--meta); }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg button { min-width: 48px; padding: 0 12px; font-family: var(--mono); }
+.seg button[aria-pressed="true"], .toggle[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+#count { font: 500 22px var(--mono); min-width: 2ch; text-align: center; }
+.actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+main .meta { font-size: 16px; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a password generator that makes memorable passwords</h1>
+
+<main id="app" class="stack">
+  <div id="pass" aria-live="polite"></div>
+  <div class="row"><span id="bits"></span><span id="strength" class="meta"></span></div>
+  <div class="actions">
+    <button id="gen" class="primary">New one</button>
+    <button id="copy">Copy</button>
+  </div>
+  <div id="msg" class="meta" role="status"></div>
+
+  <div class="ctl"><span>Words</span>
+    <div class="row"><button id="minus" aria-label="fewer words">&minus;</button><span id="count"></span><button id="plus" aria-label="more words">+</button></div>
+  </div>
+  <div class="ctl"><span>Between</span>
+    <div class="seg" id="seps">
+      <button data-sep="-">-</button><button data-sep=".">.</button><button data-sep="_">_</button><button data-sep=" " aria-label="space">space</button>
+    </div>
+  </div>
+  <div class="ctl"><span>Extras</span>
+    <div class="seg"><button id="caps" class="toggle">Caps</button><button id="digits" class="toggle">+ 2 digits</button></div>
+  </div>
+  <p class="meta">Made on this device with its own random generator. Nothing is sent or saved.</p>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  // storage helper — settings only, never passwords
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  const WORDS = 'able acid acorn acre actor add adobe adult agent agile aisle alarm album alert alley alloy alpha amber amigo ample amused anchor angle ankle anvil apex apple apron arbor arch arena argon armor aroma arrow ask aspen atlas atom attic audio aunt autumn avenue award axis baby bacon badge bagel bagpipe bake baker ballet balmy bamboo banana band banjo bank banner bark barley barn barrel basil basin basket batch bazaar beach beacon beam bean bear beard beaver bed beef beetle beetroot bell belt bench bend berry bike bird biscuit bison blade blanket blaze blend blimp blink block bloom blossom blow blue blush board boat bobcat body bold bolt bonfire bonus book boot border bottle bounce bouquet bow bowl box brain bramble branch brass brave bread breadth breeze brick bridge bridle brief bright brisk brook broom brownie brush bubble bucket buckle buddy budget buffet bugle build bulb bungee bunny burger burrow bush butter button buzz cabbage cabin cable cactus cadet cake calm camel camera camp camper canal candle candy canoe canvas canyon cape caramel card cargo carpet carrot carry cart carton cashew castle catch catfish cave cavern cedar cello chair chalk chapel charm chart chase cheer cheery cheese cheetah cherry chess chest chick chief chili chimney chip chop chorus chowder cider cinder cinema circle citrus city clam clap clarinet clay clerk clever cliff climb clock cloud clover clown coach coast coat cobalt cobra cocoa coconut cocoon coffee coin comet comic comma compass condor cook cookie copper coral cork corn cosmos cosy cottage cotton couch cougar count cousin coyote crab cradle crane crater crawl crayon cream creek crest cricket crisp crocus cross crown crumb crust cube cup cupcake curly curry curve cushion cycle cymbal dahlia daisy dance daring dash dawn deck deer delta denim desert desk dial diary dig diner dingo dish dive diver dizzy dock dolphin domino donkey doodle door dough dove dragon drama draw dream dress drift drill drink drive drizzle drum duck dumpling dune dust eager eagle early earth easel easy eat echo eclipse edge eel eggplant elbow elk elm ember emerald emu engine envoy epic equal escape exit fabric face fairy falafel falcon fame fancy farm feast feather fence fern ferry fetch fever fiber fiddle field fig film finch find fire firefly fish fix fjord flag flame flamingo flannel flash flint float fluffy flute fly foam focus fog fold folk fondue forest fork fossil fountain fox frame freckle fresh frost fruit fudge funnel fuzzy galaxy galley game garage garden garlic garnet gate gazebo gecko gem genius gentle geyser ghost giant giddy ginger giraffe gizmo glacier glad glass globe glove glow goat goblet gold golden golf gondola goose gorilla gospel grab grain grand granite grape graph grass gravel gravy green grid griddle grill grin grotto grow guava guitar gull gum gumbo habit haiku halibut hammer hammock hamster hand happy harbor harp harvest hasty hat hawk hazel hazelnut heart hearty hedge hedgehog helmet hero heron hickory hide hike hill hilltop hinge hippo hobby honey hood hook hop hope horn horse hotdog hotel house hug hum humble humor hunt husky hut ice icicle icon icy idea igloo iguana image index ink inlet iris iron island ivory ivy jacket jaguar jam jar jasmine jazz jeans jelly jester jet jewel jigsaw jog joke jolly journal judge juice jukebox jump jungle jury kayak keen kernel ketchup kettle key kick kimono kind kingdom kiosk kite kitten kiwi knee knife knit knot koala label lace ladder lagoon lake lamb lamp lane lantern laptop lasagna latte laugh lava lawn lead leaf lemon lemur lens leopard letter lettuce lever library lift lilac lily lilypad lime limerick linen lion listen lively lizard llama lobby lobster locket locust lodge loft logic lotus lucky lullaby lunar lunch macaw magnet magpie mammoth manatee mandolin mango map maple marble march marimba market marmot marsh mask meadow medal meerkat melon mend menu mermaid merry metal meteor mighty mild minnow mint mirror misty mitten mix mixer mocha model modest monkey moon moose moped mosaic moss motor mound mouse muesli muffin mural music mustang nacho nail nap napkin narwhal nature navy nebula nectar needle nest net nickel nimble noble noisy noodle north nose note novel nugget nut nutmeg oak oasis oat oatmeal ocean octopus odd odyssey olive omelet onion opal open opera orange orbit orchid origami ostrich otter outpost oven owl oyster pack paddle page paint palace palm panda panel paper paprika parade parcel park parrot parsley pasta patch path peach peacock peanut pear pebble pecan pedal pelican pen pencil penguin pepper petal pewter pheasant piano pickle picnic pier pigeon pillow pilot pine pinecone pink piranha pirate pizza plaid planet plank plant platypus play plaza pliers plum plush pocket poem polar polite poncho pond pony popcorn poppy porch possum potato pouch pour prairie pretzel prism proud puddle puffin pull pulse pump pumpkin puppy push puzzle quail quarry quartz queen quest quick quiet quill quilt quirky quiz quokka rabbit raccoon radar radio radish raft rain raisin rake ranch rapid rattle raven ravioli razor read recipe redwood reef relay remote rhino ribbon rice riddle ride ridge ring risotto river road roam roar robin robot rocket rodeo roof rooster rope rose rosy row ruby rug ruler run rusty saddle safari saffron saga sail salad salmon salsa salt salty sand sandal sandy sapphire sardine satin sauce saucer scale scallop scan scarf school scoop scout seal season seed sequoia sew shadow shake shark shelf shell sherbet shield shine shiny ship shirt shoe shore shovel shrimp shy sidecar silent silk silly silver sing sip siren skate sketch ski skillet skip skull sky sled sleep sleepy slide slim slope sloth smell smile smooth snail snake sneak snow snowy soap sock sofa soft solar solve song sonic sorbet sort soup spark sparrow spice spicy spider spin spinach splash spoon spring sprout spry squash squid squirrel stable stage stamp star stardust statue steady steam steer stir stone storm story stove straw stream street string sturdy sugar summer sun sundae sunny sunset super sushi swan sweater swift swim swing sword syrup tabby table taco tadpole tail talk tall tamarind tango tank tapioca target taxi tea teach teapot temple tennis tent thimble thistle throw thunder ticket tidy tiger timber tiny toast toffee tomato tonic tooth topaz torch toss toucan tough tower toy trace track tractor trade trail train travel tree treetop trellis trophy trout truck truffle trumpet tulip tumble tuna tundra tunnel turkey turnip turtle tusk tuxedo twig twirl type umbrella uncle unicorn union urban valley vanilla vapor vase velcro velvet vest violin visit visor vivid voice volcano vortex voyage wafer waffle wagon walk walnut walrus wand wander warm wasabi wash water wave wavy wax whale wheat wheel whisk whiskers whistle wigwam willow win window wink winter wise wish witty wizard wolf wombat wool world worm write yacht yak yard yarn yawn yell yeti yodel yogurt yolk young zany zebra zeppelin zero zesty zigzag zinc zipper zone zoo zoom zucchini'.split(' ');
+  const KEY = 'memorable-password-maker:settings';
+  const opts = Object.assign({ count: 4, sep: '-', caps: false, digits: false }, store.get(KEY, {}));
+  opts.count = Math.min(8, Math.max(3, opts.count | 0 || 4));
+
+  // unbiased integer in [0, n) from the platform CSPRNG (rejection sampling)
+  function randInt(n) {
+    const limit = Math.floor(0x100000000 / n) * n;
+    const buf = new Uint32Array(1);
+    do { crypto.getRandomValues(buf); } while (buf[0] >= limit);
+    return buf[0] % n;
+  }
+
+  function generate() {
+    if (!window.crypto || !crypto.getRandomValues) { $('#msg').textContent = 'This browser has no secure random generator.'; return; }
+    const parts = [];
+    for (let i = 0; i < opts.count; i++) {
+      let w = WORDS[randInt(WORDS.length)];
+      if (opts.caps) w = w[0].toUpperCase() + w.slice(1);
+      parts.push(w);
+    }
+    let out = parts.join(opts.sep);
+    if (opts.digits) out += opts.sep + String(randInt(100)).padStart(2, '0');
+    $('#pass').textContent = out;
+    $('#msg').textContent = '';
+    showStrength();
+  }
+
+  function showStrength() {
+    // caps is always first-letter, so it adds no entropy; digits add log2(100)
+    const bits = Math.floor(opts.count * Math.log2(WORDS.length) + (opts.digits ? Math.log2(100) : 0));
+    $('#bits').textContent = bits + ' bits';
+    // offline attack at 10 billion guesses per second, average case = half the space
+    const secs = Math.pow(2, bits - 1) / 1e10;
+    const yrs = secs / 31557600;
+    let t;
+    if (secs < 60) t = 'under a minute';
+    else if (secs < 3600) t = Math.round(secs / 60) + ' minutes';
+    else if (secs < 86400) t = Math.round(secs / 3600) + ' hours';
+    else if (yrs < 1) t = Math.round(secs / 86400) + ' days';
+    else if (yrs < 1e6) t = Math.round(yrs).toLocaleString('en') + ' years';
+    else t = 'over a million years';
+    $('#strength').textContent = '~' + t + ' at 10 billion guesses/s';
+  }
+
+  function render() {
+    $('#count').textContent = opts.count;
+    $$('#seps button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.sep === opts.sep)));
+    $('#caps').setAttribute('aria-pressed', String(opts.caps));
+    $('#digits').setAttribute('aria-pressed', String(opts.digits));
+    $('#minus').disabled = opts.count <= 3;
+    $('#plus').disabled = opts.count >= 8;
+  }
+
+  function change(fn) { fn(); store.set(KEY, opts); render(); generate(); }
+
+  $('#gen').addEventListener('click', generate);
+  $('#minus').addEventListener('click', () => change(() => { if (opts.count > 3) opts.count--; }));
+  $('#plus').addEventListener('click', () => change(() => { if (opts.count < 8) opts.count++; }));
+  $$('#seps button').forEach(b => b.addEventListener('click', () => change(() => { opts.sep = b.dataset.sep; })));
+  $('#caps').addEventListener('click', () => change(() => { opts.caps = !opts.caps; }));
+  $('#digits').addEventListener('click', () => change(() => { opts.digits = !opts.digits; }));
+
+  $('#copy').addEventListener('click', async () => {
+    const text = $('#pass').textContent;
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+      $('#msg').textContent = 'Copied.';
+    } catch {
+      const r = document.createRange(); r.selectNodeContents($('#pass'));
+      const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+      $('#msg').textContent = 'Selected. Copy it from the menu.';
+    }
+  });
+
+  render();
+  generate();
+})();
+</script>
+</body>
+</html>
