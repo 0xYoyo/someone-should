@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a game that teaches piano playing</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+.modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.modes button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.board { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.board .big { font-size: 34px; }
+.cap { font: 16px/1.3 var(--mono); color: var(--meta); }
+#staff { width: 100%; height: auto; display: block; color: var(--ink); }
+#staff .ln { stroke: currentColor; stroke-width: 1.5; }
+#staff .nh { fill: currentColor; transition: fill .15s; }
+#staff.ok .nh { fill: var(--built); }
+#staff.bad .nh { fill: var(--no); }
+#clef { margin-bottom: -6px; }
+#feedback { min-height: 1.45em; }
+.keys { position: relative; display: flex; height: 170px; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+.keys .white { flex: 1; min-width: 0; height: 100%; padding: 0 0 10px; border: 1.5px solid var(--ink); border-right-width: 0; border-radius: 0 0 var(--radius) var(--radius); background: #fbfaf6; color: #141414; display: flex; align-items: flex-end; justify-content: center; }
+.keys .white:last-of-type { border-right-width: 1.5px; }
+.keys .white.hit { background: var(--line); }
+.keys .white.right { background: #bfe0cb; }
+.keys .white.wrong { background: #f0c2ba; }
+.keys .white.reveal { box-shadow: inset 0 -10px 0 var(--built); }
+.keys .lbl { font: 600 16px/1 var(--sans); visibility: hidden; }
+.keys.labels .lbl { visibility: visible; }
+.keys .black { position: absolute; top: 0; width: 9%; height: 58%; background: #141414; border: 1.5px solid #141414; border-radius: 0 0 3px 3px; transform: translateX(-50%); }
+.row button { flex: 1; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a game that teaches piano playing</h1>
+
+<main id="app" class="stack">
+  <div class="modes" role="group" aria-label="Clef">
+    <button data-mode="treble">Treble</button>
+    <button data-mode="bass">Bass</button>
+    <button data-mode="both">Both</button>
+  </div>
+
+  <div class="board">
+    <div><div class="big" id="tally">0 / 0</div><div class="cap">right first try</div></div>
+    <div style="text-align:right"><div class="big" id="streak">0</div><div class="cap">streak · best <span id="best">0</span></div></div>
+  </div>
+
+  <div>
+    <div class="cap" id="clef">treble clef</div>
+    <svg id="staff" viewBox="0 0 300 140" role="img" aria-label="note on staff"></svg>
+  </div>
+
+  <div id="feedback" aria-live="polite">Press the key for this note.</div>
+
+  <div class="keys" id="keys" aria-label="piano keyboard"></div>
+
+  <div class="row">
+    <button id="labels" aria-pressed="false">Show key names</button>
+    <button id="replay">Hear it</button>
+  </div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  const NAMES = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+  const SEMI = [0, 2, 4, 5, 7, 9, 11];
+  // diatonic step number: octave * 7 + letter index (C4 = 28)
+  const CLEFS = {
+    treble: { bottom: 30, lo: 28, hi: 40 }, // bottom line E4, range C4..A5
+    bass:   { bottom: 18, lo: 16, hi: 28 }  // bottom line G2, range E2..C4
+  };
+  const name = d => NAMES[d % 7];
+  const octave = d => Math.floor(d / 7);
+  const freq = d => 440 * Math.pow(2, (octave(d) * 12 + SEMI[d % 7] - 57) / 12);
+
+  const saved = store.get('piano-note-game', {});
+  const state = {
+    mode: CLEFS[saved.mode] || saved.mode === 'both' ? saved.mode : 'treble',
+    labels: !!saved.labels,
+    best: saved.best | 0,
+    right: 0, total: 0, streak: 0,
+    clef: 'treble', note: 28, misses: 0, locked: false
+  };
+  const save = () => store.set('piano-note-game', { mode: state.mode, labels: state.labels, best: state.best });
+
+  // ---- sound ----
+  let ac = null;
+  function play(d) {
+    try {
+      ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+      if (ac.state === 'suspended') ac.resume();
+      const t = ac.currentTime, f = freq(d);
+      const out = ac.createGain();
+      out.gain.setValueAtTime(0.0001, t);
+      out.gain.exponentialRampToValueAtTime(0.35, t + 0.01);
+      out.gain.exponentialRampToValueAtTime(0.0001, t + 1.6);
+      out.connect(ac.destination);
+      [[1, 'triangle', 1], [2, 'sine', 0.35], [3, 'sine', 0.12]].forEach(([m, type, g]) => {
+        const o = ac.createOscillator(), og = ac.createGain();
+        o.type = type; o.frequency.value = f * m; og.gain.value = g;
+        o.connect(og); og.connect(out); o.start(t); o.stop(t + 1.7);
+      });
+    } catch {}
+  }
+
+  // ---- staff ----
+  const svg = $('#staff');
+  const SP = 8, BOTTOM_Y = 100, NOTE_X = 180;
+  const NS = svg.namespaceURI;
+  const el = (tag, attrs) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); return e; };
+
+  function drawStaff() {
+    const c = CLEFS[state.clef], off = state.note - c.bottom;
+    svg.textContent = '';
+    for (let i = 0; i < 5; i++) {
+      const y = BOTTOM_Y - i * SP * 2;
+      svg.appendChild(el('line', { class: 'ln', x1: 8, x2: 292, y1: y, y2: y }));
+    }
+    // ledger lines below and above
+    for (let o = -2; o >= off; o -= 2) svg.appendChild(el('line', { class: 'ln', x1: NOTE_X - 17, x2: NOTE_X + 17, y1: BOTTOM_Y - o * SP, y2: BOTTOM_Y - o * SP }));
+    for (let o = 10; o <= off; o += 2) svg.appendChild(el('line', { class: 'ln', x1: NOTE_X - 17, x2: NOTE_X + 17, y1: BOTTOM_Y - o * SP, y2: BOTTOM_Y - o * SP }));
+    const y = BOTTOM_Y - off * SP;
+    svg.appendChild(el('ellipse', { class: 'nh', cx: NOTE_X, cy: y, rx: 10, ry: 7, transform: `rotate(-20 ${NOTE_X} ${y})` }));
+    // stem: up when below the middle line, down otherwise
+    const up = off < 4;
+    svg.appendChild(el('line', { class: 'ln', x1: up ? NOTE_X + 9 : NOTE_X - 9, x2: up ? NOTE_X + 9 : NOTE_X - 9, y1: y, y2: up ? y - 52 : y + 52 }));
+    $('#clef').textContent = state.clef + ' clef';
+    svg.setAttribute('aria-label', 'note on the ' + state.clef + ' staff');
+  }
+
+  function nextNote(first) {
+    state.misses = 0;
+    state.clef = state.mode === 'both' ? (Math.random() < 0.5 ? 'treble' : 'bass') : state.mode;
+    const c = CLEFS[state.clef];
+    if (first) state.note = 28; // every session starts on middle C
+    else {
+      let d;
+      do d = c.lo + Math.floor(Math.random() * (c.hi - c.lo + 1)); while (d === state.note);
+      state.note = d;
+    }
+    svg.classList.remove('ok', 'bad');
+    $$('.white').forEach(k => k.classList.remove('right', 'wrong', 'reveal'));
+    drawStaff();
+  }
+
+  // ---- keyboard ----
+  const keys = $('#keys');
+  NAMES.forEach(n => {
+    const b = document.createElement('button');
+    b.className = 'white'; b.dataset.n = n; b.setAttribute('aria-label', n);
+    b.innerHTML = `<span class="lbl">${n}</span>`;
+    keys.appendChild(b);
+  });
+  // black keys sit between C-D, D-E, F-G, G-A, A-B; this game uses the white keys only
+  [1, 2, 4, 5, 6].forEach(i => {
+    const k = document.createElement('div');
+    k.className = 'black'; k.setAttribute('aria-hidden', 'true'); k.style.left = (i / 7 * 100) + '%';
+    keys.appendChild(k);
+  });
+
+  function render() {
+    $('#tally').textContent = `${state.right} / ${state.total}`;
+    $('#streak').textContent = state.streak;
+    $('#best').textContent = state.best;
+    $$('.modes button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === state.mode)));
+    keys.classList.toggle('labels', state.labels);
+    $('#labels').setAttribute('aria-pressed', String(state.labels));
+    $('#labels').textContent = state.labels ? 'Hide key names' : 'Show key names';
+  }
+
+  function answer(n) {
+    if (state.locked) return;
+    const key = $(`.white[data-n="${n}"]`);
+    const target = name(state.note);
+    if (n === target) {
+      play(state.note);
+      if (state.misses === 0) { state.right++; state.streak++; state.best = Math.max(state.best, state.streak); save(); }
+      state.total++;
+      $$('.white').forEach(k => k.classList.remove('wrong')); svg.classList.remove('bad');
+      key.classList.add('right'); svg.classList.add('ok');
+      $('#feedback').textContent = `${target}${octave(state.note)} — right.`;
+      state.locked = true;
+      render();
+      setTimeout(() => { state.locked = false; nextNote(false); }, 650);
+    } else {
+      // play the key that was pressed, in the octave nearest the target
+      const d = octave(state.note) * 7 + NAMES.indexOf(n);
+      play(Math.abs(d - state.note) > 3 ? d + (d < state.note ? 7 : -7) : d);
+      state.misses++; state.streak = 0;
+      svg.classList.add('bad'); key.classList.add('wrong');
+      setTimeout(() => { svg.classList.remove('bad'); key.classList.remove('wrong'); }, 400);
+      if (state.misses >= 2) $(`.white[data-n="${target}"]`).classList.add('reveal');
+      $('#feedback').textContent = state.misses >= 2 ? `That is ${n}. The marked key is ${target}.` : `That is ${n}. Try again.`;
+      render();
+    }
+  }
+
+  keys.addEventListener('click', e => { const b = e.target.closest('.white'); if (b) answer(b.dataset.n); });
+  document.addEventListener('keydown', e => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const n = e.key.toUpperCase();
+    if (NAMES.includes(n)) answer(n);
+  });
+
+  $('.modes').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    state.mode = b.dataset.mode; state.streak = 0; save(); render(); nextNote(false);
+    $('#feedback').textContent = 'Press the key for this note.';
+  });
+  $('#labels').addEventListener('click', () => { state.labels = !state.labels; save(); render(); });
+  $('#replay').addEventListener('click', () => play(state.note));
+
+  render();
+  nextNote(true);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+{
+  "slug": "piano-note-game",
+  "wish": "someone should make a game that teaches piano playing",
+  "year": 2015,
+  "agreed": 12,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/27198/game-to-learn-piano-play",
+      "date": "2015-12-14",
+      "points": 10,
+      "comments": 2
+    }
+  ],
+  "spec": "A note appears on a treble or bass staff; you press the matching key on a one-octave piano and hear it.\nPick treble, bass or both; wrong keys play their own note and two misses mark the right key; score, streak and best streak are kept.\nNaturals only (white keys); it does not listen to a real piano or teach rhythm.",
+  "tests": [
+    {
+      "tap": ".white[data-n=\"D\"]"
+    },
+    {
+      "expect": {
+        "sel": "#feedback",
+        "contains": "That is D"
+      }
+    },
+    {
+      "tap": ".white[data-n=\"C\"]"
+    },
+    {
+      "expect": {
+        "sel": "#feedback",
+        "contains": "C4"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#tally",
+        "contains": "0 / 1"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#streak",
+        "matches": "^0$"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:50:10Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Every session opens on middle C, then random notes in range (treble C4-A5, bass E2-C4). Sound is synthesized with Web Audio; computer keys A-G also work."
+}
