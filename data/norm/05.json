@@ -1,0 +1,2502 @@
+[
+ {
+  "k": "se:3836",
+  "drop": null,
+  "wish": "someone should make a messenger for chatting across a local network",
+  "topic": "lan-messenger",
+  "category": "social",
+  "buildable": false,
+  "why": "needs devices to reach each other",
+  "no": "needs: a server"
+ },
+ {
+  "k": "se:4278",
+  "drop": null,
+  "wish": "someone should make a tool that compares two files and shows the differences",
+  "topic": "file-diff",
+  "category": "dev",
+  "buildable": true,
+  "why": "text diff runs locally on pasted text",
+  "no": null
+ },
+ {
+  "k": "se:9953",
+  "drop": null,
+  "wish": "someone should make a tool that converts a video to an APNG",
+  "topic": "video-to-apng",
+  "category": "media",
+  "buildable": false,
+  "why": "heavy video encoding",
+  "no": "exists: ezgif"
+ },
+ {
+  "k": "se:10009",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:10060",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:10742",
+  "drop": null,
+  "wish": "someone should make a site that lets groups pick a meeting time without Doodle",
+  "topic": "group-poll-scheduler",
+  "category": "time",
+  "buildable": false,
+  "why": "shared votes need hosting",
+  "no": "needs: a server"
+ },
+ {
+  "k": "se:18308",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:18340",
+  "drop": null,
+  "wish": "someone should make a tool that tells me when a website changes",
+  "topic": "website-change-tracker",
+  "category": "data",
+  "buildable": false,
+  "why": "must fetch other sites repeatedly",
+  "no": "needs: a server"
+ },
+ {
+  "k": "se:18923",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:19273",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:19693",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:21146",
+  "drop": null,
+  "wish": "someone should make a tool that draws a gantt-style timeline chart",
+  "topic": "gantt-chart",
+  "category": "work",
+  "buildable": true,
+  "why": "canvas chart from typed tasks",
+  "no": null
+ },
+ {
+  "k": "se:25675",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:31443",
+  "drop": null,
+  "wish": "someone should make a tool that generates all combinations of a set of parameters",
+  "topic": "parameter-combinations",
+  "category": "dev",
+  "buildable": true,
+  "why": "pure combinatorics on typed lists",
+  "no": null
+ },
+ {
+  "k": "se:34202",
+  "drop": null,
+  "wish": "someone should make an app that plans my diet",
+  "topic": "meal-planner",
+  "category": "food",
+  "buildable": true,
+  "why": "typed foods and totals, saved locally",
+  "no": null
+ },
+ {
+  "k": "se:37025",
+  "drop": null,
+  "wish": "someone should make a tool that looks up DNS records",
+  "topic": "dns-lookup",
+  "category": "dev",
+  "buildable": false,
+  "why": "browsers cannot make DNS queries",
+  "no": "needs: a server"
+ },
+ {
+  "k": "se:113",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:1960",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:9780",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:10840",
+  "drop": null,
+  "wish": "someone should make a tool that blocks websites for part of the day",
+  "topic": "block-sites-by-time",
+  "category": "work",
+  "buildable": false,
+  "why": "needs system-level blocking",
+  "no": "your phone does this"
+ },
+ {
+  "k": "se:13595",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:16376",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:17720",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:19706",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:21299",
+  "drop": null,
+  "wish": "someone should make a tool that draws simple figures and diagrams",
+  "topic": "figure-drawing",
+  "category": "design",
+  "buildable": true,
+  "why": "canvas or SVG drawing",
+  "no": null
+ },
+ {
+  "k": "se:30930",
+  "drop": null,
+  "wish": "someone should make a tool that shows a hex diff of two files",
+  "topic": "hex-diff",
+  "category": "dev",
+  "buildable": true,
+  "why": "file input and byte comparison locally",
+  "no": null
+ },
+ {
+  "k": "se:34250",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:38073",
+  "drop": null,
+  "wish": "someone should make an app that reads my RSS feeds",
+  "topic": "rss-reader",
+  "category": "media",
+  "buildable": false,
+  "why": "feeds are blocked by cross-origin rules",
+  "no": "needs: a server"
+ },
+ {
+  "k": "se:2356",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:3937",
+  "drop": "hardware",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:7500",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:10640",
+  "drop": null,
+  "wish": "someone should make a tool that reads academic papers aloud",
+  "topic": "paper-to-audio",
+  "category": "learning",
+  "buildable": false,
+  "why": "needs PDF parsing and good voices",
+  "no": "needs: a server"
+ },
+ {
+  "k": "se:14116",
+  "drop": null,
+  "wish": "someone should make a tool that stores links and notes in a tree",
+  "topic": "tree-notes",
+  "category": "writing",
+  "buildable": true,
+  "why": "nested list saved locally",
+  "no": null
+ },
+ {
+  "k": "se:20734",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:23482",
+  "drop": null,
+  "wish": "someone should make a game that makes me move around while I play",
+  "topic": "movement-game",
+  "category": "games",
+  "buildable": true,
+  "why": "motion sensors on tap",
+  "no": null
+ },
+ {
+  "k": "se:38230",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:516",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:13190",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:19001",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:31258",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:36861",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:45749",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:41674",
+  "drop": null,
+  "wish": "someone should make a tool that stores and searches my code snippets offline",
+  "topic": "snippet-manager",
+  "category": "dev",
+  "buildable": true,
+  "why": "localStorage list with search",
+  "no": null
+ },
+ {
+  "k": "se:72357",
+  "drop": null,
+  "wish": "someone should make an app that syncs notes between my laptop and phone",
+  "topic": "synced-notes",
+  "category": "writing",
+  "buildable": false,
+  "why": "sync between devices needs hosting",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:27095477",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:30896373",
+  "drop": null,
+  "wish": "someone should make a tool that makes SVG animations easy",
+  "topic": "svg-animation",
+  "category": "design",
+  "buildable": true,
+  "why": "SVG and CSS animation in browser",
+  "no": null
+ },
+ {
+  "k": "hn:10873151",
+  "drop": null,
+  "wish": "someone should make an app that reminds me where I put things",
+  "topic": "where-i-put-things",
+  "category": "everyday",
+  "buildable": true,
+  "why": "typed list saved locally",
+  "no": null
+ },
+ {
+  "k": "hn:24528604",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:7189210",
+  "drop": null,
+  "wish": "someone should make a site that plans a trip from what I tell it",
+  "topic": "trip-planner",
+  "category": "travel",
+  "buildable": false,
+  "why": "needs places and prices data",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "hn:31229209",
+  "drop": null,
+  "wish": "someone should make a site with code puzzles like chess puzzles",
+  "topic": "code-puzzles",
+  "category": "dev",
+  "buildable": false,
+  "why": "needs a large puzzle collection and scoring",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "hn:1520106",
+  "drop": "unsafe",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:27838349",
+  "drop": null,
+  "wish": "someone should make a site that lists the topics YouTube demonetizes",
+  "topic": "youtube-demonetized-topics",
+  "category": "media",
+  "buildable": false,
+  "why": "no public source for the list",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "hn:18412857",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:11753501",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:16442240",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:5845849",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:32331547",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:18282203",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:4805742",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:35130846",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:30492354",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:29837769",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:2724419",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:21211641",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:19624246",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:17841341",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:7600762",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:5011758",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:5006266",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:49628247",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:47687910",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:31421862",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:28150056",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:2350875",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:22330146",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:19293535",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:10208889",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:9121721",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:907886",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:5647409",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:4939524",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:38899861",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:30726687",
+  "drop": null,
+  "wish": "someone should make a tool that sends me reminders at random times",
+  "topic": "random-reminders",
+  "category": "time",
+  "buildable": false,
+  "why": "texts need a server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:30093944",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:28304105",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:2188505",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:798102",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:46089501",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:38635026",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:34016201",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:2555682",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:2316842",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:16179289",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:5223659",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:42201347",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:24386124",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:108",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:27087",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:295",
+  "drop": null,
+  "wish": "someone should make a tool that makes an RSS feed for any website",
+  "topic": "website-to-rss",
+  "category": "media",
+  "buildable": false,
+  "why": "must fetch and watch other sites",
+  "no": "needs: a server"
+ },
+ {
+  "k": "se:355",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:357",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:499",
+  "drop": null,
+  "wish": "someone should make a tool that tracks work time and makes invoices",
+  "topic": "time-tracker-invoice",
+  "category": "work",
+  "buildable": true,
+  "why": "timer and printable invoice locally",
+  "no": null
+ },
+ {
+  "k": "se:658",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:713",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:1448",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:1753",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:2675",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:2762",
+  "drop": null,
+  "wish": "someone should make a tool that simulates a simple climate model",
+  "topic": "climate-simulator",
+  "category": "learning",
+  "buildable": true,
+  "why": "simple equations on a canvas",
+  "no": null
+ },
+ {
+  "k": "se:3811",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:3894",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:4394",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:4594",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:7075",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:7130",
+  "drop": null,
+  "wish": "someone should make an offline encyclopedia",
+  "topic": "offline-encyclopedia",
+  "category": "learning",
+  "buildable": false,
+  "why": "needs a huge content dataset",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "se:7596",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:14969",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:18615",
+  "drop": null,
+  "wish": "someone should make a tool that tries many decoders on a mystery string",
+  "topic": "decode-unknown-string",
+  "category": "text",
+  "buildable": true,
+  "why": "runs common decoders on typed text",
+  "no": null
+ },
+ {
+  "k": "se:25157",
+  "drop": null,
+  "wish": "someone should make an app that shows my finances on a calendar",
+  "topic": "budget-calendar",
+  "category": "money",
+  "buildable": true,
+  "why": "typed entries on a calendar",
+  "no": null
+ },
+ {
+  "k": "se:26692",
+  "drop": null,
+  "wish": "someone should make an app that identifies bird songs by sound",
+  "topic": "bird-song-id",
+  "category": "outdoors",
+  "buildable": false,
+  "why": "needs a trained model and bird data",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "se:27248",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:27867",
+  "drop": null,
+  "wish": "someone should make a markdown editor with live preview and tables",
+  "topic": "markdown-editor",
+  "category": "writing",
+  "buildable": true,
+  "why": "text editing and rendering in browser",
+  "no": null
+ },
+ {
+  "k": "se:30924",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:34433",
+  "drop": null,
+  "wish": "someone should make a tool that turns handwriting into code",
+  "topic": "handwriting-to-code",
+  "category": "dev",
+  "buildable": false,
+  "why": "needs handwriting recognition model",
+  "no": "needs: a server"
+ },
+ {
+  "k": "se:47747",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:347",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:393",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:444",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:453",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:545",
+  "drop": null,
+  "wish": "someone should make a markdown editor for my phone",
+  "topic": "markdown-editor",
+  "category": "writing",
+  "buildable": true,
+  "why": "text editing and rendering in browser",
+  "no": null
+ },
+ {
+  "k": "se:819",
+  "drop": null,
+  "wish": "someone should make a tool that helps a small business manage support emails",
+  "topic": "support-email-manager",
+  "category": "work",
+  "buildable": false,
+  "why": "needs email access",
+  "no": "needs: a server"
+ },
+ {
+  "k": "se:957",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:968",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:997",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:1055",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:1503",
+  "drop": null,
+  "wish": "someone should make a tool that converts HTML4 pages to HTML5 and CSS",
+  "topic": "html4-to-html5",
+  "category": "dev",
+  "buildable": true,
+  "why": "text transformation in browser",
+  "no": null
+ },
+ {
+  "k": "se:1690",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:1831",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:1934",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:2353",
+  "drop": null,
+  "wish": "someone should make an app that tracks my personal finances",
+  "topic": "expense-tracker",
+  "category": "money",
+  "buildable": true,
+  "why": "typed entries saved locally",
+  "no": null
+ },
+ {
+  "k": "se:2609",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:2830",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:2934",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:6891",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:7393",
+  "drop": null,
+  "wish": "someone should make a tool that draws Venn diagrams",
+  "topic": "venn-diagram",
+  "category": "math",
+  "buildable": true,
+  "why": "SVG circles from typed sets",
+  "no": null
+ },
+ {
+  "k": "se:9798",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:9859",
+  "drop": null,
+  "wish": "someone should make a tool that converts structured text like XML, JSON and CSV",
+  "topic": "convert-data-formats",
+  "category": "data",
+  "buildable": true,
+  "why": "parsing and serializing in browser",
+  "no": null
+ },
+ {
+  "k": "se:10979",
+  "drop": "hardware",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:12078",
+  "drop": null,
+  "wish": "someone should make a site for drawing and brainstorming together",
+  "topic": "collaborative-whiteboard",
+  "category": "work",
+  "buildable": false,
+  "why": "live sharing needs hosting",
+  "no": "needs: a server"
+ },
+ {
+  "k": "se:13276",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:16612",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:19835",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:21198",
+  "drop": null,
+  "wish": "someone should make an app for writing novels",
+  "topic": "novel-writing",
+  "category": "writing",
+  "buildable": true,
+  "why": "text editor with chapters saved locally",
+  "no": null
+ },
+ {
+  "k": "se:23540",
+  "drop": null,
+  "wish": "someone should make an app that plays a tone and shows if I hit it when singing",
+  "topic": "pitch-trainer",
+  "category": "music",
+  "buildable": true,
+  "why": "microphone pitch detection on tap",
+  "no": null
+ },
+ {
+  "k": "se:26241",
+  "drop": null,
+  "wish": "someone should make a calculator for programmers",
+  "topic": "programmer-calculator",
+  "category": "dev",
+  "buildable": true,
+  "why": "hex, binary and bit math",
+  "no": null
+ },
+ {
+  "k": "se:27381",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:32019",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:51711",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:979",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:2886",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:4175",
+  "drop": null,
+  "wish": "someone should make an app for editing video",
+  "topic": "video-editor",
+  "category": "media",
+  "buildable": false,
+  "why": "heavy video processing",
+  "no": "exists: DaVinci Resolve"
+ },
+ {
+  "k": "se:7176",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:7394",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:9880",
+  "drop": null,
+  "wish": "someone should make an app that catalogs the movies I own",
+  "topic": "movie-collection",
+  "category": "media",
+  "buildable": true,
+  "why": "typed list saved locally",
+  "no": null
+ },
+ {
+  "k": "se:10797",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:10899",
+  "drop": null,
+  "wish": "someone should make a tool that shows the differences between two images",
+  "topic": "image-diff",
+  "category": "photo",
+  "buildable": true,
+  "why": "canvas pixel comparison",
+  "no": null
+ },
+ {
+  "k": "se:10971",
+  "drop": null,
+  "wish": "someone should make an app for building a family tree offline",
+  "topic": "family-tree",
+  "category": "everyday",
+  "buildable": true,
+  "why": "typed people and links saved locally",
+  "no": null
+ },
+ {
+  "k": "se:14378",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:17020",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:17402",
+  "drop": null,
+  "wish": "someone should make a tool that converts fountain screenplays to PDF",
+  "topic": "screenplay-formatter",
+  "category": "writing",
+  "buildable": true,
+  "why": "text formatting and browser print",
+  "no": null
+ },
+ {
+  "k": "se:20288",
+  "drop": null,
+  "wish": "someone should make a tool that converts webpages to PDF",
+  "topic": "webpage-to-pdf",
+  "category": "files",
+  "buildable": false,
+  "why": "browsers already print to PDF",
+  "no": "your phone does this"
+ },
+ {
+  "k": "se:21328",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:23261",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:25096",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:25376",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:28556",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:33880",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:39964",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:64714",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:234",
+  "drop": null,
+  "wish": "someone should make a tool for making mind maps",
+  "topic": "mind-map",
+  "category": "work",
+  "buildable": true,
+  "why": "canvas nodes saved locally",
+  "no": null
+ },
+ {
+  "k": "se:1857",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:2468",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:2902",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:4037",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:7382",
+  "drop": null,
+  "wish": "someone should make a tool that converts between base64 and hex",
+  "topic": "base64-hex-converter",
+  "category": "dev",
+  "buildable": true,
+  "why": "pure text conversion",
+  "no": null
+ },
+ {
+  "k": "se:7454",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:7636",
+  "drop": "hardware",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:10915",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:14521",
+  "drop": null,
+  "wish": "someone should make a text editor that organizes notes as a tree",
+  "topic": "tree-notes",
+  "category": "writing",
+  "buildable": true,
+  "why": "nested list saved locally",
+  "no": null
+ },
+ {
+  "k": "se:16588",
+  "drop": null,
+  "wish": "someone should make a tool that shows sunrise and sunset times",
+  "topic": "sunrise-sunset-times",
+  "category": "time",
+  "buildable": true,
+  "why": "computed from date and location",
+  "no": null
+ },
+ {
+  "k": "se:23444",
+  "drop": null,
+  "wish": "someone should make a calendar that is end-to-end encrypted",
+  "topic": "encrypted-calendar",
+  "category": "privacy",
+  "buildable": false,
+  "why": "syncing a calendar needs hosting",
+  "no": "needs: a server"
+ },
+ {
+  "k": "se:25108",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:829",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:2271",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:6895",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:14897",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:26341",
+  "drop": null,
+  "wish": "someone should make a player that skips silent parts of audio and video",
+  "topic": "skip-silence-player",
+  "category": "media",
+  "buildable": true,
+  "why": "Web Audio detects quiet stretches",
+  "no": null
+ },
+ {
+  "k": "se:30254",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:35319",
+  "drop": "hardware",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:83754",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:4340",
+  "drop": null,
+  "wish": "someone should make a site where I can send a file to myself without registering",
+  "topic": "send-file-to-self",
+  "category": "files",
+  "buildable": false,
+  "why": "transfer between devices needs hosting",
+  "no": "needs: a server"
+ },
+ {
+  "k": "se:34614",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:74349",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:86629",
+  "drop": null,
+  "wish": "someone should make a tool that compares two images",
+  "topic": "image-diff",
+  "category": "photo",
+  "buildable": true,
+  "why": "canvas pixel comparison",
+  "no": null
+ },
+ {
+  "k": "se:39855",
+  "drop": "too-specific",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "se:83502",
+  "drop": null,
+  "wish": "someone should make an offline music player without ads",
+  "topic": "offline-music-player",
+  "category": "music",
+  "buildable": true,
+  "why": "plays local files in browser",
+  "no": null
+ },
+ {
+  "k": "hn:26093536",
+  "drop": null,
+  "wish": "someone should make a tool that tracks cryptocurrency energy use over time",
+  "topic": "crypto-energy-tracker",
+  "category": "data",
+  "buildable": false,
+  "why": "needs live external data",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "hn:1531196",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:42105142",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:16188284",
+  "drop": null,
+  "wish": "someone should make an app that rates individual menu items in restaurants",
+  "topic": "menu-item-ratings",
+  "category": "food",
+  "buildable": false,
+  "why": "needs many people's ratings",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "hn:12543692",
+  "drop": null,
+  "wish": "someone should make a site that generates a mock interview",
+  "topic": "mock-interview",
+  "category": "work",
+  "buildable": true,
+  "why": "question list with a timer",
+  "no": null
+ },
+ {
+  "k": "hn:41483561",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:2669450",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:7868559",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:18395830",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:11827750",
+  "drop": null,
+  "wish": "someone should make a site with an up-to-date index of conferences",
+  "topic": "conference-index",
+  "category": "work",
+  "buildable": false,
+  "why": "needs a maintained listing",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "hn:14835688",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:6842377",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:43102510",
+  "drop": null,
+  "wish": "someone should make an encrypted portfolio tracker",
+  "topic": "portfolio-tracker",
+  "category": "money",
+  "buildable": true,
+  "why": "typed holdings saved locally",
+  "no": null
+ },
+ {
+  "k": "hn:3628773",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:22634816",
+  "drop": "hardware",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:13588495",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:1082270",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:9272080",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:41603171",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:37766246",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:34560357",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:30080600",
+  "drop": null,
+  "wish": "someone should make a tool that monitors my identity for misuse",
+  "topic": "identity-monitor",
+  "category": "privacy",
+  "buildable": false,
+  "why": "needs to watch outside records",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:25905896",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:22716049",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:1248178",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:4603099",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:32815079",
+  "drop": null,
+  "wish": "someone should make a tool that makes music from a text prompt",
+  "topic": "text-to-music",
+  "category": "music",
+  "buildable": false,
+  "why": "needs a large model",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:28927043",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:24745954",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:2343781",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:22784642",
+  "drop": null,
+  "wish": "someone should make a language that describes schedules and produces calendars",
+  "topic": "schedule-to-calendar",
+  "category": "time",
+  "buildable": true,
+  "why": "text parser outputs a calendar file",
+  "no": null
+ },
+ {
+  "k": "hn:18269095",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:17773510",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:16728561",
+  "drop": "hardware",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:13852719",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:10920364",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:10909097",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:44013822",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:40525222",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:27560347",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:26137663",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:23719790",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:16447965",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:15528427",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ },
+ {
+  "k": "hn:15262013",
+  "drop": "not-a-wish",
+  "wish": null,
+  "topic": null,
+  "category": null,
+  "buildable": null,
+  "why": null,
+  "no": null
+ }
+]

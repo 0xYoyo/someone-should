@@ -1,0 +1,2502 @@
+[
+{
+"k": "hn:19641080",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:35111350",
+"drop": null,
+"wish": "someone should make a social network built on a web of trust",
+"topic": "web-of-trust-social",
+"category": "social",
+"buildable": false,
+"why": "needs shared network",
+"no": "needs: a server"
+},
+{
+"k": "hn:29294787",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:18415767",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:45031111",
+"drop": null,
+"wish": "someone should make a site that gives temporary phone numbers",
+"topic": "temp-phone-number",
+"category": "privacy",
+"buildable": false,
+"why": "needs a phone carrier",
+"no": "needs: a server"
+},
+{
+"k": "hn:24720505",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:504",
+"drop": null,
+"wish": "someone should make an app that syncs flashcards across devices",
+"topic": "flashcards-sync",
+"category": "learning",
+"buildable": false,
+"why": "sync between devices needs a backend",
+"no": "needs: a server"
+},
+{
+"k": "se:736",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:4229",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:14409",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:26",
+"drop": null,
+"wish": "someone should make an app that teaches english to small kids",
+"topic": "kids-learn-english",
+"category": "kids",
+"buildable": true,
+"why": "static lessons and quizzes in one page",
+"no": null
+},
+{
+"k": "se:195",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:2359",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:10298",
+"drop": null,
+"wish": "someone should make an app that converts handwritten math equations to latex",
+"topic": "handwriting-to-latex",
+"category": "math",
+"buildable": false,
+"why": "needs handwriting recognition",
+"no": "exists: Mathpix"
+},
+{
+"k": "se:18301",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:123",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:511",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:92047",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:47",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:541",
+"drop": null,
+"wish": "someone should make a password manager",
+"topic": "password-manager",
+"category": "privacy",
+"buildable": false,
+"why": "handles secrets",
+"no": "not safe"
+},
+{
+"k": "se:1609",
+"drop": null,
+"wish": "someone should make an app that teaches kids programming concepts",
+"topic": "kids-learn-programming",
+"category": "kids",
+"buildable": true,
+"why": "blocks and lessons in one page",
+"no": null
+},
+{
+"k": "se:9705",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:10111",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:10773",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:17992",
+"drop": null,
+"wish": "someone should make a site that shares markdown pastes by link",
+"topic": "markdown-pastebin",
+"category": "writing",
+"buildable": false,
+"why": "sharing by link needs hosting",
+"no": "needs: a server"
+},
+{
+"k": "se:44870",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:460",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:2147",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:2277",
+"drop": null,
+"wish": "someone should make a tool that recognizes music",
+"topic": "music-recognition",
+"category": "music",
+"buildable": false,
+"why": "needs a song database",
+"no": "needs: other people's data"
+},
+{
+"k": "se:16535",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:37986",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:7890981",
+"drop": null,
+"wish": "someone should make a tool that tells you if your isp is throttling you",
+"topic": "isp-throttle-test",
+"category": "data",
+"buildable": false,
+"why": "needs remote servers to test",
+"no": "needs: a server"
+},
+{
+"k": "hn:11121446",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:43828879",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:38879188",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:28586365",
+"drop": null,
+"wish": "someone should make a site that visualizes the chip shortage live",
+"topic": "chip-shortage-visualization",
+"category": "data",
+"buildable": false,
+"why": "needs live supply data",
+"no": "needs: other people's data"
+},
+{
+"k": "hn:27521314",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:33146789",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:6458539",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:17721355",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:14452833",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:12124974",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:1321151",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:26387890",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:7528872",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:967",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:1371",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:4235",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:94",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:1312",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:1438",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:1",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:4319",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:1350",
+"drop": null,
+"wish": "someone should make a tool that draws data model diagrams quickly",
+"topic": "erd-diagram-maker",
+"category": "dev",
+"buildable": true,
+"why": "svg diagram editor",
+"no": null
+},
+{
+"k": "se:3652",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:5638",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:13711",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:23247",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:2225",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:7607",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:18406",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:1300",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:2004",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:3294",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:82504",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:10228",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:16231129",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:2848885",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:24038620",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:18673517",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:14282843",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:28393031",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:16081942",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:47591829",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:1107874",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:30424279",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:4596310",
+"drop": "joke",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:42061603",
+"drop": "unsafe",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:28544094",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:13104454",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:35414217",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:1060",
+"drop": null,
+"wish": "someone should make a tool that creates comic strips",
+"topic": "comic-strip-maker",
+"category": "design",
+"buildable": true,
+"why": "canvas panels and speech bubbles",
+"no": null
+},
+{
+"k": "se:2530",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:66",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:3034",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:21028",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:1778",
+"drop": null,
+"wish": "someone should make an app that does voice chat over a local network",
+"topic": "lan-voice-chat",
+"category": "social",
+"buildable": false,
+"why": "needs a signaling server",
+"no": "needs: a server"
+},
+{
+"k": "se:336",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:531",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:564",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:2415",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:2556",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:10285",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:1041",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:1307",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:2331",
+"drop": null,
+"wish": "someone should make a tool that circles and annotates screenshots",
+"topic": "annotate-screenshot",
+"category": "photo",
+"buildable": true,
+"why": "canvas annotation on loaded image",
+"no": null
+},
+{
+"k": "se:4448",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:6826",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:9983",
+"drop": null,
+"wish": "someone should make a tool that inlines css and javascript into html",
+"topic": "inline-css-js-html",
+"category": "dev",
+"buildable": true,
+"why": "string processing in browser",
+"no": null
+},
+{
+"k": "se:17325",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:1320",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:5727",
+"drop": null,
+"wish": "someone should make a tool that draws state diagrams",
+"topic": "state-diagram-maker",
+"category": "dev",
+"buildable": true,
+"why": "svg diagram editor",
+"no": null
+},
+{
+"k": "se:11637",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:3014",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:3772",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:17210",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:35976817",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:2868520",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:10473925",
+"drop": null,
+"wish": "someone should make an app that tracks assets and transactions better than mint",
+"topic": "asset-transaction-tracker",
+"category": "money",
+"buildable": false,
+"why": "auto import needs bank login",
+"no": "needs: your bank password"
+},
+{
+"k": "hn:24475568",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:1632905",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:28876827",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:24694282",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:3534188",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:42749275",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:2960344",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:24609881",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:26227999",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:11928690",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:19882847",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:13670692",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:13011102",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:8949852",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:24264688",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:16932936",
+"drop": "joke",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:26998782",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:12168866",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:4107",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:21452",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:349",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:655",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:1397",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:1916",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:4291",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:17812",
+"drop": null,
+"wish": "someone should make a tool that diffs two json files",
+"topic": "json-diff",
+"category": "dev",
+"buildable": true,
+"why": "pure comparison in javascript",
+"no": null
+},
+{
+"k": "se:183",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:251",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:383",
+"drop": null,
+"wish": "someone should make an app that makes the screen tint warmer at night",
+"topic": "warm-screen-tint",
+"category": "health",
+"buildable": false,
+"why": "a page cannot tint the whole screen",
+"no": "your phone does this"
+},
+{
+"k": "se:468",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:3052",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:3225",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:13470",
+"drop": null,
+"wish": "someone should make a tool that extracts attachments from .eml files",
+"topic": "extract-eml-attachments",
+"category": "files",
+"buildable": true,
+"why": "parse mime and save parts in browser",
+"no": null
+},
+{
+"k": "se:35392",
+"drop": null,
+"wish": "someone should make an app that keeps notes in markdown",
+"topic": "markdown-notes",
+"category": "writing",
+"buildable": true,
+"why": "textarea and localStorage",
+"no": null
+},
+{
+"k": "se:3016",
+"drop": null,
+"wish": "someone should make a tool that builds decision trees",
+"topic": "decision-tree-maker",
+"category": "work",
+"buildable": true,
+"why": "draw and compute tree on canvas",
+"no": null
+},
+{
+"k": "se:3067",
+"drop": null,
+"wish": "someone should make an app that backs up android photos without a web service",
+"topic": "phone-photo-backup",
+"category": "photo",
+"buildable": false,
+"why": "needs access to phone storage",
+"no": "your phone does this"
+},
+{
+"k": "se:5681",
+"drop": null,
+"wish": "someone should make a tool that edits math equations visually",
+"topic": "visual-equation-editor",
+"category": "math",
+"buildable": true,
+"why": "typeset equations in browser",
+"no": null
+},
+{
+"k": "se:16422",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:2667",
+"drop": null,
+"wish": "someone should make an app that tracks gps sports activity without social features",
+"topic": "private-gps-activity-tracker",
+"category": "outdoors",
+"buildable": true,
+"why": "geolocation on tap, saved locally",
+"no": null
+},
+{
+"k": "se:35647",
+"drop": null,
+"wish": "someone should make a tool for sketching and painting quickly",
+"topic": "quick-sketch-pad",
+"category": "design",
+"buildable": true,
+"why": "canvas drawing",
+"no": null
+},
+{
+"k": "se:20720",
+"drop": null,
+"wish": "someone should make a tool that turns audio files into text",
+"topic": "audio-to-text",
+"category": "text",
+"buildable": false,
+"why": "needs speech recognition model",
+"no": "needs: a server"
+},
+{
+"k": "se:21137",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:9819",
+"drop": null,
+"wish": "someone should make an app that syncs a to-do list between android and windows",
+"topic": "synced-todo-list",
+"category": "work",
+"buildable": false,
+"why": "sync needs a backend",
+"no": "needs: a server"
+},
+{
+"k": "se:10580",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:1137",
+"drop": null,
+"wish": "someone should make a tool that sends files through a private network",
+"topic": "send-files-local-network",
+"category": "files",
+"buildable": false,
+"why": "needs a server or relay",
+"no": "needs: a server"
+},
+{
+"k": "hn:28395418",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:39428713",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:28585356",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:4142351",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:34688401",
+"drop": "hardware",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:19052481",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:28359651",
+"drop": null,
+"wish": "someone should make an rss app with a mute list",
+"topic": "rss-mute-list",
+"category": "media",
+"buildable": false,
+"why": "fetching feeds needs network",
+"no": "needs: a server"
+},
+{
+"k": "hn:5757367",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:10343830",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:2061628",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:6377743",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:40800423",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:33842359",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:26350160",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:23674412",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:6100813",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:32359894",
+"drop": null,
+"wish": "someone should make a site where a crowd votes on which design looks better",
+"topic": "crowd-ab-vote",
+"category": "design",
+"buildable": false,
+"why": "needs votes from many people",
+"no": "needs: a server"
+},
+{
+"k": "hn:17233726",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:42001650",
+"drop": "hardware",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:33113283",
+"drop": null,
+"wish": "someone should make a tool that writes a gdpr privacy statement for small blogs",
+"topic": "gdpr-privacy-statement",
+"category": "writing",
+"buildable": true,
+"why": "fill-in template text generator",
+"no": null
+},
+{
+"k": "hn:24211698",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:21797092",
+"drop": "hardware",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:27",
+"drop": null,
+"wish": "someone should make a vector editor",
+"topic": "vector-editor",
+"category": "design",
+"buildable": false,
+"why": "full editor is too big for one file",
+"no": "exists: Inkscape"
+},
+{
+"k": "se:177",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:923",
+"drop": null,
+"wish": "someone should make a tool that prints large battlemaps for rpgs",
+"topic": "print-battlemaps",
+"category": "games",
+"buildable": true,
+"why": "tile an image across printable pages",
+"no": null
+},
+{
+"k": "se:3506",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:5665",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:21449",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:23275",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:110",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:162",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:525",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:1855",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:3382",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:17442",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:41",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:190",
+"drop": null,
+"wish": "someone should make a tool that shows the outline of an html5 document",
+"topic": "html-outline-viewer",
+"category": "dev",
+"buildable": true,
+"why": "parse html and list headings",
+"no": null
+},
+{
+"k": "se:828",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:2646",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:3354",
+"drop": null,
+"wish": "someone should make an app that simulates electrical circuits",
+"topic": "circuit-simulator",
+"category": "math",
+"buildable": true,
+"why": "numeric simulation on canvas",
+"no": null
+},
+{
+"k": "se:6959",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:28406",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:733",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:904",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:25553",
+"drop": null,
+"wish": "someone should make a password manager",
+"topic": "password-manager",
+"category": "privacy",
+"buildable": false,
+"why": "handles secrets",
+"no": "not safe"
+},
+{
+"k": "se:30090",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:31467",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:90507",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:1587",
+"drop": null,
+"wish": "someone should make a tool that checks if a website is available",
+"topic": "website-up-check",
+"category": "dev",
+"buildable": false,
+"why": "cross-site checks need a server",
+"no": "needs: a server"
+},
+{
+"k": "se:1882",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:2010",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:3000",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:29808",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:3317",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:7588",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:36123",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:200",
+"drop": null,
+"wish": "someone should make a tool that resizes images automatically",
+"topic": "batch-resize-images",
+"category": "photo",
+"buildable": true,
+"why": "canvas resize in browser",
+"no": null
+},
+{
+"k": "se:399",
+"drop": null,
+"wish": "someone should make an app that generates correctly resized ios app icons",
+"topic": "app-icon-resizer",
+"category": "dev",
+"buildable": true,
+"why": "canvas resize to fixed sizes",
+"no": null
+},
+{
+"k": "se:7211",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:18673",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:11218",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:1253187",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:20931148",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:8035656",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:39809293",
+"drop": null,
+"wish": "someone should make a site that shows short summaries of the most important news",
+"topic": "short-news-summaries",
+"category": "media",
+"buildable": false,
+"why": "needs news feeds",
+"no": "needs: other people's data"
+},
+{
+"k": "hn:18969737",
+"drop": null,
+"wish": "someone should make an app that tracks budget and expenses",
+"topic": "budget-expense-tracker",
+"category": "money",
+"buildable": true,
+"why": "entries stored locally, totals in page",
+"no": null
+},
+{
+"k": "hn:29099775",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:3040178",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:30175830",
+"drop": null,
+"wish": "someone should make an app that tests your spoken english",
+"topic": "spoken-english-test",
+"category": "learning",
+"buildable": false,
+"why": "needs speech recognition model",
+"no": "needs: a server"
+},
+{
+"k": "hn:20408561",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:1969961",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:1853388",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:35091668",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:32816792",
+"drop": null,
+"wish": "someone should make a site that searches airfare better than google flights",
+"topic": "airfare-search",
+"category": "travel",
+"buildable": false,
+"why": "needs live fare data",
+"no": "needs: other people's data"
+},
+{
+"k": "hn:28228906",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:17924846",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:15869070",
+"drop": null,
+"wish": "someone should make an app that notifies you of replies to your comments",
+"topic": "reply-notifier",
+"category": "social",
+"buildable": false,
+"why": "needs polling a server",
+"no": "needs: a server"
+},
+{
+"k": "hn:10937565",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:6237799",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:45633083",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:29130137",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:19942349",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:1494789",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:18071861",
+"drop": "unsafe",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:34845217",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:28009218",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:36830583",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:11689674",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:801",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:1077",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:1847",
+"drop": null,
+"wish": "someone should make an app that reads business cards",
+"topic": "business-card-reader",
+"category": "work",
+"buildable": false,
+"why": "needs text recognition from camera",
+"no": "needs: camera hardware"
+},
+{
+"k": "se:10841",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:1454",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:1712",
+"drop": null,
+"wish": "someone should make an app that locates a lost phone",
+"topic": "phone-locator",
+"category": "everyday",
+"buildable": false,
+"why": "needs a server to reach the phone",
+"no": "needs: a server"
+},
+{
+"k": "se:3656",
+"drop": null,
+"wish": "someone should make a tool that makes scanned pdfs searchable with ocr",
+"topic": "searchable-pdf-ocr",
+"category": "files",
+"buildable": false,
+"why": "needs ocr engine",
+"no": "needs: a server"
+},
+{
+"k": "se:3920",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+}
+]

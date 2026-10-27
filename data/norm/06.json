@@ -1,0 +1,2502 @@
+[
+{
+"k": "hn:14799822",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:12141303",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:6815093",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:6454900",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:579437",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:3746596",
+"drop": null,
+"wish": "someone should make a tool that turns a website into a PDF",
+"topic": "website-to-pdf",
+"category": "files",
+"buildable": false,
+"why": "needs a server to render pages",
+"no": "needs: a server"
+},
+{
+"k": "hn:32180377",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:25006716",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:19945846",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:15768840",
+"drop": null,
+"wish": "someone should make a chat app that supports code snippets",
+"topic": "chat-code-snippets",
+"category": "dev",
+"buildable": false,
+"why": "chat needs servers and other people",
+"no": "needs: a server"
+},
+{
+"k": "hn:12532345",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:49201546",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:44036653",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:388585",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:3440190",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:31167062",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:26344101",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:25998947",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:13035692",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:109",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:178",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:235",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:378",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:402",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:571",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:671",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:896",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:1418",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:1676",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:1750",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:2098",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:2299",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:2340",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:2479",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:2610",
+"drop": null,
+"wish": "someone should make a tool for creating complex HTML tables",
+"topic": "html-table-builder",
+"category": "dev",
+"buildable": true,
+"why": "visual editor generating HTML text",
+"no": null
+},
+{
+"k": "se:2724",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:3117",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:3208",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:3974",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:4128",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:4461",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:4596",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:5649",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:6951",
+"drop": null,
+"wish": "someone should make a tool that smears or blurs text in a screenshot",
+"topic": "blur-screenshot-text",
+"category": "photo",
+"buildable": true,
+"why": "canvas blur on a loaded image",
+"no": null
+},
+{
+"k": "se:6991",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:7254",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:7267",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:7321",
+"drop": null,
+"wish": "someone should make a tool that converts HTML to Markdown",
+"topic": "html-to-markdown",
+"category": "text",
+"buildable": true,
+"why": "pure text transformation in browser",
+"no": null
+},
+{
+"k": "se:9721",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:9796",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:10136",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:10543",
+"drop": null,
+"wish": "someone should make a game that teaches the Linux command line",
+"topic": "learn-command-line-game",
+"category": "games",
+"buildable": true,
+"why": "simulated terminal quiz in one page",
+"no": null
+},
+{
+"k": "se:11050",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:13440",
+"drop": null,
+"wish": "someone should make a lightweight audio and video editor",
+"topic": "audio-video-editor",
+"category": "media",
+"buildable": false,
+"why": "too broad to define",
+"no": "too vague"
+},
+{
+"k": "se:13503",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:16184",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:17878",
+"drop": null,
+"wish": "someone should make a conditional alarm clock",
+"topic": "conditional-alarm-clock",
+"category": "time",
+"buildable": false,
+"why": "conditions undefined",
+"no": "too vague"
+},
+{
+"k": "se:17943",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:20764",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:23210",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:25338",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:25527",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:27165",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:28188",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:31490",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:31641",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:33694",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:34019",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:36599",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:299",
+"drop": null,
+"wish": "someone should make an app that implements Mozart's dice game",
+"topic": "mozart-dice-game",
+"category": "music",
+"buildable": true,
+"why": "random bar selection and audio synthesis",
+"no": null
+},
+{
+"k": "se:320",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:475",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:560",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:608",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:1765",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:2236",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:2593",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:2620",
+"drop": null,
+"wish": "someone should make a to-do list app",
+"topic": "todo-list",
+"category": "everyday",
+"buildable": true,
+"why": "list stored in localStorage",
+"no": null
+},
+{
+"k": "se:2955",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:3891",
+"drop": null,
+"wish": "someone should make an editor for vCard contacts",
+"topic": "vcard-editor",
+"category": "work",
+"buildable": true,
+"why": "parse and edit text files in browser",
+"no": null
+},
+{
+"k": "se:4330",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:9825",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:9865",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:11310",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:11434",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:11923",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:13689",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:13705",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:14028",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:14674",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:14688",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:16541",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:17179",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:18345",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:18476",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:19468",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:19697",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:20202",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:20553",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:21207",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:26316",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:26404",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:27198",
+"drop": null,
+"wish": "someone should make a game that teaches piano playing",
+"topic": "piano-learning-game",
+"category": "music",
+"buildable": true,
+"why": "on-screen keyboard with Web Audio",
+"no": null
+},
+{
+"k": "se:27897",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:31788",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:32085",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:32608",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:43273",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:408",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:520",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:1196",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:2070",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:2846",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:3095",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:3503",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:4497",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:6945",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:7545",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:10187",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:11433",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:15023",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:16823",
+"drop": null,
+"wish": "someone should make computer games for 4 year old children",
+"topic": "toddler-games",
+"category": "kids",
+"buildable": true,
+"why": "simple tap games in one page",
+"no": null
+},
+{
+"k": "se:17173",
+"drop": null,
+"wish": "someone should make a to-do app that lets you set task duration",
+"topic": "todo-with-duration",
+"category": "time",
+"buildable": true,
+"why": "list with durations in localStorage",
+"no": null
+},
+{
+"k": "se:18162",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:18302",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:18650",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:19675",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:19783",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:21197",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:26788",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:30900",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:50135",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:3948",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:7069",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:7339",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:9711",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:17606",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:21318",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:23499",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:27252",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:27639",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:28371",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:34636",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:38085",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:45170",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:47680",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:2998",
+"drop": null,
+"wish": "someone should make an app that tracks tasks across multiple projects",
+"topic": "multi-project-tasks",
+"category": "work",
+"buildable": true,
+"why": "grouped task lists in localStorage",
+"no": null
+},
+{
+"k": "se:9739",
+"drop": null,
+"wish": "someone should make a tool for drawing diagrams",
+"topic": "diagram-drawing",
+"category": "design",
+"buildable": true,
+"why": "canvas or SVG editor in browser",
+"no": null
+},
+{
+"k": "se:10537",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:13476",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:14597",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:28613",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:29946",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:38491",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:87051",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:1194",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:3022",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:10600",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:17601",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:28633",
+"drop": null,
+"wish": "someone should make a tool that resizes and compresses several images at once",
+"topic": "resize-compress-images",
+"category": "photo",
+"buildable": true,
+"why": "canvas resize and export in browser",
+"no": null
+},
+{
+"k": "se:33792",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:38969",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:20484",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:47075316",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:21346239",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:1194940",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:439015",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:3485305",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:35227730",
+"drop": null,
+"wish": "someone should make an app that makes QR codes to swap contact info",
+"topic": "qr-contact-card",
+"category": "social",
+"buildable": true,
+"why": "generate QR of contact card in browser",
+"no": null
+},
+{
+"k": "hn:23148714",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:36572811",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:49557687",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:27839617",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:16127016",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:15776366",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:6092313",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:38998802",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:34876315",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:30874967",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:29611004",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:18010871",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:7366972",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:40533364",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:39569758",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:25767975",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:22278860",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:16694732",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:11653388",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:10915927",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:42967150",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:41872063",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:36534039",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:34294251",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:3115124",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:29621621",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:2468192",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:2042498",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:825353",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:506747",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:5019844",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:4385054",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:43756079",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:43405806",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:42169773",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:413929",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:40657847",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:3265565",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:29971945",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:27820141",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:2738813",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:26805374",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:21032945",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:18432459",
+"drop": null,
+"wish": "someone should make a service that escalates emails to SMS or phone call reminders",
+"topic": "email-to-sms-escalation",
+"category": "work",
+"buildable": false,
+"why": "needs a server to send messages",
+"no": "needs: a server"
+},
+{
+"k": "hn:16060497",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:14369244",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:43464140",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:3138997",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:30715743",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:30469292",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "hn:14115684",
+"drop": null,
+"wish": "someone should make an email service that allows plaintext and respects privacy",
+"topic": "private-plaintext-email",
+"category": "privacy",
+"buildable": false,
+"why": "email needs a server",
+"no": "needs: a server"
+},
+{
+"k": "hn:1153619",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:10687",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:248",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:263",
+"drop": "not-a-wish",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:316",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:366",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:441",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:527",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:585",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:1463",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:1527",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:1548",
+"drop": null,
+"wish": "someone should make a viewer for DOT graphs",
+"topic": "dot-graph-viewer",
+"category": "dev",
+"buildable": true,
+"why": "parse DOT and draw SVG in browser",
+"no": null
+},
+{
+"k": "se:1552",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:1766",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:2193",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:2349",
+"drop": null,
+"wish": "someone should make a tool that draws ASCII trees",
+"topic": "ascii-tree-drawer",
+"category": "text",
+"buildable": true,
+"why": "text rendering from indented input",
+"no": null
+},
+{
+"k": "se:3020",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:3507",
+"drop": null,
+"wish": "someone should make an app that generates cafe or library ambience noise",
+"topic": "ambient-noise-generator",
+"category": "music",
+"buildable": true,
+"why": "Web Audio noise synthesis",
+"no": null
+},
+{
+"k": "se:3860",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:4209",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:4432",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:6949",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:7419",
+"drop": null,
+"wish": "someone should make a WYSIWYG geometry tool",
+"topic": "geometry-construction",
+"category": "math",
+"buildable": true,
+"why": "canvas geometry drawing",
+"no": null
+},
+{
+"k": "se:7524",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:7568",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:12012",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:13282",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:14229",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:17439",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+},
+{
+"k": "se:19172",
+"drop": "too-specific",
+"wish": null,
+"topic": null,
+"category": null,
+"buildable": null,
+"why": null,
+"no": null
+}
+]

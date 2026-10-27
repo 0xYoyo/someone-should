@@ -1,0 +1,1404 @@
+[
+{
+"k": "hn:23211851",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:32632720",
+"drop": "hardware"
+},
+{
+"k": "hn:23202850",
+"drop": null,
+"wish": "someone should make a search engine that excludes the biggest websites",
+"topic": "small-web-search",
+"category": "media",
+"buildable": false,
+"why": "needs a search index",
+"no": "needs: a server"
+},
+{
+"k": "hn:31706835",
+"drop": "hardware"
+},
+{
+"k": "hn:17291127",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:18228740",
+"drop": "hardware"
+},
+{
+"k": "hn:40878765",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:18508284",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:18945658",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:21991260",
+"drop": null,
+"wish": "someone should make a platform for sharing ideas people want to give away",
+"topic": "idea-giveaway",
+"category": "social",
+"buildable": false,
+"why": "needs a server",
+"no": "needs: a server"
+},
+{
+"k": "hn:4891238",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:32506168",
+"drop": null,
+"wish": "someone should make a successor to del.icio.us",
+"topic": "social-bookmarks",
+"category": "social",
+"buildable": false,
+"why": "needs shared accounts",
+"no": "needs: a server"
+},
+{
+"k": "hn:33425443",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:19450331",
+"drop": null,
+"wish": "someone should make an app that tracks a freelancer's finances",
+"topic": "track-freelance-finances",
+"category": "money",
+"buildable": true,
+"why": "typed entries and totals",
+"no": null
+},
+{
+"k": "hn:13961176",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:14008085",
+"drop": null,
+"wish": "someone should make a powerful open-source replacement for Google Calendar",
+"topic": "calendar-replacement",
+"category": "time",
+"buildable": false,
+"why": "needs sync across devices",
+"no": "needs: a server"
+},
+{
+"k": "hn:15823597",
+"drop": "hardware"
+},
+{
+"k": "hn:31567345",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:26901352",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:30793076",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:24893771",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:46871179",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:15637607",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:23497756",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:31386483",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:13472331",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:36468335",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:33595879",
+"drop": null,
+"wish": "someone should make a cloud music library that does not delete your music",
+"topic": "cloud-music-library",
+"category": "music",
+"buildable": false,
+"why": "needs hosted storage",
+"no": "needs: a server"
+},
+{
+"k": "hn:30685223",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:13488795",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:1926047",
+"drop": "not-a-wish"
+},
+{
+"k": "se:867",
+"drop": null,
+"wish": "someone should make a self-hosted replacement for GitHub",
+"topic": "self-hosted-git",
+"category": "dev",
+"buildable": false,
+"why": "needs a server",
+"no": "exists: Gitea"
+},
+{
+"k": "hn:23472692",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:32750322",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:16393815",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:29532676",
+"drop": "not-a-wish"
+},
+{
+"k": "se:1308",
+"drop": "too-specific"
+},
+{
+"k": "hn:12752671",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:36307810",
+"drop": "hardware"
+},
+{
+"k": "hn:21641864",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:23264850",
+"drop": null,
+"wish": "someone should make an open source tool for creating simple CRUD apps",
+"topic": "crud-app-builder",
+"category": "dev",
+"buildable": false,
+"why": "too broad",
+"no": "too vague"
+},
+{
+"k": "hn:1206993",
+"drop": "unsafe"
+},
+{
+"k": "hn:20704993",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:41036914",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:30385479",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:1182512",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:31549303",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:32315035",
+"drop": null,
+"wish": "someone should make a tool that enables commenting on HTML elements",
+"topic": "comment-on-html",
+"category": "work",
+"buildable": false,
+"why": "needs shared comments",
+"no": "needs: a server"
+},
+{
+"k": "hn:13070261",
+"drop": "not-a-wish"
+},
+{
+"k": "se:17714",
+"drop": null,
+"wish": "someone should make a simple markdown viewer",
+"topic": "markdown-viewer",
+"category": "text",
+"buildable": true,
+"why": "render pasted or opened markdown",
+"no": null
+},
+{
+"k": "hn:11469047",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:32141539",
+"drop": "not-a-wish"
+},
+{
+"k": "se:1897",
+"drop": "too-specific"
+},
+{
+"k": "hn:37397529",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:26452996",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:30209366",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:40939333",
+"drop": "hardware"
+},
+{
+"k": "hn:14218177",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:12359560",
+"drop": "unsafe"
+},
+{
+"k": "hn:33392246",
+"drop": null,
+"wish": "someone should make a list of the richest people by liquid assets",
+"topic": "richest-by-liquid-assets",
+"category": "data",
+"buildable": false,
+"why": "needs outside data",
+"no": "needs: other people's data"
+},
+{
+"k": "hn:41580203",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:13963698",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:34398656",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:33223124",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:35092674",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:32565059",
+"drop": null,
+"wish": "someone should make a tool to organize and rename PDF files",
+"topic": "rename-pdf-files",
+"category": "files",
+"buildable": false,
+"why": "browser cannot rename files",
+"no": "too vague"
+},
+{
+"k": "hn:28336742",
+"drop": null,
+"wish": "someone should make a recruiter email blocklist",
+"topic": "recruiter-blocklist",
+"category": "work",
+"buildable": false,
+"why": "needs shared list",
+"no": "needs: other people's data"
+},
+{
+"k": "hn:32833581",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:32737313",
+"drop": "unsafe"
+},
+{
+"k": "se:40",
+"drop": null,
+"wish": "someone should make a graph tool with better automatic node placement",
+"topic": "graph-layout",
+"category": "data",
+"buildable": false,
+"why": "needs a layout engine",
+"no": "exists: yEd"
+},
+{
+"k": "hn:37408794",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:43829927",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:48707536",
+"drop": null,
+"wish": "someone should make a list of employers who do not pay",
+"topic": "bad-employers-list",
+"category": "work",
+"buildable": false,
+"why": "needs shared list",
+"no": "needs: other people's data"
+},
+{
+"k": "hn:41043077",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:3438079",
+"drop": null,
+"wish": "someone should make a repository of failed startups",
+"topic": "failed-startups",
+"category": "work",
+"buildable": false,
+"why": "needs shared data",
+"no": "needs: other people's data"
+},
+{
+"k": "hn:32637990",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:13034546",
+"drop": "not-a-wish"
+},
+{
+"k": "se:245",
+"drop": "too-specific"
+},
+{
+"k": "hn:8870948",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:34556096",
+"drop": "not-a-wish"
+},
+{
+"k": "se:817",
+"drop": "unsafe"
+},
+{
+"k": "hn:18724725",
+"drop": null,
+"wish": "someone should make a decentralised alternative to Slack",
+"topic": "team-chat",
+"category": "social",
+"buildable": false,
+"why": "needs a server",
+"no": "needs: a server"
+},
+{
+"k": "se:4539",
+"drop": null,
+"wish": "someone should make an alternative to TrueCrypt",
+"topic": "disk-encryption",
+"category": "privacy",
+"buildable": false,
+"why": "needs disk-level access",
+"no": "exists: VeraCrypt"
+},
+{
+"k": "hn:36025977",
+"drop": null,
+"wish": "someone should make a web app to store blood test results",
+"topic": "blood-test-tracker",
+"category": "health",
+"buildable": true,
+"why": "typed values in localStorage",
+"no": null
+},
+{
+"k": "hn:33747231",
+"drop": null,
+"wish": "someone should make a site that is just a text scratchpad",
+"topic": "text-scratchpad",
+"category": "writing",
+"buildable": true,
+"why": "one textarea saved locally",
+"no": null
+},
+{
+"k": "hn:2934103",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:32797711",
+"drop": null,
+"wish": "someone should make a beautiful markdown editor",
+"topic": "markdown-editor",
+"category": "writing",
+"buildable": true,
+"why": "in-browser markdown rendering",
+"no": null
+},
+{
+"k": "se:70",
+"drop": null,
+"wish": "someone should make an audio and video format converter",
+"topic": "convert-media-format",
+"category": "media",
+"buildable": false,
+"why": "needs heavy codecs",
+"no": "exists: VLC"
+},
+{
+"k": "hn:17924798",
+"drop": null,
+"wish": "someone should make a tool that compares two tables and shows the differences",
+"topic": "table-diff",
+"category": "data",
+"buildable": true,
+"why": "paste two tables, compare in browser",
+"no": null
+},
+{
+"k": "se:785",
+"drop": "too-specific"
+},
+{
+"k": "hn:30237284",
+"drop": null,
+"wish": "someone should make a tool for personal document hell",
+"topic": "personal-documents",
+"category": "everyday",
+"buildable": false,
+"why": "too broad",
+"no": "too vague"
+},
+{
+"k": "hn:8729888",
+"drop": null,
+"wish": "someone should make a listing of part-time dev jobs",
+"topic": "part-time-dev-jobs",
+"category": "work",
+"buildable": false,
+"why": "needs job postings",
+"no": "needs: other people's data"
+},
+{
+"k": "hn:20980552",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:31667761",
+"drop": null,
+"wish": "someone should make a site where users can write HTML and CSS",
+"topic": "html-css-playground",
+"category": "dev",
+"buildable": true,
+"why": "live preview in iframe",
+"no": null
+},
+{
+"k": "se:34352",
+"drop": "too-specific"
+},
+{
+"k": "hn:34277033",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:11917206",
+"drop": null,
+"wish": "someone should make a site with example files for all media types",
+"topic": "sample-media-files",
+"category": "files",
+"buildable": false,
+"why": "needs hosted files",
+"no": "needs: a server"
+},
+{
+"k": "hn:13737871",
+"drop": "not-a-wish"
+},
+{
+"k": "se:696",
+"drop": null,
+"wish": "someone should make a program that logs time spent in each program",
+"topic": "time-per-program",
+"category": "time",
+"buildable": false,
+"why": "needs OS integration",
+"no": "exists: ActivityWatch"
+},
+{
+"k": "se:71013",
+"drop": null,
+"wish": "someone should make an offline markdown viewer",
+"topic": "markdown-viewer",
+"category": "text",
+"buildable": true,
+"why": "render pasted or opened markdown",
+"no": null
+},
+{
+"k": "hn:13455283",
+"drop": "not-a-wish"
+},
+{
+"k": "se:7019",
+"drop": null,
+"wish": "someone should make a tool that records the screen to an animated GIF",
+"topic": "screen-to-gif",
+"category": "media",
+"buildable": false,
+"why": "needs OS screen capture",
+"no": "exists: LICEcap"
+},
+{
+"k": "hn:1995029",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:11699668",
+"drop": "not-a-wish"
+},
+{
+"k": "se:82",
+"drop": null,
+"wish": "someone should make an offline map browser with offline search",
+"topic": "offline-maps",
+"category": "travel",
+"buildable": false,
+"why": "needs map data",
+"no": "needs: other people's data"
+},
+{
+"k": "se:3412",
+"drop": null,
+"wish": "someone should make a tool that makes a scanned PDF searchable",
+"topic": "ocr-pdf",
+"category": "files",
+"buildable": false,
+"why": "needs OCR engine",
+"no": "exists: OCRmyPDF"
+},
+{
+"k": "se:25211",
+"drop": "too-specific"
+},
+{
+"k": "se:710",
+"drop": null,
+"wish": "someone should make a tool that records the screen to an animated GIF",
+"topic": "screen-to-gif",
+"category": "media",
+"buildable": false,
+"why": "needs OS screen capture",
+"no": "exists: LICEcap"
+},
+{
+"k": "hn:15791786",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:29596399",
+"drop": null,
+"wish": "someone should make a wall of shame for ISPs that ignore DNS TTLs",
+"topic": "isp-dns-ttl-shame",
+"category": "dev",
+"buildable": false,
+"why": "needs measuring other networks",
+"no": "needs: other people's data"
+},
+{
+"k": "hn:8131898",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:28955982",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:20555977",
+"drop": "not-a-wish"
+},
+{
+"k": "se:5746",
+"drop": null,
+"wish": "someone should make a markdown editor that renders live in the editing pane",
+"topic": "markdown-editor",
+"category": "writing",
+"buildable": true,
+"why": "contenteditable markdown rendering",
+"no": null
+},
+{
+"k": "hn:656988",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:22553254",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:20993082",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:1423954",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:12307585",
+"drop": "unsafe"
+},
+{
+"k": "hn:32070377",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:34069496",
+"drop": null,
+"wish": "someone should make a site for quality short-term contract programming work",
+"topic": "contract-job-board",
+"category": "work",
+"buildable": false,
+"why": "needs job postings",
+"no": "needs: other people's data"
+},
+{
+"k": "hn:6390709",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:37008080",
+"drop": "unsafe"
+},
+{
+"k": "hn:33669196",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:47609117",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:25940949",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:7502206",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:35643709",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:10417071",
+"drop": null,
+"wish": "someone should make an app to keep a work diary",
+"topic": "work-diary",
+"category": "work",
+"buildable": true,
+"why": "dated entries in localStorage",
+"no": null
+},
+{
+"k": "hn:31433321",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:16044200",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:30895905",
+"drop": null,
+"wish": "someone should make a tool that draws binary protocol figures from a spec",
+"topic": "protocol-diagram",
+"category": "dev",
+"buildable": true,
+"why": "parse field list, draw SVG",
+"no": null
+},
+{
+"k": "hn:36909902",
+"drop": null,
+"wish": "someone should make a Crunchbase for politicians",
+"topic": "politician-database",
+"category": "data",
+"buildable": false,
+"why": "needs shared data",
+"no": "needs: other people's data"
+},
+{
+"k": "hn:13398643",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:44460198",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:375296",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:48026211",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:23901803",
+"drop": "joke"
+},
+{
+"k": "se:10012",
+"drop": "too-specific"
+},
+{
+"k": "hn:948036",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:42548539",
+"drop": "not-a-wish"
+},
+{
+"k": "se:506",
+"drop": "too-specific"
+},
+{
+"k": "hn:9875500",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:896428",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:453645",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:32248750",
+"drop": "not-a-wish"
+},
+{
+"k": "se:3069",
+"drop": null,
+"wish": "someone should make a tool that adds text and arrows to a screenshot",
+"topic": "annotate-screenshot",
+"category": "photo",
+"buildable": true,
+"why": "canvas drawing on a loaded image",
+"no": null
+},
+{
+"k": "hn:19071050",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:32042780",
+"drop": null,
+"wish": "someone should make a Calibre equivalent for audiobooks",
+"topic": "audiobook-library",
+"category": "media",
+"buildable": false,
+"why": "needs file library management",
+"no": "exists: Audiobookshelf"
+},
+{
+"k": "hn:49022990",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:22939006",
+"drop": "unsafe"
+},
+{
+"k": "se:310",
+"drop": null,
+"wish": "someone should make a tool that monitors the quality of an internet connection",
+"topic": "monitor-connection",
+"category": "dev",
+"buildable": false,
+"why": "needs network tests",
+"no": "needs: a server"
+},
+{
+"k": "se:1237",
+"drop": "unsafe"
+},
+{
+"k": "se:129",
+"drop": null,
+"wish": "someone should make a tool that syncs files between computers",
+"topic": "file-sync",
+"category": "files",
+"buildable": false,
+"why": "needs a server",
+"no": "exists: Syncthing"
+},
+{
+"k": "se:3716",
+"drop": null,
+"wish": "someone should make a LOGO interpreter that has a turtle",
+"topic": "logo-turtle",
+"category": "learning",
+"buildable": true,
+"why": "interpreter and canvas turtle",
+"no": null
+},
+{
+"k": "se:18839",
+"drop": null,
+"wish": "someone should make a viewer for huge JSON files",
+"topic": "json-viewer",
+"category": "dev",
+"buildable": true,
+"why": "collapsible tree from a local file",
+"no": null
+},
+{
+"k": "se:6",
+"drop": "too-specific"
+},
+{
+"k": "hn:16648585",
+"drop": "not-a-wish"
+},
+{
+"k": "se:25",
+"drop": null,
+"wish": "someone should make a markdown editor with a live preview",
+"topic": "markdown-editor",
+"category": "writing",
+"buildable": true,
+"why": "in-browser markdown rendering",
+"no": null
+},
+{
+"k": "se:34552",
+"drop": "too-specific"
+},
+{
+"k": "se:2753",
+"drop": "too-specific"
+},
+{
+"k": "hn:8741262",
+"drop": null,
+"wish": "someone should make a Glassdoor for recruitment companies",
+"topic": "rate-recruiters",
+"category": "work",
+"buildable": false,
+"why": "needs other people's reviews",
+"no": "needs: other people's data"
+},
+{
+"k": "se:24903",
+"drop": "too-specific"
+},
+{
+"k": "se:41601",
+"drop": "too-specific"
+},
+{
+"k": "hn:38591829",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:1585219",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:3674414",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:4305508",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:19184024",
+"drop": "not-a-wish"
+},
+{
+"k": "se:98",
+"drop": "too-specific"
+},
+{
+"k": "se:163",
+"drop": "too-specific"
+},
+{
+"k": "hn:636388",
+"drop": null,
+"wish": "someone should make a web-based icon editor",
+"topic": "icon-editor",
+"category": "design",
+"buildable": true,
+"why": "pixel grid on canvas",
+"no": null
+},
+{
+"k": "hn:19032802",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:36980429",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:29037774",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:25561398",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:42859394",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:42170746",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:34137593",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:13568474",
+"drop": null,
+"wish": "someone should make a Hacker News equivalent for research papers",
+"topic": "paper-discussion",
+"category": "learning",
+"buildable": false,
+"why": "needs a server",
+"no": "needs: a server"
+},
+{
+"k": "hn:38398167",
+"drop": "hardware"
+},
+{
+"k": "hn:36361075",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:38391199",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:30993317",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:1879721",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:22826668",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:28505018",
+"drop": null,
+"wish": "someone should make a search engine that does exact search",
+"topic": "exact-search-engine",
+"category": "media",
+"buildable": false,
+"why": "needs a search index",
+"no": "needs: a server"
+},
+{
+"k": "hn:12810139",
+"drop": "not-a-wish"
+},
+{
+"k": "se:6907",
+"drop": null,
+"wish": "someone should make a video player that steps backward frame by frame",
+"topic": "frame-by-frame-video",
+"category": "media",
+"buildable": true,
+"why": "video element seeking on a local file",
+"no": null
+},
+{
+"k": "se:4165",
+"drop": "too-specific"
+},
+{
+"k": "hn:31132557",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:44319903",
+"drop": "hardware"
+},
+{
+"k": "se:1747",
+"drop": "too-specific"
+},
+{
+"k": "hn:26935278",
+"drop": null,
+"wish": "someone should make a tool that turns text into a timeline diagram",
+"topic": "text-to-timeline",
+"category": "design",
+"buildable": true,
+"why": "parse lines, draw SVG",
+"no": null
+},
+{
+"k": "hn:37720804",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:31555252",
+"drop": "not-a-wish"
+},
+{
+"k": "se:11444",
+"drop": null,
+"wish": "someone should make a tool that tells you when you are out of garbage bags",
+"topic": "household-restock-reminder",
+"category": "home",
+"buildable": false,
+"why": "needs sensing stock",
+"no": "too vague"
+},
+{
+"k": "hn:9667247",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:28810725",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:33927783",
+"drop": "not-a-wish"
+},
+{
+"k": "se:11678",
+"drop": "too-specific"
+},
+{
+"k": "se:23",
+"drop": "too-specific"
+},
+{
+"k": "hn:2304832",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:26850679",
+"drop": "not-a-wish"
+},
+{
+"k": "se:167",
+"drop": null,
+"wish": "someone should make a file integrity checker",
+"topic": "file-checksum",
+"category": "files",
+"buildable": true,
+"why": "SubtleCrypto hash of local files",
+"no": null
+},
+{
+"k": "se:10471",
+"drop": "too-specific"
+},
+{
+"k": "se:23430",
+"drop": null,
+"wish": "someone should make a free alternative to Photoshop",
+"topic": "photo-editor",
+"category": "photo",
+"buildable": false,
+"why": "too big for one file",
+"no": "exists: GIMP"
+},
+{
+"k": "se:25018",
+"drop": null,
+"wish": "someone should make a diff tool for JSON files",
+"topic": "json-diff",
+"category": "dev",
+"buildable": true,
+"why": "parse and compare two JSON texts",
+"no": null
+},
+{
+"k": "se:106",
+"drop": null,
+"wish": "someone should make a tool that combines pages from several PDFs into one",
+"topic": "merge-pdf-pages",
+"category": "files",
+"buildable": false,
+"why": "needs a PDF library",
+"no": "exists: PDFsam"
+},
+{
+"k": "hn:40046670",
+"drop": null,
+"wish": "someone should make a tool that tracks copy changes on websites and emails",
+"topic": "track-copy-changes",
+"category": "work",
+"buildable": false,
+"why": "needs fetching sites",
+"no": "needs: a server"
+},
+{
+"k": "hn:34036839",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:9715073",
+"drop": "not-a-wish"
+},
+{
+"k": "se:1816",
+"drop": "too-specific"
+},
+{
+"k": "se:155",
+"drop": null,
+"wish": "someone should make an online storage service that works well on Linux",
+"topic": "online-storage",
+"category": "files",
+"buildable": false,
+"why": "needs a server",
+"no": "needs: a server"
+},
+{
+"k": "se:14413",
+"drop": null,
+"wish": "someone should make a grep that highlights matches instead of filtering",
+"topic": "highlight-matches",
+"category": "text",
+"buildable": true,
+"why": "regex highlight over pasted text",
+"no": null
+},
+{
+"k": "hn:27687024",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:16874108",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:40074360",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:29587703",
+"drop": "not-a-wish"
+},
+{
+"k": "se:1380",
+"drop": "too-specific"
+},
+{
+"k": "se:13875",
+"drop": "too-specific"
+},
+{
+"k": "se:1530",
+"drop": null,
+"wish": "someone should make an alternative messaging network to WhatsApp",
+"topic": "private-chat",
+"category": "social",
+"buildable": false,
+"why": "needs a server",
+"no": "needs: a server"
+},
+{
+"k": "hn:21963056",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:14307750",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:36229990",
+"drop": null,
+"wish": "someone should make a tool that turns an audio song into sheet music",
+"topic": "audio-to-sheet-music",
+"category": "music",
+"buildable": false,
+"why": "needs ML transcription",
+"no": "too vague"
+},
+{
+"k": "hn:34423855",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:32855963",
+"drop": null,
+"wish": "someone should make a Stack Overflow clone that pays money for answers",
+"topic": "paid-q-and-a",
+"category": "social",
+"buildable": false,
+"why": "needs a server and payments",
+"no": "needs: a server"
+},
+{
+"k": "hn:10533306",
+"drop": null,
+"wish": "someone should make a site where strangers have random conversations",
+"topic": "random-chat",
+"category": "social",
+"buildable": false,
+"why": "needs a server",
+"no": "needs: a server"
+},
+{
+"k": "hn:2542693",
+"drop": "not-a-wish"
+},
+{
+"k": "se:33669",
+"drop": "too-specific"
+},
+{
+"k": "se:46362",
+"drop": null,
+"wish": "someone should make a standalone SVG editor",
+"topic": "svg-editor",
+"category": "design",
+"buildable": true,
+"why": "SVG shapes in browser",
+"no": null
+},
+{
+"k": "se:175",
+"drop": "too-specific"
+},
+{
+"k": "hn:16375212",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:1330607",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:31017335",
+"drop": "not-a-wish"
+},
+{
+"k": "se:274",
+"drop": "too-specific"
+},
+{
+"k": "hn:43676397",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:37319451",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:36588600",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:30327283",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:40412264",
+"drop": "not-a-wish"
+},
+{
+"k": "se:4045",
+"drop": "too-specific"
+},
+{
+"k": "se:287",
+"drop": null,
+"wish": "someone should make a WYSIWYG HTML editor",
+"topic": "wysiwyg-html-editor",
+"category": "dev",
+"buildable": true,
+"why": "contenteditable with HTML output",
+"no": null
+},
+{
+"k": "se:32612",
+"drop": "too-specific"
+},
+{
+"k": "se:19023",
+"drop": "too-specific"
+},
+{
+"k": "hn:24716562",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:38828739",
+"drop": "not-a-wish"
+},
+{
+"k": "hn:19485840",
+"drop": null,
+"wish": "someone should make a way to browse live YC companies",
+"topic": "browse-yc-companies",
+"category": "data",
+"buildable": false,
+"why": "needs outside data",
+"no": "needs: other people's data"
+},
+{
+"k": "hn:30052199",
+"drop": "hardware"
+},
+{
+"k": "se:1496",
+"drop": "too-specific"
+}
+]
