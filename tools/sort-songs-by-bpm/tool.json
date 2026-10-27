@@ -1,0 +1,54 @@
+{
+ "slug": "sort-songs-by-bpm",
+ "wish": "someone should make a music player that organizes songs by BPM",
+ "year": 2013,
+ "agreed": 63,
+ "sources": [
+  {
+   "site": "reddit",
+   "url": "https://www.reddit.com/r/CrazyIdeas/comments/1kscu4/",
+   "date": "2013-08-21",
+   "points": 53,
+   "comments": 10
+  }
+ ],
+ "spec": "Detects the tempo of audio files you add from your device and lists them sorted by BPM.\nTap Add songs, set a From/To BPM range, flip slow-to-fast, tap a song to play; playback continues down the list. Test beats are listed first so the list works before any file is added.\nIt does not upload anything, read tags, or find beat grids; tempo is estimated from a 90 s excerpt, and the divide by 2 and times 2 buttons fix half or double readings.",
+ "tests": [
+  {
+   "wait": 600
+  },
+  {
+   "expect": {
+    "sel": "#list .bpm",
+    "matches": "^90$"
+   }
+  },
+  {
+   "tap": "#sort"
+  },
+  {
+   "expect": {
+    "sel": "#list .bpm",
+    "matches": "^150$"
+   }
+  },
+  {
+   "type": {
+    "sel": "#min",
+    "text": "100"
+   }
+  },
+  {
+   "expect": {
+    "sel": "#count",
+    "contains": "2 of 3"
+   }
+  }
+ ],
+ "status": "pending",
+ "built": "2026-10-27T11:19:49Z",
+ "model": "sonnet-5.5",
+ "minutes": 1,
+ "approved": false,
+ "notes": "Fully offline. Playback uses Web Audio because the CSP allows no blob: media. A song is decoded again when played."
+}

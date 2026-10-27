@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a music player that organizes songs by BPM</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+.meta { font-size: 16px; }
+.field { display: grid; gap: 4px; flex: 1; min-width: 90px; }
+#list li { padding: 0; gap: 6px; }
+#list .play { flex: 1; min-width: 0; border: 0; text-align: left; padding: 0 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+#list li.on .play { font-weight: 600; }
+#list li.on { border-left: 3px solid var(--ink); padding-left: 8px; }
+#list .bpm { font: 500 20px/1 var(--mono); min-width: 44px; text-align: right; font-variant-numeric: tabular-nums; }
+#list .adj { min-width: 44px; padding: 0; }
+#now { min-height: 24px; }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a music player that organizes songs by BPM</h1>
+
+<main id="app" class="stack">
+  <div class="row">
+    <button id="add" class="primary">Add songs</button>
+    <button id="sort">Slow to fast</button>
+    <button id="clear">Clear</button>
+    <input id="files" type="file" accept="audio/*" multiple hidden>
+  </div>
+  <div class="row">
+    <label class="field"><span class="meta">From BPM</span><input id="min" type="number" inputmode="numeric" min="0" max="400" value="60"></label>
+    <label class="field"><span class="meta">To BPM</span><input id="max" type="number" inputmode="numeric" min="0" max="400" value="200"></label>
+  </div>
+  <div id="count" class="meta"></div>
+  <ul id="list" class="plain"></ul>
+  <div id="empty" class="empty" hidden>Add songs from this device. Nothing is uploaded.</div>
+  <div id="msg" class="meta no" role="status"></div>
+  <div id="now" class="meta" role="status"></div>
+  <div id="transport" class="row" hidden>
+    <button id="toggle">Pause</button>
+    <button id="next">Next</button>
+  </div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const KEY = 'sortbpm.v1';
+  const saved = store.get(KEY, {});
+  const state = {
+    min: Number.isFinite(saved.min) ? saved.min : 60,
+    max: Number.isFinite(saved.max) ? saved.max : 200,
+    desc: !!saved.desc,
+    cache: saved.cache && typeof saved.cache === 'object' ? saved.cache : {}
+  };
+  function persist() {
+    const keys = Object.keys(state.cache);
+    if (keys.length > 500) keys.slice(0, keys.length - 500).forEach(k => delete state.cache[k]);
+    store.set(KEY, state);
+  }
+
+  // ---- tempo detection ----
+  // Energy envelope -> onset strength -> autocorrelation, weighted toward 120 BPM.
+  const LOW = 60, HIGH = 200, FPS = 86;
+  function detectBpm(x, sr) {
+    const hop = Math.max(1, Math.round(sr / FPS));
+    const fps = sr / hop;
+    const n = Math.floor(x.length / hop) - 1;
+    if (n < fps * 6) return null;
+    const env = new Float32Array(n);
+    for (let i = 0; i < n; i++) {
+      let s = 0;
+      const a = i * hop, b = a + hop * 2;
+      for (let j = a; j < b; j++) s += x[j] * x[j];
+      env[i] = Math.log(1 + 1000 * Math.sqrt(s / (hop * 2)));
+    }
+    const on = new Float32Array(n);
+    let mean = 0;
+    for (let i = 1; i < n; i++) { on[i] = Math.max(0, env[i] - env[i - 1]); mean += on[i]; }
+    mean /= n;
+    let energy = 0;
+    for (let i = 0; i < n; i++) { on[i] -= mean; energy += on[i] * on[i]; }
+    if (energy < 1e-6) return null;
+    const minLag = Math.floor(fps * 60 / HIGH), maxLag = Math.ceil(fps * 60 / LOW);
+    const ac = new Float32Array(maxLag * 2 + 2);
+    for (let l = minLag - 1; l < ac.length && l < n / 2; l++) {
+      let s = 0;
+      for (let i = 0; i + l < n; i++) s += on[i] * on[i + l];
+      ac[l] = s / (n - l);
+    }
+    let best = -1, bestScore = 0;
+    for (let l = minLag; l <= maxLag; l++) {
+      const bpm = 60 * fps / l;
+      const octaves = Math.log2(bpm / 120) / 0.4;
+      const prior = Math.exp(-0.5 * octaves * octaves);
+      const score = (ac[l] + 0.5 * ac[2 * l]) * prior;
+      if (score > bestScore) { bestScore = score; best = l; }
+    }
+    if (best < 0) return null;
+    // parabolic refinement around the best lag
+    const y0 = ac[best - 1], y1 = ac[best], y2 = ac[best + 1];
+    const d = y0 - 2 * y1 + y2;
+    const shift = d < 0 ? 0.5 * (y0 - y2) / d : 0;
+    return 60 * fps / (best + Math.max(-1, Math.min(1, shift)));
+  }
+  window.__detectBpm = detectBpm;
+
+  // ---- decoding ----
+  async function decodeFile(file) {
+    const ab = await file.arrayBuffer();
+    return new OfflineAudioContext(1, 1, 44100).decodeAudioData(ab);
+  }
+  function monoSegment(buf, seconds) {
+    const len = Math.min(buf.length, Math.floor(seconds * buf.sampleRate));
+    const from = Math.floor((buf.length - len) / 2);
+    const out = new Float32Array(len);
+    for (let c = 0; c < buf.numberOfChannels; c++) {
+      const d = buf.getChannelData(c);
+      for (let i = 0; i < len; i++) out[i] += d[from + i] / buf.numberOfChannels;
+    }
+    return out;
+  }
+
+  // ---- built-in test beats, so the list works before any file is added ----
+  function clickTrack(bpm, seconds) {
+    const sr = 11025;
+    const buf = new AudioBuffer({ length: sr * seconds, sampleRate: sr });
+    const x = buf.getChannelData(0);
+    const step = sr * 60 / bpm;
+    for (let k = 0; k * step < x.length - 400; k++) {
+      const t0 = Math.round(k * step), amp = k % 4 === 0 ? 0.9 : 0.55;
+      for (let j = 0; j < 400; j++) x[t0 + j] += amp * Math.sin(2 * Math.PI * 1000 * j / sr) * Math.exp(-j / 80);
+    }
+    return buf;
+  }
+
+  // ---- list ----
+  let items = [], nextId = 1;
+  const queue = [];
+  let working = false;
+
+  function addItem(o) { const it = Object.assign({ id: nextId++, bpm: null, status: 'wait' }, o); items.push(it); return it; }
+
+  async function analyse(it) {
+    try {
+      if (it.buf) {
+        it.bpm = detectBpm(it.buf.getChannelData(0), it.buf.sampleRate);
+      } else {
+        const cached = state.cache[it.key];
+        if (cached) it.bpm = cached;
+        else {
+          const buf = await decodeFile(it.file);
+          it.bpm = detectBpm(monoSegment(buf, 90), buf.sampleRate);
+          if (it.bpm) { state.cache[it.key] = it.bpm; persist(); }
+        }
+      }
+      it.status = it.bpm ? 'ok' : 'err';
+    } catch { it.status = 'err'; it.bpm = null; }
+  }
+  async function work() {
+    if (working) return;
+    working = true;
+    while (queue.length) {
+      const it = queue.shift();
+      if (!items.includes(it)) continue;
+      await analyse(it);
+      render();
+      await new Promise(r => setTimeout(r, 0));
+    }
+    working = false;
+  }
+  function enqueue(it) { queue.push(it); work(); }
+
+  function visible() {
+    const rows = items.filter(it => it.bpm == null || (it.bpm >= state.min && it.bpm <= state.max));
+    rows.sort((a, b) => {
+      if (a.bpm == null) return b.bpm == null ? 0 : 1;
+      if (b.bpm == null) return -1;
+      return state.desc ? b.bpm - a.bpm : a.bpm - b.bpm;
+    });
+    return rows;
+  }
+
+  function render() {
+    const rows = visible();
+    const list = $('#list');
+    list.textContent = '';
+    for (const it of rows) {
+      const li = document.createElement('li');
+      if (playing === it) li.className = 'on';
+      const b = document.createElement('button');
+      b.className = 'play'; b.textContent = it.name; b.title = it.name;
+      b.addEventListener('click', () => play(it));
+      const v = document.createElement('span');
+      v.className = 'bpm';
+      v.textContent = it.status === 'wait' ? '...' : it.bpm ? String(Math.round(it.bpm)) : '?';
+      li.append(b, v);
+      if (it.bpm) {
+        for (const [label, f] of [['\u00f72', 0.5], ['\u00d72', 2]]) {
+          const a = document.createElement('button');
+          a.className = 'adj'; a.textContent = label;
+          a.setAttribute('aria-label', f < 1 ? 'Halve BPM' : 'Double BPM');
+          a.addEventListener('click', () => {
+            it.bpm *= f;
+            if (it.key) { state.cache[it.key] = it.bpm; persist(); }
+            render();
+          });
+          li.append(a);
+        }
+      }
+      list.append(li);
+    }
+    $('#empty').hidden = items.length > 0;
+    $('#count').textContent = items.length ? rows.length + ' of ' + items.length + ' songs' : '';
+    $('#sort').textContent = state.desc ? 'Fast to slow' : 'Slow to fast';
+  }
+
+  function say(t) { $('#msg').textContent = t || ''; }
+
+  // ---- playback (Web Audio, so no media URLs are needed) ----
+  let ac = null, src = null, playing = null, token = 0, startedAt = 0, ticker = 0;
+  function stopSource() {
+    if (src) { src.onended = null; try { src.stop(); } catch {} src = null; }
+  }
+  function fmt(s) { s = Math.max(0, Math.floor(s)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
+  function tick() {
+    if (playing && ac) $('#now').textContent = playing.name + '  ' + fmt(ac.currentTime - startedAt);
+  }
+  async function play(it) {
+    const my = ++token;
+    stopSource();
+    say('');
+    if (!ac) {
+      try { ac = new (window.AudioContext || window.webkitAudioContext)(); }
+      catch { say('This browser cannot play audio.'); return; }
+    }
+    ac.resume();
+    playing = it;
+    $('#now').textContent = 'Loading...';
+    $('#transport').hidden = false;
+    $('#toggle').textContent = 'Pause';
+    render();
+    let buf;
+    try { buf = it.buf || await decodeFile(it.file); }
+    catch { if (my === token) { say('This file could not be played.'); stopAll(); } return; }
+    if (my !== token) return;
+    await ac.resume();
+    src = ac.createBufferSource();
+    src.buffer = buf;
+    src.connect(ac.destination);
+    src.onended = () => { if (my === token) advance(it); };
+    startedAt = ac.currentTime;
+    src.start();
+    clearInterval(ticker);
+    ticker = setInterval(tick, 500);
+    tick();
+  }
+  function stopAll() {
+    token++;
+    stopSource();
+    clearInterval(ticker);
+    playing = null;
+    $('#now').textContent = '';
+    $('#transport').hidden = true;
+    render();
+  }
+  function advance(it) {
+    const rows = visible().filter(r => r.bpm);
+    const i = rows.indexOf(it);
+    if (i >= 0 && i + 1 < rows.length) play(rows[i + 1]); else stopAll();
+  }
+
+  // ---- controls ----
+  $('#add').addEventListener('click', () => $('#files').click());
+  $('#files').addEventListener('change', e => {
+    const files = [...e.target.files];
+    e.target.value = '';
+    if (!files.length) return;
+    let skipped = 0;
+    for (const f of files) {
+      if (f.type && !f.type.startsWith('audio/')) { skipped++; continue; }
+      enqueue(addItem({ name: f.name.replace(/\.[^.]+$/, ''), file: f, key: f.name + '|' + f.size + '|' + f.lastModified }));
+    }
+    say(skipped ? skipped + ' file(s) skipped: not audio.' : '');
+    render();
+  });
+  $('#sort').addEventListener('click', () => { state.desc = !state.desc; persist(); render(); });
+  $('#clear').addEventListener('click', () => { items = []; queue.length = 0; if (playing) stopAll(); say(''); render(); });
+  for (const id of ['min', 'max']) {
+    $('#' + id).value = state[id];
+    $('#' + id).addEventListener('input', e => {
+      const n = parseFloat(e.target.value);
+      state[id] = Number.isFinite(n) ? n : (id === 'min' ? 0 : 999);
+      persist(); render();
+    });
+  }
+  $('#toggle').addEventListener('click', async () => {
+    if (!ac) return;
+    if (ac.state === 'running') { await ac.suspend(); $('#toggle').textContent = 'Play'; }
+    else { await ac.resume(); $('#toggle').textContent = 'Pause'; }
+  });
+  $('#next').addEventListener('click', () => { if (playing) advance(playing); });
+
+  render();
+  // test beats are generated after first paint
+  setTimeout(() => {
+    for (const bpm of [128, 90, 150]) enqueue(addItem({ name: 'Test beat ' + bpm, buf: clickTrack(bpm, 12) }));
+    render();
+  }, 0);
+})();
+</script>
+</body>
+</html>
