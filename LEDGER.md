@@ -115,3 +115,4 @@ NO tiles: small-web-search-engine [needs: a server] · idea-giveaway-board [need
 
 </details>
 
+| 03:33 | factory | batch 1: 8 built / 8 PASS / 0 fail (compare-two-tables, blood-test-results-log, freelance-money-ledger, pocket-kanban-board, markdown-writing-room, arrows-on-a-screenshot, logo-turtle-playground, markdown-file-viewer). Tokens: opus build 0.59M (avg 73k/PASS). Running total: opus 0.70M $5.59 · sonnet 1.47M $5.14 · total $10.73. Projected at 100 PASS ≈ $65 → adaptive: stay on opus. No rate-limit errors. (Note: my earlier LEDGER times 03:40/04:05/04:20 were estimates and ran ahead of the clock; real times are earlier.) | 8 opus | 10.73 |
