@@ -1,0 +1,48 @@
+{
+  "slug": "jpgs-to-one-pdf",
+  "wish": "someone should make a tool that joins many JPG images into one PDF without recompressing",
+  "year": 2015,
+  "agreed": 29,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/26084/software-to-quickly-join-many-jpg-images-into-one-pdf-without-recompressing",
+      "date": "2015-10-29",
+      "points": 22,
+      "comments": 7
+    }
+  ],
+  "spec": "Joins the JPG files you pick into one PDF, one image per page, in the order shown.\nPick or drop files, reorder or sort by name, choose page size, tap Make PDF, save.\nIt never decodes or recompresses: the original JPEG bytes go into the PDF unchanged; other formats are skipped.",
+  "tests": [
+    {
+      "tap": "#sample"
+    },
+    {
+      "tap": "#sample"
+    },
+    {
+      "expect": {
+        "sel": "#list li",
+        "count": 2
+      }
+    },
+    {
+      "tap": "#make"
+    },
+    {
+      "wait": 300
+    },
+    {
+      "expect": {
+        "sel": "#result",
+        "matches": "^2 pages · .*JPEG data, untouched"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:50:11Z",
+  "model": "opus-5.5",
+  "minutes": 8,
+  "approved": false,
+  "notes": "Each JPEG is embedded as a DCTDecode stream byte-for-byte. Page size follows JFIF DPI (72 if absent); EXIF rotation applied via page /Rotate, not pixels. Sample button exists so the pipeline is testable without a file picker."
+}

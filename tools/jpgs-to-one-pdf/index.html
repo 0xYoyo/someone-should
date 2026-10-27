@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that joins many JPG images into one PDF without recompressing</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+.pick { position: relative; display: flex; align-items: center; justify-content: center; min-height: 96px; border: 1.5px dashed var(--line); border-radius: var(--radius); text-align: center; padding: 16px; cursor: pointer; }
+.pick.over { border-color: var(--ink); }
+.pick input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+#list li { flex-wrap: nowrap; }
+#list .name { min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#list .name small { display: block; font: 16px/1.3 var(--mono); color: var(--meta); }
+#list .acts { display: flex; gap: 6px; flex: none; }
+#list .acts button { padding: 0; width: 44px; }
+#download { display: inline-flex; align-items: center; min-height: var(--tap); padding: 0 18px; background: var(--built); color: #fff; border-radius: var(--radius); text-decoration: none; }
+#download[hidden] { display: none; }
+.err { color: var(--no); }
+#result { color: var(--meta); }
+label.inline { display: grid; gap: 6px; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that joins many JPG images into one PDF without recompressing</h1>
+
+<main id="app" class="stack">
+  <label class="pick" id="drop">
+    <span>Choose or drop JPG files</span>
+    <input type="file" id="files" accept="image/jpeg,.jpg,.jpeg" multiple>
+  </label>
+  <div class="row">
+    <button id="sort" type="button">Sort by name</button>
+    <button id="clear" type="button">Clear</button>
+    <button id="sample" type="button">Add a sample</button>
+  </div>
+  <ul class="plain" id="list"></ul>
+  <p class="empty" id="empty">No images yet.</p>
+  <p id="msg" class="err" hidden></p>
+  <label class="inline">Page size
+    <select id="size">
+      <option value="image">Same as each image</option>
+      <option value="a4">A4, image fitted</option>
+      <option value="letter">Letter, image fitted</option>
+    </select>
+  </label>
+  <button id="make" class="primary" type="button">Make PDF</button>
+  <div class="row">
+    <a id="download" hidden download="images.pdf">Save PDF</a>
+    <span id="result"></span>
+  </div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const SAMPLE = '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';
+  const items = []; // { name, bytes, w, h, comps, rot }
+  let url = null, sampleN = 0;
+
+  const size = $('#size');
+  size.value = store.get('jpgpdf.size', 'image');
+  size.addEventListener('change', () => { store.set('jpgpdf.size', size.value); stale(); });
+
+  // Read dimensions, colour components, density and EXIF orientation straight from JPEG markers.
+  function parseJpeg(b) {
+    if (b[0] !== 0xFF || b[1] !== 0xD8) return null;
+    const info = { dpi: 0, rot: 0 };
+    let i = 2;
+    while (i + 4 < b.length) {
+      if (b[i] !== 0xFF) { i++; continue; }
+      const m = b[i + 1];
+      if (m === 0xFF) { i++; continue; }
+      if (m === 0xD8 || m === 0x01 || (m >= 0xD0 && m <= 0xD7)) { i += 2; continue; }
+      const len = (b[i + 2] << 8) | b[i + 3];
+      const s = i + 4;
+      if (m === 0xE0 && b[s] === 0x4A && b[s + 1] === 0x46 && b[s + 4] === 0) {
+        const unit = b[s + 7], xd = (b[s + 8] << 8) | b[s + 9];
+        if (unit === 1 && xd > 0) info.dpi = xd; else if (unit === 2 && xd > 0) info.dpi = xd * 2.54;
+      } else if (m === 0xE1 && b[s] === 0x45 && b[s + 1] === 0x78 && b[s + 2] === 0x69 && b[s + 3] === 0x66) {
+        info.rot = exifRotation(b, s + 6, len - 8);
+      } else if (m >= 0xC0 && m <= 0xCF && m !== 0xC4 && m !== 0xC8 && m !== 0xCC) {
+        info.h = (b[s + 1] << 8) | b[s + 2];
+        info.w = (b[s + 3] << 8) | b[s + 4];
+        info.comps = b[s + 5];
+        info.adobe = info.adobe || false;
+        return info.w && info.h ? info : null;
+      } else if (m === 0xEE && b[s] === 0x41 && b[s + 1] === 0x64) {
+        info.adobe = true;
+      }
+      i += 2 + len;
+    }
+    return null;
+  }
+
+  function exifRotation(b, t, n) {
+    try {
+      const le = b[t] === 0x49;
+      const u16 = o => le ? b[t + o] | (b[t + o + 1] << 8) : (b[t + o] << 8) | b[t + o + 1];
+      const u32 = o => le ? (u16(o) | (u16(o + 2) << 16)) >>> 0 : ((u16(o) << 16) | u16(o + 2)) >>> 0;
+      const ifd = u32(4), count = u16(ifd);
+      for (let k = 0; k < count; k++) {
+        const e = ifd + 2 + k * 12;
+        if (e + 12 > n) break;
+        if (u16(e) === 0x0112) return { 3: 180, 6: 90, 8: 270 }[u16(e + 8)] || 0;
+      }
+    } catch {}
+    return 0;
+  }
+
+  function addBytes(name, bytes) {
+    const info = parseJpeg(bytes);
+    if (!info || ![1, 3, 4].includes(info.comps)) return false;
+    items.push({ name, bytes, ...info });
+    return true;
+  }
+
+  async function addFiles(files) {
+    const bad = [];
+    for (const f of files) {
+      const bytes = new Uint8Array(await f.arrayBuffer());
+      if (!addBytes(f.name, bytes)) bad.push(f.name);
+    }
+    say(bad.length ? 'Not a JPEG, skipped: ' + bad.join(', ') : '');
+    stale(); render();
+  }
+
+  function say(t) { const m = $('#msg'); m.textContent = t; m.hidden = !t; }
+
+  function stale() {
+    if (url) { URL.revokeObjectURL(url); url = null; }
+    $('#download').hidden = true;
+    $('#result').textContent = '';
+  }
+
+  function kb(n) { return n < 1048576 ? Math.max(1, Math.round(n / 1024)) + ' kB' : (n / 1048576).toFixed(1) + ' MB'; }
+
+  function render() {
+    const list = $('#list');
+    list.textContent = '';
+    items.forEach((it, idx) => {
+      const li = document.createElement('li');
+      const name = document.createElement('span');
+      name.className = 'name';
+      name.textContent = (idx + 1) + '. ' + it.name;
+      const sm = document.createElement('small');
+      sm.textContent = it.w + '×' + it.h + ' · ' + kb(it.bytes.length);
+      name.append(sm);
+      const acts = document.createElement('span');
+      acts.className = 'acts';
+      [['↑', -1, 'Move up'], ['↓', 1, 'Move down'], ['×', 0, 'Remove']].forEach(([t, d, label]) => {
+        const b = document.createElement('button');
+        b.type = 'button'; b.textContent = t; b.setAttribute('aria-label', label + ' ' + it.name);
+        b.addEventListener('click', () => {
+          if (d === 0) items.splice(idx, 1);
+          else { const j = idx + d; if (j < 0 || j >= items.length) return; [items[idx], items[j]] = [items[j], items[idx]]; }
+          stale(); render();
+        });
+        acts.append(b);
+      });
+      li.append(name, acts);
+      list.append(li);
+    });
+    $('#empty').hidden = items.length > 0;
+  }
+
+  // PDF writer: each JPEG is stored as-is in a DCTDecode image stream.
+  const enc = new TextEncoder();
+  const PAGES = { a4: [595.28, 841.89], letter: [612, 792] };
+
+  function buildPdf(mode) {
+    const parts = [], offsets = [];
+    let pos = 0;
+    const put = x => { const u = typeof x === 'string' ? enc.encode(x) : x; parts.push(u); pos += u.length; };
+    const obj = (n, body) => { offsets[n] = pos; put(n + ' 0 obj\n'); body(); put('\nendobj\n'); };
+    const f = v => (Math.round(v * 100) / 100).toString();
+
+    put('%PDF-1.4\n');
+    put(new Uint8Array([0x25, 0xE2, 0xE3, 0xCF, 0xD3, 0x0A]));
+    const n = items.length;
+    const kids = [];
+    for (let k = 0; k < n; k++) kids.push((3 + k * 3) + ' 0 R');
+    obj(1, () => put('<< /Type /Catalog /Pages 2 0 R >>'));
+    obj(2, () => put('<< /Type /Pages /Count ' + n + ' /Kids [' + kids.join(' ') + '] >>'));
+
+    items.forEach((it, k) => {
+      const pg = 3 + k * 3, img = pg + 1, cs = pg + 2;
+      const turned = it.rot === 90 || it.rot === 270;
+      let pw, ph, dw, dh, x = 0, y = 0;
+      if (mode === 'image') {
+        const s = 72 / (it.dpi || 72);
+        pw = dw = it.w * s; ph = dh = it.h * s;
+      } else {
+        let [W, H] = PAGES[mode];
+        if (turned) [W, H] = [H, W];
+        const m = 28.35; // 1 cm margin
+        const sc = Math.min((W - 2 * m) / it.w, (H - 2 * m) / it.h);
+        dw = it.w * sc; dh = it.h * sc; pw = W; ph = H;
+        x = (W - dw) / 2; y = (H - dh) / 2;
+      }
+      const content = 'q ' + f(dw) + ' 0 0 ' + f(dh) + ' ' + f(x) + ' ' + f(y) + ' cm /Im0 Do Q';
+      obj(pg, () => put('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ' + f(pw) + ' ' + f(ph) + ']' +
+        (it.rot ? ' /Rotate ' + it.rot : '') +
+        ' /Resources << /XObject << /Im0 ' + img + ' 0 R >> >> /Contents ' + cs + ' 0 R >>'));
+      const space = it.comps === 1 ? '/DeviceGray' : it.comps === 4 ? '/DeviceCMYK' : '/DeviceRGB';
+      const decode = it.comps === 4 && it.adobe ? ' /Decode [1 0 1 0 1 0 1 0]' : '';
+      obj(img, () => {
+        put('<< /Type /XObject /Subtype /Image /Width ' + it.w + ' /Height ' + it.h + ' /ColorSpace ' + space +
+          ' /BitsPerComponent 8 /Filter /DCTDecode' + decode + ' /Length ' + it.bytes.length + ' >>\nstream\n');
+        put(it.bytes);
+        put('\nendstream');
+      });
+      obj(cs, () => put('<< /Length ' + content.length + ' >>\nstream\n' + content + '\nendstream'));
+    });
+
+    const total = 3 + n * 3;
+    const xref = pos;
+    let t = 'xref\n0 ' + total + '\n0000000000 65535 f \n';
+    for (let k = 1; k < total; k++) t += String(offsets[k]).padStart(10, '0') + ' 00000 n \n';
+    put(t + 'trailer\n<< /Size ' + total + ' /Root 1 0 R >>\nstartxref\n' + xref + '\n%%EOF\n');
+    return new Blob(parts, { type: 'application/pdf' });
+  }
+
+  $('#make').addEventListener('click', () => {
+    stale();
+    if (!items.length) { say('Add at least one JPG first.'); return; }
+    say('');
+    const blob = buildPdf(size.value);
+    const jpegBytes = items.reduce((a, it) => a + it.bytes.length, 0);
+    url = URL.createObjectURL(blob);
+    const a = $('#download');
+    a.href = url;
+    const first = items[0].name.replace(/\.[^.]*$/, '');
+    a.download = (items.length > 1 ? first + '-and-' + (items.length - 1) + '-more' : first) + '.pdf';
+    a.hidden = false;
+    $('#result').textContent = items.length + (items.length === 1 ? ' page' : ' pages') + ' · ' + kb(blob.size) +
+      ' · ' + kb(jpegBytes) + ' of original JPEG data, untouched';
+  });
+
+  $('#files').addEventListener('change', e => { addFiles([...e.target.files]); e.target.value = ''; });
+  const drop = $('#drop');
+  drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
+  drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+  drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); addFiles([...e.dataTransfer.files]); });
+
+  $('#sort').addEventListener('click', () => {
+    const c = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
+    items.sort((a, b) => c.compare(a.name, b.name)); stale(); render();
+  });
+  $('#clear').addEventListener('click', () => { items.length = 0; say(''); stale(); render(); });
+  $('#sample').addEventListener('click', () => {
+    const bin = atob(SAMPLE), u = new Uint8Array(bin.length);
+    for (let k = 0; k < bin.length; k++) u[k] = bin.charCodeAt(k);
+    addBytes('sample-' + (++sampleN) + '.jpg', u);
+    stale(); render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
