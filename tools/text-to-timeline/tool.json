@@ -1,0 +1,57 @@
+{
+  "slug": "text-to-timeline",
+  "wish": "someone should make a tool that turns text into a timeline diagram",
+  "year": 2021,
+  "agreed": 49,
+  "sources": [
+    {
+      "site": "hn",
+      "url": "https://news.ycombinator.com/item?id=26935278",
+      "date": "2021-04-25",
+      "points": 39,
+      "comments": 10
+    }
+  ],
+  "spec": "Turns lines like \"1969: moon landing\" or \"1939–1945: war\" into a timeline drawn to scale, top to bottom.\nType or paste one event per line (years, full dates, BC, ranges); the diagram redraws as you type and saves to SVG or PNG.\nIt does not fetch dates from anywhere, guess missing years, or lay events out horizontally.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#src",
+        "text": "1903: first powered flight\n1939–1945: Second World War\n1969-07-20: moon landing"
+      }
+    },
+    {
+      "wait": 600
+    },
+    {
+      "expect": {
+        "sel": "#tl text.ev",
+        "contains": "first powered flight"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#tl circle",
+        "count": 3
+      }
+    },
+    {
+      "expect": {
+        "sel": "#status",
+        "matches": "3 events · 1903 to 1969 · 67 years"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#tl",
+        "visible": true
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:34:30Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": ""
+}

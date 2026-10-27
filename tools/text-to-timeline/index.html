@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that turns text into a timeline diagram</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+h1 { font-size: 16px; }
+main { max-width: 720px; }
+textarea { min-height: 168px; resize: vertical; font: 16px/1.5 var(--mono); }
+#status, #skipped { font: 16px/1.4 var(--mono); color: var(--meta); margin: 0; }
+#skipped { color: var(--no); }
+#skipped:empty { display: none; }
+#chart { width: 100%; overflow: hidden; }
+#chart svg { display: block; width: 100%; height: auto; }
+.row button { flex: 1 1 0; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that turns text into a timeline diagram</h1>
+
+<main id="app" class="stack">
+  <textarea id="src" spellcheck="false" aria-label="One event per line: date, colon, what happened" placeholder="1903: first powered flight
+1969-07-20: moon landing
+1939–1945: Second World War
+500 BC: Classical Greece"></textarea>
+  <p id="status">One event per line, like 1969: moon landing</p>
+  <p id="skipped"></p>
+  <div id="chart"></div>
+  <div class="row">
+    <button id="svg-btn" type="button">Save SVG</button>
+    <button id="png-btn" type="button" class="primary">Save PNG</button>
+  </div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const src = $('#src'), statusEl = $('#status'), skippedEl = $('#skipped'), chart = $('#chart');
+  const SVG_NS = ['http:', '', 'www.w3.org', '2000', 'svg'].join('/');
+  const MONTHS = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+  const MONTH_RE = '(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\\.?';
+  // separators between date and label, tried in this order
+  const SEPS = [':', '\\|', '\\s-\\s', '\\s[—–]\\s', ','];
+
+  // A single date point -> { v: fractional year, text }
+  function parsePoint(s) {
+    s = s.trim().replace(/^(c\.|ca\.|circa|about|~)\s*/i, '');
+    let m, bc = false;
+    if ((m = s.match(/^(.*?)\s*(bce|bc|b\.c\.e?\.?)$/i))) { bc = true; s = m[1]; }
+    else s = s.replace(/\s*(ce|ad|a\.d\.)$/i, '');
+    let y, mo = 0, d = 0;
+    if ((m = s.match(/^(-?\d{1,5})(?:[-/.](\d{1,2})(?:[-/.](\d{1,2}))?)?$/))) {
+      y = +m[1]; mo = m[2] ? +m[2] : 0; d = m[3] ? +m[3] : 0;
+    } else if ((m = s.match(/^(\d{1,2})[/.](\d{1,2})[/.](\d{3,4})$/))) {
+      y = +m[3]; mo = +m[2]; d = +m[1];
+      if (mo > 12) { const t = mo; mo = d; d = t; }
+    } else if ((m = s.match(new RegExp('^' + MONTH_RE + '\\s+(\\d{1,2})(?:st|nd|rd|th)?,?\\s+(\\d{1,5})$', 'i')))) {
+      mo = MONTHS.indexOf(m[1].toLowerCase()) + 1; d = +m[2]; y = +m[3];
+    } else if ((m = s.match(new RegExp('^(\\d{1,2})(?:st|nd|rd|th)?\\s+' + MONTH_RE + ',?\\s+(\\d{1,5})$', 'i')))) {
+      d = +m[1]; mo = MONTHS.indexOf(m[2].toLowerCase()) + 1; y = +m[3];
+    } else if ((m = s.match(new RegExp('^' + MONTH_RE + ',?\\s+(\\d{1,5})$', 'i')))) {
+      mo = MONTHS.indexOf(m[1].toLowerCase()) + 1; y = +m[2];
+    } else return null;
+    if (mo > 12 || d > 31) return null;
+    if (bc) y = -y;
+    const v = y + (mo ? (mo - 1) / 12 : 0) + (d ? (d - 1) / 372 : 0);
+    return { v, y, mo, d };
+  }
+
+  function fmtYear(y) { return y < 0 ? (-y) + ' BC' : String(y); }
+  function fmtPoint(p) {
+    const yr = fmtYear(p.y);
+    if (!p.mo) return yr;
+    const mon = MONTHS[p.mo - 1][0].toUpperCase() + MONTHS[p.mo - 1].slice(1);
+    return (p.d ? p.d + ' ' : '') + mon + ' ' + yr;
+  }
+
+  // "date: label" or "date – date: label"
+  function parseLine(line) {
+    const tries = [];
+    for (const sep of SEPS) {
+      const parts = line.match(new RegExp('^(.+?)\\s*' + sep + '\\s*(.+)$'));
+      if (parts) tries.push([parts[1], parts[2]]);
+    }
+    // also allow "1969 moon landing" (no separator) for a bare leading year
+    const bare = line.match(/^(-?\d{1,5}(?:\s*(?:bce|bc))?)\s+(.+)$/i);
+    if (bare) tries.push([bare[1], bare[2]]);
+    for (const [when, label] of tries) {
+      const range = when.match(/^(.+?)\s*(?:–|—|\bto\b|\s-\s|-(?=\s*\d{3,5}\b))\s*(.+)$/i);
+      if (range) {
+        const a = parsePoint(range[1]), b = parsePoint(range[2]);
+        if (a && b && b.v >= a.v) return { a, b, label: label.trim() };
+      }
+      const a = parsePoint(when);
+      if (a) return { a, b: null, label: label.trim() };
+    }
+    return null;
+  }
+
+  function parse(text) {
+    const events = [], skipped = [];
+    text.split('\n').forEach((raw, i) => {
+      const line = raw.trim();
+      if (!line || line.startsWith('#')) return;
+      const e = parseLine(line);
+      if (e && e.label) events.push(e); else skipped.push(i + 1);
+    });
+    events.sort((x, y) => x.a.v - y.a.v);
+    return { events, skipped };
+  }
+
+  function niceStep(span) {
+    const raw = span / 6;
+    const p = Math.pow(10, Math.floor(Math.log10(raw || 1)));
+    for (const k of [1, 2, 5, 10]) if (k * p >= raw) return Math.max(1, k * p);
+    return Math.max(1, 10 * p);
+  }
+
+  const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  function wrap(text, maxChars) {
+    const words = text.split(/\s+/), lines = [];
+    let cur = '';
+    for (let w of words) {
+      while (w.length > maxChars) { if (cur) { lines.push(cur); cur = ''; } lines.push(w.slice(0, maxChars)); w = w.slice(maxChars); }
+      if (!cur) cur = w;
+      else if ((cur + ' ' + w).length <= maxChars) cur += ' ' + w;
+      else { lines.push(cur); cur = w; }
+    }
+    if (cur) lines.push(cur);
+    return lines;
+  }
+
+  // Build the diagram as a standalone SVG string. Time runs top to bottom, to scale.
+  function buildSvg(events, W, pal) {
+    const FS = 16, LH = 20, DATE_FS = 13;
+    const axisX = 64, labelX = axisX + 34, top = 28;
+    const maxChars = Math.max(12, Math.floor((W - labelX - 8) / (FS * 0.56)));
+    const t0 = events[0].a.v;
+    const t1 = Math.max(...events.map(e => (e.b || e.a).v));
+    const span = t1 - t0;
+    const scaleH = Math.max(320, events.length * 64);
+    const k = span > 0 ? scaleH / span : 0;
+    const yOf = v => top + (v - t0) * k;
+
+    // range lanes so overlapping periods sit side by side
+    const laneEnds = [];
+    events.forEach(e => {
+      if (!e.b) return;
+      let lane = laneEnds.findIndex(end => end <= e.a.v);
+      if (lane < 0) { lane = laneEnds.length; laneEnds.push(0); }
+      laneEnds[lane] = e.b.v; e.lane = Math.min(lane, 3);
+    });
+
+    // labels: placed at their true time, pushed down only to avoid overlap
+    let cursor = -Infinity, out = '';
+    const labels = events.map(e => {
+      const lines = wrap(e.label, maxChars);
+      const dateText = fmtPoint(e.a) + (e.b ? ' – ' + fmtPoint(e.b) : '');
+      const h = DATE_FS + 4 + lines.length * LH;
+      const want = yOf(e.a.v) - 6;
+      const y = Math.max(want, cursor + 14);
+      cursor = y + h;
+      return { e, lines, dateText, y, h };
+    });
+    const H = Math.ceil(Math.max(cursor, yOf(t1)) + 28);
+
+    const step = niceStep(span || 1);
+    const axisEnd = Math.max(yOf(t1), top) ;
+    let ticks = '';
+    if (span >= 1) {
+      for (let y = Math.ceil(t0 / step) * step; y <= t1 + 1e-9; y += step) {
+        const py = yOf(y);
+        ticks += `<line x1="${axisX - 6}" y1="${py}" x2="${axisX}" y2="${py}" stroke="${pal.meta}" stroke-width="1"/>` +
+          `<text x="${axisX - 10}" y="${py + 4}" text-anchor="end" font-family="${pal.mono}" font-size="13" fill="${pal.meta}">${esc(fmtYear(Math.round(y)))}</text>`;
+      }
+    }
+    out += `<line x1="${axisX}" y1="${top - 10}" x2="${axisX}" y2="${axisEnd + 10}" stroke="${pal.line}" stroke-width="2"/>` + ticks;
+
+    labels.forEach(({ e, lines, dateText, y }) => {
+      const py = yOf(e.a.v);
+      if (e.b) {
+        const bx = axisX + 8 + (e.lane || 0) * 6;
+        out += `<rect x="${bx - 2}" y="${py}" width="4" height="${Math.max(4, yOf(e.b.v) - py)}" rx="2" fill="${pal.ink}" opacity="0.55"/>`;
+      }
+      out += `<circle cx="${axisX}" cy="${py}" r="5" fill="${pal.paper}" stroke="${pal.ink}" stroke-width="2"/>`;
+      out += `<path d="M${axisX + 5} ${py} L${labelX - 12} ${py} L${labelX - 4} ${y + DATE_FS / 2}" fill="none" stroke="${pal.line}" stroke-width="1.2"/>`;
+      out += `<text x="${labelX}" y="${y + DATE_FS - 2}" font-family="${pal.mono}" font-size="${DATE_FS}" fill="${pal.meta}">${esc(dateText)}</text>`;
+      out += `<text class="ev" x="${labelX}" y="${y + DATE_FS + 2}" font-family="${pal.sans}" font-size="${FS}" fill="${pal.ink}">` +
+        lines.map((l, i) => `<tspan x="${labelX}" dy="${i ? LH : LH - 4}">${esc(l)}</tspan>`).join('') + '</text>';
+    });
+
+    return `<svg xmlns="${SVG_NS}" id="tl" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">` +
+      `<rect width="${W}" height="${H}" fill="${pal.paper}"/>${out}</svg>`;
+  }
+
+  function palette(fromPage) {
+    const cs = getComputedStyle(document.documentElement);
+    const v = n => cs.getPropertyValue(n).trim();
+    const fonts = { sans: v('--sans').replace(/"/g, "'"), mono: v('--mono').replace(/"/g, "'") };
+    if (fromPage) return { paper: v('--paper'), ink: v('--ink'), meta: v('--meta'), line: v('--line'), ...fonts };
+    return { paper: '#f4f1ea', ink: '#141414', meta: '#6b6b6b', line: '#c9c3b3', ...fonts };
+  }
+
+  let current = [];
+  function render() {
+    const text = src.value;
+    store.set('ttl.text', text);
+    const { events, skipped } = parse(text);
+    current = events;
+    skippedEl.textContent = skipped.length
+      ? `No date found on line${skipped.length > 1 ? 's' : ''} ${skipped.slice(0, 8).join(', ')}${skipped.length > 8 ? '…' : ''}`
+      : '';
+    if (!events.length) {
+      chart.innerHTML = '';
+      statusEl.textContent = 'One event per line, like 1969: moon landing';
+      return;
+    }
+    const first = events[0].a, last = events.reduce((m, e) => ((e.b || e.a).v > m.v ? (e.b || e.a) : m), first);
+    const years = Math.round(last.v - first.v);
+    statusEl.textContent = `${events.length} event${events.length > 1 ? 's' : ''} · ${fmtYear(first.y)} to ${fmtYear(last.y)} · ${years} year${years === 1 ? '' : 's'}`;
+    chart.innerHTML = buildSvg(events, Math.max(300, Math.round(chart.clientWidth || 340)), palette(true));
+  }
+
+  function download(blob, name) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  }
+
+  function exportSvg() {
+    if (!current.length) { statusEl.textContent = 'Nothing to save yet. Add a line like 1969: moon landing'; return null; }
+    return buildSvg(current, 640, palette(false));
+  }
+
+  $('#svg-btn').addEventListener('click', () => {
+    const s = exportSvg();
+    if (s) download(new Blob([s], { type: 'image/svg+xml' }), 'timeline.svg');
+  });
+
+  $('#png-btn').addEventListener('click', () => {
+    const s = exportSvg();
+    if (!s) return;
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const scale = 2, c = document.createElement('canvas');
+        c.width = img.width * scale; c.height = img.height * scale;
+        const ctx = c.getContext('2d');
+        ctx.scale(scale, scale); ctx.drawImage(img, 0, 0);
+        c.toBlob(b => b ? download(b, 'timeline.png') : (statusEl.textContent = 'PNG failed here. Try Save SVG.'), 'image/png');
+      } catch { statusEl.textContent = 'PNG failed here. Try Save SVG.'; }
+    };
+    img.onerror = () => { statusEl.textContent = 'PNG failed here. Try Save SVG.'; };
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(s);
+  });
+
+  let timer;
+  src.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(render, 120); });
+  let lastW = 0;
+  window.addEventListener('resize', () => { if (chart.clientWidth !== lastW) { lastW = chart.clientWidth; render(); } });
+
+  src.value = store.get('ttl.text', '');
+  render();
+})();
+</script>
+</body>
+</html>
