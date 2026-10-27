@@ -1,0 +1,54 @@
+{
+  "slug": "geometric-avatar-maker",
+  "wish": "someone should make a tool that generates avatar portraits",
+  "year": 2014,
+  "agreed": 8,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/1238/avatar-portrait-image-generator",
+      "date": "2014-02-16",
+      "points": 7,
+      "comments": 1
+    }
+  ],
+  "spec": "Generates a flat portrait avatar from face shape, hair, eyes, brows, nose, mouth, glasses, facial hair, extras and four colour sets.\nStep through each part with the arrows, tap swatches, hit Random, or type a name to get that name's avatar (same name, same face every time); save as SVG or 1024px PNG.\nIt does not draw from a photo, and it uses no images or network; everything is drawn in the browser.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#name",
+        "text": "Ada"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#code",
+        "contains": "5921010000631"
+      }
+    },
+    {
+      "tap": "[data-part=hair] .next"
+    },
+    {
+      "expect": {
+        "sel": "[data-part=hair] .val",
+        "contains": "bald"
+      }
+    },
+    {
+      "tap": "#svg"
+    },
+    {
+      "expect": {
+        "sel": "#status",
+        "contains": "saved avatar-ada.svg"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:54:47Z",
+  "model": "opus-5.5",
+  "minutes": 9,
+  "approved": false,
+  "notes": "PNG export renders the SVG onto a canvas from a data: URL, no network."
+}

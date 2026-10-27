@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that generates avatar portraits</title>
+<style>
+/* ---- paste design/tokens.css here, verbatim ---- */
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+/* ---- tool styles below ---- */
+#avatar { width: min(240px, 70vw); aspect-ratio: 1; margin: 0 auto; border-radius: var(--radius); overflow: hidden; border: 1.5px solid var(--line); }
+#avatar svg { display: block; width: 100%; height: 100%; }
+.actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.actions button { padding: 0 8px; }
+#code { text-align: center; }
+#status { min-height: 1.4em; text-align: center; }
+.parts li { flex-wrap: nowrap; }
+.parts .lab { width: 98px; flex: none; color: var(--meta); }
+.parts .val { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.parts .step { width: var(--tap); padding: 0; flex: none; font-size: 22px; line-height: 1; }
+ul.plain.colors li { display: block; }
+.colors .lab { color: var(--meta); display: block; margin-bottom: 8px; }
+.swatches { display: flex; flex-wrap: wrap; gap: 6px; }
+.sw { width: var(--tap); height: var(--tap); padding: 0; border: 1.5px solid var(--line); }
+.sw[aria-pressed="true"] { outline: 2px solid var(--ink); outline-offset: 2px; border-color: var(--ink); }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that generates avatar portraits</h1>
+
+<main id="app" class="stack">
+  <div id="avatar" role="img" aria-label="avatar preview"></div>
+  <div id="code" class="meta"></div>
+  <input id="name" type="text" autocomplete="off" spellcheck="false" placeholder="type a name for its avatar" aria-label="name">
+  <div class="actions">
+    <button id="random" class="primary" type="button">Random</button>
+    <button id="svg" type="button">Save SVG</button>
+    <button id="png" type="button">Save PNG</button>
+  </div>
+  <div id="status" class="meta" aria-live="polite"></div>
+  <ul class="plain parts" id="parts"></ul>
+  <ul class="plain colors" id="colors"></ul>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  // storage helper — never throws
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const INK = '#2b2420';
+  // the SVG namespace, joined so the source holds no literal URL
+  const SVG_NS = ['http:', '', 'www.w3.org', '2000', 'svg'].join('/');
+
+  // Each part: list of [name, back-layer fn, front-layer fn] or [name, fn]. Coordinates in a 200×200 box.
+  const FACES = [
+    ['oval', s => `<ellipse cx="100" cy="98" rx="42" ry="52" fill="${s}"/>`],
+    ['round', s => `<circle cx="100" cy="100" r="48" fill="${s}"/>`],
+    ['square', s => `<rect x="56" y="48" width="88" height="102" rx="22" fill="${s}"/>`],
+    ['long', s => `<ellipse cx="100" cy="98" rx="37" ry="56" fill="${s}"/>`],
+    ['heart', s => `<path d="M58 80 Q58 44 100 44 Q142 44 142 80 Q142 128 100 152 Q58 128 58 80Z" fill="${s}"/>`],
+    ['wide', s => `<ellipse cx="100" cy="102" rx="50" ry="46" fill="${s}"/>`]
+  ];
+
+  const CAP = 'M54 96 Q52 38 100 38 Q148 38 146 96 Q140 66 100 62 Q60 66 54 96Z';
+  const curls = () => { let o = ''; for (let i = 0; i <= 10; i++) { const a = Math.PI * (1 + i / 10); o += `<circle cx="${(100 + 50 * Math.cos(a)).toFixed(1)}" cy="${(84 + 46 * Math.sin(a)).toFixed(1)}" r="15"/>`; } return o; };
+  const HAIR = [
+    ['bald', () => '', () => ''],
+    ['short', () => '', h => `<path d="${CAP}" fill="${h}"/>`],
+    ['long', h => `<path d="M50 92 Q50 32 100 32 Q150 32 150 92 L156 170 L44 170Z" fill="${h}"/>`, h => `<path d="${CAP}" fill="${h}"/>`],
+    ['bob', h => `<path d="M48 96 Q48 34 100 34 Q152 34 152 96 L152 134 L48 134Z" fill="${h}"/>`, h => `<path d="M54 90 Q54 38 100 38 Q146 38 146 90 L146 74 Q100 70 54 74Z" fill="${h}"/>`],
+    ['bun', () => '', h => `<circle cx="100" cy="30" r="17" fill="${h}"/><path d="${CAP}" fill="${h}"/>`],
+    ['curly', h => `<g fill="${h}">${curls()}</g>`, h => `<path d="M58 84 Q60 50 100 50 Q140 50 142 84 Q120 66 100 70 Q80 66 58 84Z" fill="${h}"/>`],
+    ['side part', () => '', h => `<path d="M54 100 Q48 36 104 36 Q150 38 146 96 Q140 70 120 60 Q90 74 54 100Z" fill="${h}"/>`],
+    ['spiky', () => '', h => `<path d="M54 92 L50 56 L66 62 L68 36 L84 52 L96 28 L106 50 L122 32 L126 56 L144 48 L146 92 Q132 66 100 64 Q68 66 54 92Z" fill="${h}"/>`],
+    ['mohawk', () => '', h => `<path d="M88 66 Q86 22 100 18 Q114 22 112 66Z" fill="${h}"/>`],
+    ['ponytail', h => `<path d="M140 70 Q172 80 160 140 Q150 110 138 96Z" fill="${h}"/>`, h => `<path d="${CAP}" fill="${h}"/>`]
+  ];
+
+  const eyePair = f => f(80) + f(120);
+  const EYES = [
+    ['dots', () => eyePair(x => `<circle cx="${x}" cy="96" r="4.5" fill="${INK}"/>`)],
+    ['round', () => eyePair(x => `<circle cx="${x}" cy="96" r="8" fill="#fff"/><circle cx="${x + 1}" cy="97" r="4" fill="${INK}"/>`)],
+    ['sleepy', () => eyePair(x => `<path d="M${x - 8} 96 Q${x} 102 ${x + 8} 96" stroke="${INK}" stroke-width="3" fill="none" stroke-linecap="round"/>`)],
+    ['happy', () => eyePair(x => `<path d="M${x - 8} 99 Q${x} 89 ${x + 8} 99" stroke="${INK}" stroke-width="3" fill="none" stroke-linecap="round"/>`)],
+    ['wink', () => `<circle cx="80" cy="96" r="4.5" fill="${INK}"/><path d="M112 98 Q120 92 128 98" stroke="${INK}" stroke-width="3" fill="none" stroke-linecap="round"/>`],
+    ['lashes', () => eyePair(x => `<ellipse cx="${x}" cy="96" rx="5" ry="6" fill="${INK}"/><path d="M${x - 6} 90 L${x - 10} 86 M${x} 89 L${x} 84 M${x + 6} 90 L${x + 10} 86" stroke="${INK}" stroke-width="2" stroke-linecap="round"/>`)],
+    ['wide', () => eyePair(x => `<ellipse cx="${x}" cy="95" rx="9" ry="10" fill="#fff"/><circle cx="${x}" cy="97" r="5" fill="${INK}"/><circle cx="${x + 2}" cy="95" r="1.6" fill="#fff"/>`)]
+  ];
+
+  const BROWS = [
+    ['none', () => ''],
+    ['flat', () => eyePair(x => `<path d="M${x - 9} 82 L${x + 9} 82" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>`)],
+    ['arched', () => eyePair(x => `<path d="M${x - 10} 84 Q${x} 74 ${x + 10} 84" stroke="${INK}" stroke-width="3" fill="none" stroke-linecap="round"/>`)],
+    ['stern', () => `<path d="M70 79 L90 85 M130 79 L110 85" stroke="${INK}" stroke-width="3.5" stroke-linecap="round"/>`],
+    ['worried', () => `<path d="M70 85 L90 79 M130 85 L110 79" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>`],
+    ['thick', () => eyePair(x => `<rect x="${x - 11}" y="78" width="22" height="6" rx="3" fill="${INK}"/>`)]
+  ];
+
+  const NOSES = [
+    ['none', () => ''],
+    ['dot', () => `<circle cx="100" cy="112" r="3" fill="${INK}" opacity=".55"/>`],
+    ['line', () => `<path d="M100 100 L100 116 L94 116" stroke="${INK}" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/>`],
+    ['button', s => `<circle cx="100" cy="112" r="7" fill="${s}" stroke="${INK}" stroke-width="2" stroke-opacity=".35"/>`],
+    ['nostrils', () => `<circle cx="95" cy="115" r="2.2" fill="${INK}" opacity=".6"/><circle cx="105" cy="115" r="2.2" fill="${INK}" opacity=".6"/>`],
+    ['curve', () => `<path d="M96 116 Q100 120 104 116" stroke="${INK}" stroke-width="2.5" fill="none" stroke-linecap="round" opacity=".6"/>`]
+  ];
+
+  const MOUTHS = [
+    ['smile', () => `<path d="M86 128 Q100 140 114 128" stroke="${INK}" stroke-width="3" fill="none" stroke-linecap="round"/>`],
+    ['grin', () => `<path d="M84 126 Q100 148 116 126Z" fill="${INK}"/><path d="M88 128 L112 128 L110 132 L90 132Z" fill="#fff"/>`],
+    ['flat', () => `<path d="M90 131 L110 131" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>`],
+    ['open', () => `<ellipse cx="100" cy="132" rx="7" ry="8" fill="${INK}"/>`],
+    ['smirk', () => `<path d="M88 132 Q104 134 114 124" stroke="${INK}" stroke-width="3" fill="none" stroke-linecap="round"/>`],
+    ['frown', () => `<path d="M88 136 Q100 126 112 136" stroke="${INK}" stroke-width="3" fill="none" stroke-linecap="round"/>`],
+    ['tongue', () => `<path d="M86 127 Q100 140 114 127" stroke="${INK}" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M96 133 Q96 142 101 142 Q106 142 106 133Z" fill="#e0707a"/>`]
+  ];
+
+  const GLASSES = [
+    ['none', () => ''],
+    ['round', () => `<g stroke="${INK}" stroke-width="3" fill="none"><circle cx="80" cy="96" r="13"/><circle cx="120" cy="96" r="13"/><path d="M93 95 Q100 90 107 95 M67 94 L56 90 M133 94 L144 90"/></g>`],
+    ['square', () => `<g stroke="${INK}" stroke-width="3" fill="none"><rect x="65" y="86" width="30" height="21" rx="4"/><rect x="105" y="86" width="30" height="21" rx="4"/><path d="M95 94 L105 94 M65 92 L56 90 M135 92 L144 90"/></g>`],
+    ['shades', () => `<g fill="${INK}"><path d="M64 88 L96 88 L94 100 Q90 108 80 108 Q68 108 66 100Z"/><path d="M104 88 L136 88 L134 100 Q132 108 120 108 Q110 108 106 100Z"/></g><path d="M96 92 L104 92 M64 90 L56 88 M136 90 L144 88" stroke="${INK}" stroke-width="3"/>`]
+  ];
+
+  const FACIAL = [
+    ['none', () => ''],
+    ['mustache', h => `<path d="M100 121 Q90 116 82 122 Q86 128 100 124 Q114 128 118 122 Q110 116 100 121Z" fill="${h}"/>`],
+    ['beard', h => `<path d="M58 104 Q60 160 100 162 Q140 160 142 104 Q136 124 118 122 Q100 116 82 122 Q64 124 58 104Z M90 130 Q100 138 110 130 Q100 134 90 130Z" fill="${h}" fill-rule="evenodd"/>`],
+    ['goatee', h => `<path d="M90 140 Q100 158 110 140 Q100 146 90 140Z" fill="${h}"/>`],
+    ['stubble', h => `<path d="M60 112 Q64 156 100 158 Q136 156 140 112 Q130 140 100 142 Q70 140 60 112Z" fill="${h}" opacity=".28"/>`]
+  ];
+
+  const EXTRAS = [
+    ['none', () => ''],
+    ['blush', () => `<ellipse cx="74" cy="116" rx="9" ry="5" fill="#e0707a" opacity=".45"/><ellipse cx="126" cy="116" rx="9" ry="5" fill="#e0707a" opacity=".45"/>`],
+    ['freckles', () => [[72, 110], [78, 114], [84, 110], [116, 110], [122, 114], [128, 110]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.6" fill="${INK}" opacity=".45"/>`).join('')],
+    ['earrings', () => `<circle cx="53" cy="118" r="4" fill="#d9a520"/><circle cx="147" cy="118" r="4" fill="#d9a520"/>`],
+    ['mole', () => `<circle cx="118" cy="122" r="2.4" fill="${INK}" opacity=".7"/>`],
+    ['scar', () => `<path d="M124 82 L132 106 M124 90 L131 88 M127 98 L134 96" stroke="#b5605a" stroke-width="2" stroke-linecap="round"/>`]
+  ];
+
+  const PARTS = [
+    ['face', 'Face', FACES], ['hair', 'Hair', HAIR], ['eyes', 'Eyes', EYES], ['brows', 'Brows', BROWS],
+    ['nose', 'Nose', NOSES], ['mouth', 'Mouth', MOUTHS], ['glasses', 'Glasses', GLASSES],
+    ['facial', 'Facial hair', FACIAL], ['extra', 'Extra', EXTRAS]
+  ];
+  const COLORS = [
+    ['skin', 'Skin', ['#ffdbc4', '#f3c29b', '#e0a878', '#c68a5c', '#a86c45', '#8a5234', '#643a22', '#f2d6a2']],
+    ['hairc', 'Hair colour', ['#1f1a17', '#4a2f1f', '#7a4a26', '#b5773b', '#e3c27a', '#a8a8a8', '#b8432f', '#4f6fb5']],
+    ['bg', 'Background', ['#f4f1ea', '#d6e4d8', '#cfe0ef', '#f2d4cf', '#efe1b8', '#ded3ec', '#2b2b2b', '#e6c9a8']],
+    ['shirt', 'Shirt', ['#2b2b2b', '#e8e2d4', '#2e7d4f', '#3d5a99', '#c8321e', '#d9a520', '#7a5c99', '#5c7a7a']]
+  ];
+  const KEYS = [...PARTS.map(p => p[0]), ...COLORS.map(c => c[0])];
+  const SIZES = [...PARTS.map(p => p[2].length), ...COLORS.map(c => c[2].length)];
+
+  const DEFAULT = { face: 0, hair: 1, eyes: 1, brows: 2, nose: 1, mouth: 0, glasses: 0, facial: 0, extra: 0, skin: 1, hairc: 1, bg: 2, shirt: 3 };
+  let state = sanitize(store.get('gam.state', DEFAULT));
+  let name = store.get('gam.name', '');
+
+  function sanitize(s) {
+    const o = {};
+    KEYS.forEach((k, i) => { const v = s && Number.isInteger(s[k]) ? s[k] : DEFAULT[k]; o[k] = ((v % SIZES[i]) + SIZES[i]) % SIZES[i]; });
+    return o;
+  }
+
+  // small deterministic PRNG so a name always gives the same face
+  function hash(str) { let h = 2166136261; for (const c of str) { h ^= c.codePointAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+  function rng(seed) { let a = seed || 1; return () => { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+  function roll(r) {
+    const s = {};
+    KEYS.forEach((k, i) => { s[k] = Math.floor(r() * SIZES[i]); });
+    // keep accessories occasional so most results look like plain portraits
+    if (r() < 0.6) s.glasses = 0;
+    if (r() < 0.6) s.facial = 0;
+    if (r() < 0.5) s.extra = 0;
+    if (s.bg === 6 && s.shirt === 0) s.shirt = 1;
+    return s;
+  }
+
+  const pick = (list, k) => list[state[k]];
+  function shade(hex, f) {
+    const n = parseInt(hex.slice(1), 16);
+    const c = [n >> 16, (n >> 8) & 255, n & 255].map(v => Math.max(0, Math.min(255, Math.round(v * f))));
+    return '#' + c.map(v => v.toString(16).padStart(2, '0')).join('');
+  }
+
+  function svgString() {
+    const skin = COLORS[0][2][state.skin], hc = COLORS[1][2][state.hairc], bg = COLORS[2][2][state.bg], shirt = COLORS[3][2][state.shirt];
+    const hair = pick(HAIR, 'hair'), dark = shade(skin, 0.86);
+    return `<svg xmlns="${SVG_NS}" viewBox="0 0 200 200" width="200" height="200">` +
+      `<rect width="200" height="200" fill="${bg}"/>` +
+      hair[1](hc) +
+      `<path d="M30 200 Q32 156 100 150 Q168 156 170 200Z" fill="${shirt}"/>` +
+      `<rect x="86" y="128" width="28" height="30" rx="8" fill="${dark}"/>` +
+      `<path d="M86 152 Q100 166 114 152" fill="${dark}"/>` +
+      `<ellipse cx="53" cy="104" rx="8" ry="12" fill="${dark}"/><ellipse cx="147" cy="104" rx="8" ry="12" fill="${dark}"/>` +
+      pick(FACES, 'face')[1](skin) +
+      pick(FACIAL, 'facial')[1](hc) +
+      pick(EXTRAS, 'extra')[1]() +
+      pick(NOSES, 'nose')[1](dark) +
+      pick(MOUTHS, 'mouth')[1]() +
+      pick(EYES, 'eyes')[1]() +
+      pick(BROWS, 'brows')[1]() +
+      hair[2](hc) +
+      pick(GLASSES, 'glasses')[1]() +
+      `</svg>`;
+  }
+
+  const code = () => KEYS.map(k => state[k].toString(36)).join('');
+
+  function render() {
+    $('#avatar').innerHTML = svgString();
+    $('#code').textContent = 'code ' + code();
+    PARTS.forEach(([k, , list]) => { $(`[data-part="${k}"] .val`).textContent = list[state[k]][0]; });
+    COLORS.forEach(([k]) => { document.querySelectorAll(`[data-color="${k}"] .sw`).forEach((b, i) => b.setAttribute('aria-pressed', String(i === state[k]))); });
+    store.set('gam.state', state);
+    store.set('gam.name', name);
+  }
+
+  function say(t) { $('#status').textContent = t; }
+
+  // build controls
+  const partsEl = $('#parts');
+  PARTS.forEach(([k, label, list]) => {
+    const li = document.createElement('li');
+    li.dataset.part = k;
+    li.innerHTML = `<span class="lab">${label}</span><span class="val"></span>` +
+      `<button type="button" class="step prev" aria-label="previous ${label.toLowerCase()}">‹</button>` +
+      `<button type="button" class="step next" aria-label="next ${label.toLowerCase()}">›</button>`;
+    li.querySelector('.prev').addEventListener('click', () => { state[k] = (state[k] + list.length - 1) % list.length; say(''); render(); });
+    li.querySelector('.next').addEventListener('click', () => { state[k] = (state[k] + 1) % list.length; say(''); render(); });
+    partsEl.appendChild(li);
+  });
+  const colorsEl = $('#colors');
+  COLORS.forEach(([k, label, list]) => {
+    const li = document.createElement('li');
+    li.dataset.color = k;
+    li.innerHTML = `<span class="lab">${label}</span><div class="swatches">` +
+      list.map((c, i) => `<button type="button" class="sw" style="background:${c}" data-i="${i}" aria-label="${label.toLowerCase()} ${i + 1}"></button>`).join('') + '</div>';
+    li.querySelectorAll('.sw').forEach(b => b.addEventListener('click', () => { state[k] = +b.dataset.i; say(''); render(); }));
+    colorsEl.appendChild(li);
+  });
+
+  const nameEl = $('#name');
+  nameEl.value = name;
+  nameEl.addEventListener('input', () => {
+    name = nameEl.value;
+    const n = name.trim().toLowerCase();
+    if (n) state = roll(rng(hash(n)));
+    say('');
+    render();
+  });
+
+  $('#random').addEventListener('click', () => {
+    state = roll(Math.random);
+    name = '';
+    nameEl.value = '';
+    say('');
+    render();
+  });
+
+  function fileBase() {
+    const n = name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    return n ? 'avatar-' + n : 'avatar-' + code();
+  }
+
+  function download(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    say('saved ' + filename);
+  }
+
+  $('#svg').addEventListener('click', () => {
+    try { download(new Blob([svgString()], { type: 'image/svg+xml' }), fileBase() + '.svg'); }
+    catch { say('could not save the SVG in this browser'); }
+  });
+
+  $('#png').addEventListener('click', () => {
+    const img = new Image();
+    const fail = () => say('could not make a PNG in this browser, try SVG');
+    img.onload = () => {
+      try {
+        const c = document.createElement('canvas');
+        c.width = c.height = 1024;
+        c.getContext('2d').drawImage(img, 0, 0, 1024, 1024);
+        c.toBlob(b => (b ? download(b, fileBase() + '.png') : fail()), 'image/png');
+      } catch { fail(); }
+    };
+    img.onerror = fail;
+    say('making PNG');
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgString());
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
