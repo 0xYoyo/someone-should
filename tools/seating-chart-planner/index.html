@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that plans seating charts</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+main { max-width: 720px; }
+h2 { font: 500 16px/1.3 var(--mono); color: var(--meta); margin: 8px 0 0; }
+.field { display: flex; gap: 8px; }
+.field input { flex: 1; min-width: 0; }
+.field button { flex: none; }
+.lbl { font-size: 16px; color: var(--meta); }
+#seats { width: 76px; flex: none; text-align: center; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { padding: 0 14px; border-color: var(--line); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chip.sel, .seat.sel { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+#status { min-height: 1.45em; font-size: 16px; }
+#status:empty { display: none; }
+.selbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+#summary { font-size: 16px; color: var(--meta); font-variant-numeric: tabular-nums; }
+#tables { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+.tcard { border: 1.5px solid var(--line); border-radius: var(--radius); padding: 10px; display: grid; gap: 10px; min-width: 0; }
+.tcard.bad { border-color: var(--no); }
+.thead { display: flex; gap: 6px; align-items: center; }
+.thead input { flex: 1; min-width: 0; font-weight: 500; border-color: transparent; padding: 10px 6px; }
+.thead input:hover { border-color: var(--line); }
+.thead .n { font-size: 16px; color: var(--meta); font-variant-numeric: tabular-nums; flex: none; }
+.thead button { padding: 0; width: var(--tap); flex: none; border-color: var(--line); }
+.seatgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.seat { padding: 0 10px; text-align: left; border-color: var(--line); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.seat.open { color: var(--meta); border-style: dashed; }
+.seat.clash { color: var(--no); border-color: var(--no); }
+.seat.over { border-color: var(--ink); border-style: solid; }
+.warn { margin: 0; font-size: 16px; }
+#apart-list li span { min-width: 0; overflow-wrap: anywhere; }
+#apart-list li button { flex: none; }
+.empty { padding: 4px 0; font-size: 16px; }
+@media print {
+  body { padding: 0; background: #fff; color: #000; }
+  .controls, .selbar, #status, .thead button, #apart-sec { display: none !important; }
+  .tcard { break-inside: avoid; border-color: #000; }
+  .thead input { border: 0; color: #000; }
+  .seat { border-color: #999; color: #000; }
+  .seat.open { color: #999; }
+}
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that plans seating charts</h1>
+
+<main id="app" class="stack">
+  <div class="controls stack">
+    <div class="field">
+      <input id="guest-name" type="text" placeholder="Guest names, comma separated" autocomplete="off" aria-label="Guest names">
+      <button id="add-guest" class="primary">Add</button>
+    </div>
+    <div class="field">
+      <input id="apart-input" type="text" placeholder="Keep apart: Anna, Ben" autocomplete="off" list="guest-names" aria-label="Two guests to keep apart">
+      <button id="add-apart">Apart</button>
+    </div>
+    <datalist id="guest-names"></datalist>
+    <div class="row">
+      <span class="lbl">Seats per table</span>
+      <input id="seats" type="number" min="1" max="40" value="8" inputmode="numeric" aria-label="Seats per new table">
+      <button id="add-table">Add table</button>
+    </div>
+    <div class="row">
+      <button id="auto" class="primary">Seat everyone</button>
+      <button id="clear-seats">Clear seats</button>
+      <button id="print">Print</button>
+    </div>
+  </div>
+
+  <div id="status" role="status"></div>
+  <div id="summary"></div>
+
+  <section class="controls stack" id="unseated-sec">
+    <h2>Unseated</h2>
+    <div id="unseated" class="chips"></div>
+  </section>
+
+  <section class="stack">
+    <h2>Tables</h2>
+    <div id="tables"></div>
+  </section>
+
+  <section class="stack" id="apart-sec">
+    <h2>Kept apart</h2>
+    <ul id="apart-list" class="plain"></ul>
+  </section>
+
+  <div class="controls row"><button id="reset">Start over</button></div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  // storage helper — never throws
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const KEY = 'seating-chart-planner';
+  const blank = () => ({ guests: [], tables: [], apart: [], next: 1 });
+  let state = store.get(KEY, null);
+  if (!state || !Array.isArray(state.guests) || !Array.isArray(state.tables) || !Array.isArray(state.apart)) state = blank();
+  let sel = null;
+  let resetArmed = false;
+
+  const save = () => store.set(KEY, state);
+  const say = (msg, bad) => { const s = $('#status'); s.textContent = msg || ''; s.className = bad ? 'no' : ''; };
+  const guest = id => state.guests.find(g => g.id === id);
+  const nameOf = id => (guest(id) || {}).name || '';
+  const findByName = n => state.guests.find(g => g.name.toLowerCase() === n.trim().toLowerCase());
+  const seatsPer = () => Math.max(1, Math.min(40, parseInt($('#seats').value, 10) || 8));
+
+  function seatOf(id) {
+    for (let t = 0; t < state.tables.length; t++) {
+      const i = state.tables[t].seats.indexOf(id);
+      if (i >= 0) return { t, i };
+    }
+    return null;
+  }
+
+  function newTable(n) {
+    const used = new Set(state.tables.map(t => t.name));
+    let k = state.tables.length + 1;
+    while (used.has('Table ' + k)) k++;
+    state.tables.push({ id: state.next++, name: 'Table ' + k, seats: Array(n).fill(null) });
+  }
+
+  function enemiesOf(id) {
+    const out = [];
+    for (const [a, b] of state.apart) { if (a === id) out.push(b); else if (b === id) out.push(a); }
+    return out;
+  }
+
+  // pairs that ended up at the same table
+  function clashes() {
+    const where = new Map();
+    state.tables.forEach((t, ti) => t.seats.forEach(g => { if (g != null) where.set(g, ti); }));
+    return state.apart.filter(([a, b]) => where.has(a) && where.get(a) === where.get(b)).map(([a, b]) => ({ a, b, t: where.get(a) }));
+  }
+
+  function unseat(id) {
+    const p = seatOf(id);
+    if (p) state.tables[p.t].seats[p.i] = null;
+  }
+
+  function place(id, t, i) {
+    const seats = state.tables[t].seats;
+    const occ = seats[i];
+    if (occ === id) return;
+    const from = seatOf(id);
+    if (from) state.tables[from.t].seats[from.i] = occ;
+    seats[i] = id;
+  }
+
+  // ---- actions ----
+  function addGuests() {
+    const inp = $('#guest-name');
+    const names = inp.value.split(/[,;\n]+/).map(s => s.trim().replace(/\s+/g, ' ')).filter(Boolean);
+    if (!names.length) { say('Type a name first.', true); return; }
+    const dup = [];
+    let added = 0;
+    for (const n of names) {
+      if (findByName(n)) { dup.push(n); continue; }
+      state.guests.push({ id: state.next++, name: n.slice(0, 60) });
+      added++;
+    }
+    inp.value = '';
+    save(); render();
+    say(dup.length ? `Already on the list: ${dup.join(', ')}.` : `Added ${added} guest${added === 1 ? '' : 's'}.`, dup.length && !added);
+  }
+
+  function addApart() {
+    const inp = $('#apart-input');
+    const parts = inp.value.split(/\s*(?:,|\/|&|\+|\band\b)\s*/i).map(s => s.trim()).filter(Boolean);
+    if (parts.length !== 2) { say('Name two guests, like: Anna, Ben', true); return; }
+    const a = findByName(parts[0]), b = findByName(parts[1]);
+    const missing = [!a && parts[0], !b && parts[1]].filter(Boolean);
+    if (missing.length) { say(`Not on the guest list: ${missing.join(', ')}.`, true); return; }
+    if (a.id === b.id) { say('Pick two different guests.', true); return; }
+    if (state.apart.some(([x, y]) => (x === a.id && y === b.id) || (x === b.id && y === a.id))) { say('Already kept apart.', true); return; }
+    state.apart.push([a.id, b.id]);
+    inp.value = '';
+    save(); render();
+    say(`${a.name} and ${b.name} will sit at different tables.`);
+  }
+
+  function addTable() {
+    newTable(seatsPer());
+    save(); render();
+    say('');
+  }
+
+  // fills unseated guests into free seats, never putting an apart pair at one table
+  function solve(order) {
+    const tables = state.tables.map(t => t.seats.slice());
+    const tableOf = new Map();
+    tables.forEach((s, ti) => s.forEach(g => { if (g != null) tableOf.set(g, ti); }));
+    let budget = 40000;
+    const go = k => {
+      if (k === order.length) return true;
+      if (--budget < 0) return false;
+      const g = order[k];
+      const foes = enemiesOf(g);
+      for (let ti = 0; ti < tables.length; ti++) {
+        const i = tables[ti].indexOf(null);
+        if (i < 0) continue;
+        if (foes.some(f => tableOf.get(f) === ti)) continue;
+        tables[ti][i] = g; tableOf.set(g, ti);
+        if (go(k + 1)) return true;
+        tables[ti][i] = null; tableOf.delete(g);
+      }
+      return false;
+    };
+    return go(0) ? tables : null;
+  }
+
+  function autoSeat() {
+    const todo = state.guests.filter(g => !seatOf(g.id)).map(g => g.id);
+    if (!state.guests.length) { say('Add some guests first.', true); return; }
+    if (!todo.length) { say('Everyone already has a seat.'); return; }
+    const before = state.tables.length;
+    const per = seatsPer();
+    if (!state.tables.length) for (let k = 0; k < Math.ceil(todo.length / per); k++) newTable(per);
+    const order = todo.slice().sort((a, b) => enemiesOf(b).length - enemiesOf(a).length);
+    let result = null;
+    for (let tries = 0; tries <= todo.length && !result; tries++) {
+      result = solve(order);
+      if (!result) newTable(per);
+    }
+    if (!result) { say('Could not seat everyone. Add a table and try again.', true); save(); render(); return; }
+    result.forEach((s, ti) => { state.tables[ti].seats = s; });
+    sel = null;
+    save(); render();
+    const added = state.tables.length - before;
+    say(`Seated ${todo.length} guest${todo.length === 1 ? '' : 's'}.` + (added ? ` Added ${added} table${added === 1 ? '' : 's'}.` : ''));
+  }
+
+  function tapSeat(t, i) {
+    const occ = state.tables[t].seats[i];
+    if (sel != null) {
+      if (occ === sel) { unseat(sel); say(`${nameOf(sel)} is unseated.`); sel = null; }
+      else { place(sel, t, i); say(''); sel = null; }
+      save(); render(); return;
+    }
+    if (occ != null) { sel = occ; render(); say(''); return; }
+    say(state.guests.length ? 'Tap a guest first, then a seat.' : 'Add some guests first.', true);
+  }
+
+  // ---- render ----
+  function render() {
+    const clash = clashes();
+    const clashIds = new Set(clash.flatMap(c => [c.a, c.b]));
+    const seated = new Set();
+    state.tables.forEach(t => t.seats.forEach(g => { if (g != null) seated.add(g); }));
+
+    // datalist
+    const dl = $('#guest-names');
+    dl.replaceChildren(...state.guests.map(g => { const o = document.createElement('option'); o.value = g.name; return o; }));
+
+    // unseated chips
+    const un = $('#unseated');
+    const loose = state.guests.filter(g => !seated.has(g.id));
+    un.replaceChildren();
+    if (!state.guests.length) un.innerHTML = '<p class="empty">No guests yet.</p>';
+    else if (!loose.length) un.innerHTML = '<p class="empty">Everyone has a seat.</p>';
+    for (const g of loose) {
+      const b = document.createElement('button');
+      b.className = 'chip' + (sel === g.id ? ' sel' : '');
+      b.textContent = g.name;
+      b.draggable = true;
+      b.dataset.g = g.id;
+      un.appendChild(b);
+    }
+
+    // selection bar
+    let bar = $('.selbar');
+    if (bar) bar.remove();
+    if (sel != null && guest(sel)) {
+      bar = document.createElement('div');
+      bar.className = 'selbar';
+      const p = seatOf(sel);
+      bar.innerHTML = `<span></span>${p ? '<button data-act="unseat">Unseat</button>' : ''}<button data-act="remove">Remove guest</button><button data-act="done">Done</button>`;
+      bar.firstChild.textContent = `${nameOf(sel)}: tap a seat.`;
+      $('#status').before(bar);
+    } else sel = null;
+
+    // tables
+    const box = $('#tables');
+    box.replaceChildren();
+    if (!state.tables.length) box.innerHTML = '<p class="empty">No tables yet. Add one, or tap Seat everyone.</p>';
+    state.tables.forEach((t, ti) => {
+      const card = document.createElement('section');
+      card.className = 'tcard';
+      card.id = 'table-' + (ti + 1);
+      card.dataset.t = ti;
+      const head = document.createElement('div');
+      head.className = 'thead';
+      const nm = document.createElement('input');
+      nm.value = t.name; nm.dataset.name = ti; nm.setAttribute('aria-label', 'Table name');
+      const n = document.createElement('span');
+      n.className = 'n';
+      n.textContent = `${t.seats.filter(g => g != null).length}/${t.seats.length}`;
+      head.append(nm, n);
+      head.insertAdjacentHTML('beforeend', '<button data-act="less" aria-label="Remove a seat">&minus;</button><button data-act="more" aria-label="Add a seat">+</button><button data-act="del" aria-label="Remove table">&times;</button>');
+      const grid = document.createElement('div');
+      grid.className = 'seatgrid';
+      t.seats.forEach((g, i) => {
+        const b = document.createElement('button');
+        b.className = 'seat' + (g == null ? ' open' : '') + (g != null && g === sel ? ' sel' : '') + (clashIds.has(g) && clash.some(c => c.t === ti && (c.a === g || c.b === g)) ? ' clash' : '');
+        b.textContent = g == null ? `Seat ${i + 1}` : nameOf(g);
+        b.dataset.s = i;
+        if (g != null) { b.draggable = true; b.dataset.g = g; }
+        grid.appendChild(b);
+      });
+      card.append(head, grid);
+      const bad = clash.filter(c => c.t === ti);
+      if (bad.length) {
+        card.classList.add('bad');
+        for (const c of bad) {
+          const w = document.createElement('p');
+          w.className = 'warn no';
+          w.textContent = `${nameOf(c.a)} and ${nameOf(c.b)} should not share this table.`;
+          card.appendChild(w);
+        }
+      }
+      box.appendChild(card);
+    });
+
+    // apart list
+    const al = $('#apart-list');
+    al.replaceChildren();
+    if (!state.apart.length) al.innerHTML = '<li class="empty">Nobody yet.</li>';
+    state.apart.forEach(([a, b], k) => {
+      const li = document.createElement('li');
+      const s = document.createElement('span');
+      s.textContent = `${nameOf(a)} / ${nameOf(b)}`;
+      const x = document.createElement('button');
+      x.textContent = 'Remove'; x.dataset.apart = k;
+      li.append(s, x);
+      al.appendChild(li);
+    });
+
+    // summary
+    const total = state.guests.length;
+    const nt = state.tables.length;
+    $('#summary').textContent = total
+      ? `${seated.size} of ${total} seated · ${nt} table${nt === 1 ? '' : 's'} · ${clash.length ? clash.length + ' conflict' + (clash.length === 1 ? '' : 's') : 'no conflicts'}`
+      : '';
+  }
+
+  // ---- events ----
+  $('#add-guest').addEventListener('click', addGuests);
+  $('#guest-name').addEventListener('keydown', e => { if (e.key === 'Enter') addGuests(); });
+  $('#add-apart').addEventListener('click', addApart);
+  $('#apart-input').addEventListener('keydown', e => { if (e.key === 'Enter') addApart(); });
+  $('#add-table').addEventListener('click', addTable);
+  $('#auto').addEventListener('click', autoSeat);
+  $('#print').addEventListener('click', () => { sel = null; render(); window.print(); });
+  $('#clear-seats').addEventListener('click', () => {
+    state.tables.forEach(t => t.seats.fill(null));
+    sel = null; save(); render(); say('All seats cleared.');
+  });
+  $('#reset').addEventListener('click', e => {
+    if (!resetArmed) { resetArmed = true; e.target.textContent = 'Tap again to erase everything'; return; }
+    state = blank(); sel = null; resetArmed = false; e.target.textContent = 'Start over';
+    save(); render(); say('');
+  });
+
+  $('#unseated').addEventListener('click', e => {
+    const b = e.target.closest('.chip');
+    if (!b) return;
+    const id = +b.dataset.g;
+    sel = sel === id ? null : id;
+    say(''); render();
+  });
+
+  $('#app').addEventListener('click', e => {
+    const act = e.target.closest('[data-act]');
+    if (!act) return;
+    const a = act.dataset.act;
+    if (a === 'unseat' || a === 'remove' || a === 'done') {
+      if (a === 'unseat') { unseat(sel); say(`${nameOf(sel)} is unseated.`); }
+      if (a === 'remove') {
+        const g = sel;
+        say(`Removed ${nameOf(g)}.`);
+        unseat(g);
+        state.guests = state.guests.filter(x => x.id !== g);
+        state.apart = state.apart.filter(([x, y]) => x !== g && y !== g);
+      }
+      sel = null; save(); render(); return;
+    }
+    const card = act.closest('.tcard');
+    if (!card) return;
+    const t = state.tables[+card.dataset.t];
+    if (a === 'more') { if (t.seats.length < 40) t.seats.push(null); }
+    if (a === 'less' && t.seats.length > 1) {
+      const gone = t.seats.pop();
+      if (gone != null) say(`${nameOf(gone)} is unseated.`);
+    }
+    if (a === 'del') { state.tables.splice(+card.dataset.t, 1); say(`Removed ${t.name}.`); }
+    save(); render();
+  });
+
+  const tables = $('#tables');
+  tables.addEventListener('click', e => {
+    const s = e.target.closest('.seat');
+    if (!s) return;
+    tapSeat(+s.closest('.tcard').dataset.t, +s.dataset.s);
+  });
+  tables.addEventListener('input', e => {
+    if (e.target.dataset.name == null) return;
+    state.tables[+e.target.dataset.name].name = e.target.value.slice(0, 40);
+    save();
+  });
+
+  // drag and drop for mouse users; tap works everywhere
+  document.addEventListener('dragstart', e => {
+    const b = e.target.closest && e.target.closest('[data-g]');
+    if (b) e.dataTransfer.setData('text/plain', b.dataset.g);
+  });
+  tables.addEventListener('dragover', e => { const s = e.target.closest('.seat'); if (s) { e.preventDefault(); s.classList.add('over'); } });
+  tables.addEventListener('dragleave', e => { const s = e.target.closest('.seat'); if (s) s.classList.remove('over'); });
+  tables.addEventListener('drop', e => {
+    const s = e.target.closest('.seat');
+    if (!s) return;
+    e.preventDefault();
+    const id = +e.dataTransfer.getData('text/plain');
+    if (!guest(id)) return;
+    place(id, +s.closest('.tcard').dataset.t, +s.dataset.s);
+    sel = null; save(); render(); say('');
+  });
+  const unsec = $('#unseated-sec');
+  unsec.addEventListener('dragover', e => e.preventDefault());
+  unsec.addEventListener('drop', e => {
+    e.preventDefault();
+    const id = +e.dataTransfer.getData('text/plain');
+    if (!guest(id)) return;
+    unseat(id); sel = null; save(); render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
