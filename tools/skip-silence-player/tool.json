@@ -1,0 +1,48 @@
+{
+  "slug": "skip-silence-player",
+  "wish": "someone should make a player that skips silent parts of audio and video",
+  "year": 2015,
+  "agreed": 13,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/26341/player-that-skips-over-silent-parts-of-an-audio-video",
+      "date": "2015-11-10",
+      "points": 8,
+      "comments": 5
+    }
+  ],
+  "spec": "Plays an audio or video file from your device and jumps over every stretch quieter than your threshold.\nOpen a file, set the quiet level and the shortest gap worth skipping, press play; the timeline shades what will be skipped.\nDoes not edit or export the file and never uploads it; very large files fast-forward through quiet parts live instead of jumping.",
+  "tests": [
+    {
+      "tap": "#sample"
+    },
+    {
+      "wait": 1200
+    },
+    {
+      "expect": {
+        "sel": "#stat",
+        "contains": "2 silent parts"
+      }
+    },
+    {
+      "tap": "#play"
+    },
+    {
+      "wait": 1500
+    },
+    {
+      "expect": {
+        "sel": "#skips",
+        "matches": "skipped [1-9]"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:50:11Z",
+  "model": "opus-5.5",
+  "minutes": 12,
+  "approved": false,
+  "notes": "Offline: the file is read locally as a data URL (the CSP allows media-src data: only). Silence is found ahead of time by decoding the audio track; if the browser cannot decode it, or the file is over 400 MB, it switches to live detection and plays quiet parts at 8x."
+}
