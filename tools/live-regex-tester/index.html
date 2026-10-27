@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that tests regular expressions live, like SQLFiddle</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+main { max-width: 760px; }
+.meta { font-size: 16px; }
+label { display: block; font: 16px/1.4 var(--mono); color: var(--meta); margin-bottom: 6px; }
+.mono, #pattern, #text, #replace { font-family: var(--mono); font-size: 16px; }
+.pat { display: flex; align-items: stretch; border: 1.5px solid var(--line); border-radius: var(--radius); }
+.pat span { display: flex; align-items: center; padding: 0 8px; font: 16px var(--mono); color: var(--meta); }
+.pat input { border: 0; padding-left: 0; padding-right: 0; min-width: 0; }
+.pat:focus-within { outline: 2px solid var(--ink); outline-offset: 2px; }
+.pat input:focus { outline: none; }
+.pat.bad { border-color: var(--no); }
+.flags { gap: 6px; }
+.flags button { min-width: var(--tap); padding: 0 10px; font-family: var(--mono); border-color: var(--line); color: var(--meta); }
+.flags button[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+textarea { resize: vertical; min-height: 120px; display: block; }
+#err { min-height: 0; margin: 0; font: 16px/1.4 var(--mono); }
+#err:empty { display: none; }
+#count { font: 16px/1.4 var(--mono); }
+#view { font: 16px/1.6 var(--mono); white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere; padding: 12px; border: 1.5px dashed var(--line); border-radius: var(--radius); min-height: 48px; }
+#view mark { background: color-mix(in srgb, var(--built) 28%, transparent); color: inherit; border-radius: 2px; box-shadow: inset 0 -2px 0 var(--built); }
+#view mark.alt { background: color-mix(in srgb, var(--built) 14%, transparent); }
+#view mark.z { display: inline-block; width: 2px; height: 1.2em; vertical-align: text-bottom; background: var(--built); box-shadow: none; }
+h2 { font: 500 16px/1.3 var(--mono); color: var(--meta); margin: 12px 0 0; }
+#matches li, #explain li { display: block; font: 16px/1.45 var(--mono); }
+#matches li b { font-weight: 600; }
+#matches .g { color: var(--meta); padding-left: 16px; }
+#matches .g q { color: var(--ink); quotes: '"' '"'; }
+#explain li { display: grid; grid-template-columns: minmax(64px, max-content) 1fr; gap: 12px; padding: 8px 0; }
+#explain code { font: 16px var(--mono); word-break: break-all; }
+#explain span { font-family: var(--sans); }
+#explain .d1 code { padding-left: 12px; } #explain .d2 code { padding-left: 24px; } #explain .d3 code { padding-left: 36px; }
+#out { font: 16px/1.6 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; padding: 12px; border: 1.5px solid var(--line); border-radius: var(--radius); }
+#out:empty { display: none; }
+.actions button { flex: 1 1 auto; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that tests regular expressions live, like SQLFiddle</h1>
+
+<main id="app" class="stack">
+  <div>
+    <label for="pattern">pattern</label>
+    <div class="pat" id="patbox"><span>/</span><input id="pattern" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="\d+"><span id="flagecho">/g</span></div>
+  </div>
+  <div class="row flags" role="group" aria-label="flags">
+    <button data-f="g" title="global: all matches">g</button>
+    <button data-f="i" title="ignore case">i</button>
+    <button data-f="m" title="multiline: ^ $ per line">m</button>
+    <button data-f="s" title="dotAll: . matches newline">s</button>
+    <button data-f="u" title="unicode">u</button>
+    <button data-f="y" title="sticky">y</button>
+  </div>
+  <p id="err" class="no" role="alert"></p>
+  <div>
+    <label for="text">test text</label>
+    <textarea id="text" spellcheck="false" autocapitalize="off" autocorrect="off" placeholder="text to search"></textarea>
+  </div>
+  <div id="count" aria-live="polite"></div>
+  <div id="view" aria-label="highlighted matches"></div>
+
+  <h2>matches</h2>
+  <ul id="matches" class="plain"></ul>
+
+  <h2>replace with</h2>
+  <input id="replace" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="$1, $<name>, $&amp;">
+  <div id="out"></div>
+
+  <h2>reading</h2>
+  <ul id="explain" class="plain"></ul>
+
+  <div class="row actions">
+    <button id="share">copy link to this test</button>
+    <button id="clear">clear</button>
+  </div>
+  <div id="note" class="meta" aria-live="polite"></div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const KEY = 'live-regex-tester';
+  const MAX = 1000;
+
+  const sample = {
+    p: '(\\w+)@(\\w+)\\.com',
+    f: 'g',
+    t: 'Write to ana@example.com or bo@mail.com.\nNot this: cy@site.org',
+    r: ''
+  };
+
+  const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const show = s => JSON.stringify(s).slice(1, -1);
+
+  function fromHash() {
+    try {
+      const h = location.hash.slice(1);
+      if (!h) return null;
+      const o = JSON.parse(decodeURIComponent(h));
+      return o && typeof o.p === 'string' ? o : null;
+    } catch { return null; }
+  }
+
+  let state = Object.assign({}, sample, store.get(KEY, {}), fromHash() || {});
+  const pattern = $('#pattern'), text = $('#text'), replace = $('#replace');
+  pattern.value = state.p; text.value = state.t; replace.value = state.r || '';
+
+  // ---- plain reading of each token ----
+  const ESCAPES = {
+    d: 'a digit 0-9', D: 'not a digit', w: 'a word character (letter, digit, _)', W: 'not a word character',
+    s: 'whitespace', S: 'not whitespace', b: 'a word boundary', B: 'not a word boundary',
+    n: 'a newline', r: 'a carriage return', t: 'a tab', f: 'a form feed', v: 'a vertical tab', 0: 'a null character'
+  };
+
+  function quant(q) {
+    const lazy = q.length > 1 && q.endsWith('?') && q !== '?' ? ', as few as possible' : '';
+    const b = lazy ? q.slice(0, -1) : q;
+    if (b === '*') return 'zero or more times' + lazy;
+    if (b === '+') return 'one or more times' + lazy;
+    if (b === '?') return 'optional' + lazy;
+    const m = b.match(/^\{(\d+)(,?)(\d*)\}$/);
+    if (!m) return 'repeat ' + q;
+    if (!m[2]) return 'exactly ' + m[1] + ' times';
+    if (!m[3]) return m[1] + ' or more times' + lazy;
+    return m[1] + ' to ' + m[3] + ' times' + lazy;
+  }
+
+  function readEscape(src, i) {
+    const c = src[i + 1];
+    if (c === undefined) return ['\\', 'a trailing backslash'];
+    if (ESCAPES[c] && !(c === '0' && /\d/.test(src[i + 2] || ''))) return ['\\' + c, ESCAPES[c]];
+    let m;
+    const rest = src.slice(i);
+    if ((m = rest.match(/^\\x[0-9a-fA-F]{2}/))) return [m[0], 'the character ' + show(String.fromCharCode(parseInt(m[0].slice(2), 16)))];
+    if ((m = rest.match(/^\\u\{[0-9a-fA-F]+\}|^\\u[0-9a-fA-F]{4}/))) return [m[0], 'the character U+' + m[0].replace(/[\\u{}]/g, '').toUpperCase()];
+    if ((m = rest.match(/^\\[pP]\{[^}]*\}/))) return [m[0], (m[0][1] === 'P' ? 'not ' : '') + 'a character with Unicode property ' + m[0].slice(3, -1)];
+    if ((m = rest.match(/^\\k<[^>]*>/))) return [m[0], 'the same text group "' + m[0].slice(3, -1) + '" matched'];
+    if ((m = rest.match(/^\\[1-9]\d*/))) return [m[0], 'the same text group ' + m[0].slice(1) + ' matched'];
+    if ((m = rest.match(/^\\c[A-Za-z]/))) return [m[0], 'control character ' + m[0][2].toUpperCase()];
+    return ['\\' + c, 'the character ' + show(c)];
+  }
+
+  function readClass(src, i) {
+    let j = i + 1;
+    if (src[j] === '^') j++;
+    if (src[j] === ']') j++;
+    while (j < src.length && src[j] !== ']') j += src[j] === '\\' ? 2 : 1;
+    const tok = src.slice(i, j + 1);
+    const neg = tok[1] === '^';
+    const body = tok.slice(neg ? 2 : 1, -1);
+    const parts = [];
+    for (let k = 0; k < body.length;) {
+      let a, len;
+      if (body[k] === '\\') {
+        const e = readEscape(body, k); a = e[1]; len = e[0].length;
+        if (body[k + 1] === 'b') a = 'a backspace';
+      } else { a = show(body[k]); len = 1; }
+      if (body[k + len] === '-' && k + len + 1 < body.length) {
+        const to = body[k + len + 1] === '\\' ? readEscape(body, k + len + 1) : [body[k + len + 1], show(body[k + len + 1])];
+        parts.push(a + ' to ' + to[1]); k += len + 1 + to[0].length;
+      } else { parts.push(a); k += len; }
+    }
+    const list = parts.length ? parts.join(', ') : 'nothing';
+    return [tok, (neg ? 'any character except ' : 'one of: ') + list];
+  }
+
+  let groupNames = [];
+  function explain(src, flags) {
+    const out = [];
+    groupNames = [];
+    let depth = 0, group = 0;
+    for (let i = 0; i < src.length;) {
+      const c = src[i];
+      let tok, say, d = depth;
+      if (c === '\\') [tok, say] = readEscape(src, i);
+      else if (c === '[') [tok, say] = readClass(src, i);
+      else if (c === '(') {
+        let m = src.slice(i).match(/^\(\?(<[A-Za-z_$][\w$]*>|:|=|!|<=|<!)?/);
+        tok = m ? m[0] : '(';
+        const k = m && m[1];
+        if (!k && tok === '(') say = 'start group ' + (++group) + ' (captured)';
+        else if (k === ':') say = 'start a group (not captured)';
+        else if (k === '=') say = 'start: followed by';
+        else if (k === '!') say = 'start: not followed by';
+        else if (k === '<=') say = 'start: preceded by';
+        else if (k === '<!') say = 'start: not preceded by';
+        else if (k) { say = 'start group ' + (++group) + ' named "' + k.slice(1, -1) + '"'; groupNames[group] = k.slice(1, -1); }
+        else say = 'unknown group';
+        depth++;
+      } else if (c === ')') { tok = ')'; depth = Math.max(0, depth - 1); d = depth; say = 'end group'; }
+      else if (c === '|') { tok = '|'; say = 'or'; }
+      else if (c === '.') { tok = '.'; say = flags.includes('s') ? 'any character' : 'any character except newline'; }
+      else if (c === '^') { tok = '^'; say = flags.includes('m') ? 'start of a line' : 'start of the text'; }
+      else if (c === '$') { tok = '$'; say = flags.includes('m') ? 'end of a line' : 'end of the text'; }
+      else {
+        const m = src.slice(i).match(/^(\*\??|\+\??|\?\??|\{\d+,?\d*\}\??)/);
+        if (m && out.length) {
+          const prev = out[out.length - 1];
+          prev.tok += m[0]; prev.say += ', ' + quant(m[0]);
+          i += m[0].length; continue;
+        }
+        // run of plain literal characters
+        const r = src.slice(i).match(/^[^\\[\]().|^$*+?{]+/) || [c];
+        let lit = r[0];
+        const next = src[i + lit.length];
+        if (lit.length > 1 && next && /[*+?{]/.test(next)) lit = lit.slice(0, -1);
+        tok = lit; say = lit.length === 1 ? 'the character ' + show(lit) : 'the text ' + show(lit);
+      }
+      out.push({ tok, say, d });
+      i += tok.length;
+    }
+    return out;
+  }
+
+  // ---- matching ----
+  function run() {
+    state = { p: pattern.value, f: state.f, t: text.value, r: replace.value };
+    store.set(KEY, state);
+    $('#flagecho').textContent = '/' + state.f;
+    $$('.flags button').forEach(b => b.setAttribute('aria-pressed', String(state.f.includes(b.dataset.f))));
+
+    const err = $('#err'), view = $('#view'), list = $('#matches'), count = $('#count'), out = $('#out'), ex = $('#explain');
+    err.textContent = ''; $('#patbox').classList.remove('bad');
+
+    ex.innerHTML = state.p
+      ? explain(state.p, state.f).map(x => `<li class="d${Math.min(x.d, 3)}"><code>${esc(x.tok)}</code><span>${esc(x.say)}</span></li>`).join('')
+      : '<li class="empty">type a pattern above</li>';
+
+    if (!state.p) {
+      count.textContent = 'no pattern yet';
+      view.textContent = state.t; list.innerHTML = ''; out.textContent = '';
+      return;
+    }
+    let re;
+    try { re = new RegExp(state.p, state.f); }
+    catch (e) {
+      err.textContent = e.message.replace(/^Invalid regular expression: /, '');
+      $('#patbox').classList.add('bad');
+      count.textContent = ''; view.textContent = state.t; list.innerHTML = ''; out.textContent = '';
+      return;
+    }
+
+    const found = [];
+    const s = state.t;
+    if (re.global || re.sticky) {
+      re.lastIndex = 0;
+      let m;
+      while (found.length < MAX && (m = re.exec(s))) {
+        found.push(m);
+        if (!re.global) break;
+        if (m[0] === '') re.lastIndex += (re.unicode && s.codePointAt(re.lastIndex) > 0xffff) ? 2 : 1;
+        if (re.lastIndex > s.length) break;
+      }
+    } else {
+      const m = re.exec(s);
+      if (m) found.push(m);
+    }
+
+    count.textContent = !s ? 'no test text yet'
+      : found.length === 0 ? 'no match'
+      : found.length + (found.length === 1 ? ' match' : ' matches') + (found.length === MAX ? ' (first ' + MAX + ')' : '');
+
+    let html = '', at = 0;
+    found.forEach((m, n) => {
+      html += esc(s.slice(at, m.index));
+      html += m[0] === '' ? '<mark class="z" title="empty match"></mark>'
+        : `<mark${n % 2 ? ' class="alt"' : ''}>${esc(m[0])}</mark>`;
+      at = m.index + m[0].length;
+    });
+    html += esc(s.slice(at));
+    view.innerHTML = s ? html : '<span class="meta">highlighted matches appear here</span>';
+
+    list.innerHTML = found.length ? found.slice(0, 200).map((m, n) => {
+      const groups = m.slice(1).map((g, k) => {
+        const nm = groupNames[k + 1];
+        return `<div class="g">${k + 1}${nm ? ' ' + esc(nm) : ''}: ${g === undefined ? '<i>not matched</i>' : '<q>' + esc(show(g)) + '</q>'}</div>`;
+      }).join('');
+      return `<li><b>${n + 1}.</b> <q>${esc(show(m[0]))}</q> <span class="meta">at ${m.index}</span>${groups}</li>`;
+    }).join('') : '<li class="empty">nothing matched</li>';
+
+    if (state.r && s) {
+      try { re.lastIndex = 0; out.textContent = s.replace(re, state.r); } catch { out.textContent = ''; }
+    } else out.textContent = '';
+  }
+
+  $$('.flags button').forEach(b => b.addEventListener('click', () => {
+    const f = b.dataset.f;
+    state.f = state.f.includes(f) ? state.f.replace(f, '') : 'dgimsuvy'.split('').filter(x => x === f || state.f.includes(x)).join('');
+    run();
+  }));
+  [pattern, text, replace].forEach(el => el.addEventListener('input', run));
+
+  $('#share').addEventListener('click', async () => {
+    const hash = '#' + encodeURIComponent(JSON.stringify(state));
+    try { history.replaceState(null, '', hash); } catch {}
+    const url = location.href.split('#')[0] + hash;
+    let ok = false;
+    try { await navigator.clipboard.writeText(url); ok = true; } catch {}
+    $('#note').textContent = ok ? 'link copied: it holds this pattern, flags and text' : 'link is in the address bar';
+  });
+  $('#clear').addEventListener('click', () => {
+    pattern.value = ''; text.value = ''; replace.value = ''; state.f = 'g';
+    $('#note').textContent = '';
+    try { history.replaceState(null, '', location.pathname); } catch {}
+    run(); pattern.focus();
+  });
+
+  run();
+})();
+</script>
+</body>
+</html>

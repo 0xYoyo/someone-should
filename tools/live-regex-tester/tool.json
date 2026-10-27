@@ -1,0 +1,81 @@
+{
+  "slug": "live-regex-tester",
+  "wish": "someone should make a tool that tests regular expressions live, like SQLFiddle",
+  "year": 2014,
+  "agreed": 46,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/650/tool-for-building-net-regular-expressions",
+      "date": "2014-02-07",
+      "points": 12,
+      "comments": 3
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/4226/regular-expression-tool-like-sqlfiddle",
+      "date": "2014-05-19",
+      "points": 7,
+      "comments": 4
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/6971/free-program-to-create-regular-expressions-with-a-gui",
+      "date": "2014-06-15",
+      "points": 8,
+      "comments": 3
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/12052/regular-expression-tool-for-windows",
+      "date": "2014-10-09",
+      "points": 6,
+      "comments": 3
+    }
+  ],
+  "spec": "Type a regex, toggle flags and paste test text; matches highlight live, with capture groups, a replace preview and a plain reading of each token.\nEverything updates as you type and is remembered on this device; copy link puts the whole test into a shareable URL, like a fiddle.\nUses the JavaScript regex engine only (not .NET or PCRE) and cannot stop a pattern that backtracks forever.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#pattern",
+        "text": "(\\d{3})-(?<line>\\d{4})"
+      }
+    },
+    {
+      "type": {
+        "sel": "#text",
+        "text": "call 555-1234 or 555-9876 today"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#count",
+        "contains": "2 matches"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#matches li",
+        "contains": "1234"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#view mark",
+        "contains": "555-1234"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#explain",
+        "contains": "exactly 3 times"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:50:11Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "JavaScript regex flavour only; the share link stores the test in the URL hash, nothing leaves the device."
+}
