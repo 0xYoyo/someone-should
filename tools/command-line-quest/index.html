@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a game that teaches the Linux command line</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+main { max-width: 680px; }
+#level { font: 500 16px/1.3 var(--mono); color: var(--meta); }
+#goal { font-size: 19px; line-height: 1.35; margin: 0; }
+#hinttext { font: 16px/1.45 var(--mono); color: var(--meta); margin: 0; }
+#hinttext:empty { display: none; }
+#term { border: 1.5px solid var(--line); border-radius: var(--radius); padding: 10px 12px; font: 16px/1.45 var(--mono); }
+#out { height: 46dvh; min-height: 200px; overflow-y: auto; overflow-x: hidden; }
+#out div { white-space: pre-wrap; overflow-wrap: anywhere; }
+#out .err { color: var(--no); }
+#out .win { color: var(--built); }
+#out .dim { color: var(--meta); }
+#prompt-form { display: flex; align-items: center; gap: 8px; border-top: 1px solid var(--line); margin-top: 8px; padding-top: 6px; }
+#ps { white-space: nowrap; color: var(--meta); max-width: 45%; overflow: hidden; text-overflow: ellipsis; }
+#cmd { border: 0; padding: 8px 0; font: 16px/1.45 var(--mono); min-width: 0; flex: 1; }
+#cmd:focus { outline: none; }
+.row button { flex: 1 1 0; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a game that teaches the Linux command line</h1>
+
+<main id="app" class="stack">
+  <div id="level"></div>
+  <p id="goal"></p>
+  <p id="hinttext"></p>
+  <div id="term">
+    <div id="out" aria-live="polite"></div>
+    <form id="prompt-form" autocomplete="off">
+      <label id="ps" for="cmd">~$</label>
+      <input id="cmd" type="text" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" aria-label="command">
+    </form>
+  </div>
+  <div class="row">
+    <button id="hint" type="button">hint</button>
+    <button id="tab" type="button" aria-label="complete name">tab</button>
+    <button id="reset" type="button">restart</button>
+  </div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const HOME = '/home/you';
+  const KEY = 'clq-v1';
+
+  const f = s => ({ t: 'f', s });
+  const d = c => ({ t: 'd', c });
+  const LOG = [
+    'day 1: water drips from the ceiling.',
+    'day 2: a bat flew past the lantern.',
+    'day 3: found scratches on the wall.',
+    'day 4: a bat landed on my boot.',
+    'day 5: the vault door needs a password.',
+    'day 6: password: ember',
+    'day 7: two more bats tonight.',
+    'day 8: hid the key in key.txt, right here in the cave.',
+    'day 9: the bats are getting louder.'
+  ].join('\n');
+  const BATS = LOG.split('\n').filter(l => l.includes('bat')).length;
+
+  function freshFs() {
+    return d({ home: d({ you: d({
+      'note.txt': f('The vault key is hidden somewhere on this machine.\nStart in the forest directory.'),
+      forest: d({
+        'tree.txt': f('Just bark and moss.'),
+        '.lantern': f('A hidden lantern. Files starting with a dot are hidden from plain ls.'),
+        cave: d({ 'log.txt': f(LOG), 'key.txt': f('an old brass key') })
+      }),
+      junk: d({ 'old1.tmp': f('x'), 'old2.tmp': f('x'), 'old3.tmp': f('x') }),
+      vault: d({})
+    }) }) });
+  }
+
+  // Quests: goal (one line), hint, check(ctx) where ctx = { name, raw, out, flags }
+  const Q = [
+    { g: 'Find out where you are.', h: 'pwd  — print working directory', c: x => x.name === 'pwd' },
+    { g: 'List the files here.', h: 'ls  — list directory contents', c: x => x.name === 'ls' && S.cwd === HOME },
+    { g: 'Read note.txt.', h: 'cat note.txt  — print a file', c: x => x.name === 'cat' && x.out.includes('vault key') },
+    { g: 'Go into the forest directory.', h: 'cd forest  — change directory', c: () => S.cwd === HOME + '/forest' },
+    { g: 'Something in the forest is hidden. Show it.', h: 'ls -a  — list all, including dot files', c: x => x.name === 'ls' && x.out.includes('.lantern') },
+    { g: 'Go deeper, into the cave.', h: 'cd cave', c: () => S.cwd === HOME + '/forest/cave' },
+    { g: 'Find the line with the word password in log.txt.', h: 'grep password log.txt  — search inside files', c: x => x.name === 'grep' && x.out.includes('ember') },
+    { g: 'Go back home.', h: 'cd ..  goes up one level. cd ~ (or plain cd) goes home.', c: () => S.cwd === HOME },
+    { g: 'Make a directory called backpack.', h: 'mkdir backpack  — make directory', c: () => node(HOME + '/backpack')?.t === 'd' },
+    { g: 'Put key.txt from the cave into your backpack.', h: 'mv forest/cave/key.txt backpack/  — move a file', c: () => node(HOME + '/backpack/key.txt') && !node(HOME + '/forest/cave/key.txt') },
+    { g: 'Delete every file in junk.', h: 'rm junk/*  — remove files; * matches every name', c: () => { const j = node(HOME + '/junk'); return !j || (j.t === 'd' && !Object.keys(j.c).length); } },
+    { g: 'Write the password into vault/answer.txt.', h: 'echo ember > vault/answer.txt  — > sends output into a file', c: () => (node(HOME + '/vault/answer.txt')?.s || '').includes('ember') },
+    { g: 'Count the lines in the cave log that mention a bat.', h: 'grep bat forest/cave/log.txt | wc -l  — | feeds one command into the next', c: x => x.raw.includes('|') && x.out.trim() === String(BATS) }
+  ];
+
+  let S;
+  function load() {
+    const s = store.get(KEY, null);
+    S = s && s.fs && typeof s.q === 'number' ? s : { fs: freshFs(), cwd: HOME, q: 0 };
+  }
+  const save = () => store.set(KEY, S);
+
+  // ---- filesystem helpers ----
+  function norm(p) {
+    if (p === '~' || p.startsWith('~/')) p = HOME + p.slice(1);
+    const parts = (p.startsWith('/') ? p : S.cwd + '/' + p).split('/');
+    const outp = [];
+    for (const x of parts) {
+      if (!x || x === '.') continue;
+      if (x === '..') outp.pop(); else outp.push(x);
+    }
+    return '/' + outp.join('/');
+  }
+  function node(abs) {
+    let n = S.fs;
+    for (const x of abs.split('/').filter(Boolean)) {
+      if (!n || n.t !== 'd' || !Object.prototype.hasOwnProperty.call(n.c, x)) return null;
+      n = n.c[x];
+    }
+    return n;
+  }
+  const parentOf = abs => abs.slice(0, abs.lastIndexOf('/')) || '/';
+  const baseOf = abs => abs.slice(abs.lastIndexOf('/') + 1);
+  const pretty = abs => abs === HOME ? '~' : abs.startsWith(HOME + '/') ? '~' + abs.slice(HOME.length) : abs;
+
+  // ---- parsing ----
+  function tokenize(line) {
+    const toks = []; let cur = null, q = null;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (q) { if (ch === q) q = null; else cur += ch; continue; }
+      if (ch === '"' || ch === "'") { q = ch; cur = cur ?? ''; continue; }
+      if (/\s/.test(ch)) { if (cur != null) { toks.push(cur); cur = null; } continue; }
+      if (ch === '|' || ch === '>') {
+        if (cur != null) { toks.push(cur); cur = null; }
+        if (ch === '>' && line[i + 1] === '>') { toks.push({ op: '>>' }); i++; } else toks.push({ op: ch });
+        continue;
+      }
+      cur = (cur ?? '') + ch;
+    }
+    if (q) throw new Error('unexpected end of line: missing ' + q);
+    if (cur != null) toks.push(cur);
+    return toks;
+  }
+  function glob(arg) {
+    if (!arg.includes('*')) return [arg];
+    const slash = arg.lastIndexOf('/');
+    const dir = slash >= 0 ? arg.slice(0, slash + 1) : '';
+    const pat = new RegExp('^' + arg.slice(slash + 1).replace(/[.+?^${}()[\]\\]/g, '\\$&').replace(/\*/g, '.*') + '$');
+    const n = node(norm(dir || '.'));
+    if (!n || n.t !== 'd') return [arg];
+    const hits = Object.keys(n.c).filter(k => !k.startsWith('.') && pat.test(k)).sort().map(k => dir + k);
+    return hits.length ? hits : [arg];
+  }
+  function splitArgs(args) {
+    const flags = new Set(), rest = [];
+    for (const a of args) {
+      if (/^-[a-zA-Z]+$/.test(a)) for (const c of a.slice(1)) flags.add(c);
+      else rest.push(a);
+    }
+    return { flags, rest };
+  }
+
+  // ---- commands: (args, stdin) -> { out, err } ----
+  const E = (cmd, p, msg) => `${cmd}: ${p}: ${msg}`;
+  function readFiles(cmd, files, stdin) {
+    if (!files.length) return stdin == null ? { err: cmd + ': missing file name' } : { text: stdin };
+    const texts = [], errs = [];
+    for (const p of files) {
+      const n = node(norm(p));
+      if (!n) errs.push(E(cmd, p, 'No such file or directory'));
+      else if (n.t === 'd') errs.push(E(cmd, p, 'Is a directory'));
+      else texts.push(n.s);
+    }
+    return { text: texts.join('\n'), err: errs.join('\n') };
+  }
+  const CMDS = {
+    help() { return { out: 'commands: ' + Object.keys(CMDS).sort().join(' ') }; },
+    pwd() { return { out: S.cwd }; },
+    ls(args) {
+      const { flags, rest } = splitArgs(args);
+      const targets = rest.length ? rest : ['.'];
+      const outs = [], errs = [];
+      for (const p of targets) {
+        const n = node(norm(p));
+        if (!n) { errs.push(`ls: cannot access '${p}': No such file or directory`); continue; }
+        if (n.t === 'f') { outs.push(p); continue; }
+        let names = Object.keys(n.c).sort();
+        if (!flags.has('a')) names = names.filter(k => !k.startsWith('.'));
+        else names = ['.', '..', ...names];
+        const line = names.map(k => (n.c[k] && n.c[k].t === 'd') ? k + '/' : k).join(flags.has('l') ? '\n' : '  ');
+        outs.push(targets.length > 1 ? p + ':\n' + line : line);
+      }
+      return { out: outs.join('\n'), err: errs.join('\n') };
+    },
+    cd(args) {
+      const p = args[0] ?? '~';
+      const abs = norm(p), n = node(abs);
+      if (!n) return { err: E('cd', p, 'No such file or directory') };
+      if (n.t !== 'd') return { err: E('cd', p, 'Not a directory') };
+      S.cwd = abs; return {};
+    },
+    cat(args, stdin) { const r = readFiles('cat', args, stdin); return { out: r.text, err: r.err }; },
+    grep(args, stdin) {
+      const { flags, rest } = splitArgs(args);
+      if (!rest.length) return { err: 'grep: usage: grep [-i] [-n] [-c] PATTERN [FILE]...' };
+      const pat = rest[0], files = rest.slice(1);
+      const r = readFiles('grep', files, stdin);
+      if (r.err && !r.text) return { err: r.err };
+      const needle = flags.has('i') ? pat.toLowerCase() : pat;
+      const hits = [];
+      r.text.split('\n').forEach((l, i) => {
+        if ((flags.has('i') ? l.toLowerCase() : l).includes(needle)) hits.push((flags.has('n') ? (i + 1) + ':' : '') + l);
+      });
+      return { out: flags.has('c') ? String(hits.length) : hits.join('\n'), err: r.err };
+    },
+    wc(args, stdin) {
+      const { flags, rest } = splitArgs(args);
+      const r = readFiles('wc', rest, stdin);
+      if (r.err) return { err: r.err };
+      const t = r.text, lines = t ? t.split('\n').length : 0, words = t.split(/\s+/).filter(Boolean).length;
+      return { out: flags.has('l') ? String(lines) : `${lines} ${words} ${t.length}` };
+    },
+    head(args, stdin) {
+      let n = 10; const a = [...args];
+      const i = a.indexOf('-n'); if (i >= 0) { n = parseInt(a[i + 1], 10) || 10; a.splice(i, 2); }
+      const r = readFiles('head', a, stdin);
+      return { out: r.text.split('\n').slice(0, n).join('\n'), err: r.err };
+    },
+    echo(args) { return { out: args.join(' ') }; },
+    mkdir(args) {
+      if (!args.length) return { err: 'mkdir: missing operand' };
+      const errs = [];
+      for (const p of args) {
+        const abs = norm(p), par = node(parentOf(abs));
+        if (node(abs)) errs.push(`mkdir: cannot create directory '${p}': File exists`);
+        else if (!par || par.t !== 'd') errs.push(`mkdir: cannot create directory '${p}': No such file or directory`);
+        else par.c[baseOf(abs)] = d({});
+      }
+      return { err: errs.join('\n') };
+    },
+    touch(args) {
+      if (!args.length) return { err: 'touch: missing file operand' };
+      for (const p of args) {
+        const abs = norm(p), par = node(parentOf(abs));
+        if (!par || par.t !== 'd') return { err: `touch: cannot touch '${p}': No such file or directory` };
+        if (!node(abs)) par.c[baseOf(abs)] = f('');
+      }
+      return {};
+    },
+    rm(args) {
+      const { flags, rest } = splitArgs(args);
+      if (!rest.length) return { err: 'rm: missing operand' };
+      const errs = [];
+      for (const p of rest) {
+        const abs = norm(p), n = node(abs);
+        if (!n) errs.push(`rm: cannot remove '${p}': No such file or directory`);
+        else if (n.t === 'd' && !flags.has('r')) errs.push(`rm: cannot remove '${p}': Is a directory (use rm -r)`);
+        else if (abs === HOME || S.cwd === abs || S.cwd.startsWith(abs + '/')) errs.push(`rm: refusing to remove '${p}'`);
+        else delete node(parentOf(abs)).c[baseOf(abs)];
+      }
+      return { err: errs.join('\n') };
+    },
+    mv(args) { return move(args, false); },
+    cp(args) { return move(args, true); },
+    clear() { $('#out').textContent = ''; return {}; }
+  };
+  function move(args, copy) {
+    const cmd = copy ? 'cp' : 'mv';
+    const { flags, rest } = splitArgs(args);
+    if (rest.length < 2) return { err: `${cmd}: missing destination` };
+    const dest = rest.pop(), dAbs = norm(dest), dn = node(dAbs);
+    if (rest.length > 1 && (!dn || dn.t !== 'd')) return { err: `${cmd}: target '${dest}' is not a directory` };
+    const errs = [];
+    for (const p of rest) {
+      const abs = norm(p), n = node(abs);
+      if (!n) { errs.push(`${cmd}: cannot stat '${p}': No such file or directory`); continue; }
+      if (copy && n.t === 'd' && !flags.has('r')) { errs.push(`cp: -r not specified; omitting directory '${p}'`); continue; }
+      const target = dn && dn.t === 'd' ? dAbs + '/' + baseOf(abs) : dAbs;
+      if (target === abs || target.startsWith(abs + '/')) { errs.push(`${cmd}: cannot move '${p}' into itself`); continue; }
+      const tp = node(parentOf(target));
+      if (!tp || tp.t !== 'd') { errs.push(`${cmd}: cannot move to '${dest}': No such file or directory`); continue; }
+      tp.c[baseOf(target)] = copy ? JSON.parse(JSON.stringify(n)) : n;
+      if (!copy) { delete node(parentOf(abs)).c[baseOf(abs)]; if (S.cwd === abs || S.cwd.startsWith(abs + '/')) S.cwd = target + S.cwd.slice(abs.length); }
+    }
+    return { err: errs.join('\n') };
+  }
+
+  function run(line) {
+    const toks = tokenize(line);
+    let redirect = null;
+    const ri = toks.findIndex(t => t.op === '>' || t.op === '>>');
+    if (ri >= 0) {
+      const file = toks[ri + 1];
+      if (typeof file !== 'string') throw new Error('syntax error near unexpected token `newline\'');
+      redirect = { mode: toks[ri].op, file };
+      toks.splice(ri, 2);
+    }
+    const stages = [[]];
+    for (const t of toks) { if (t.op === '|') stages.push([]); else if (typeof t === 'string') stages[stages.length - 1].push(t); }
+    if (stages.some(s => !s.length)) throw new Error("syntax error near unexpected token `|'");
+    let stdin = null, errs = [], name = '', flagsSeen = '';
+    for (const st of stages) {
+      name = st[0];
+      const fn = CMDS[name];
+      if (!fn || !Object.prototype.hasOwnProperty.call(CMDS, name)) { errs.push(`bash: ${name}: command not found`); stdin = ''; continue; }
+      const args = st.slice(1).flatMap(glob);
+      flagsSeen += args.filter(a => a.startsWith('-')).join('');
+      const r = fn(args, stdin) || {};
+      if (r.err) errs.push(r.err);
+      stdin = r.out ?? '';
+    }
+    let out = stdin ?? '';
+    if (redirect) {
+      const abs = norm(redirect.file), par = node(parentOf(abs)), cur = node(abs);
+      if (!par || par.t !== 'd') errs.push(`bash: ${redirect.file}: No such file or directory`);
+      else if (cur && cur.t === 'd') errs.push(`bash: ${redirect.file}: Is a directory`);
+      else {
+        const text = out + '\n';
+        par.c[baseOf(abs)] = f(redirect.mode === '>>' && cur ? cur.s + (cur.s.endsWith('\n') || !cur.s ? '' : '\n') + text : text);
+      }
+      out = '';
+    }
+    return { name, raw: line, out, err: errs.join('\n'), flags: flagsSeen };
+  }
+
+  // ---- UI ----
+  const outEl = $('#out'), cmdEl = $('#cmd');
+  function print(text, cls) {
+    if (!text) return;
+    const div = document.createElement('div');
+    if (cls) div.className = cls;
+    div.textContent = text;
+    outEl.appendChild(div);
+    while (outEl.childNodes.length > 300) outEl.removeChild(outEl.firstChild);
+    outEl.scrollTop = outEl.scrollHeight;
+  }
+  function render() {
+    $('#ps').textContent = 'you:' + pretty(S.cwd) + '$';
+    $('#hinttext').textContent = '';
+    if (S.q >= Q.length) {
+      $('#level').textContent = `quest ${Q.length} / ${Q.length}`;
+      $('#goal').textContent = 'Every quest cleared. Keep exploring, or restart.';
+      $('#hint').disabled = true;
+    } else {
+      $('#level').textContent = `quest ${S.q + 1} / ${Q.length}`;
+      $('#goal').textContent = Q[S.q].g;
+      $('#hint').disabled = false;
+    }
+  }
+
+  const history = []; let hi = 0;
+  $('#prompt-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const line = cmdEl.value.trim();
+    cmdEl.value = '';
+    print('you:' + pretty(S.cwd) + '$ ' + line, 'dim');
+    if (!line) return;
+    history.push(line); hi = history.length;
+    let res;
+    try { res = run(line); } catch (err) { print('bash: ' + err.message, 'err'); return; }
+    print(res.out);
+    print(res.err, 'err');
+    if (S.q < Q.length && !res.err && Q[S.q].c(res)) {
+      S.q++;
+      print(S.q < Q.length ? `quest cleared. next: ${Q[S.q].g}` : 'quest cleared. You opened the vault.', 'win');
+    }
+    save();
+    render();
+  });
+  cmdEl.addEventListener('keydown', e => {
+    if (e.key === 'ArrowUp' && hi > 0) { cmdEl.value = history[--hi]; e.preventDefault(); }
+    else if (e.key === 'ArrowDown') { hi = Math.min(history.length, hi + 1); cmdEl.value = history[hi] || ''; e.preventDefault(); }
+    else if (e.key === 'Tab') { e.preventDefault(); complete(); }
+  });
+
+  function complete() {
+    const v = cmdEl.value, m = v.match(/(\S*)$/), word = m[1];
+    const slash = word.lastIndexOf('/');
+    const dir = slash >= 0 ? word.slice(0, slash + 1) : '', partial = word.slice(slash + 1);
+    const isCmd = !v.slice(0, v.length - word.length).trim() || /\|\s*$/.test(v.slice(0, v.length - word.length));
+    let opts;
+    if (isCmd && !dir) opts = Object.keys(CMDS).filter(k => k.startsWith(partial)).map(k => k + ' ');
+    else {
+      const n = node(norm(dir || '.'));
+      opts = n && n.t === 'd' ? Object.keys(n.c).filter(k => k.startsWith(partial) && (partial.startsWith('.') || !k.startsWith('.'))).map(k => k + (n.c[k].t === 'd' ? '/' : ' ')) : [];
+    }
+    if (opts.length === 1) cmdEl.value = v.slice(0, v.length - partial.length) + opts[0];
+    else if (opts.length > 1) print(opts.map(o => o.trim()).join('  '), 'dim');
+    cmdEl.focus();
+  }
+
+  $('#tab').addEventListener('click', complete);
+  $('#hint').addEventListener('click', () => {
+    if (S.q < Q.length) $('#hinttext').textContent = 'try: ' + Q[S.q].h;
+    cmdEl.focus();
+  });
+  $('#reset').addEventListener('click', () => {
+    S = { fs: freshFs(), cwd: HOME, q: 0 };
+    save(); outEl.textContent = '';
+    print('new game. type help to see commands.', 'dim');
+    render();
+  });
+
+  load();
+  render();
+  print(S.q === 0 ? 'You wake up inside a computer. Find the vault key. Type help to see commands.' : 'welcome back. type help to see commands.', 'dim');
+})();
+</script>
+</body>
+</html>

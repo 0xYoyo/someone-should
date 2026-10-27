@@ -1,0 +1,61 @@
+{
+  "slug": "command-line-quest",
+  "wish": "someone should make a game that teaches the Linux command line",
+  "year": 2014,
+  "agreed": 21,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/10543/a-game-to-learn-how-to-use-the-linux-command-line",
+      "date": "2014-08-09",
+      "points": 11,
+      "comments": 1
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/53871/educational-games-to-master-unix-command-line",
+      "date": "2018-12-23",
+      "points": 6,
+      "comments": 3
+    }
+  ],
+  "spec": "A simulated shell over a small fake filesystem with 13 quests that teach pwd, ls, ls -a, cat, cd, grep, mkdir, mv, rm with *, echo with > and pipes into wc.\nType real commands at the prompt; each quest clears when the command actually does the job, with a hint button, tab completion, and saved progress.\nIt does not run a real shell, touch your files, or cover permissions, processes or package managers.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#cmd",
+        "text": "pwd"
+      }
+    },
+    {
+      "key": "Enter"
+    },
+    {
+      "expect": {
+        "sel": "#out",
+        "contains": "/home/you"
+      }
+    },
+    {
+      "type": {
+        "sel": "#cmd",
+        "text": "ls"
+      }
+    },
+    {
+      "key": "Enter"
+    },
+    {
+      "expect": {
+        "sel": "#level",
+        "contains": "quest 3 / 13"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:50:10Z",
+  "model": "opus-5.5",
+  "minutes": 3,
+  "approved": false,
+  "notes": "Commands: pwd ls cd cat grep wc head echo mkdir touch rm mv cp clear help, plus | pipes, > and >> redirects, * globs."
+}
