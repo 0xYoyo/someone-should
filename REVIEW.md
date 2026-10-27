@@ -45,3 +45,6 @@ Corrections:
 1. Keep pushing every ~15 tools; don't batch larger than that (the owner may wake and look mid-run).
 2. In the final LEDGER line, give: wave-2 PASS, dropped, spend, year histogram, kind histogram, best 10 by your judgment, and the 10 highest-agreed NO stamps (those are the funniest content on the wall).
 3. If spend reaches $130 before the list is exhausted, stop cleanly at the end of that batch rather than squeezing; leave the reviewer $10.
+
+## 2026-10-27 12:45 — wave 2 paused (owner's subscription lapsed mid-run)
+State: 186 PASS total (100 wave 1 + 86 wave 2), 0 dropped. Reviewer re-verified the 86 wave-2 tools: 86/86. Last factory push ≈10:50. 393 wishes remain queued in data/top2.json, in agreement order. Est. spend ≈ $110 of $250 (wave 1 ≈ $63, wave 2 ≈ $46). To resume: same pipeline, skip slugs already in built.json, sonnet builders, ~$95 cap. Reviewer check-ins stopped until the owner restarts the factory.
