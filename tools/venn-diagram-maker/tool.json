@@ -1,0 +1,64 @@
+{
+  "slug": "venn-diagram-maker",
+  "wish": "someone should make a tool that draws Venn diagrams",
+  "year": 2014,
+  "agreed": 20,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/7393/javascript-library-to-display-venn-diagrams",
+      "date": "2014-06-29",
+      "points": 11,
+      "comments": 2
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/25706/library-to-generate-a-scaled-4-set-venn-diagram",
+      "date": "2015-10-14",
+      "points": 7,
+      "comments": 0
+    }
+  ],
+  "spec": "Draws a labeled 2- or 3-set Venn diagram from set names and item lists, placing each item in the region it belongs to.\nType names and comma- or line-separated items; the diagram and a region-by-region list update as you type; optionally scale circles to set sizes; save as SVG or PNG.\nDoes not draw 4 or more sets, and scaled 3-set layouts are approximate.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#items-a",
+        "text": "apple, pear, plum"
+      }
+    },
+    {
+      "type": {
+        "sel": "#items-b",
+        "text": "pear, kiwi"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#r-ab",
+        "contains": "pear"
+      }
+    },
+    {
+      "tap": "#three"
+    },
+    {
+      "type": {
+        "sel": "#items-c",
+        "text": "plum, fig"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#r-ac",
+        "contains": "plum"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:37:18Z",
+  "model": "opus-5.5",
+  "minutes": 9,
+  "approved": false,
+  "notes": "Up to 3 sets. 'Scale to size' makes circle areas proportional to set sizes; 3-set overlaps are approximate."
+}
