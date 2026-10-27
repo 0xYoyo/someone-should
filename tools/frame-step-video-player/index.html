@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data: blob:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a video player that steps backward frame by frame</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+.file { display: inline-flex; align-items: center; min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); border-radius: var(--radius); cursor: pointer; background: var(--ink); color: var(--paper); }
+.file input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.file:focus-within { outline: 2px solid var(--ink); outline-offset: 2px; }
+video { width: 100%; max-height: 56vh; background: #000; border-radius: var(--radius); display: block; }
+.readout { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+#info, .hint, #msg { font-size: 16px; color: var(--meta); font-variant-numeric: tabular-nums; }
+#msg:empty { display: none; }
+.pad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.pad button { padding: 0; min-width: 0; font-variant-numeric: tabular-nums; }
+input[type=range] { padding: 0; border: 0; accent-color: var(--ink); }
+.opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.opts label { display: grid; gap: 4px; font-size: 16px; color: var(--meta); }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a video player that steps backward frame by frame</h1>
+
+<main id="app" class="stack">
+  <div class="row">
+    <label class="file">Open video<input id="file" type="file" accept="video/*"></label>
+    <button id="sample">Sample clip</button>
+  </div>
+  <p id="msg" class="empty">No video open.</p>
+  <video id="v" playsinline preload="auto" hidden></video>
+  <div class="readout">
+    <div><span class="meta">frame</span> <span id="frame" class="big">–</span></div>
+    <div id="info">0.000 s</div>
+  </div>
+  <input id="scrub" type="range" min="0" max="0" step="1" value="0" aria-label="Frame">
+  <div class="pad">
+    <button id="back10" aria-label="Back 10 frames">−10</button>
+    <button id="back" aria-label="Back 1 frame">−1</button>
+    <button id="play" aria-label="Play or pause">Play</button>
+    <button id="fwd" aria-label="Forward 1 frame">+1</button>
+    <button id="fwd10" aria-label="Forward 10 frames">+10</button>
+  </div>
+  <div class="opts">
+    <label>Frame rate
+      <select id="fps">
+        <option value="auto">Auto</option>
+        <option>23.976</option><option>24</option><option>25</option><option>29.97</option>
+        <option>30</option><option>50</option><option>59.94</option><option>60</option>
+      </select>
+    </label>
+    <label>Go to frame<input id="goto" type="number" inputmode="numeric" min="0" placeholder="0"></label>
+  </div>
+  <p class="hint">Keys: ← → one frame, shift ×10, space play.</p>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const SAMPLE = 'data:video/webm;base64,GkXfo59ChoEBQveBAULygQRC84EIQoKEd2VibUKHgQJChYECGFOAZwEAAAAAAAwyEU2bdLpNu4tTq4QVSalmU6yBoU27i1OrhBZUrmtTrIHYTbuMU6uEElTDZ1OsggElTbuMU6uEHFO7a1Osggwc7AEAAAAAAABZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVSalmsirXsYMPQkBNgI1MYXZmNjAuMTYuMTAwV0GNTGF2ZjYwLjE2LjEwMESJiECfQAAAAAAAFlSua8iuAQAAAAAAAD/XgQFzxYjQKqIOLJNe55yBACK1nIN1bmSIgQCGhVZfVlA5g4EBI+ODhAT3kNXgkLCBoLqBWpqBAlWwhFW5gQESVMNnQIBzc6BjwIBnyJpFo4dFTkNPREVSRIeNTGF2ZjYwLjE2LjEwMHNz2mPAi2PFiNAqog4sk17nZ8ilRaOHRU5DT0RFUkSHmExhdmM2MC4zMS4xMDIgbGlidnB4LXZwOWfIoUWjiERVUkFUSU9ORIeTMDA6MDA6MDIuMDAwMDAwMDAwAB9DtnVKa+eBAKNETYEAAICCSYNCAAnwBZYqOCQcGPYAAhB+ncYPz+o6RoTxlvIuaO4vn9v3s7kMBlHDB0jGiCYsAAB47///BTrzjipWQWZBw+bZdXP2QnFZKcwfXLu4OuOm2/STFyflWKRt/S0J9fsmi8MaUIPabSvOnniHBG098ZWCI1+1D1NfBg2PFiUIHPpH+KZNP/Y5+fhrz8WucD3CBhVnxJhHkru3mjv5m/kLqDBVscBP6h55L2Bkiyh7tCW/ZajzD53oyY4af9qgJa97A7OdVNa1b01Wjvvo0eHoSCsQ6Y7YvhxPOEGEIESVvDYhZ4r6aDIhVQoTnDL7FoRvW3n3xLJdtK1EJrY2ML4EXObwz//+cd8oPNLAJsghcB9uM4sN46StGCvN9zi2V3TUNI8KfuYELZzrRu9pqg8iv7+qdUl7RB8pta4ejLN2QpQ+UGK509uQPIA/Id+TcxS5O3DuoR8mHgbwuIiiRw+cRQx3abEObrlfnVnUb2prHFpE7gPaUnXfGCO066dFXEUVaEU3PW/EXoj2rLaeWnHRFfCCaKynIeY19xHmRyI4DJbXrmG3b5bVV448XMcY9JPD+Kv/++Qf7Av6bja/TAU+rFa/Df5McdcJRQls74cwNYIIcsLx7EZnh2mU/+f1/wuEooS2d8FK9QVcn3tFE/91/FxsSjUbCFtETOMr6MA00Y9LmnNnhdw9go+MCLDIC1bP/Hjl01HhOP/+QVMWYMf2LgzbCoH4VtYf/A62GNxnViZ9WiyMNf+CaYGNPY0EMWB6T9OPOvhzaPlkqbhaB18MHzNrApBYQ/x3bvXURD8gljFrOmF+N/VxjWIkpnmhIaEMypzKHLMwsr4lP0kpKG4bZvu/V99zSamHtFV4hWEBYf+zgRKUMUgHPzxXee7BDeaS48zDKjXdemkZdjdOouG/o6IpmFmnYUeBSDkdDt1qCEuRYyfc55c75qGc6JJ132Dctj/7HanB26QBB9XufXOs7hh9bsCl/5OkS81pvlfi+MhumHP6e9t5YkTNLHQSQid3pXvxuGYhMDf6IyfsvIUC6h73PU5Cb1kWz257L2slAGPEUPfW7kX98AGc9B9Ku0U5hjJ+urCy7/l5DGj9Zxt/9fYdUWpoDmCVugnH66u+A+92RKVvFJ1DF8GiCP9DlfQ0GSt4lSbpT5RkKPxXiIgoX/HRxI2rMfAbvLIGtLEGfY/jCoez5C5jcpRZBGoe06wLgCyCQsnPJ7EHzYmJRCHXfsn8XeorGTve68VsQRHr/Cshy/evDV86LBWtbM1I4pfhrQt052Ypkku9h0qp+MX4o4wmWv1uN9D9oXmyzqgzwkOtJQccWJ7QuCguhTIyfEs+cq6RogsPLZPJz6mx/fTyCy8xnHwO3NT5FhTjHliW2qwwg6xK9xESPXM4T9eo95MNH2rtrtKb4rGsm75MYvLm0hZcHKBEHoTiP0OB5uWAaIiu4xbejoqyAKOpgQBTAIYAQJIcQFkAAANgAABaBeO54lb9gCtCIJ5ufFakLtenVobe3ACjtIEApwCGAECSnFhYAAADYAAAWgWzwbEbS5BAb6245x8jt10Td55nbm08LYIzPh+G7kEG5qKjroEA+gCGAECSHEBZAAADYAAAWgXkaEnuhs2O1bUCZ/RO42+uSMV0PY68TazteQCjx4EBTQCGAECSjIBWoAADYAAAWgQ0q8BUEkEBh9XDw6Rwqt7nWWRTKtU8kfIHKPE+iPkj2t6/jS9mITdiPj0rLZ1x+auV/ycAo6WBAaEAhgBAkgxgWQAAA2AAAFxnF7LGIiC+6VTGVkKmD2T0iQGAo8KBAfQAhgBAkoxkWAAAA3AAAFoC+sj6nOLILhLCWlEa+aQLdS7OYMFWvgoUj8dSqnzsA1s35VGg53dJ5/iO0U3NoACjrIECRwCGAECSDExZAAADYAAAWgW1HR7BuupihugDsE6LoAtn6OWioMNWv6Jwo0CTgQKbAIYAQJKMRFRgAANwAABaBwR+oAiTuUQDrGZ/pYKGaD/ZYQldLYPoKmSl442YjfRnQKtr/r74srZH4RDfgCsHIBx4NZIg+bnwpi4OjlDTEhunkAO+gqusvkJzVH7jRWKDi8My5VtgAEALbJalPHbHARgAIzgY/7Gm1XihZkmpMhZL8T6BOpCcv45s5HfT5oUwo6eBAu4AhgBAkgxMWQAAA2AAAFoC5lxSNsmos5xM85VMs156meKKAgCj5oEDQQCGAMCS8TFRgAAMYAAAV5mV+PXTJu/B221+QAIzRXzOV1PY2kwWOn6IA0+1i7o3zh929c4GHZzJeYrJMPVWg7TzZOsiFBWY7i0nG2ZaIdsK6X5r+F1WESN1qVyQAcMmemg/oKOmgQOVAIYAQJIMTFkAAANgAABaAvp8W4YjbqcZzE6tbsq8FKBh3OCj4oED6ACGAECSjExWoAADcAAAWjkz5Oe8TY8t66grFwtJF2eEDHeX/+rwaHaG+n+ZvhWXs4cMjFUAwX1Pw8+pQcvZYYlqresT4eX2QKLn6Pfl68O0uw2LNEt8WcDg581+kNaEo6aBBDsAhgBAkgxgWQAAA2AAAFoC7jf1OWBSRRuz1qrkVJWbUpbc8KPFgQSPAIYAQJKMlFgAAANwAABaBbT6Deu/nWYdTEadzo4bD4f5iJJZrewhL2sXpIIl5elSoYyZEz3KPyfzfO0FaQ8XhkJAo7CBBOIAhgBAkgyAWQAAA2AAAGv5tFSje+1slqjgvJpZxmnx2bFofqDqU1lu/7hc83CjQISBBTUAhgBAkoyAVGAAA3AAAFyLKPJAzLnjNwzG8taHxeUsNFab/nmSVInV/686BekCeTluPPTvuPZ3mA51Avnpx8JYLKAASsAvyg2VvlfwG+z2Gn0kJ5dYeFNW+IZdjosZ2OUcJX8y3A3Ix+RfGasVdk6qudXKPX2PHPCsa2i9/VzPUQCjpYEFiQCGAECSHIxZAAADYAAAa/k4Y1PtCPaLXl3PSpLnwyUK5Lyju4EF3ACGAECSnJBYAAADcAAAWgXk3zz5PMqXdPC8vLw6KV0TnuijUZHMj+C8G9qkAVenxZYDQ+7YdjYAo7KBBi8AhgBAkhyAWQAAA3AAAGv5tFZI4KmOeELUITER5iLFsJkvd3v4/QOJgGGxsfZoAKNAjoEGgwCGAMCSnIBUYAADYAAAbA7/otb5bl9/SR1yJFErFpvADvbGSBxamIh5Bwwqhx4foJeI5C2kXnqSnN9L9dLNR/QNhJW1AK+3t77fvFbNxr724sKjqfSkA0Twl7/x6cA/DaTLGx/EQZkkpful1tv8p9vaTkkTZAAsWCCf+tEp+kpjaTfWHNHUNTY0tQCjq4EG1gCGAECSHIxZAAADYAAAWgcEgYWUksNaD4SsU2GNRXHoqFK17P/S2ACju4EHKQCGAECSnKBYAAADYAAAa/rhvtKwANNCDyw2NkuED12nh9k+LgLlMZ/gB+9Z60/lqBJQrPxwjnQAo7WBB30AhgBAkgyIWQAAA2AAAFyL1YW37GvJMQLRL0AIdCUGgFxhY1/75ZoX8R7hBLVp7ikr4BxTu2uRu4+zgQC3iveBAfGCAavwgQM=';
+  const COMMON = [23.976, 24, 25, 29.97, 30, 48, 50, 59.94, 60, 120];
+  const v = $('#v'), fpsSel = $('#fps'), scrub = $('#scrub'), msg = $('#msg');
+  let fps = 30, detected = 0, loaded = false, want = null, url = null, probing = false;
+
+  fpsSel.value = store.get('fsvp.fps', 'auto');
+  const say = t => { msg.textContent = t; };
+  const frameAt = t => Math.max(0, Math.floor(t * fps + 1e-3));
+  const lastFrame = () => Math.max(0, Math.ceil((v.duration || 0) * fps - 1e-3) - 1);
+
+  function applyFps() {
+    const manual = parseFloat(fpsSel.value);
+    fps = manual > 0 ? manual : (detected || 30);
+    fpsSel.options[0].textContent = detected ? `Auto (${+detected.toFixed(3)})` : 'Auto';
+    if (loaded) { scrub.max = lastFrame(); render(); }
+  }
+
+  function render(t = v.currentTime) {
+    if (!loaded) return;
+    const n = want != null ? want : frameAt(t);
+    $('#frame').textContent = n;
+    $('#info').textContent = `${(n / fps).toFixed(3)} s · of ${lastFrame()}`;
+    scrub.value = n;
+  }
+
+  function seekFrame(n) {
+    if (!loaded) { say('Open a video first.'); return; }
+    if (!v.paused) v.pause();
+    n = Math.min(lastFrame(), Math.max(0, Math.round(n)));
+    want = n;
+    // aim at the middle of the frame so rounding never lands on a neighbour
+    v.currentTime = Math.min((n + 0.5) / fps, Math.max(0, v.duration - 0.001));
+    render();
+  }
+  const step = d => {
+    if (!loaded) { say('Open a video first.'); return; }
+    seekFrame((want != null ? want : frameAt(v.currentTime)) + d);
+  };
+
+  function togglePlay() {
+    if (!loaded) { say('Open a video first.'); return; }
+    if (v.paused) { want = null; v.play().catch(() => say('Playback was blocked.')); } else v.pause();
+  }
+
+  // Measure the real frame interval from presented frames during a short muted play.
+  function probeFps() {
+    if (!('requestVideoFrameCallback' in v)) { say('Frame rate not detected. Pick it below.'); return; }
+    probing = true;
+    const times = [], wasMuted = v.muted;
+    v.muted = true;
+    const done = () => {
+      probing = false; v.pause(); v.muted = wasMuted;
+      const deltas = times.slice(1).map((t, i) => t - times[i]).filter(d => d > 0.001);
+      if (deltas.length) {
+        const raw = 1 / Math.min(...deltas);
+        const snap = COMMON.find(c => Math.abs(c - raw) / c < 0.02);
+        detected = snap || Math.round(raw * 100) / 100;
+      } else say('Frame rate not detected. Pick it below.');
+      applyFps(); seekFrame(0);
+    };
+    const timer = setTimeout(done, 1200);
+    const onFrame = (_, meta) => {
+      if (!probing) return;
+      times.push(meta.mediaTime);
+      if (times.length >= 8) { clearTimeout(timer); done(); } else v.requestVideoFrameCallback(onFrame);
+    };
+    v.requestVideoFrameCallback(onFrame);
+    v.play().catch(() => { clearTimeout(timer); probing = false; say('Frame rate not detected. Pick it below.'); });
+  }
+
+  function open(src, knownFps) {
+    loaded = false; want = null; detected = knownFps || 0;
+    v.hidden = false; say('');
+    v.onloadedmetadata = () => {
+      loaded = true; applyFps();
+      if (knownFps) seekFrame(0); else probeFps();
+    };
+    v.src = src;
+  }
+
+  $('#file').addEventListener('change', e => {
+    const f = e.target.files[0];
+    if (!f) return;
+    if (url) URL.revokeObjectURL(url);
+    url = URL.createObjectURL(f);
+    open(url, 0);
+  });
+  $('#sample').addEventListener('click', () => open(SAMPLE, 12));
+
+  v.addEventListener('error', () => { loaded = false; v.hidden = true; say('This browser cannot play that file.'); });
+  v.addEventListener('seeked', () => { if (probing) return; want = null; render(); });
+  v.addEventListener('pause', () => { $('#play').textContent = 'Play'; render(); });
+  v.addEventListener('play', () => {
+    if (probing) return;
+    $('#play').textContent = 'Pause';
+    const tick = (_, meta) => { if (!v.paused) { render(meta ? meta.mediaTime : v.currentTime); loop(); } };
+    const loop = () => 'requestVideoFrameCallback' in v ? v.requestVideoFrameCallback(tick) : requestAnimationFrame(() => tick());
+    loop();
+  });
+
+  $('#back10').addEventListener('click', () => step(-10));
+  $('#back').addEventListener('click', () => step(-1));
+  $('#fwd').addEventListener('click', () => step(1));
+  $('#fwd10').addEventListener('click', () => step(10));
+  $('#play').addEventListener('click', togglePlay);
+  scrub.addEventListener('input', () => seekFrame(+scrub.value));
+  fpsSel.addEventListener('change', () => {
+    const keep = loaded ? (want != null ? want : frameAt(v.currentTime)) / fps : 0;
+    store.set('fsvp.fps', fpsSel.value);
+    applyFps();
+    if (loaded) seekFrame(keep * fps);
+  });
+  $('#goto').addEventListener('change', e => { if (e.target.value !== '') seekFrame(+e.target.value); });
+  $('#goto').addEventListener('keydown', e => { if (e.key === 'Enter') seekFrame(+e.target.value); });
+
+  document.addEventListener('keydown', e => {
+    if (e.target.closest('input:not([type=range]), select') || e.metaKey || e.ctrlKey || e.altKey) return;
+    const k = e.key, big = e.shiftKey ? 10 : 1;
+    if (k === 'ArrowRight' || k === '.') step(big);
+    else if (k === 'ArrowLeft' || k === ',') step(-big);
+    else if (k === ' ' || k === 'k') togglePlay();
+    else if (k === 'Home') seekFrame(0);
+    else if (k === 'End') seekFrame(lastFrame());
+    else return;
+    e.preventDefault();
+  });
+})();
+</script>
+</body>
+</html>

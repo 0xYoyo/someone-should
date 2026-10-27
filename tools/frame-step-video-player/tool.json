@@ -1,0 +1,52 @@
+{
+  "slug": "frame-step-video-player",
+  "wish": "someone should make a video player that steps backward frame by frame",
+  "year": 2014,
+  "agreed": 61,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/6907/video-player-with-backward-frame-by-frame-stepping-for-linux",
+      "date": "2014-06-12",
+      "points": 44,
+      "comments": 7
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/7296/view-each-frame-of-video-and-delete-edit-them",
+      "date": "2014-06-25",
+      "points": 8,
+      "comments": 2
+    }
+  ],
+  "spec": "Opens a video from your device and steps it forward or backward one frame (or ten) at a time, showing frame number and time.\nTap -1/+1/-10/+10, drag the scrubber, type a frame, or use arrow keys (shift for 10); frame rate is auto-detected or set by hand.\nIt does not upload, edit, or export the video; it plays only formats your browser can decode.",
+  "tests": [
+    {
+      "tap": "#sample"
+    },
+    {
+      "wait": 1000
+    },
+    {
+      "tap": "#fwd10"
+    },
+    {
+      "tap": "#back"
+    },
+    {
+      "wait": 800
+    },
+    {
+      "expect": {
+        "sel": "#frame",
+        "matches": "^9$"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:34:29Z",
+  "model": "opus-5.5",
+  "minutes": 5,
+  "approved": false,
+  "notes": "CSP media-src adds blob: so a locally opened file can play; nothing leaves the device. Includes a 3 kB inline sample clip (12 fps test pattern) so it works before a file is chosen."
+}
