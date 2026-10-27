@@ -1,0 +1,67 @@
+{
+  "slug": "markdown-file-viewer",
+  "wish": "someone should make a simple markdown viewer",
+  "year": 2015,
+  "agreed": 239,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/17714/simple-markdown-viewer-for-ubuntu-standalone-program-not-something-that-requir",
+      "date": "2015-03-06",
+      "points": 128,
+      "comments": 22
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/71013/simple-open-source-offline-markdown-viewer-for-windows",
+      "date": "2019-12-02",
+      "points": 72,
+      "comments": 17
+    }
+  ],
+  "spec": "Renders a markdown file as a clean page: headings, lists, tables, code, quotes, links, task lists, with a contents list built from the headings.\nTap Open .md file (or drop a file, or paste into the box); the last document is kept on this device.\nDoes not fetch remote images or run embedded HTML; remote images show as their alt text.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#src",
+        "text": "# Title\n\nSome *text* here.\n\n## Part one\n\n| a | b |\n|---|---|\n| 1 | **2** |\n\n- [x] done\n- open\n\n```js\nlet x = 1 < 2;\n```\n"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#doc h1",
+        "contains": "Title"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#doc table td strong",
+        "contains": "2"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#toc a[href=\"#part-one\"]",
+        "contains": "Part one"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#doc pre code",
+        "contains": "let x = 1 < 2;"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#doc .task.done",
+        "count": 1
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:32:58Z",
+  "model": "opus-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": "Remote images are not loaded (no network); they render as [alt text]. Raw HTML in the markdown is shown as text, not executed."
+}

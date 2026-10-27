@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T01:33:49.825Z",
+ "updated": "2026-10-27T01:33:56.509Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -58,9 +58,14 @@
   },
   {
    "slug": "markdown-file-viewer",
-   "status": "pending",
+   "status": "pass",
    "attempts": 1,
-   "model": "opus-5.5"
+   "model": "opus-5.5",
+   "kb": 19.1,
+   "tests": "6/6",
+   "built": "2026-10-27T01:32:58Z",
+   "minutes": 4,
+   "approved": false
   },
   {
    "slug": "compare-two-tables",

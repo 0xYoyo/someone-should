@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a simple markdown viewer</title>
+<style>
+/* ---- paste design/tokens.css here, verbatim ---- */
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+.sr { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; pointer-events: none; }
+#app { min-width: 0; }
+#status { margin: 0; color: var(--meta); font-size: 16px; min-height: 1.45em; overflow-wrap: anywhere; }
+#status.err { color: var(--no); }
+#src { min-height: 40vh; font: 16px/1.5 var(--mono); resize: vertical; }
+body.view #src { display: none; }
+body.drag { outline: 2px dashed var(--meta); outline-offset: -8px; }
+.layout { display: grid; gap: 16px; min-width: 0; }
+.tocbox[hidden] { display: none; }
+.tocbox summary { min-height: var(--tap); display: flex; align-items: center; cursor: pointer; color: var(--meta); font-size: 16px; }
+#toc ul { list-style: none; margin: 0; padding: 0; }
+#toc a { display: flex; align-items: center; min-height: var(--tap); color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--line); font-size: 16px; overflow-wrap: anywhere; }
+#toc .l2 a { padding-left: 14px; } #toc .l3 a { padding-left: 28px; } #toc .l4 a { padding-left: 42px; color: var(--meta); }
+@media (min-width: 820px) {
+  .layout.has-toc { grid-template-columns: 220px minmax(0, 1fr); align-items: start; }
+  .tocbox { position: sticky; top: 16px; max-height: calc(100dvh - 32px); overflow-y: auto; }
+  .tocbox summary { display: none; }
+}
+#doc { min-width: 0; overflow-wrap: break-word; max-width: 46em; }
+#doc > :first-child { margin-top: 0; }
+#doc h1, #doc h2, #doc h3, #doc h4, #doc h5, #doc h6 { line-height: 1.25; margin: 1.4em 0 .5em; font-weight: 600; scroll-margin-top: 12px; }
+#doc h1 { font-size: 30px; } #doc h2 { font-size: 24px; padding-bottom: 4px; border-bottom: 1px solid var(--line); }
+#doc h3 { font-size: 20px; } #doc h4, #doc h5, #doc h6 { font-size: 17px; } #doc h6 { color: var(--meta); }
+#doc p, #doc ul, #doc ol, #doc blockquote, #doc pre, #doc .tw { margin: 0 0 1em; }
+#doc ul, #doc ol { padding-left: 1.5em; }
+#doc li > ul, #doc li > ol { margin: 0; }
+#doc a { color: var(--ink); text-underline-offset: 3px; }
+#doc code { font: 16px/1.5 var(--mono); background: rgba(127,127,127,.14); padding: 1px 4px; border-radius: 3px; }
+#doc pre { overflow-x: auto; padding: 12px; background: rgba(127,127,127,.1); border-radius: var(--radius); }
+#doc pre code { background: none; padding: 0; white-space: pre; }
+#doc blockquote { margin-left: 0; padding: 0 0 0 14px; border-left: 3px solid var(--line); color: var(--meta); }
+#doc hr { border: 0; border-top: 1px solid var(--line); margin: 1.6em 0; }
+#doc .tw { overflow-x: auto; }
+#doc table { border-collapse: collapse; font-size: 16px; }
+#doc th, #doc td { border: 1px solid var(--line); padding: 6px 10px; text-align: left; vertical-align: top; }
+#doc th { font-weight: 600; }
+#doc img { max-width: 100%; }
+#doc .img { color: var(--meta); }
+#doc .task { display: inline-block; width: 16px; height: 16px; border: 1.5px solid var(--ink); border-radius: 3px; margin-right: 8px; vertical-align: -2px; }
+#doc .task.done { background: var(--ink); }
+#doc li.tl { list-style: none; margin-left: -1.3em; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a simple markdown viewer</h1>
+
+<main id="app" class="stack">
+  <div class="row">
+    <button id="open" class="primary" type="button">Open .md file</button>
+    <button id="mode" type="button">Hide source</button>
+    <input id="file" class="sr" type="file" accept=".md,.markdown,.mdown,.mkd,.txt,text/markdown,text/plain" tabindex="-1" aria-hidden="true">
+  </div>
+  <p id="status" aria-live="polite"></p>
+  <textarea id="src" spellcheck="false" placeholder="Paste markdown here" aria-label="Markdown source"></textarea>
+  <div class="layout" id="layout">
+    <details class="tocbox" id="tocbox" hidden><summary>Contents</summary><nav id="toc" aria-label="Contents"></nav></details>
+    <article id="doc"></article>
+  </div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  // storage helper — never throws
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  // ---------- markdown → html ----------
+  const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const LIST = /^( {0,3})([*+-]|\d{1,9}[.)])( {1,4}|$)(.*)$/;
+  const HR = /^ {0,3}([-*_])(?: *\1){2,} *$/;
+  const FENCE = /^( {0,3})(`{3,}|~{3,})\s*([^`\s]*)[^`]*$/;
+  const DELIM = /^ *\|? *:?-+:? *(\| *:?-+:? *)*\|? *$/;
+  let ST, refs, toc, used;
+
+  const safeUrl = u => {
+    u = u.trim();
+    if (/^(javascript|vbscript|file|data):/i.test(u.replace(/[\s\x00-\x1f]/g, '')) && !/^data:image\/(png|gif|jpe?g|webp);/i.test(u)) return '#';
+    return u;
+  };
+  const put = h => '\u0001' + (ST.push(h) - 1) + '\u0002';
+  const link = (u, html, title) => {
+    const href = safeUrl(u), local = href.startsWith('#');
+    return `<a href="${esc(href)}"${title ? ` title="${esc(title)}"` : ''}${local ? '' : ' target="_blank" rel="noopener noreferrer"'}>${html}</a>`;
+  };
+
+  function inline(s) {
+    s = s.replace(/(`+)([^`]|[^`][\s\S]*?[^`])\1(?!`)/g, (_, f, c) => put(`<code>${esc(c.replace(/\n/g, ' ').replace(/^ (.+) $/, '$1'))}</code>`));
+    s = s.replace(/\\\n/g, () => put('<br>') + '\n');
+    s = s.replace(/\\([!-\/:-@\[-`{-~])/g, (_, c) => put(esc(c)));
+    s = s.replace(/<((?:https?|ftp|mailto):[^\s<>]+)>/gi, (_, u) => put(link(u, esc(u))));
+    s = s.replace(/<([^\s<>@]+@[^\s<>@]+\.[a-z]+)>/gi, (_, u) => put(link('mailto:' + u, esc(u))));
+    s = s.replace(/!\[([^\]]*)\]\(\s*<?([^\s)>]*)>?(?:\s+["'][^"']*["'])?\s*\)/g, (_, alt, src) =>
+      put(/^data:image\//i.test(src) && safeUrl(src) !== '#' ? `<img src="${esc(src)}" alt="${esc(alt)}">` : `<span class="img">[${esc(alt || 'image')}]</span>`));
+    s = s.replace(/\[((?:[^\[\]]|\[[^\]]*\])*)\]\(\s*<?([^\s()>]*(?:\([^\s)]*\)[^\s()>]*)?)>?(?:\s+["']([^"']*)["'])?\s*\)/g,
+      (_, t, u, ti) => put(link(u, inline(t), ti)));
+    s = s.replace(/\[((?:[^\[\]]|\[[^\]]*\])+)\](?:\[([^\]]*)\])?/g, (m, t, r) => {
+      const d = refs.get((r || t).trim().toLowerCase().replace(/\s+/g, ' '));
+      return d ? put(link(d.url, inline(t), d.title)) : m;
+    });
+    s = s.replace(/(^|[\s(])((?:https?:\/\/|www\.)[^\s<\u0001]*[^\s<.,:;"')\]!?*_~\u0001])/g,
+      (_, p, u) => p + put(link(u.startsWith('www.') ? 'https://' + u : u, esc(u))));
+    s = esc(s);
+    s = s.replace(/\*\*\*(?=\S)([\s\S]*?\S)\*\*\*/g, '<strong><em>$1</em></strong>')
+      .replace(/\*\*(?=\S)([\s\S]*?\S)\*\*/g, '<strong>$1</strong>')
+      .replace(/(^|[^\w])__(?=\S)([\s\S]*?\S)__(?!\w)/g, '$1<strong>$2</strong>')
+      .replace(/~~(?=\S)([\s\S]*?\S)~~/g, '<del>$1</del>')
+      .replace(/\*(?=\S)([\s\S]*?\S)\*/g, '<em>$1</em>')
+      .replace(/(^|[^\w])_(?=\S)([\s\S]*?\S)_(?!\w)/g, '$1<em>$2</em>')
+      .replace(/ {2,}\n/g, '<br>\n');
+    while (/\u0001\d+\u0002/.test(s)) s = s.replace(/\u0001(\d+)\u0002/g, (_, n) => ST[n]);
+    return s;
+  }
+
+  const textOf = html => { const d = document.createElement('div'); d.innerHTML = html; return d.textContent.trim(); };
+  function heading(level, raw) {
+    const html = inline(raw.trim()), text = textOf(html);
+    let base = text.toLowerCase().replace(/[^\p{L}\p{N}\s_-]/gu, '').trim().replace(/\s/g, '-') || 'section', id = base, n = 0;
+    while (used.has(id)) id = base + '-' + (++n);
+    used.add(id);
+    toc.push({ level, id, text });
+    return `<h${level} id="h-${esc(id)}">${html}</h${level}>`;
+  }
+
+  const cells = l => l.trim().replace(/^\|/, '').replace(/(^|[^\\])\|$/, '$1').split(/(?<!\\)\|/).map(c => c.trim());
+
+  function table(lines, i) {
+    const head = cells(lines[i]), al = cells(lines[i + 1]).map(c => /^:-+:$/.test(c) ? 'center' : /-:$/.test(c) ? 'right' : '');
+    const td = (tag, c, k) => `<${tag}${al[k] ? ` style="text-align:${al[k]}"` : ''}>${inline(c)}</${tag}>`;
+    let h = '<div class="tw"><table><thead><tr>' + head.map((c, k) => td('th', c, k)).join('') + '</tr></thead><tbody>';
+    i += 2;
+    while (i < lines.length && lines[i].trim() && lines[i].includes('|')) {
+      const r = cells(lines[i]);
+      h += '<tr>' + head.map((_, k) => td('td', r[k] || '', k)).join('') + '</tr>';
+      i++;
+    }
+    return [h + '</tbody></table></div>', i];
+  }
+
+  function list(lines, i) {
+    const m0 = lines[i].match(LIST), ordered = /\d/.test(m0[2]), mark = m0[2].slice(-1);
+    const items = [];
+    let loose = false;
+    while (i < lines.length) {
+      const m = lines[i].match(LIST);
+      if (!m || HR.test(lines[i]) || /\d/.test(m[2]) !== ordered || m[2].slice(-1) !== mark) break;
+      const indent = m[1].length + m[2].length + (m[4] === '' ? 1 : m[3].length);
+      const item = [m[4]];
+      let blank = false;
+      i++;
+      while (i < lines.length) {
+        const l = lines[i];
+        if (!l.trim()) { item.push(''); blank = true; i++; continue; }
+        if (l.match(/^ */)[0].length >= indent) { item.push(l.slice(indent)); blank = false; i++; continue; }
+        if (blank || LIST.test(l) || HR.test(l) || /^ {0,3}(#|>|```|~~~)/.test(l)) break;
+        item.push(l.trim()); i++;
+      }
+      let trail = 0;
+      while (item.length > 1 && item[item.length - 1] === '') { item.pop(); trail++; }
+      if (item.includes('') || (trail && i < lines.length && LIST.test(lines[i]))) loose = true;
+      items.push(item);
+    }
+    const tag = ordered ? 'ol' : 'ul', start = ordered ? parseInt(m0[2], 10) : 1;
+    const lis = items.map(it => {
+      const t = it[0].match(/^\[([ xX])\]\s+(.*)$/);
+      if (t) { it = [t[2], ...it.slice(1)]; return `<li class="tl"><span class="task${t[1] === ' ' ? '' : ' done'}" role="img" aria-label="${t[1] === ' ' ? 'not done' : 'done'}"></span>${blocks(it, !loose)}</li>`; }
+      return `<li>${blocks(it, !loose)}</li>`;
+    });
+    return [`<${tag}${start !== 1 ? ` start="${start}"` : ''}>${lis.join('')}</${tag}>`, i];
+  }
+
+  function blocks(lines, tight) {
+    const out = [];
+    let para = [], i = 0, m;
+    const flush = () => {
+      if (!para.length) return;
+      const h = inline(para.join('\n').trim());
+      out.push(tight ? h : `<p>${h}</p>`);
+      para = [];
+    };
+    while (i < lines.length) {
+      const line = lines[i];
+      if (!line.trim()) { flush(); i++; continue; }
+      if ((m = line.match(FENCE))) {
+        flush();
+        const close = new RegExp(`^ {0,3}${m[2][0] === '`' ? '`' : '~'}{${m[2].length},}\\s*$`), strip = new RegExp(`^ {0,${m[1].length}}`), code = [];
+        for (i++; i < lines.length && !close.test(lines[i]); i++) code.push(lines[i].replace(strip, ''));
+        i++;
+        out.push(`<pre><code${m[3] ? ` class="lang-${esc(m[3])}"` : ''}>${esc(code.join('\n'))}</code></pre>`);
+        continue;
+      }
+      if ((m = line.match(/^ {0,3}(#{1,6})(?:[ \t]+(.*?))?(?:[ \t]+#+)?[ \t]*$/))) { flush(); out.push(heading(m[1].length, m[2] || '')); i++; continue; }
+      if (para.length && (m = line.match(/^ {0,3}(=+|-+) *$/))) { out.push(heading(m[1][0] === '=' ? 1 : 2, para.join(' '))); para = []; i++; continue; }
+      if (HR.test(line)) { flush(); out.push('<hr>'); i++; continue; }
+      if (/^ {0,3}>/.test(line)) {
+        flush();
+        const q = [];
+        while (i < lines.length && lines[i].trim() && !(q.length && (HR.test(lines[i]) || FENCE.test(lines[i])) && !/^ {0,3}>/.test(lines[i]))) { q.push(lines[i].replace(/^ {0,3}> ?/, '')); i++; }
+        out.push(`<blockquote>${blocks(q, false)}</blockquote>`);
+        continue;
+      }
+      if (line.includes('|') && i + 1 < lines.length && lines[i + 1].includes('|') && lines[i + 1].includes('-') && DELIM.test(lines[i + 1])) {
+        flush(); [m, i] = table(lines, i); out.push(m); continue;
+      }
+      if (LIST.test(line) && !(para.length && (!LIST.exec(line)[4].trim() || /^ {0,3}([2-9]|\d{2,})/.test(line)))) {
+        flush(); [m, i] = list(lines, i); out.push(m); continue;
+      }
+      if (!para.length && /^ {4}/.test(line)) {
+        const code = [];
+        while (i < lines.length && (/^ {4}/.test(lines[i]) || !lines[i].trim())) { code.push(lines[i].slice(4)); i++; }
+        while (code.length && !code[code.length - 1].trim()) code.pop();
+        out.push(`<pre><code>${esc(code.join('\n'))}</code></pre>`);
+        continue;
+      }
+      para.push(line); i++;
+    }
+    flush();
+    return out.join('\n');
+  }
+
+  function render(src) {
+    ST = []; refs = new Map(); toc = []; used = new Set();
+    const raw = src.replace(/\r\n?/g, '\n').replace(/\t/g, '    ').split('\n'), lines = [];
+    let fence = null;
+    for (const l of raw) {
+      const f = l.match(FENCE);
+      if (fence) { if (f && f[2][0] === fence[0] && f[2].length >= fence.length && !f[3]) fence = null; }
+      else if (f) fence = f[2];
+      else {
+        const d = l.match(/^ {0,3}\[([^\]]+)\]:\s*<?(\S+?)>?(?:\s+["'(](.*)["')])?\s*$/);
+        if (d) { refs.set(d[1].trim().toLowerCase().replace(/\s+/g, ' '), { url: d[2], title: d[3] }); continue; }
+      }
+      lines.push(l);
+    }
+    return blocks(lines, false);
+  }
+
+  // ---------- ui ----------
+  const src = $('#src'), doc = $('#doc'), tocNav = $('#toc'), tocBox = $('#tocbox'), status = $('#status');
+  const wide = window.matchMedia('(min-width: 820px)');
+  let name = '', saveTimer = 0, renderTimer = 0;
+
+  const say = (msg, err) => { status.textContent = msg; status.classList.toggle('err', !!err); };
+
+  function show() {
+    const text = src.value;
+    if (!text.trim()) {
+      doc.innerHTML = '<p class="empty">Open a .md file, paste markdown above, or drop a file on this page.</p>';
+      tocBox.hidden = true; $('#layout').classList.remove('has-toc');
+      return;
+    }
+    doc.innerHTML = render(text);
+    const items = toc.filter(t => t.level <= 4);
+    const min = Math.min(...items.map(t => t.level));
+    tocNav.innerHTML = '<ul>' + items.map(t => `<li class="l${t.level - min + 1}"><a href="#${esc(t.id)}">${esc(t.text)}</a></li>`).join('') + '</ul>';
+    const has = items.length >= 2;
+    tocBox.hidden = !has;
+    $('#layout').classList.toggle('has-toc', has);
+    if (wide.matches) tocBox.open = true;
+  }
+
+  function setMode(view) {
+    document.body.classList.toggle('view', view);
+    $('#mode').textContent = view ? 'Show source' : 'Hide source';
+  }
+
+  function save() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => store.set('mdv.doc', { name, text: src.value }), 300);
+  }
+
+  src.addEventListener('input', () => {
+    if (name) { name = ''; say(''); }
+    clearTimeout(renderTimer);
+    if (src.value.length < 50000) show(); else renderTimer = setTimeout(show, 200);
+    save();
+  });
+
+  function load(file) {
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) return say('That file is over 5 MB.', true);
+    const r = new FileReader();
+    r.onload = () => {
+      const text = String(r.result);
+      if (text.includes('\u0000')) return say('That does not look like a text file.', true);
+      src.value = text; name = file.name;
+      say(name);
+      show(); setMode(true); save();
+      window.scrollTo(0, 0);
+    };
+    r.onerror = () => say('Could not read that file.', true);
+    r.readAsText(file);
+  }
+
+  $('#open').addEventListener('click', () => $('#file').click());
+  $('#file').addEventListener('change', e => { load(e.target.files[0]); e.target.value = ''; });
+  $('#mode').addEventListener('click', () => setMode(!document.body.classList.contains('view')));
+
+  document.addEventListener('dragover', e => { e.preventDefault(); document.body.classList.add('drag'); });
+  document.addEventListener('dragleave', e => { if (!e.relatedTarget) document.body.classList.remove('drag'); });
+  document.addEventListener('drop', e => {
+    e.preventDefault(); document.body.classList.remove('drag');
+    if (e.dataTransfer.files.length) load(e.dataTransfer.files[0]);
+  });
+
+  // in-document anchors (#slug) point at headings whose ids are prefixed h-
+  const jump = e => {
+    const a = e.target.closest('a[href^="#"]');
+    if (!a) return;
+    e.preventDefault();
+    let id = a.getAttribute('href').slice(1);
+    try { id = decodeURIComponent(id); } catch {}
+    const el = document.getElementById('h-' + id) || document.getElementById('h-' + id.toLowerCase());
+    if (!el) return;
+    if (!wide.matches && tocBox.contains(a)) tocBox.open = false;
+    el.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+  };
+  doc.addEventListener('click', jump);
+  tocNav.addEventListener('click', jump);
+
+  const saved = store.get('mdv.doc', null);
+  if (saved && typeof saved.text === 'string' && saved.text.trim()) {
+    src.value = saved.text; name = saved.name || '';
+    if (name) say(name);
+    setMode(true);
+  }
+  show();
+})();
+</script>
+</body>
+</html>
