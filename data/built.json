@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T01:58:44.529Z",
+ "updated": "2026-10-27T01:59:59.056Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -704,6 +704,78 @@
    "built": "2026-10-27T01:54:46Z",
    "minutes": 9,
    "approved": false
+  },
+  {
+   "slug": "compass-and-straightedge",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "3d-equation-plotter",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "graph-image-digitizer",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "brainfuck-debugger",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "toddler-tap-games",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "picture-swap-storybook",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "table-to-heatmap",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "redact-a-scan",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "recipes-to-shopping-list",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "editor-color-scheme-maker",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "screenshot-in-browser-frame",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "guitar-chord-charts",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
   }
  ]
 }
