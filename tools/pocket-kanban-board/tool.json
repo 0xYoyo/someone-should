@@ -1,0 +1,79 @@
+{
+  "slug": "pocket-kanban-board",
+  "wish": "someone should make an app that works like trello",
+  "year": 2014,
+  "agreed": 77,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/15056/open-source-equivalent-to-trello",
+      "date": "2015-01-05",
+      "points": 16,
+      "comments": 2
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/39840/combined-kanban-and-gantt-chart-project-management-tool",
+      "date": "2017-03-03",
+      "points": 10,
+      "comments": 8
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/7502/scrum-workflow-software",
+      "date": "2014-07-03",
+      "points": 14,
+      "comments": 2
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/7625/looking-for-a-project-management-tool-that-would-serve-as-a-mix-of-scrum-and-kan",
+      "date": "2014-07-08",
+      "points": 7,
+      "comments": 8
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/68953/digital-scrum-boards-that-capture-the-physical-board-experience",
+      "date": "2019-09-16",
+      "points": 7,
+      "comments": 3
+    }
+  ],
+  "spec": "A kanban board: columns of cards you add, edit, delete, and drag (by the grip) between and within columns; columns can be added, renamed, reordered and removed.\nType in a column's box and press Enter to add a card; tap a card to edit or move it; tap a column name to rename it. Everything is saved on this device; Export/Import moves the board as a JSON file.\nIt does not sync between devices or people, has no accounts, due dates, labels or attachments, and makes no network requests.",
+  "tests": [
+    {
+      "type": {
+        "sel": ".col .add-text",
+        "text": "Write the spec"
+      }
+    },
+    {
+      "key": "Enter"
+    },
+    {
+      "expect": {
+        "sel": ".col .card-text",
+        "contains": "Write the spec"
+      }
+    },
+    {
+      "tap": ".card-text"
+    },
+    {
+      "tap": "#ed-right"
+    },
+    {
+      "expect": {
+        "sel": ".col:nth-child(2) .card-text",
+        "contains": "Write the spec"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:30:02Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Drag uses pointer events on a grip handle so swiping the board still scrolls on phones; tap-to-edit sheet has Move left/right as a non-drag fallback."
+}
