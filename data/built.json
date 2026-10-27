@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T01:41:26.414Z",
+ "updated": "2026-10-27T01:42:49.863Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -308,6 +308,78 @@
    "built": "2026-10-27T01:37:19Z",
    "minutes": 6,
    "approved": false
+  },
+  {
+   "slug": "json-diff-viewer",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "sql-on-csv-files",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "mystery-string-decoder",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "highlight-text-matches",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "plain-text-box-drawer",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "family-tree-maker",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "colorblind-image-filter",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "hide-text-in-image",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "run-a-checklist",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "gpx-track-stats",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "treasure-hunt-clue-maker",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "printable-game-cards",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
   }
  ]
 }
