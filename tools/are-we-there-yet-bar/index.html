@@ -45,96 +45,253 @@ ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: fl
 .no { color: var(--no); }
 .built { color: var(--built); }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
-
-.meta { font-size: 16px; }
-.track { position: relative; height: 28px; border: 2px solid var(--ink); border-radius: 14px; margin: 44px 8px 8px; }
-.fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--accent); border-radius: 12px; width: 0; transition: width .6s; }
-.car { position: absolute; top: -34px; left: 0; width: 44px; height: 30px; margin-left: -22px; transition: left .6s; }
-.flag { position: absolute; right: -6px; top: -34px; font: 500 16px var(--mono); }
-.pct { text-align: center; }
-.left { text-align: center; }
-label { display: grid; gap: 4px; flex: 1; min-width: 140px; }
-@media (prefers-reduced-motion: reduce) { .fill, .car { transition: none; } }
+:root { --sky: #cfe6f2; --grass: #a9c98f; --hill1: #b7d3b0; --hill2: #8fba7e; --tree: #5d9a57; --road: #55585c; --car: #e8602c; --cloud: #fff; --sun: #ffd45e; --sign: #fff; --signink: #1d1d1d; }
+@media (prefers-color-scheme: dark) { :root { --sky: #1d2b3a; --grass: #2f4a2c; --hill1: #2c4a3d; --hill2: #28502a; --tree: #1f3d20; --road: #3a3c40; --cloud: #3b4a5b; --sun: #e8c860; --sign: #e9e9e9; } }
+body { max-width: 560px; margin: 0 auto; }
+h1 { margin-bottom: 12px; }
+#scene { display: block; width: 100%; height: auto; border-radius: 10px; border: 2px solid var(--ink); background: var(--sky); }
+#scene text { font: 600 16px var(--sans); fill: var(--signink); }
+.ready .lay { transition: transform 1s linear; }
+.cloud { animation: drift 90s linear infinite; }
+.cloud.b { animation-duration: 140s; }
+@keyframes drift { from { transform: translateX(-80px); } to { transform: translateX(400px); } }
+#carbob { animation: bob .5s ease-in-out infinite alternate; }
+@keyframes bob { from { transform: translateY(0); } to { transform: translateY(-1.4px); } }
+.sign.passed { opacity: .5; }
+.track { height: 22px; border: 2px solid var(--ink); border-radius: 11px; margin: 14px 0 10px; overflow: hidden; }
+#fill { height: 100%; width: 0; background: var(--car); }
+.ready #fill { transition: width 1s linear; }
+#pct { margin: 0; }
+#left { font-size: 22px; font-weight: 500; margin: 2px 0 8px; }
+#route, #wakemsg, #err { margin: 0 0 8px; }
+#err { color: var(--no); }
+.btns { display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0; }
+#setup { border-top: 1px solid var(--line); padding-top: 12px; margin-top: 8px; }
+#setup[hidden] { display: none; }
+#setup label { display: block; margin: 12px 0 4px; }
+.dests { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.dests button { padding: 0 6px; }
+.dests button[aria-pressed="true"] { background: var(--car); border-color: var(--car); color: #fff; }
+#conf { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 </style>
 <style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
 </head>
 <body>
-<h1 id="wish">someone should make a progress bar for the back seat so kids can see if we're there yet</h1>
-<main id="app" class="stack">
-  <div class="pct big" id="pct">0%</div>
-  <div class="track" aria-hidden="true">
-    <div class="fill" id="fill"></div>
-    <svg class="car" id="car" viewBox="0 0 44 30" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 22v-6l5-1 5-8h16l6 8 6 1v6z" fill="var(--paper)"/><circle cx="12" cy="23" r="4" fill="var(--paper)"/><circle cx="33" cy="23" r="4" fill="var(--paper)"/></svg>
-    <span class="flag">there</span>
+<h1>someone should make a progress bar for the back seat so kids can see if we're there yet</h1>
+<svg id="scene" viewBox="0 0 320 240" role="img" aria-label="A little car driving along a winding road">
+  <circle cx="262" cy="34" r="16" fill="var(--sun)"/>
+  <g class="cloud" style="animation-delay:-30s"><g fill="var(--cloud)"><ellipse cx="0" cy="40" rx="22" ry="8"/><ellipse cx="12" cy="33" rx="13" ry="9"/></g></g>
+  <g class="cloud b" style="animation-delay:-90s"><g fill="var(--cloud)"><ellipse cx="0" cy="20" rx="18" ry="6"/><ellipse cx="-8" cy="15" rx="10" ry="7"/></g></g>
+  <g class="cloud" style="animation-delay:-70s"><g fill="var(--cloud)"><ellipse cx="0" cy="58" rx="16" ry="5"/><ellipse cx="8" cy="53" rx="9" ry="6"/></g></g>
+  <g id="hill1" class="lay"><path fill="var(--hill1)" d="M0,100 Q60,60 120,95 T240,90 T360,88 T480,92 T600,88 L640,92 V150 H0Z"/></g>
+  <g id="hill2" class="lay"><path fill="var(--hill2)" d="M0,118 Q50,80 100,113 T200,108 T300,106 T400,110 T500,106 T600,110 L640,113 V150 H0Z"/></g>
+  <rect y="118" width="320" height="122" fill="var(--grass)"/>
+  <g id="trees" class="lay"></g>
+  <path id="road" d="M24,170 C70,135 100,190 155,165 S250,130 296,145" fill="none" stroke="var(--road)" stroke-width="24" stroke-linecap="round"/>
+  <path d="M24,170 C70,135 100,190 155,165 S250,130 296,145" fill="none" stroke="var(--sign)" stroke-width="2" stroke-dasharray="7 7" opacity=".8"/>
+  <g id="home" transform="translate(6,128)"><path d="M2,22 V10 L14,0 L26,10 V22Z" fill="#e7d3a8"/><path d="M-1,11 L14,-3 L29,11Z" fill="#b5483a"/><rect x="11" y="13" width="6" height="9" fill="#6b4a2e"/></g>
+  <g id="dests" transform="translate(268,96)">
+    <g id="d-grandma"><path d="M2,40 V22 L22,4 L42,22 V40Z" fill="#f0d9b5"/><path d="M-2,23 L22,-1 L46,23Z" fill="#7b4fa0"/><rect x="17" y="26" width="10" height="14" fill="#6b4a2e"/><path d="M22,21 C14,14 18,10 22,15 C26,10 30,14 22,21Z" fill="#d6304a"/></g>
+    <g id="d-beach"><rect x="-4" y="30" width="52" height="12" fill="#f0d68a"/><path d="M-4,36 Q6,30 16,36 T36,36 T52,36 V42 H-4Z" fill="#4aa3d8"/><rect x="21" y="6" width="3" height="32" fill="#6b4a2e"/><path d="M6,12 Q22,-8 40,12Z" fill="#d6304a"/><path d="M22,12 Q30,-4 40,12Z" fill="#fff" opacity=".7"/></g>
+    <g id="d-zoo"><rect x="2" y="22" width="40" height="18" fill="#8a6a4a"/><rect x="8" y="14" width="28" height="9" rx="2" fill="#fff"/><rect x="20" y="28" width="5" height="12" fill="#3d2b1b"/><rect x="34" y="-6" width="5" height="26" fill="#f2b84b"/><ellipse cx="38" cy="-8" rx="7" ry="4.5" fill="#f2b84b"/><circle cx="36" cy="2" r="1.6" fill="#a8641e"/><circle cx="37" cy="12" r="1.6" fill="#a8641e"/></g>
+    <g id="d-city"><rect x="0" y="16" width="14" height="24" fill="#7f8da3"/><rect x="16" y="2" width="14" height="38" fill="#5f6f89"/><rect x="32" y="12" width="12" height="28" fill="#8e9bb0"/><g fill="#ffe9a0"><rect x="3" y="20" width="3" height="3"/><rect x="8" y="26" width="3" height="3"/><rect x="20" y="8" width="3" height="3"/><rect x="25" y="16" width="3" height="3"/><rect x="20" y="26" width="3" height="3"/><rect x="36" y="18" width="3" height="3"/></g></g>
+    <g id="d-camp"><path d="M2,40 L22,8 L42,40Z" fill="#e8602c"/><path d="M22,40 L16,40 L22,22 L28,40Z" fill="#3d2b1b"/><rect x="45" y="26" width="3" height="14" fill="#6b4a2e"/><path d="M38,28 L46,10 L54,28Z" fill="var(--tree)"/></g>
+  </g>
+  <g id="signs"></g>
+  <g id="stopsg"></g>
+  <g id="car"><g id="carbob">
+    <path d="M-18,-4 V-11 Q-18,-14 -14,-14 H14 Q18,-14 18,-10 V-4Z" fill="var(--car)"/>
+    <path d="M-9,-13 L-5,-21 H6 L11,-13Z" fill="var(--car)"/>
+    <path d="M-6,-14 L-3,-19.5 H5 L8,-14Z" fill="var(--sky)"/>
+    <circle cx="0" cy="-16" r="2.6" fill="#f3c9a0"/>
+    <circle cx="17" cy="-9" r="2" fill="#ffe27a"/>
+    <circle cx="-10" cy="-3" r="4.5" fill="#1d1d1d"/><circle cx="10" cy="-3" r="4.5" fill="#1d1d1d"/>
+    <circle cx="-10" cy="-3" r="1.6" fill="#ccc"/><circle cx="10" cy="-3" r="1.6" fill="#ccc"/>
+  </g></g>
+</svg>
+<div class="track" aria-hidden="true"><div id="fill"></div></div>
+<p id="pct" class="big">0% there</p>
+<p id="left"></p>
+<p id="route" class="meta"></p>
+<div class="btns">
+  <button id="unit" type="button">Show cartoons</button>
+  <button id="wake" type="button">Keep screen on</button>
+  <button id="open-setup" type="button" class="primary">Set up trip</button>
+</div>
+<p id="wakemsg" class="meta" role="status"></p>
+<form id="setup" hidden>
+  <label for="mins">Trip length in minutes</label>
+  <input id="mins" type="text" inputmode="decimal" autocomplete="off" placeholder="90">
+  <label for="arr">Or arrive at (used if filled)</label>
+  <input id="arr" type="time">
+  <label>Where to</label>
+  <div class="dests" id="destbtns">
+    <button type="button" data-d="grandma" aria-pressed="false">Grandma's</button>
+    <button type="button" data-d="beach" aria-pressed="true">Beach</button>
+    <button type="button" data-d="zoo" aria-pressed="false">Zoo</button>
+    <button type="button" data-d="city" aria-pressed="false">City</button>
+    <button type="button" data-d="camp" aria-pressed="false">Campsite</button>
   </div>
-  <div class="left big" id="left">--</div>
-  <div class="left meta" id="msg"></div>
-  <div class="row">
-    <label class="meta">leave<input type="time" id="dep"></label>
-    <label class="meta">arrive<input type="time" id="arr"></label>
-  </div>
-  <div class="meta" id="err"></div>
-</main>
+  <label for="stops">Stops, minutes into the trip (optional)</label>
+  <input id="stops" type="text" inputmode="text" autocomplete="off" placeholder="45, 90">
+  <p id="err" class="meta" role="status"></p>
+  <div class="btns"><button id="go" type="submit" class="primary">Start the trip</button></div>
+</form>
+<canvas id="conf"></canvas>
 <script>
-(() => {
-  'use strict';
-  const store = {
-    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
-    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+(function () {
+  var $ = function (s) { return document.querySelector(s); };
+  var NS = document.querySelector('#scene').namespaceURI;
+  var store = {
+    get: function (k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
+    set: function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
   };
-  const $ = (s, r = document) => r.querySelector(s);
-  const pad = n => String(n).padStart(2, '0');
-  const hm = d => pad(d.getHours()) + ':' + pad(d.getMinutes());
-  const MIN = 60000, DAY = 86400000;
+  var NAMES = { grandma: "grandma's house", beach: 'the beach', zoo: 'the zoo', city: 'the city', camp: 'the campsite' };
+  var road = $('#road'), roadLen = road.getTotalLength();
+  var now0 = Date.now(), MIN = 60000;
+  // Example trip, 40% done, so the first frame is alive.
+  var trip = { start: now0 - 34.01 * MIN, end: now0 + 51 * MIN, dest: 'beach', stops: [60], demo: true };
+  var saved = store.get('awty');
+  if (saved && saved.end > saved.start) trip = saved;
+  var cartoons = !!(store.get('awty-unit'));
+  var wasDone = false;
 
-  // default example: left 40 minutes ago, 2 hours long
-  const saved = store.get('awty', null);
-  const now0 = new Date();
-  const d0 = new Date(now0 - 40 * MIN), a0 = new Date(+d0 + 120 * MIN);
-  $('#dep').value = saved ? saved.dep : hm(d0);
-  $('#arr').value = saved ? saved.arr : hm(a0);
+  function el(name, attrs, parent) {
+    var e = document.createElementNS(NS, name);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    parent.appendChild(e); return e;
+  }
+  function pt(f) { return road.getPointAtLength(f * roadLen); }
 
-  function toDate(str, base) {
-    const [h, m] = str.split(':').map(Number);
-    const d = new Date(base); d.setHours(h, m, 0, 0); return d;
+  // Trees: one wide strip that slides as the trip goes on.
+  (function () {
+    var g = $('#trees');
+    for (var i = 0; i < 24; i++) {
+      var x = 14 + i * 27 + (i * 7 % 11), y = 134 + (i % 3) * 4;
+      el('rect', { x: x - 1.5, y: y, width: 3, height: 7, fill: '#6b4a2e' }, g);
+      el('circle', { cx: x, cy: y - 2, r: 7 + (i % 2), fill: 'var(--tree)' }, g);
+    }
+  })();
+
+  var signEls = [];
+  function buildSigns() {
+    var g = $('#signs'); g.innerHTML = ''; signEls = [];
+    [[0.25, ['25%']], [0.5, ['halfway']], [0.9, ['almost', 'there']]].forEach(function (m) {
+      var p = pt(m[0]), lines = m[1], h = 8 + lines.length * 17, w = lines[0].length > 5 ? 66 : 52;
+      var s = el('g', { 'class': 'sign' }, g);
+      el('rect', { x: p.x - 1.5, y: p.y + 12, width: 3, height: 14, fill: '#6b4a2e' }, s);
+      el('rect', { x: p.x - w / 2, y: p.y + 18, width: w, height: h, rx: 5, fill: 'var(--sign)', stroke: '#1d1d1d', 'stroke-width': 1.5 }, s);
+      lines.forEach(function (t, i) {
+        var tx = el('text', { x: p.x, y: p.y + 18 + 17 + i * 17 - 1, 'text-anchor': 'middle' }, s);
+        tx.textContent = t;
+      });
+      signEls.push({ f: m[0], e: s });
+    });
   }
-  function fmt(ms) {
-    const m = Math.ceil(ms / MIN);
-    if (m < 60) return m + ' min';
-    return Math.floor(m / 60) + ' h ' + pad(m % 60) + ' min';
+  function buildStops() {
+    var g = $('#stopsg'); g.innerHTML = '';
+    var total = (trip.end - trip.start) / MIN;
+    (trip.stops || []).forEach(function (m) {
+      if (!(m > 0 && m < total)) return;
+      var p = pt(m / total);
+      el('rect', { x: p.x - 1, y: p.y - 30, width: 2, height: 20, fill: '#1d1d1d' }, g);
+      el('path', { d: 'M' + (p.x + 1) + ',' + (p.y - 30) + ' h12 l-4,5 l4,5 h-12Z', fill: '#2a7fd0' }, g);
+    });
   }
-  function msgFor(p) {
-    if (p >= 1) return 'we are there';
-    if (p > 0.9) return 'almost there';
-    if (p > 0.5) return 'more than halfway';
-    if (p > 0.25) return 'a good start';
-    return 'just getting going';
+
+  function fmtLeft(ms) {
+    var m = Math.round(ms / MIN);
+    if (cartoons) {
+      if (m < 2) return 'any second now';
+      if (m < 11) return 'less than a cartoon';
+      var n = Math.max(1, Math.round(m / 22));
+      return 'about ' + n + ' more cartoon' + (n === 1 ? '' : 's');
+    }
+    if (m < 1) return 'less than a minute';
+    if (m > 10) m = Math.round(m / 5) * 5;
+    if (m < 60) return 'about ' + m + ' minute' + (m === 1 ? '' : 's');
+    var h = Math.floor(m / 60), r = m % 60;
+    return 'about ' + h + (h === 1 ? ' hour' : ' hours') + (r ? ' ' + r + ' min' : '');
   }
-  function tick() {
-    const err = $('#err');
-    if (!$('#dep').value || !$('#arr').value) { err.textContent = 'set both times'; return; }
-    err.textContent = '';
-    const now = new Date();
-    let dep = toDate($('#dep').value, now), arr = toDate($('#arr').value, now);
-    if (arr <= dep) arr = new Date(+arr + DAY);
-    // a departure far in the future means the trip began yesterday
-    if (dep - now > 12 * 3600000) { dep = new Date(+dep - DAY); arr = new Date(+arr - DAY); }
-    const total = arr - dep;
-    let p = (now - dep) / total;
-    p = Math.max(0, Math.min(1, p));
-    const pc = Math.floor(p * 100);
-    $('#pct').textContent = pc + '%';
-    $('#fill').style.width = (p * 100) + '%';
-    $('#car').style.left = (p * 100) + '%';
-    if (now < dep) { $('#left').textContent = 'leaves in ' + fmt(dep - now); $('#msg').textContent = 'not yet'; }
-    else if (now >= arr) { $('#left').textContent = 'there'; $('#msg').textContent = msgFor(1); }
-    else { $('#left').textContent = fmt(arr - now) + ' to go'; $('#msg').textContent = msgFor(p); }
+  function hhmm(t) { return new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); }
+
+  function draw() {
+    var now = Date.now(), p = Math.min(1, Math.max(0, (now - trip.start) / (trip.end - trip.start)));
+    var done = p >= 1, pos = pt(p), q = pt(Math.min(1, p + 0.02)), r = pt(Math.max(0, p - 0.02));
+    var ang = Math.atan2(q.y - r.y, q.x - r.x) * 180 / Math.PI;
+    $('#car').setAttribute('transform', 'translate(' + pos.x.toFixed(1) + ',' + (pos.y + 4).toFixed(1) + ') rotate(' + ang.toFixed(1) + ')');
+    $('#hill1').style.transform = 'translateX(' + (-p * 160).toFixed(1) + 'px)';
+    $('#hill2').style.transform = 'translateX(' + (-p * 260).toFixed(1) + 'px)';
+    $('#trees').style.transform = 'translateX(' + (-p * 320).toFixed(1) + 'px)';
+    $('#fill').style.width = (p * 100).toFixed(1) + '%';
+    signEls.forEach(function (s) { s.e.setAttribute('class', 'sign' + (p >= s.f ? ' passed' : '')); });
+    ['grandma', 'beach', 'zoo', 'city', 'camp'].forEach(function (d) { $('#d-' + d).style.display = d === trip.dest ? '' : 'none'; });
+    $('#pct').textContent = done ? "We're here!" : Math.floor(p * 100) + '% there';
+    $('#left').textContent = done ? 'Everybody out!' : fmtLeft(trip.end - now);
+    $('#route').textContent = (trip.demo ? 'Example trip. ' : '') + 'Home to ' + NAMES[trip.dest] + ', ' + hhmm(trip.start) + ' to ' + hhmm(trip.end);
+    if (done && !wasDone && !trip.demo && now - trip.end < 5000) confetti();
+    wasDone = done;
   }
-  function onEdit() { store.set('awty', { dep: $('#dep').value, arr: $('#arr').value }); tick(); }
-  $('#dep').addEventListener('input', onEdit);
-  $('#arr').addEventListener('input', onEdit);
-  tick();
-  setInterval(tick, 10000);
+
+  var raf = 0;
+  function confetti() {
+    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var c = $('#conf'), x = c.getContext('2d'), W = c.width = innerWidth, H = c.height = innerHeight;
+    var cols = ['#e8602c', '#2a7fd0', '#f2b84b', '#4aa35a', '#d6304a', '#7b4fa0'], ps = [], t0 = Date.now();
+    for (var i = 0; i < 110; i++) ps.push({ x: W / 2, y: H * 0.4, vx: (Math.random() - 0.5) * 12, vy: -Math.random() * 12 - 3, s: 5 + Math.random() * 6, c: cols[i % 6], a: Math.random() * 6 });
+    cancelAnimationFrame(raf);
+    (function step() {
+      x.clearRect(0, 0, W, H);
+      ps.forEach(function (q) { q.vy += 0.3; q.x += q.vx; q.y += q.vy; q.a += 0.2; x.fillStyle = q.c; x.save(); x.translate(q.x, q.y); x.rotate(q.a); x.fillRect(-q.s / 2, -q.s / 4, q.s, q.s / 2); x.restore(); });
+      if (Date.now() - t0 < 4500) raf = requestAnimationFrame(step); else x.clearRect(0, 0, W, H);
+    })();
+  }
+
+  function setUnit() {
+    $('#unit').textContent = cartoons ? 'Show minutes' : 'Show cartoons';
+    store.set('awty-unit', cartoons); draw();
+  }
+  $('#unit').addEventListener('click', function () { cartoons = !cartoons; setUnit(); });
+
+  // Keep screen awake (Wake Lock API). Falls back to a one-line hint.
+  var lock = null;
+  async function getLock() {
+    try { lock = await navigator.wakeLock.request('screen'); $('#wake').textContent = 'Screen stays on'; $('#wakemsg').textContent = '';
+      lock.addEventListener('release', function () { if (!lock) $('#wake').textContent = 'Keep screen on'; });
+    } catch (e) { lock = null; $('#wakemsg').textContent = "Couldn't keep the screen on. Raise the screen timeout in settings."; }
+  }
+  $('#wake').addEventListener('click', function () {
+    if (!('wakeLock' in navigator)) { $('#wakemsg').textContent = "This browser can't keep the screen on. Raise the screen timeout in settings."; return; }
+    if (lock) { var l = lock; lock = null; l.release(); $('#wake').textContent = 'Keep screen on'; } else getLock();
+  });
+  document.addEventListener('visibilitychange', function () { if (lock && document.visibilityState === 'visible') getLock(); });
+
+  // Parent setup
+  var pick = trip.dest;
+  function markDest() {
+    document.querySelectorAll('#destbtns button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.d === pick ? 'true' : 'false'); });
+  }
+  $('#destbtns').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) { pick = b.dataset.d; markDest(); } });
+  $('#open-setup').addEventListener('click', function () { var s = $('#setup'); s.hidden = !s.hidden; markDest(); });
+  $('#setup').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var start = Date.now(), end, a = $('#arr').value, mins = parseFloat($('#mins').value.replace(',', '.'));
+    if (a) {
+      var d = new Date(start); d.setHours(+a.split(':')[0], +a.split(':')[1], 0, 0);
+      if (d.getTime() <= start + 30000) d.setDate(d.getDate() + 1);
+      end = d.getTime();
+    } else if (mins > 0 && mins < 3000) end = start + mins * MIN;
+    if (!end) { $('#err').textContent = 'Enter the trip length in minutes, or an arrival time.'; return; }
+    $('#err').textContent = '';
+    var stops = $('#stops').value.split(/[,\s]+/).map(parseFloat).filter(function (n) { return n > 0; });
+    trip = { start: start, end: end, dest: pick, stops: stops };
+    store.set('awty', trip);
+    wasDone = false; buildStops(); $('#setup').hidden = true; draw();
+  });
+
+  buildSigns(); buildStops(); setUnit();
+  requestAnimationFrame(function () { requestAnimationFrame(function () { document.body.classList.add('ready'); }); });
+  setInterval(draw, 500);
 })();
 </script>
 </body>

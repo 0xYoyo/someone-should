@@ -12,46 +12,40 @@
       "comments": 22
     }
   ],
-  "spec": "Shows a big progress bar with a car driving toward the finish, percent done and time left.\nSet the leave and arrive times; the bar fills as the clock moves.\nIt does not track location or traffic; it only follows the clock.",
+  "spec": "A cartoon road scene where a little car drives from home to grandma's, the beach, the zoo, a city or a campsite, with hills and trees sliding past and signs at 25%, halfway and almost there.\nA parent taps Set up trip, enters minutes or an arrival time, picks the destination and optional stops; the kids read the big percent and the time left in minutes or cartoons.\nIt follows the clock only, not GPS or traffic; at 100% it throws confetti and says We're here.",
   "tests": [
     {
       "expect": {
         "sel": "#pct",
-        "matches": "\\d+%"
+        "matches": "^4\\d% there"
       }
+    },
+    {
+      "tap": "#open-setup"
     },
     {
       "type": {
-        "sel": "#dep",
-        "text": "00:00"
+        "sel": "#mins",
+        "text": "0.01"
       }
     },
     {
-      "type": {
-        "sel": "#arr",
-        "text": "23:59"
-      }
+      "tap": "#go"
     },
     {
-      "wait": 300
+      "wait": 1400
     },
     {
       "expect": {
-        "sel": "#left",
-        "contains": "to go"
-      }
-    },
-    {
-      "expect": {
-        "sel": "#car",
-        "visible": true
+        "sel": "#pct",
+        "contains": "We're here"
       }
     }
   ],
   "status": "pass",
-  "built": "2026-10-27T08:40:31Z",
+  "built": "2026-10-27T12:22:43Z",
   "model": "sonnet-5.5",
-  "minutes": 1,
+  "minutes": 6,
   "approved": false,
   "notes": "Offline; follows the device clock only."
 }
