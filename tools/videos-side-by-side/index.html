@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data: blob:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app that plays several videos side by side</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+#grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; background: var(--paper); }
+#grid.n1 { grid-template-columns: 1fr; }
+#grid:fullscreen { background: #000; align-content: center; padding: 6px; }
+.slot { position: relative; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius); overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.slot video { width: 100%; height: 100%; object-fit: contain; display: block; }
+.slot.empty { background: transparent; border: 1.5px dashed var(--line); color: var(--meta); cursor: pointer; }
+.slot .tag { position: absolute; top: 4px; left: 4px; font: 13px/1 var(--mono); color: #fff; background: rgba(0,0,0,.55); padding: 4px 6px; border-radius: 3px; pointer-events: none; }
+.slot input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.transport { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; }
+#time { font: 15px/1.2 var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+#seek { padding: 0; border: 0; min-height: var(--tap); accent-color: var(--ink); }
+#play { min-width: 88px; }
+select { width: auto; }
+#rows li { flex-wrap: wrap; }
+#rows .name { flex: 1 1 100%; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#rows .ctl { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+#rows button { padding: 0 12px; min-width: 44px; }
+#rows .off { font: 16px/1 var(--mono); min-width: 64px; text-align: center; font-variant-numeric: tabular-nums; }
+#rows button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+#msg { min-height: 1.45em; margin: 0; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make an app that plays several videos side by side</h1>
+
+<main id="app" class="stack">
+  <div id="grid"></div>
+  <div class="transport">
+    <button id="play" class="primary">Play</button>
+    <input id="seek" type="range" min="0" max="0" step="0.01" value="0" aria-label="Position">
+    <span id="time">0:00.0</span>
+  </div>
+  <div class="row">
+    <label class="row"><span class="meta">speed</span>
+      <select id="speed" aria-label="Speed"><option>0.25</option><option>0.5</option><option selected>1</option><option>1.5</option><option>2</option></select></label>
+    <button id="addslot">+ slot</button>
+    <button id="full">Full screen</button>
+  </div>
+  <p id="msg" class="meta"></p>
+  <ul id="rows" class="plain"></ul>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  // storage helper — never throws
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+
+  const MAX = 4;
+  const grid = $('#grid'), rows = $('#rows'), playBtn = $('#play'), seek = $('#seek'), timeEl = $('#time'), msg = $('#msg');
+  let slots = [];          // { file, url, video, offset, muted }
+  let playing = false, seeking = false;
+  let rate = 1;
+
+  const say = (t) => { msg.textContent = t; };
+  const fmt = (s) => { s = Math.max(0, s); const m = Math.floor(s / 60); return m + ':' + (s % 60).toFixed(1).padStart(4, '0'); };
+  const fmtOff = (o) => (o >= 0 ? '+' : '−') + Math.abs(o).toFixed(1) + ' s';
+  const loaded = () => slots.filter(s => s.video);
+
+  function newSlot() { return { file: null, url: null, video: null, offset: 0, muted: true }; }
+  for (let i = 0; i < Math.min(MAX, +store.get('vsbs.slots', 2) || 2); i++) slots.push(newSlot());
+  if (!slots.length) slots.push(newSlot());
+
+  // master clock = video time minus its offset; the first loaded video leads
+  function masterTime() {
+    const l = loaded().find(s => !s.video.paused && !s.video.ended) || loaded()[0];
+    return l ? l.video.currentTime - l.offset : 0;
+  }
+  function length() {
+    const l = loaded().filter(s => isFinite(s.video.duration));
+    return l.length ? Math.max(...l.map(s => s.video.duration - s.offset)) : 0;
+  }
+
+  function place(s, t, hard) {
+    const v = s.video, want = t + s.offset;
+    if (!isFinite(v.duration)) return;
+    if (want < 0 || want >= v.duration) {
+      if (!v.paused) v.pause();
+      const edge = want < 0 ? 0 : v.duration;
+      if (hard || Math.abs(v.currentTime - edge) > 0.05) v.currentTime = edge;
+      return;
+    }
+    if (hard || Math.abs(v.currentTime - want) > 0.15) v.currentTime = want;
+    if (playing && v.paused) v.play().catch(() => {});
+  }
+  function seekAll(t) { loaded().forEach(s => place(s, t, true)); render(t); }
+
+  function play() {
+    if (!loaded().length) { say('Add a video first.'); return; }
+    let t = masterTime();
+    if (t >= length() - 0.05) t = 0;
+    playing = true; say('');
+    loaded().forEach(s => { s.video.playbackRate = rate; place(s, t, true); });
+    playBtn.textContent = 'Pause';
+  }
+  function pause() {
+    playing = false;
+    loaded().forEach(s => s.video.pause());
+    playBtn.textContent = 'Play';
+  }
+
+  function tick() {
+    if (loaded().length) {
+      const t = masterTime();
+      if (playing) {
+        if (t >= length() - 0.03) pause();
+        else loaded().forEach(s => place(s, t, false));
+      }
+      render(t);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function render(t) {
+    const len = length();
+    seek.max = len.toFixed(2);
+    if (!seeking) seek.value = Math.min(t, len).toFixed(2);
+    timeEl.textContent = fmt(t) + ' / ' + fmt(len);
+  }
+
+  function setFile(i, file) {
+    if (!file) return;
+    if (!/^video\/|^audio\//.test(file.type) && !/\.(mp4|m4v|mov|webm|mkv|ogv|avi)$/i.test(file.name)) { say('That is not a video file.'); return; }
+    const s = slots[i];
+    if (s.url) URL.revokeObjectURL(s.url);
+    s.file = file; s.url = URL.createObjectURL(file); s.offset = 0;
+    s.muted = loaded().some(o => o !== s && !o.muted);
+    const v = document.createElement('video');
+    v.src = s.url; v.preload = 'auto'; v.playsInline = true; v.muted = s.muted; v.playbackRate = rate;
+    v.addEventListener('error', () => say('Slot ' + (i + 1) + ': this browser cannot play that file.'));
+    v.addEventListener('loadedmetadata', () => { place(s, masterTime(), true); render(masterTime()); });
+    s.video = v;
+    say('');
+    build();
+  }
+
+  function addFiles(files) {
+    files = [...files];
+    for (const f of files) {
+      let i = slots.findIndex(s => !s.video);
+      if (i < 0 && slots.length < MAX) { slots.push(newSlot()); i = slots.length - 1; }
+      if (i < 0) { say('Four videos at most.'); break; }
+      setFile(i, f);
+    }
+  }
+
+  function build() {
+    pause();
+    store.set('vsbs.slots', slots.length);
+    grid.className = slots.length === 1 ? 'n1' : '';
+    grid.replaceChildren();
+    rows.replaceChildren();
+    $('#addslot').disabled = slots.length >= MAX;
+    slots.forEach((s, i) => {
+      if (s.video) {
+        const box = document.createElement('div');
+        box.className = 'slot';
+        box.append(s.video);
+        const tag = document.createElement('span'); tag.className = 'tag'; tag.textContent = i + 1;
+        box.append(tag);
+        grid.append(box);
+      } else {
+        const box = document.createElement('label');
+        box.className = 'slot empty';
+        box.innerHTML = '<span>' + (i + 1) + ' · choose video</span><input type="file" accept="video/*" multiple>';
+        $('input', box).addEventListener('change', (e) => { const f = [...e.target.files]; setFile(i, f[0]); if (f.length > 1) addFiles(f.slice(1)); });
+        grid.append(box);
+      }
+      const li = document.createElement('li');
+      li.className = 'row-' + (i + 1);
+      li.innerHTML = '<span class="name"></span><span class="ctl">' +
+        '<button class="minus" aria-label="Earlier">−</button><span class="off"></span><button class="plus" aria-label="Later">+</button>' +
+        '<button class="sound" aria-pressed="false">Sound</button><button class="remove">Remove</button></span>';
+      $('.name', li).textContent = (i + 1) + '  ' + (s.file ? s.file.name : 'empty');
+      $('.off', li).textContent = fmtOff(s.offset);
+      $('.sound', li).setAttribute('aria-pressed', String(!s.muted));
+      const nudge = (d) => {
+        s.offset = Math.round((s.offset + d) * 10) / 10;
+        $('.off', li).textContent = fmtOff(s.offset);
+        if (s.video) place(s, masterTime(), true);
+      };
+      $('.minus', li).onclick = () => nudge(-0.1);
+      $('.plus', li).onclick = () => nudge(0.1);
+      $('.sound', li).onclick = () => {
+        s.muted = !s.muted;
+        if (s.video) s.video.muted = s.muted;
+        $('.sound', li).setAttribute('aria-pressed', String(!s.muted));
+      };
+      $('.remove', li).onclick = () => {
+        if (s.url) URL.revokeObjectURL(s.url);
+        if (slots.length > 1) slots.splice(i, 1); else slots[i] = newSlot();
+        build();
+      };
+      rows.append(li);
+    });
+    render(masterTime());
+  }
+
+  playBtn.onclick = () => (playing ? pause() : play());
+  seek.addEventListener('input', () => { seeking = true; seekAll(+seek.value); });
+  seek.addEventListener('change', () => { seeking = false; });
+  $('#speed').onchange = (e) => { rate = +e.target.value; loaded().forEach(s => { s.video.playbackRate = rate; }); };
+  $('#addslot').onclick = () => { if (slots.length < MAX) { slots.push(newSlot()); build(); } };
+  $('#full').onclick = () => {
+    if (!loaded().length) { say('Add a video first.'); return; }
+    const req = grid.requestFullscreen || grid.webkitRequestFullscreen;
+    if (req) Promise.resolve(req.call(grid)).catch(() => say('Full screen is not available here.'));
+    else say('Full screen is not available here.');
+  };
+  document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' && !/INPUT|SELECT|BUTTON/.test(e.target.tagName)) { e.preventDefault(); playing ? pause() : play(); }
+  });
+  // drop files anywhere
+  document.addEventListener('dragover', (e) => e.preventDefault());
+  document.addEventListener('drop', (e) => { e.preventDefault(); if (e.dataTransfer.files.length) addFiles(e.dataTransfer.files); });
+
+  build();
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

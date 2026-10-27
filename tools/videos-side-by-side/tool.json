@@ -1,0 +1,58 @@
+{
+  "slug": "videos-side-by-side",
+  "wish": "someone should make an app that plays several videos side by side",
+  "year": 2014,
+  "agreed": 21,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/20359/showing-multiple-videos-at-once",
+      "date": "2015-06-16",
+      "points": 7,
+      "comments": 4
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/10105/playing-multiple-video-files-side-by-side",
+      "date": "2014-07-24",
+      "points": 6,
+      "comments": 4
+    }
+  ],
+  "spec": "Plays up to four of your own video files side by side in a grid, locked to one shared play button, scrubber and speed.\nTap a slot to pick a file (or drop files), nudge each video earlier or later in 0.1 s steps to line them up, choose which ones have sound, go full screen.\nDoes not upload anything, does not play links from websites, and does not remember files between visits.",
+  "tests": [
+    {
+      "tap": "#play"
+    },
+    {
+      "expect": {
+        "sel": "#msg",
+        "contains": "Add a video first"
+      }
+    },
+    {
+      "tap": "#addslot"
+    },
+    {
+      "expect": {
+        "count": 3,
+        "sel": ".slot"
+      }
+    },
+    {
+      "tap": ".row-2 .plus"
+    },
+    {
+      "expect": {
+        "sel": ".row-2 .off",
+        "contains": "+0.1 s"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T02:04:27Z",
+  "model": "opus-5.5",
+  "minutes": 3,
+  "approved": false,
+  "notes": "CSP media-src extended with blob: so local files picked by the user can play; still zero network."
+}
