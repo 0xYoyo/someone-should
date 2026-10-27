@@ -1782,23 +1782,6 @@
    "spec_hint": "One full-page text area that saves itself on the device; word count; nothing else."
   },
   {
-   "slug": "programmer-calculator",
-   "wish": "someone should make a calculator for programmers",
-   "year": 2015,
-   "agreed": 13,
-   "category": "dev",
-   "sources": [
-    {
-     "site": "se",
-     "url": "https://softwarerecs.stackexchange.com/questions/26241/windows-calculator-for-programmers",
-     "date": "2015-11-05",
-     "points": 11,
-     "comments": 2
-    }
-   ],
-   "spec_hint": "Calculator showing hex, decimal, octal and binary at once with bitwise ops, shifts and word sizes."
-  },
-  {
    "slug": "text-diff",
    "wish": "someone should make a tool that diffs two texts pasted into it",
    "year": 2014,
@@ -1888,40 +1871,6 @@
    "spec_hint": "Pick an ingredient and amount; converts grams to cups, mL and spoons using ingredient densities."
   },
   {
-   "slug": "base64-hex-converter",
-   "wish": "someone should make a tool that converts between base64 and hex",
-   "year": 2014,
-   "agreed": 13,
-   "category": "dev",
-   "sources": [
-    {
-     "site": "se",
-     "url": "https://softwarerecs.stackexchange.com/questions/7382/library-to-convert-between-base64-hex-for-c",
-     "date": "2014-06-29",
-     "points": 9,
-     "comments": 4
-    }
-   ],
-   "spec_hint": "Paste base64, hex or text; converts between all three live, with file input too."
-  },
-  {
-   "slug": "json-csv-xml-converter",
-   "wish": "someone should make a tool that converts structured text like XML, JSON and CSV",
-   "year": 2014,
-   "agreed": 13,
-   "category": "data",
-   "sources": [
-    {
-     "site": "se",
-     "url": "https://softwarerecs.stackexchange.com/questions/9859/library-for-transforming-structured-text-files-xml-to-json-or-json-to-csv",
-     "date": "2014-07-16",
-     "points": 11,
-     "comments": 2
-    }
-   ],
-   "spec_hint": "Paste or open JSON, CSV, XML or YAML; converts to any of the others; download the result."
-  },
-  {
    "slug": "html-to-markdown",
    "wish": "someone should make a tool that converts HTML to Markdown",
    "year": 2014,
@@ -1977,72 +1926,151 @@
    "spec_hint": "Set work and break lengths; full-screen break prompt with countdown that is hard to skip; eye-rest tips."
   },
   {
-   "slug": "timer-and-stopwatch",
-   "wish": "someone should make an app that is a nice-looking timer and stopwatch",
-   "year": 2017,
-   "agreed": 29,
-   "category": "time",
+   "slug": "identical-image-check",
+   "wish": "someone should make a tool that checks whether two images are exactly the same",
+   "year": 2014,
+   "agreed": 51,
+   "category": "photo",
    "sources": [
     {
      "site": "se",
-     "url": "https://softwarerecs.stackexchange.com/questions/43145/timer-stopwatch-for-windows-that-looks-nice-and-is-always-on-top-or-in-the-tas",
-     "date": "2017-06-22",
-     "points": 22,
-     "comments": 7
+     "url": "https://softwarerecs.stackexchange.com/questions/9774/command-line-tool-to-check-whether-two-images-are-exactly-the-same-graphically",
+     "date": "2014-07-13",
+     "points": 32,
+     "comments": 8
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/51032/compare-two-image-files-for-identical-data-excluding-metadata",
+     "date": "2018-07-08",
+     "points": 6,
+     "comments": 5
     }
    ],
-   "spec_hint": "A clean countdown timer and stopwatch with laps, big digits and a sound at zero."
+   "spec_hint": "Load two images; reports whether their pixels are exactly identical, ignoring metadata."
   },
   {
-   "slug": "plain-todo-list",
-   "wish": "someone should make a to-do list app",
+   "slug": "small-svg-editor",
+   "wish": "someone should make a standalone SVG editor",
    "year": 2014,
-   "agreed": 12,
-   "category": "everyday",
+   "agreed": 49,
+   "category": "design",
    "sources": [
     {
      "site": "se",
-     "url": "https://softwarerecs.stackexchange.com/questions/2620/simple-mac-to-do-list",
-     "date": "2014-03-22",
-     "points": 10,
+     "url": "https://softwarerecs.stackexchange.com/questions/46362/a-standalone-svg-editor",
+     "date": "2017-10-12",
+     "points": 39,
+     "comments": 5
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/2035/vector-drawing-app-for-android",
+     "date": "2014-03-06",
+     "points": 5,
+     "comments": 0
+    }
+   ],
+   "spec_hint": "Draw and edit SVG shapes, paths and text; edit attributes; open and save .svg files."
+  },
+  {
+   "slug": "neural-network-diagram",
+   "wish": "someone should make a tool that draws convolutional neural network diagrams",
+   "year": 2016,
+   "agreed": 49,
+   "category": "design",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/28169/drawing-convolutional-neural-networks",
+     "date": "2016-01-20",
+     "points": 38,
+     "comments": 3
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/47841/drawing-neural-networks",
+     "date": "2017-12-29",
+     "points": 6,
      "comments": 2
     }
    ],
-   "spec_hint": "Add, check off, reorder and delete tasks; saved on the device; nothing else."
+   "spec_hint": "List layers with sizes; draws a convolutional network block diagram; export SVG."
   },
   {
-   "slug": "pomodoro-timer",
-   "wish": "someone should make a pomodoro timer",
+   "slug": "split-scanned-photos",
+   "wish": "someone should make a tool that crops a scan of several photos into separate images",
    "year": 2014,
-   "agreed": 8,
-   "category": "time",
+   "agreed": 21,
+   "category": "photo",
    "sources": [
     {
      "site": "se",
-     "url": "https://softwarerecs.stackexchange.com/questions/3961/pomodoro-technique-timer-assistant-for-windows",
-     "date": "2014-05-08",
+     "url": "https://softwarerecs.stackexchange.com/questions/13152/automatically-crop-a-scan-of-multiple-photos",
+     "date": "2014-10-13",
      "points": 7,
-     "comments": 1
+     "comments": 4
+    },
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/21056/program-to-cutsave-rectangles-out-of-a-scanned-document",
+     "date": "2015-07-10",
+     "points": 7,
+     "comments": 3
     }
    ],
-   "spec_hint": "25-minute work and 5-minute break cycles with adjustable lengths, sound and a count of rounds."
+   "spec_hint": "Load a scan of several photos; detects or lets you draw each one; saves them as separate images."
   },
   {
-   "slug": "unit-converter",
-   "wish": "someone should make a universal unit conversion app",
+   "slug": "where-did-i-put-it",
+   "wish": "someone should make an app that reminds me where I put things",
    "year": 2016,
-   "agreed": 10,
-   "category": "math",
+   "agreed": 13,
+   "category": "everyday",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=10873151",
+     "date": "2016-01-09",
+     "points": 5,
+     "comments": 8
+    }
+   ],
+   "spec_hint": "Log an item and where it is; search to find it; saved on the device."
+  },
+  {
+   "slug": "private-workout-log",
+   "wish": "someone should make an app that tracks my fitness without storing data online",
+   "year": 2014,
+   "agreed": 16,
+   "category": "health",
    "sources": [
     {
      "site": "se",
-     "url": "https://softwarerecs.stackexchange.com/questions/29789/universal-unit-conversion-application",
-     "date": "2016-02-15",
-     "points": 6,
-     "comments": 4
+     "url": "https://softwarerecs.stackexchange.com/questions/13810/fitness-tracking-software-that-doesnt-store-data-online",
+     "date": "2014-11-10",
+     "points": 13,
+     "comments": 3
     }
    ],
-   "spec_hint": "Convert length, mass, volume, temperature, area, speed, time and data units as you type."
+   "spec_hint": "Log workouts with exercise, sets, reps and weight; progress charts; data stays on the device."
+  },
+  {
+   "slug": "qr-contact-card",
+   "wish": "someone should make an app that makes QR codes to swap contact info",
+   "year": 2023,
+   "agreed": 11,
+   "category": "social",
+   "sources": [
+    {
+     "site": "hn",
+     "url": "https://news.ycombinator.com/item?id=35227730",
+     "date": "2023-03-20",
+     "points": 3,
+     "comments": 8
+    }
+   ],
+   "spec_hint": "Enter name, phone and email; makes a vCard QR code someone else can scan."
   }
  ],
  "reserve": [
@@ -2183,23 +2211,6 @@
    "spec_hint": "Generates a map of polygon regions; paint terrain and name regions; export PNG."
   },
   {
-   "slug": "where-did-i-put-it",
-   "wish": "someone should make an app that reminds me where I put things",
-   "year": 2016,
-   "agreed": 13,
-   "category": "everyday",
-   "sources": [
-    {
-     "site": "hn",
-     "url": "https://news.ycombinator.com/item?id=10873151",
-     "date": "2016-01-09",
-     "points": 5,
-     "comments": 8
-    }
-   ],
-   "spec_hint": "Log an item and where it is; search to find it; saved on the device."
-  },
-  {
    "slug": "memory-and-focus-drills",
    "wish": "someone should make an app that trains perception, cognition and memory",
    "year": 2014,
@@ -2268,30 +2279,6 @@
    "spec_hint": "Type the alarm time on number keys; big clock and an alarm sound while the page is open."
   },
   {
-   "slug": "small-svg-editor",
-   "wish": "someone should make a standalone SVG editor",
-   "year": 2014,
-   "agreed": 49,
-   "category": "design",
-   "sources": [
-    {
-     "site": "se",
-     "url": "https://softwarerecs.stackexchange.com/questions/46362/a-standalone-svg-editor",
-     "date": "2017-10-12",
-     "points": 39,
-     "comments": 5
-    },
-    {
-     "site": "se",
-     "url": "https://softwarerecs.stackexchange.com/questions/2035/vector-drawing-app-for-android",
-     "date": "2014-03-06",
-     "points": 5,
-     "comments": 0
-    }
-   ],
-   "spec_hint": "Draw and edit SVG shapes, paths and text; edit attributes; open and save .svg files."
-  },
-  {
    "slug": "xml-diff",
    "wish": "someone should make a tool that diffs XML files",
    "year": 2015,
@@ -2341,30 +2328,6 @@
     }
    ],
    "spec_hint": "Open an Apache access log; parsed table with filters, top paths, status codes and hourly chart."
-  },
-  {
-   "slug": "identical-image-check",
-   "wish": "someone should make a tool that checks whether two images are exactly the same",
-   "year": 2014,
-   "agreed": 51,
-   "category": "photo",
-   "sources": [
-    {
-     "site": "se",
-     "url": "https://softwarerecs.stackexchange.com/questions/9774/command-line-tool-to-check-whether-two-images-are-exactly-the-same-graphically",
-     "date": "2014-07-13",
-     "points": 32,
-     "comments": 8
-    },
-    {
-     "site": "se",
-     "url": "https://softwarerecs.stackexchange.com/questions/51032/compare-two-image-files-for-identical-data-excluding-metadata",
-     "date": "2018-07-08",
-     "points": 6,
-     "comments": 5
-    }
-   ],
-   "spec_hint": "Load two images; reports whether their pixels are exactly identical, ignoring metadata."
   },
   {
    "slug": "tree-of-notes",
@@ -2430,30 +2393,6 @@
     }
    ],
    "spec_hint": "Type tables and fields in a short text syntax; draws an entity-relationship diagram; export SVG."
-  },
-  {
-   "slug": "neural-network-diagram",
-   "wish": "someone should make a tool that draws convolutional neural network diagrams",
-   "year": 2016,
-   "agreed": 49,
-   "category": "design",
-   "sources": [
-    {
-     "site": "se",
-     "url": "https://softwarerecs.stackexchange.com/questions/28169/drawing-convolutional-neural-networks",
-     "date": "2016-01-20",
-     "points": 38,
-     "comments": 3
-    },
-    {
-     "site": "se",
-     "url": "https://softwarerecs.stackexchange.com/questions/47841/drawing-neural-networks",
-     "date": "2017-12-29",
-     "points": 6,
-     "comments": 2
-    }
-   ],
-   "spec_hint": "List layers with sizes; draws a convolutional network block diagram; export SVG."
   },
   {
    "slug": "tech-tree-diagram",
@@ -2572,30 +2511,6 @@
    "spec_hint": "Select many images; resize to a max size or percent and recompress; download them all."
   },
   {
-   "slug": "split-scanned-photos",
-   "wish": "someone should make a tool that crops a scan of several photos into separate images",
-   "year": 2014,
-   "agreed": 21,
-   "category": "photo",
-   "sources": [
-    {
-     "site": "se",
-     "url": "https://softwarerecs.stackexchange.com/questions/13152/automatically-crop-a-scan-of-multiple-photos",
-     "date": "2014-10-13",
-     "points": 7,
-     "comments": 4
-    },
-    {
-     "site": "se",
-     "url": "https://softwarerecs.stackexchange.com/questions/21056/program-to-cutsave-rectangles-out-of-a-scanned-document",
-     "date": "2015-07-10",
-     "points": 7,
-     "comments": 3
-    }
-   ],
-   "spec_hint": "Load a scan of several photos; detects or lets you draw each one; saves them as separate images."
-  },
-  {
    "slug": "blur-screenshot-text",
    "wish": "someone should make a tool that smears or blurs text in a screenshot",
    "year": 2014,
@@ -2630,23 +2545,6 @@
    "spec_hint": "Load a sprite or icon sheet; set grid or detect icons; download each as its own PNG."
   },
   {
-   "slug": "qr-contact-card",
-   "wish": "someone should make an app that makes QR codes to swap contact info",
-   "year": 2023,
-   "agreed": 11,
-   "category": "social",
-   "sources": [
-    {
-     "site": "hn",
-     "url": "https://news.ycombinator.com/item?id=35227730",
-     "date": "2023-03-20",
-     "points": 3,
-     "comments": 8
-    }
-   ],
-   "spec_hint": "Enter name, phone and email; makes a vCard QR code someone else can scan."
-  },
-  {
    "slug": "home-library-catalog",
    "wish": "someone should make an app for managing a library of books",
    "year": 2014,
@@ -2669,23 +2567,6 @@
     }
    ],
    "spec_hint": "Add books with title, author, location and loaned-to; search and sort; export CSV."
-  },
-  {
-   "slug": "private-workout-log",
-   "wish": "someone should make an app that tracks my fitness without storing data online",
-   "year": 2014,
-   "agreed": 16,
-   "category": "health",
-   "sources": [
-    {
-     "site": "se",
-     "url": "https://softwarerecs.stackexchange.com/questions/13810/fitness-tracking-software-that-doesnt-store-data-online",
-     "date": "2014-11-10",
-     "points": 13,
-     "comments": 3
-    }
-   ],
-   "spec_hint": "Log workouts with exercise, sets, reps and weight; progress charts; data stays on the device."
   },
   {
    "slug": "sun-position-finder",
@@ -2788,6 +2669,125 @@
     }
    ],
    "spec_hint": "Open an audio file; loops it or a selected section with no gap."
+  },
+  {
+   "slug": "programmer-calculator",
+   "wish": "someone should make a calculator for programmers",
+   "year": 2015,
+   "agreed": 13,
+   "category": "dev",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/26241/windows-calculator-for-programmers",
+     "date": "2015-11-05",
+     "points": 11,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "Calculator showing hex, decimal, octal and binary at once with bitwise ops, shifts and word sizes."
+  },
+  {
+   "slug": "base64-hex-converter",
+   "wish": "someone should make a tool that converts between base64 and hex",
+   "year": 2014,
+   "agreed": 13,
+   "category": "dev",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/7382/library-to-convert-between-base64-hex-for-c",
+     "date": "2014-06-29",
+     "points": 9,
+     "comments": 4
+    }
+   ],
+   "spec_hint": "Paste base64, hex or text; converts between all three live, with file input too."
+  },
+  {
+   "slug": "json-csv-xml-converter",
+   "wish": "someone should make a tool that converts structured text like XML, JSON and CSV",
+   "year": 2014,
+   "agreed": 13,
+   "category": "data",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/9859/library-for-transforming-structured-text-files-xml-to-json-or-json-to-csv",
+     "date": "2014-07-16",
+     "points": 11,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "Paste or open JSON, CSV, XML or YAML; converts to any of the others; download the result."
+  },
+  {
+   "slug": "timer-and-stopwatch",
+   "wish": "someone should make an app that is a nice-looking timer and stopwatch",
+   "year": 2017,
+   "agreed": 29,
+   "category": "time",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/43145/timer-stopwatch-for-windows-that-looks-nice-and-is-always-on-top-or-in-the-tas",
+     "date": "2017-06-22",
+     "points": 22,
+     "comments": 7
+    }
+   ],
+   "spec_hint": "A clean countdown timer and stopwatch with laps, big digits and a sound at zero."
+  },
+  {
+   "slug": "plain-todo-list",
+   "wish": "someone should make a to-do list app",
+   "year": 2014,
+   "agreed": 12,
+   "category": "everyday",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/2620/simple-mac-to-do-list",
+     "date": "2014-03-22",
+     "points": 10,
+     "comments": 2
+    }
+   ],
+   "spec_hint": "Add, check off, reorder and delete tasks; saved on the device; nothing else."
+  },
+  {
+   "slug": "pomodoro-timer",
+   "wish": "someone should make a pomodoro timer",
+   "year": 2014,
+   "agreed": 8,
+   "category": "time",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/3961/pomodoro-technique-timer-assistant-for-windows",
+     "date": "2014-05-08",
+     "points": 7,
+     "comments": 1
+    }
+   ],
+   "spec_hint": "25-minute work and 5-minute break cycles with adjustable lengths, sound and a count of rounds."
+  },
+  {
+   "slug": "unit-converter",
+   "wish": "someone should make a universal unit conversion app",
+   "year": 2016,
+   "agreed": 10,
+   "category": "math",
+   "sources": [
+    {
+     "site": "se",
+     "url": "https://softwarerecs.stackexchange.com/questions/29789/universal-unit-conversion-application",
+     "date": "2016-02-15",
+     "points": 6,
+     "comments": 4
+    }
+   ],
+   "spec_hint": "Convert length, mass, volume, temperature, area, speed, time and data units as you type."
   }
  ],
  "no": [
