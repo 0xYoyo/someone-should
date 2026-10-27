@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app that shows guitar chord fingering charts with alternate symbols</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+#q { font-size: 22px; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chips button { padding: 0 12px; min-width: 44px; }
+#name { font-size: 28px; font-weight: 500; line-height: 1.2; }
+#full, #notes { color: var(--meta); }
+#aliases { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+#aliases li { border: 1.5px solid var(--line); border-radius: var(--radius); padding: 4px 10px; font-family: var(--mono); font-size: 17px; }
+#grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.diagram { display: grid; justify-items: center; gap: 4px; padding: 8px 4px; height: auto; border-color: var(--line); }
+.diagram.on { border-color: var(--ink); }
+.diagram svg { width: 140px; height: auto; display: block; overflow: visible; }
+.diagram svg text { font: 16px var(--mono); fill: var(--ink); }
+.diagram svg .fg { fill: var(--paper); font-size: 15px; font-weight: 600; }
+.diagram svg .ln { stroke: var(--ink); }
+.diagram svg .dot { fill: var(--ink); }
+.diagram .tab { font: 16px var(--mono); color: var(--meta); letter-spacing: 0; overflow-wrap: anywhere; }
+#err { min-height: 0; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make an app that shows guitar chord fingering charts with alternate symbols</h1>
+
+<main id="app" class="stack">
+  <input id="q" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Chord name" placeholder="Am7, F#m7b5, BbΔ7, C/G">
+  <div class="chips" id="picks"></div>
+  <p id="err" class="empty" hidden></p>
+  <section id="out" class="stack">
+    <div>
+      <div id="name"></div>
+      <div id="full"></div>
+      <div id="notes" class="meta"></div>
+    </div>
+    <div class="stack" style="gap:6px">
+      <div class="meta">also written</div>
+      <ul id="aliases"></ul>
+    </div>
+    <div class="meta">tap a chart to hear it</div>
+    <div id="grid"></div>
+  </section>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  // storage helper — never throws
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  const SHARP = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+  const FLAT  = ['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
+  const LETTER = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+  const TUNING = [40, 45, 50, 55, 59, 64]; // E2 A2 D3 G3 B3 E4, low to high
+
+  // tones: semitones from root. need: tones that must sound. Aliases: first is the display name.
+  const Q = [
+    { id: 'maj', full: 'major', tones: [0,4,7], need: [0,4,7], al: ['', 'maj', 'M', 'major'] },
+    { id: 'm', full: 'minor', tones: [0,3,7], need: [0,3,7], al: ['m', 'min', '-', 'mi', 'minor'] },
+    { id: '5', full: 'power chord (no third)', tones: [0,7], need: [0,7], al: ['5', '(no3)'], min: 3 },
+    { id: '7', full: 'dominant seventh', tones: [0,4,7,10], need: [0,4,10], al: ['7', 'dom7', 'dom'] },
+    { id: 'maj7', full: 'major seventh', tones: [0,4,7,11], need: [0,4,11], al: ['maj7', 'M7', 'Δ7', 'Δ', 'ma7', 'j7', 'major7'] },
+    { id: 'm7', full: 'minor seventh', tones: [0,3,7,10], need: [0,3,10], al: ['m7', 'min7', '-7', 'mi7', 'minor7'] },
+    { id: 'mM7', full: 'minor major seventh', tones: [0,3,7,11], need: [0,3,11], al: ['m(maj7)', 'mM7', 'mmaj7', 'minmaj7', '-Δ7', 'mΔ7', '-maj7'] },
+    { id: 'm7b5', full: 'half-diminished seventh', tones: [0,3,6,10], need: [0,3,6,10], al: ['m7b5', 'ø7', 'ø', '-7b5', 'min7b5', 'm7(b5)', 'mi7b5'] },
+    { id: 'dim', full: 'diminished triad', tones: [0,3,6], need: [0,3,6], al: ['dim', '°', 'o', 'mb5', 'm(b5)'] },
+    { id: 'dim7', full: 'diminished seventh', tones: [0,3,6,9], need: [0,3,6,9], al: ['dim7', '°7', 'o7'] },
+    { id: 'aug', full: 'augmented triad', tones: [0,4,8], need: [0,4,8], al: ['aug', '+', '#5', '(#5)', '+5'] },
+    { id: 'aug7', full: 'augmented seventh', tones: [0,4,8,10], need: [0,4,8,10], al: ['7#5', '+7', 'aug7', '7(#5)', '7+5'] },
+    { id: 'sus4', full: 'suspended fourth', tones: [0,5,7], need: [0,5,7], al: ['sus4', 'sus'] },
+    { id: 'sus2', full: 'suspended second', tones: [0,2,7], need: [0,2,7], al: ['sus2'] },
+    { id: '7sus4', full: 'dominant seventh, suspended fourth', tones: [0,5,7,10], need: [0,5,10], al: ['7sus4', '7sus', '7(sus4)'] },
+    { id: '6', full: 'major sixth', tones: [0,4,7,9], need: [0,4,9], al: ['6', 'maj6', 'M6', 'add6'] },
+    { id: 'm6', full: 'minor sixth', tones: [0,3,7,9], need: [0,3,9], al: ['m6', 'min6', '-6', 'mi6'] },
+    { id: '69', full: 'six-nine', tones: [0,4,7,9,2], need: [0,4,9,2], al: ['6/9', '69', '6add9', 'M6/9'] },
+    { id: 'add9', full: 'added ninth', tones: [0,4,7,2], need: [0,4,2], al: ['add9', 'add2', '(add9)', '2'] },
+    { id: 'madd9', full: 'minor added ninth', tones: [0,3,7,2], need: [0,3,2], al: ['m(add9)', 'madd9', 'madd2', '-add9', 'm2'] },
+    { id: '9', full: 'dominant ninth', tones: [0,4,7,10,2], need: [0,4,10,2], al: ['9', 'dom9', '7(9)'] },
+    { id: 'maj9', full: 'major ninth', tones: [0,4,7,11,2], need: [0,4,11,2], al: ['maj9', 'M9', 'Δ9', 'ma9'] },
+    { id: 'm9', full: 'minor ninth', tones: [0,3,7,10,2], need: [0,3,10,2], al: ['m9', 'min9', '-9', 'mi9'] },
+    { id: '7b9', full: 'dominant seventh, flat nine', tones: [0,4,7,10,1], need: [0,4,10,1], al: ['7b9', '7(b9)', '7-9'] },
+    { id: '7#9', full: 'dominant seventh, sharp nine', tones: [0,4,7,10,3], need: [0,4,10,3], al: ['7#9', '7(#9)', '7+9'] },
+    { id: '11', full: 'dominant eleventh', tones: [0,7,10,2,5], need: [0,10,5], al: ['11', '9sus4', '9sus'] },
+    { id: 'm11', full: 'minor eleventh', tones: [0,3,7,10,5], need: [0,3,10,5], al: ['m11', 'min11', '-11'] },
+    { id: '13', full: 'dominant thirteenth', tones: [0,4,7,10,9], need: [0,4,10,9], al: ['13', '7(13)', '7add13'] },
+  ];
+  const NAMES = ['root','b9','9','m3','3','4','b5','5','#5','6','b7','7'];
+
+  // lookup: exact first, then case-insensitive for multi-letter aliases
+  const exact = new Map(), loose = new Map();
+  for (const q of Q) for (const a of q.al) {
+    exact.set(a.replace(/[()]/g, ''), q);
+    if (a.length > 2 && !loose.has(a.toLowerCase().replace(/[()]/g, ''))) loose.set(a.toLowerCase().replace(/[()]/g, ''), q);
+  }
+
+  function parseRoot(s) {
+    const m = /^([A-Ga-g])([#b]?)/.exec(s);
+    if (!m) return null;
+    let pc = LETTER[m[1].toUpperCase()] + (m[2] === '#' ? 1 : m[2] === 'b' ? -1 : 0);
+    return { pc: (pc + 12) % 12, text: m[1].toUpperCase() + m[2], len: m[0].length };
+  }
+
+  function parse(raw) {
+    let s = raw.trim().replace(/\s+/g, '').replace(/♯/g, '#').replace(/♭/g, 'b').replace(/△/g, 'Δ').replace(/º/g, '°');
+    if (!s) return { empty: true };
+    const root = parseRoot(s);
+    if (!root) return { error: 'Start with a note name, A to G.' };
+    let rest = s.slice(root.len), bass = null;
+    const slash = rest.match(/\/([A-Ga-g][#b]?)$/);
+    if (slash) { bass = parseRoot(slash[1]); rest = rest.slice(0, -slash[0].length); }
+    const key = rest.replace(/[()]/g, '');
+    const q = exact.get(key) || loose.get(key.toLowerCase());
+    if (!q) return { error: 'Unknown chord type "' + rest + '".' };
+    return { root, q, bass };
+  }
+
+  const useFlats = r => /b/.test(r.text) || r.text === 'F';
+  const spell = (pc, flats) => (flats ? FLAT : SHARP)[(pc + 12) % 12];
+  function enharmonic(r) {
+    const s = SHARP[r.pc], f = FLAT[r.pc];
+    if (s === f) return null;
+    return r.text === s ? f : r.text === f ? s : null;
+  }
+
+  // find playable voicings by scanning 4-fret windows up the neck
+  function voicings(rootPc, q, bassPc) {
+    const tones = new Set(q.tones.map(t => (rootPc + t) % 12));
+    if (bassPc != null) tones.add(bassPc);
+    const need = q.need.map(t => (rootPc + t) % 12);
+    if (bassPc != null) need.push(bassPc);
+    const bass = bassPc != null ? bassPc : rootPc;
+    const minStrings = q.min || (need.length >= 5 ? 5 : 4);
+    const found = new Map();
+    for (let base = 1; base <= 12; base++) {
+      const opts = TUNING.map(open => {
+        const o = [-1];
+        if (tones.has(open % 12)) o.push(0);
+        for (let f = base; f < base + 4; f++) if (tones.has((open + f) % 12)) o.push(f);
+        return o;
+      });
+      const cur = [];
+      (function walk(i) {
+        if (i === 6) { consider(cur.slice()); return; }
+        for (const f of opts[i]) { cur[i] = f; walk(i + 1); }
+      })(0);
+    }
+    function consider(fr) {
+      const played = fr.map((f, i) => f >= 0 ? i : -1).filter(i => i >= 0);
+      if (played.length < Math.min(minStrings, 6)) return;
+      const lo = played[0], hi = played[played.length - 1];
+      if (hi - lo + 1 !== played.length) return; // no muted strings inside
+      if ((TUNING[lo] + fr[lo]) % 12 !== bass) return;
+      const pcs = new Set(played.map(i => (TUNING[i] + fr[i]) % 12));
+      if (!need.every(p => pcs.has(p))) return;
+      const fretted = played.filter(i => fr[i] > 0);
+      if (fretted.length) {
+        const fs = fretted.map(i => fr[i]);
+        const mn = Math.min(...fs), mx = Math.max(...fs);
+        if (mx - mn > 3) return;
+        if (fr.includes(0) && mx > 4) return; // open strings only near the nut
+        if (fingering(fr) == null) return;
+      }
+      const k = fr.join(',');
+      if (!found.has(k)) found.set(k, fr);
+    }
+    const scored = [...found.values()].map(fr => ({ fr, s: score(fr) })).sort((a, b) => b.s - a.s);
+    const pick = [];
+    for (const c of scored) {
+      // skip shapes that are just a better one with strings muted
+      if (pick.some(p => p.fr.every((f, i) => c.fr[i] === f || c.fr[i] === -1))) continue;
+      if (pick.some(p => pos(p.fr) === pos(c.fr) && p.fr.filter((f, i) => f !== c.fr[i]).length <= 1)) continue;
+      pick.push(c);
+      if (pick.length === 6) break;
+    }
+    return pick.map(p => p.fr).sort((a, b) => pos(a) - pos(b));
+  }
+  const pos = fr => { const f = fr.filter(x => x > 0); return f.length ? Math.min(...f) : 0; };
+  function score(fr) {
+    const played = fr.filter(f => f >= 0).length;
+    const fretted = fr.filter(f => f > 0);
+    const opens = fr.filter(f => f === 0).length;
+    const p = pos(fr);
+    const span = fretted.length ? Math.max(...fretted) - Math.min(...fretted) : 0;
+    const fing = fingering(fr);
+    return played * 3 - p * 0.6 - span * 1.2 + (p <= 4 ? opens * 1.5 : -opens * 2) + (fr[5] >= 0 ? 2 : 0) - (fing && fing.barre ? 1.5 : 0);
+  }
+
+  // returns {fingers: [per string], barre: {fret, from, to}} or null if it needs more than four fingers
+  function fingering(fr) {
+    const idx = fr.map((f, i) => f > 0 ? i : -1).filter(i => i >= 0);
+    const out = fr.map(() => 0);
+    if (!idx.length) return { fingers: out, barre: null };
+    const mn = Math.min(...idx.map(i => fr[i]));
+    const assign = (list, start) => {
+      list.sort((a, b) => fr[a] - fr[b] || a - b);
+      let n = start;
+      for (const i of list) out[i] = n++;
+      return n - 1 <= 4;
+    };
+    if (idx.length <= 4) return assign(idx.slice(), 1) ? { fingers: out, barre: null } : null;
+    const atMin = idx.filter(i => fr[i] === mn);
+    if (atMin.length < 2) return null;
+    const from = atMin[0], to = atMin[atMin.length - 1];
+    for (let i = from; i <= to; i++) if (fr[i] < mn) return null; // barre would block an open or muted string
+    for (const i of atMin) out[i] = 1;
+    const others = idx.filter(i => fr[i] > mn);
+    if (others.length > 3) return null;
+    assign(others, 2);
+    return { fingers: out, barre: { fret: mn, from, to } };
+  }
+
+  // SVG built as markup; the HTML parser puts it in the SVG namespace
+  function el(tag, attrs, text) {
+    let a = '';
+    for (const k in attrs) a += ` ${k}="${attrs[k]}"`;
+    return text == null ? `<${tag}${a}/>` : `<${tag}${a}>${text}</${tag}>`;
+  }
+  function diagram(fr) {
+    const fing = fingering(fr);
+    const fretted = fr.filter(f => f > 0);
+    const mx = fretted.length ? Math.max(...fretted) : 0;
+    const start = mx <= 4 ? 1 : Math.min(...fretted);
+    const L = 36, T = 34, SX = 20, FY = 26, ROWS = 4;
+    const W = L + SX * 5 + 14, H = T + FY * ROWS + 6;
+    const svg = [];
+    for (let s = 0; s < 6; s++) svg.push(el('line', { class: 'ln', x1: L + s * SX, x2: L + s * SX, y1: T, y2: T + FY * ROWS, 'stroke-width': 1.2 }));
+    for (let r = 0; r <= ROWS; r++) svg.push(el('line', { class: 'ln', x1: L, x2: L + SX * 5, y1: T + r * FY, y2: T + r * FY, 'stroke-width': r === 0 && start === 1 ? 5 : 1.2 }));
+    if (start > 1) svg.push(el('text', { x: L - 15, y: T + FY / 2 + 6, 'text-anchor': 'end' }, String(start)));
+    if (fing && fing.barre && fing.barre.to > fing.barre.from) {
+      const y = T + (fing.barre.fret - start + 0.5) * FY;
+      svg.push(el('rect', { class: 'dot', x: L + fing.barre.from * SX - 9, y: y - 9, width: (fing.barre.to - fing.barre.from) * SX + 18, height: 18, rx: 9 }));
+    }
+    fr.forEach((f, s) => {
+      const x = L + s * SX;
+      if (f < 0) svg.push(el('text', { x, y: T - 10, 'text-anchor': 'middle' }, '×'));
+      else if (f === 0) svg.push(el('circle', { cx: x, cy: T - 15, r: 6, fill: 'none', class: 'ln', 'stroke-width': 1.5 }));
+      else {
+        const y = T + (f - start + 0.5) * FY;
+        svg.push(el('circle', { class: 'dot', cx: x, cy: y, r: 9.5 }));
+        if (fing) svg.push(el('text', { class: 'fg', x, y: y + 5, 'text-anchor': 'middle' }, String(fing.fingers[s])));
+      }
+    });
+    return `<svg viewBox="0 0 ${W} ${H}" aria-hidden="true">${svg.join('')}</svg>`;
+  }
+
+  // plucked-string strum, created on first tap only
+  let ac = null;
+  function strum(fr) {
+    try {
+      ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+      if (ac.state === 'suspended') ac.resume();
+      const t0 = ac.currentTime + 0.02;
+      const master = ac.createGain(); master.gain.value = 0.22; master.connect(ac.destination);
+      let k = 0;
+      fr.forEach((f, s) => {
+        if (f < 0) return;
+        const hz = 440 * Math.pow(2, (TUNING[s] + f - 69) / 12), t = t0 + k++ * 0.035;
+        const o = ac.createOscillator(), g = ac.createGain(), lp = ac.createBiquadFilter();
+        o.type = 'sawtooth'; o.frequency.value = hz;
+        lp.type = 'lowpass'; lp.frequency.setValueAtTime(hz * 6, t); lp.frequency.exponentialRampToValueAtTime(hz * 1.5, t + 0.6);
+        g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(1, t + 0.005); g.gain.exponentialRampToValueAtTime(0.0001, t + 2.2);
+        o.connect(lp); lp.connect(g); g.connect(master);
+        o.start(t); o.stop(t + 2.3);
+      });
+    } catch { /* no audio: the chart still works */ }
+  }
+
+  const q = $('#q'), out = $('#out'), err = $('#err');
+  function render() {
+    const p = parse(q.value);
+    if (p.empty || p.error) {
+      out.hidden = true; err.hidden = false;
+      err.textContent = p.empty ? 'Type a chord name.' : p.error;
+      return;
+    }
+    store.set('gcc-last', q.value.trim());
+    const { root, q: qual, bass } = p;
+    const flats = useFlats(root);
+    const bassTxt = bass ? '/' + bass.text : '';
+    const name = root.text + qual.al[0] + bassTxt;
+    const fv = voicings(root.pc, qual, bass ? bass.pc : null);
+    err.hidden = true; out.hidden = false;
+    $('#name').textContent = name;
+    $('#full').textContent = root.text + ' ' + qual.full + (bass ? ', ' + bass.text + ' in the bass' : '');
+    $('#notes').textContent = qual.tones.map(t => spell(root.pc + t, flats) + ' ' + NAMES[t]).join('  ·  ');
+    const roots = [root.text, enharmonic(root)].filter(Boolean);
+    const bassAlt = bass ? [bass.text, enharmonic(bass)].filter(Boolean) : [''];
+    const seen = new Set(), ul = $('#aliases');
+    ul.textContent = '';
+    for (const r of roots) for (const a of qual.al) for (const b of bassAlt) {
+      const t = r + a + (b ? '/' + b : '');
+      if (seen.has(t) || /^(major|minor|major7|minor7)$/.test(a)) continue;
+      seen.add(t);
+      const li = document.createElement('li'); li.textContent = t; ul.append(li);
+    }
+    const grid = $('#grid');
+    grid.textContent = '';
+    if (!fv.length) { const e = document.createElement('p'); e.className = 'empty'; e.textContent = 'No playable shape found in standard tuning.'; grid.append(e); return; }
+    fv.forEach(fr => {
+      const b = document.createElement('button');
+      b.className = 'diagram';
+      b.type = 'button';
+      const tab = fr.map(f => f < 0 ? 'x' : f).join(fr.some(f => f > 9) ? '-' : '');
+      b.setAttribute('aria-label', name + ' ' + tab);
+      b.innerHTML = diagram(fr);
+      const t = document.createElement('div'); t.className = 'tab'; t.textContent = tab; b.append(t);
+      b.addEventListener('click', () => { $$('.diagram.on').forEach(x => x.classList.remove('on')); b.classList.add('on'); strum(fr); });
+      grid.append(b);
+    });
+  }
+
+  const picks = ['C', 'G', 'Am', 'F', 'D7', 'Em7', 'Cmaj7', 'Bm7b5', 'Bb', 'F#m', 'Esus4', 'A/C#'];
+  for (const c of picks) {
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = c;
+    b.addEventListener('click', () => { q.value = c; render(); });
+    $('#picks').append(b);
+  }
+  q.addEventListener('input', render);
+  q.value = store.get('gcc-last', 'C');
+  render();
+})();
+</script>
+</body>
+</html>

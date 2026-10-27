@@ -1,0 +1,60 @@
+{
+  "slug": "guitar-chord-charts",
+  "wish": "someone should make an app that shows guitar chord fingering charts with alternate symbols",
+  "year": 2014,
+  "agreed": 10,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/960/guitar-chords-application-with-a-catalogue-of-fingering-charts-and-alternate-cho",
+      "date": "2014-02-11",
+      "points": 7,
+      "comments": 3
+    }
+  ],
+  "spec": "Type any chord name (Cmaj7, F#m7b5, BbΔ7, C/G) and get up to six fingering charts up the neck, with finger numbers and barres. Lists every other way the same chord is written, its notes and intervals; tap a chart to hear it strummed. Standard tuning only; no left-handed or alternate tunings.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#q",
+        "text": "CΔ7"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#name",
+        "contains": "Cmaj7"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#aliases",
+        "contains": "CM7"
+      }
+    },
+    {
+      "type": {
+        "sel": "#q",
+        "text": "F#m7b5"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#aliases",
+        "contains": "Gbø7"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#grid .tab",
+        "matches": "^[x0-9-]{6,}$"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T02:00:22Z",
+  "model": "opus-5.5",
+  "minutes": 10,
+  "approved": false,
+  "notes": ""
+}
