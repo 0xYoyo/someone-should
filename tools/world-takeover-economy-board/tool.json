@@ -1,0 +1,48 @@
+{
+ "slug": "world-takeover-economy-board",
+ "wish": "someone should make a board game combining Monopoly and Risk with world takeover and economy",
+ "year": 2013,
+ "agreed": 67,
+ "sources": [
+  {
+   "site": "reddit",
+   "url": "https://www.reddit.com/r/CrazyIdeas/comments/1gjkhl/",
+   "date": "2013-06-17",
+   "points": 59,
+   "comments": 8
+  }
+ ],
+ "spec": "Hot-seat board game for 2 to 4 players on an 11-territory world map: buy territories for income, pay coins to add armies, attack neighbours with Risk-style dice.\nTap a territory, then use Buy, Add army or Attack; End turn collects the next player's income. Last player holding territories wins.\nIt does not have AI players, cards, or online play; one device is passed around.",
+ "tests": [
+  {
+   "tap": "#t1"
+  },
+  {
+   "tap": "#buy"
+  },
+  {
+   "expect": {
+    "sel": "#t1",
+    "contains": "A1"
+   }
+  },
+  {
+   "tap": "#t4"
+  },
+  {
+   "tap": "#recruit"
+  },
+  {
+   "expect": {
+    "sel": "#t4",
+    "contains": "A4"
+   }
+  }
+ ],
+ "status": "pending",
+ "built": "2026-10-27T11:19:17Z",
+ "model": "sonnet-5.5",
+ "minutes": 6,
+ "approved": false,
+ "notes": ""
+}

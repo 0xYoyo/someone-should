@@ -1,0 +1,60 @@
+{
+ "slug": "regex-plain-words-translator",
+ "wish": "someone should make a structured regex language that parses to and from regex",
+ "year": 2021,
+ "agreed": 69,
+ "sources": [
+  {
+   "site": "reddit",
+   "url": "https://www.reddit.com/r/Lightbulb/comments/mnndfc/",
+   "date": "2021-04-09",
+   "points": 59,
+   "comments": 10
+  }
+ ],
+ "spec": "Turns a line-per-element plain words syntax into a regex, and a pasted regex back into plain words.\nEdit either side and the other updates; type test lines to see matches highlighted.\nIt does not support lookarounds, named groups, backreferences or lazy counts.",
+ "tests": [
+  {
+   "expect": {
+    "sel": "#count",
+    "matches": "^2 matches"
+   }
+  },
+  {
+   "type": {
+    "sel": "#words",
+    "text": "start\ndigit x 3\nend"
+   }
+  },
+  {
+   "expect": {
+    "sel": "#count",
+    "matches": "^0 matches"
+   }
+  },
+  {
+   "type": {
+    "sel": "#re",
+    "text": "\\d+-\\d+"
+   }
+  },
+  {
+   "expect": {
+    "sel": "#count",
+    "matches": "^2 matches"
+   }
+  },
+  {
+   "expect": {
+    "sel": "#hl mark",
+    "contains": "555-123"
+   }
+  }
+ ],
+ "status": "pending",
+ "built": "2026-10-27T11:19:19Z",
+ "model": "sonnet-5.5",
+ "minutes": 6,
+ "approved": false,
+ "notes": ""
+}

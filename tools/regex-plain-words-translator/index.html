@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a structured regex language that parses to and from regex</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+label { display: block; font: 13px/1.4 var(--mono); color: var(--meta); margin-bottom: 4px; }
+textarea, input[type=text] { font-family: var(--mono); font-size: 16px; }
+textarea { resize: vertical; line-height: 1.5; }
+.err { color: var(--no); min-height: 1.45em; font-size: 16px; margin: 4px 0 0; }
+.chk { display: flex; align-items: center; gap: 10px; min-height: var(--tap); }
+.chk input { width: 44px; height: 44px; min-height: 0; padding: 0; margin: 0; }
+#hl { white-space: pre-wrap; word-break: break-word; font: 16px/1.5 var(--mono); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); min-height: var(--tap); }
+#hl mark { background: var(--ink); color: var(--paper); border-radius: 2px; }
+#ref { font: 16px/1.5 var(--mono); color: var(--meta); margin: 0; }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a structured regex language that parses to and from regex</h1>
+<main id="app" class="stack">
+  <div>
+    <label for="words">plain words, one per line</label>
+    <textarea id="words" rows="9" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+    <p class="err" id="e1"></p>
+  </div>
+  <div>
+    <label for="re">regex</label>
+    <input type="text" id="re" spellcheck="false" autocapitalize="off" autocomplete="off">
+    <p class="err" id="e2"></p>
+  </div>
+  <p id="ref">start end digit letter word space any / text oneof notoneof raw / opengroup opencapture or close / add: x 3, x 2-4, x 1+, x 0+, x optional</p>
+  <div>
+    <label for="sample">test text, one case per line</label>
+    <textarea id="sample" rows="4" spellcheck="false"></textarea>
+  </div>
+  <label class="chk"><input type="checkbox" id="ci"> ignore case</label>
+  <div id="hl" aria-live="polite"></div>
+  <div class="meta" id="count"></div>
+</main>
+<script>
+(() => {
+  'use strict';
+  const $ = (s) => document.querySelector(s);
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const words = $('#words'), re = $('#re'), sample = $('#sample'), ci = $('#ci');
+
+  const WORDS = { start: '^', end: '$', digit: '\\d', letter: '[A-Za-z]', word: '\\w', space: '\\s', any: '.' };
+  const PLURAL = { digits: 'digit', letters: 'letter', words: 'word', spaces: 'space' };
+  const ARGS = ['text', 'oneof', 'notoneof', 'raw'];
+
+  function quant(q) {
+    if (q === 'optional') return '?';
+    let m;
+    if ((m = /^(\d+)$/.exec(q))) return m[1] === '1' ? '' : '{' + m[1] + '}';
+    if ((m = /^(\d+)\+$/.exec(q))) return m[1] === '0' ? '*' : m[1] === '1' ? '+' : '{' + m[1] + ',}';
+    if ((m = /^(\d+)-(\d+)$/.exec(q))) {
+      if (+m[1] > +m[2]) return null;
+      return m[1] === '0' && m[2] === '1' ? '?' : '{' + m[1] + ',' + m[2] + '}';
+    }
+    return null;
+  }
+  const escapeText = (s) => s.replace(/[.*+?^${}()|[\]\\\/]/g, '\\$&');
+
+  // plain words -> regex. Returns {re} or {err}
+  function toRegex(src) {
+    const stack = [];
+    let out = '';
+    const lines = src.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line || line[0] === '#') continue;
+      const m = /^(\S+)\s*(.*)$/.exec(line);
+      let cmd = m[1].toLowerCase(), rest = m[2];
+      cmd = PLURAL[cmd] || cmd;
+      const n = 'line ' + (i + 1) + ': ';
+      let arg = '', q = '';
+      if (ARGS.includes(cmd)) {
+        const p = /^(.*?)(?:\s+x\s+(\S+))?$/.exec(rest);
+        arg = p[1]; q = p[2] || '';
+        if (!arg) return { err: n + cmd + ' needs something after it' };
+      } else {
+        q = rest.replace(/^x\s+/i, '').trim();
+      }
+      let qs = '';
+      if (q) { qs = quant(q.toLowerCase()); if (qs === null) return { err: n + 'cannot read "' + q + '" as a count' }; }
+      if (cmd === 'opengroup' || cmd === 'opencapture') {
+        if (q) return { err: n + 'put the count on close' };
+        stack.push(cmd); out += cmd === 'opengroup' ? '(?:' : '('; continue;
+      }
+      if (cmd === 'close') {
+        if (!stack.length) return { err: n + 'close without an open' };
+        stack.pop(); out += ')' + qs; continue;
+      }
+      if (cmd === 'or') { out += '|'; continue; }
+      if (cmd === 'start' || cmd === 'end') {
+        if (q) return { err: n + cmd + ' takes no count' };
+        out += WORDS[cmd]; continue;
+      }
+      let atom;
+      if (WORDS[cmd]) atom = WORDS[cmd];
+      else if (cmd === 'text') { atom = escapeText(arg); if (qs && arg.length > 1) atom = '(?:' + atom + ')'; }
+      else if (cmd === 'oneof') atom = '[' + arg + ']';
+      else if (cmd === 'notoneof') atom = '[^' + arg + ']';
+      else if (cmd === 'raw') atom = qs && arg.length > 1 ? '(?:' + arg + ')' : arg;
+      else return { err: n + 'unknown word "' + m[1] + '"' };
+      out += atom + qs;
+    }
+    if (stack.length) return { err: 'a group is never closed' };
+    return { re: out };
+  }
+
+  // regex -> plain words. Returns {words} or {err}
+  function toWords(src) {
+    const items = [];
+    let depth = 0, i = 0;
+    const last = () => items[items.length - 1];
+    const push = (cmd, arg) => items.push({ cmd, arg: arg || '', q: '', depth });
+    while (i < src.length) {
+      const c = src[i];
+      if (c === '\\') {
+        const d = src[i + 1];
+        if (d === undefined) return { err: 'regex ends with a lone backslash' };
+        if (d === 'd') push('digit'); else if (d === 'w') push('word'); else if (d === 's') push('space');
+        else if (/[a-zA-Z0-9]/.test(d)) push('raw', '\\' + d);
+        else push('text', d);
+        i += 2;
+      } else if (c === '[') {
+        let j = i + 1;
+        if (src[j] === '^') j++;
+        if (src[j] === ']') j++;
+        while (j < src.length && src[j] !== ']') j += src[j] === '\\' ? 2 : 1;
+        if (j >= src.length) return { err: 'a [ is never closed' };
+        const body = src.slice(i + 1, j);
+        if (body === 'A-Za-z') push('letter');
+        else if (body[0] === '^') push('notoneof', body.slice(1));
+        else push('oneof', body);
+        i = j + 1;
+      } else if (c === '(') {
+        if (src[i + 1] === '?') {
+          if (src.slice(i, i + 3) !== '(?:') return { err: 'lookaround and named groups are not supported' };
+          push('opengroup'); i += 3;
+        } else { push('opencapture'); i++; }
+        depth++;
+      } else if (c === ')') {
+        if (!depth) return { err: 'a ) has no matching (' };
+        depth--; push('close'); i++;
+      } else if (c === '|') { push('or'); i++; }
+      else if (c === '^') { push('start'); i++; }
+      else if (c === '$') { push('end'); i++; }
+      else if (c === '.') { push('any'); i++; }
+      else if (c === '*' || c === '+' || c === '?' || c === '{') {
+        const p = last();
+        if (!p || p.q || ['start', 'end', 'or', 'opengroup', 'opencapture'].includes(p.cmd)) {
+          return { err: p && p.q ? 'lazy and possessive counts are not supported' : 'a count has nothing to repeat' };
+        }
+        if (c === '*') { p.q = '0+'; i++; }
+        else if (c === '+') { p.q = '1+'; i++; }
+        else if (c === '?') { p.q = 'optional'; i++; }
+        else {
+          const m = /^\{(\d+)(?:(,)(\d*))?\}/.exec(src.slice(i));
+          if (!m) return { err: 'cannot read the {} count' };
+          p.q = !m[2] ? m[1] : m[3] === '' ? m[1] + '+' : m[1] + '-' + m[3];
+          i += m[0].length;
+        }
+        if (p.cmd === 'text' && p.arg.length === 1) { /* single character, fine */ }
+      } else { push('text', c); i++; }
+    }
+    if (depth) return { err: 'a ( is never closed' };
+    // join neighbouring plain characters into one text line
+    const merged = [];
+    for (const it of items) {
+      const p = merged[merged.length - 1];
+      if (p && p.cmd === 'text' && it.cmd === 'text' && !p.q && p.depth === it.depth) p.arg += it.arg;
+      else merged.push(it);
+    }
+    // a count on a group sits on its close line; indent by nesting
+    const lines = merged.map((it) => {
+      const ind = '  '.repeat(it.cmd === 'close' ? it.depth : it.depth);
+      let s = it.cmd + (it.arg ? ' ' + it.arg : '');
+      if (it.q) s += (it.arg ? ' x ' : ' ') + it.q;
+      return ind + s;
+    });
+    return { words: lines.join('\n') };
+  }
+
+  function say(el, msg) { el.textContent = msg || ''; }
+
+  function runTest() {
+    const hl = $('#hl'), count = $('#count');
+    hl.textContent = '';
+    let rx;
+    try { rx = new RegExp(re.value, 'gm' + (ci.checked ? 'i' : '')); }
+    catch { say(count, ''); if (re.value) say($('#e2'), 'this is not a valid regex'); return; }
+    if (!re.value) { say(count, 'nothing to match yet'); hl.textContent = sample.value; return; }
+    const text = sample.value;
+    let pos = 0, n = 0, m;
+    while ((m = rx.exec(text)) && n < 500) {
+      if (m[0] === '') { rx.lastIndex++; continue; }
+      hl.appendChild(document.createTextNode(text.slice(pos, m.index)));
+      const mk = document.createElement('mark');
+      mk.textContent = m[0]; hl.appendChild(mk);
+      pos = m.index + m[0].length; n++;
+    }
+    hl.appendChild(document.createTextNode(text.slice(pos)));
+    say(count, n === 1 ? '1 match' : n + ' matches');
+  }
+
+  function save() { store.set('rpwt', { w: words.value, s: sample.value, ci: ci.checked }); }
+
+  words.addEventListener('input', () => {
+    const r = toRegex(words.value);
+    say($('#e2'), '');
+    if (r.err) { say($('#e1'), r.err); } else { say($('#e1'), ''); re.value = r.re; }
+    runTest(); save();
+  });
+  re.addEventListener('input', () => {
+    say($('#e2'), '');
+    const r = toWords(re.value);
+    if (r.err) { say($('#e1'), r.err); } else { say($('#e1'), ''); words.value = r.words; }
+    runTest(); save();
+  });
+  sample.addEventListener('input', () => { runTest(); save(); });
+  ci.addEventListener('change', () => { runTest(); save(); });
+
+  const saved = store.get('rpwt', null);
+  words.value = saved && typeof saved.w === 'string' ? saved.w :
+    'start\ndigit x 3\ntext - x optional\ndigit x 3\ntext - x optional\ndigit x 4\nend';
+  sample.value = saved && typeof saved.s === 'string' ? saved.s : '555-123-4567\n5551234567\n55-12';
+  ci.checked = !!(saved && saved.ci);
+  const r0 = toRegex(words.value);
+  if (r0.err) say($('#e1'), r0.err); else re.value = r0.re;
+  runTest();
+})();
+</script>
+</body>
+</html>

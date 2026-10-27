@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a board game combining Monopoly and Risk with world takeover and economy</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+.map{position:relative;height:430px;border:1.5px solid var(--line);border-radius:var(--radius)}
+.map svg{position:absolute;inset:0;width:100%;height:100%}
+.map line{stroke:var(--line);stroke-width:2;vector-effect:non-scaling-stroke}
+.t{position:absolute;width:50px;height:50px;min-height:50px;padding:0;transform:translate(-50%,-50%);border-radius:50%;font:600 17px/1 var(--mono);background:var(--paper);border:2px solid var(--ink)}
+.t:active{transform:translate(-50%,-50%) translateY(1px)}
+.t.free{border-style:dotted;color:var(--meta);border-color:var(--meta)}
+.t.p0{background:var(--ink);color:var(--paper)}
+.t.p1{border-width:5px}
+.t.p2{border-style:dashed;border-width:3px}
+.t.p3{background:var(--meta);color:var(--paper);border-color:var(--meta)}
+.t.sel{outline:3px solid var(--ink);outline-offset:3px}
+.t.hit{outline:3px solid var(--no);outline-offset:3px}
+.bar{justify-content:space-between}
+#info{min-height:48px}
+#log{min-height:48px}
+button:disabled{opacity:.4;cursor:default}
+select{width:auto}
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a board game combining Monopoly and Risk with world takeover and economy</h1>
+<main id="app" class="stack">
+  <div class="row bar">
+    <div id="turn" class="meta"></div>
+    <div class="row">
+      <select id="players" aria-label="players"><option value="2">2 players</option><option value="3" selected>3 players</option><option value="4">4 players</option></select>
+      <button id="new">New game</button>
+    </div>
+  </div>
+  <div class="map" id="map"><svg id="edges" viewBox="0 0 100 100" preserveAspectRatio="none"></svg></div>
+  <div id="info"></div>
+  <div class="row">
+    <button id="buy" class="primary" hidden></button>
+    <button id="recruit" class="primary" hidden></button>
+    <button id="attack" class="primary" hidden></button>
+    <button id="end">End turn</button>
+  </div>
+  <div id="log" class="meta"></div>
+  <div class="meta">Buy land for income. Recruit armies, 2 coins each. Attack neighbours with dice. Last player standing wins.</div>
+</main>
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  // name, x%, y%, price, income per turn
+  const T = [
+    ['Northwind', 18, 8, 3, 1], ['Frostmark', 50, 7, 4, 2], ['Highreach', 82, 10, 3, 1],
+    ['Westfold', 14, 31, 5, 2], ['Centrale', 47, 32, 8, 4], ['Eastport', 82, 34, 5, 2],
+    ['Dustlands', 18, 58, 3, 1], ['Goldcoast', 50, 60, 6, 3], ['Redmarsh', 84, 60, 3, 1],
+    ['Southcape', 30, 87, 4, 2], ['Isles', 70, 88, 4, 2]
+  ];
+  const E = [[0,1],[1,2],[0,3],[0,4],[1,4],[2,4],[2,5],[3,4],[4,5],[3,6],[4,7],[5,8],[5,7],[6,7],[7,8],[6,9],[7,9],[7,10],[8,10],[9,10]];
+  const adj = T.map(() => []);
+  E.forEach(([a, b]) => { adj[a].push(b); adj[b].push(a); });
+  const L = 'ABCD';
+  const RECRUIT = 2;
+
+  let g;
+
+  // the game already under way, so the first view shows it working
+  function example() {
+    return { n: 3, owner: [0,-1,2,-1,0,2,-1,1,-1,1,-1], arm: [1,0,2,0,3,2,0,3,0,1,0],
+      coins: [10,6,6], cur: 0, turns: 0, sel: 4, tgt: null, over: false, log: 'A to move. Buy, recruit or attack.' };
+  }
+  function fresh(n) {
+    return { n, owner: T.map(() => -1), arm: T.map(() => 0), coins: Array(n).fill(10),
+      cur: 0, turns: 0, sel: null, tgt: null, over: false, log: 'A to move. Buy a territory.' };
+  }
+  function valid(s) {
+    return s && s.n >= 2 && s.n <= 4 && s.owner && s.owner.length === T.length && s.arm && s.arm.length === T.length && s.coins && s.coins.length === s.n;
+  }
+  g = store.get('wteb', null);
+  if (!valid(g)) g = example();
+
+  const income = p => T.reduce((s, t, i) => s + (g.owner[i] === p ? t[4] : 0), 0);
+  const count = p => g.owner.filter(o => o === p).length;
+  const alive = p => count(p) > 0 || g.turns < g.n;
+  const save = () => store.set('wteb', g);
+
+  // build map once
+  const map = $('#map');
+  const svg = $('#edges');
+  svg.innerHTML = E.map(([a, b]) => '<line x1="' + T[a][1] + '" y1="' + T[a][2] + '" x2="' + T[b][1] + '" y2="' + T[b][2] + '"/>').join('');
+  const nodes = T.map((t, i) => {
+    const b = document.createElement('button');
+    b.id = 't' + i;
+    b.className = 't';
+    b.style.left = t[1] + '%';
+    b.style.top = t[2] + '%';
+    b.addEventListener('click', () => pick(i));
+    map.appendChild(b);
+    return b;
+  });
+
+  function pick(i) {
+    if (g.over) return;
+    const s = g.sel;
+    if (s !== null && g.owner[s] === g.cur && g.arm[s] > 1 && adj[s].includes(i) && g.owner[i] !== -1 && g.owner[i] !== g.cur) {
+      g.tgt = i;
+    } else {
+      g.sel = i;
+      g.tgt = null;
+    }
+    render();
+  }
+
+  function roll(k) {
+    return Array.from({ length: k }, () => 1 + Math.floor(Math.random() * 6)).sort((a, b) => b - a);
+  }
+
+  function buy() {
+    const i = g.sel;
+    if (i === null || g.owner[i] !== -1 || g.coins[g.cur] < T[i][3]) return;
+    g.coins[g.cur] -= T[i][3];
+    g.owner[i] = g.cur;
+    g.arm[i] = 1;
+    g.log = L[g.cur] + ' bought ' + T[i][0] + '.';
+    render();
+  }
+
+  function recruit() {
+    const i = g.sel;
+    if (i === null || g.owner[i] !== g.cur || g.coins[g.cur] < RECRUIT) return;
+    g.coins[g.cur] -= RECRUIT;
+    g.arm[i]++;
+    g.log = L[g.cur] + ' added an army in ' + T[i][0] + '.';
+    render();
+  }
+
+  function attack() {
+    const s = g.sel, t = g.tgt;
+    if (s === null || t === null || g.arm[s] < 2) return;
+    const a = roll(Math.min(3, g.arm[s] - 1));
+    const d = roll(Math.min(2, g.arm[t]));
+    let al = 0, dl = 0;
+    for (let k = 0; k < Math.min(a.length, d.length); k++) {
+      if (a[k] > d[k]) dl++; else al++;   // ties go to the defender
+    }
+    const defender = g.owner[t];
+    g.arm[s] -= al;
+    g.arm[t] -= dl;
+    let msg = L[g.cur] + ' ' + a.join(' ') + ' vs ' + L[defender] + ' ' + d.join(' ') + '. ';
+    if (g.arm[t] <= 0) {
+      const move = Math.min(a.length, g.arm[s] - 1) || 1;
+      g.owner[t] = g.cur;
+      g.arm[t] = move;
+      g.arm[s] -= move;
+      g.sel = t;
+      g.tgt = null;
+      msg += T[t][0] + ' taken.';
+    } else {
+      msg += 'Lost ' + al + ', killed ' + dl + '.';
+      if (g.arm[s] < 2) g.tgt = null;
+    }
+    g.log = msg;
+    checkWin();
+    render();
+  }
+
+  function checkWin() {
+    const left = [...Array(g.n).keys()].filter(alive);
+    if (left.length === 1) {
+      g.over = true;
+      g.log = L[left[0]] + ' holds the world.';
+    }
+  }
+
+  function end() {
+    if (g.over) return;
+    g.turns++;
+    checkWin();
+    if (g.over) return render();
+    let p = g.cur;
+    do { p = (p + 1) % g.n; } while (!alive(p));
+    g.cur = p;
+    const inc = income(p);
+    g.coins[p] += inc;
+    g.sel = null;
+    g.tgt = null;
+    g.log = L[p] + ' collects ' + inc + '. ' + L[p] + ' to move.';
+    render();
+  }
+
+  function render() {
+    const s = g.sel, c = g.cur;
+    nodes.forEach((b, i) => {
+      const o = g.owner[i];
+      b.className = 't ' + (o === -1 ? 'free' : 'p' + o) + (i === s ? ' sel' : '') + (i === g.tgt ? ' hit' : '');
+      b.textContent = o === -1 ? '$' + T[i][3] : L[o] + g.arm[i];
+      b.setAttribute('aria-label', T[i][0] + (o === -1 ? ', unowned' : ', ' + L[o] + ' ' + g.arm[i] + ' armies'));
+    });
+    $('#turn').textContent = g.over ? 'Game over' : L[c] + ' · ' + g.coins[c] + ' coins · +' + income(c) + ' per turn';
+    let info = 'Tap a territory.';
+    if (s !== null) {
+      const o = g.owner[s];
+      info = T[s][0] + ' · income ' + T[s][4] + ' · ' + (o === -1 ? 'unowned, price ' + T[s][3] : L[o] + ' holds it with ' + g.arm[s]);
+      if (g.tgt !== null) info += '. Target: ' + T[g.tgt][0] + ' (' + L[g.owner[g.tgt]] + ' ' + g.arm[g.tgt] + ')';
+    }
+    $('#info').textContent = info;
+    const own = s !== null && g.owner[s] === c;
+    const buyB = $('#buy'), recB = $('#recruit'), atkB = $('#attack');
+    buyB.hidden = g.over || s === null || g.owner[s] !== -1;
+    if (!buyB.hidden) { buyB.textContent = 'Buy for ' + T[s][3]; buyB.disabled = g.coins[c] < T[s][3]; }
+    recB.hidden = g.over || !own;
+    recB.textContent = 'Add army for ' + RECRUIT;
+    recB.disabled = g.coins[c] < RECRUIT;
+    atkB.hidden = g.over || !own || g.tgt === null;
+    atkB.textContent = 'Attack';
+    $('#end').disabled = g.over;
+    $('#log').textContent = g.log;
+    save();
+  }
+
+  $('#buy').addEventListener('click', buy);
+  $('#recruit').addEventListener('click', recruit);
+  $('#attack').addEventListener('click', attack);
+  $('#end').addEventListener('click', end);
+  $('#new').addEventListener('click', () => { g = fresh(+$('#players').value); render(); });
+  $('#players').value = String(g.n);
+  render();
+})();
+</script>
+</body>
+</html>

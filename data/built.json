@@ -2156,6 +2156,28 @@
       "model": "sonnet-5.5",
       "approved": false,
       "wave": 2
+    },
+    {
+      "slug": "world-takeover-economy-board",
+      "status": "pass",
+      "kb": 11.4,
+      "tests": "6/6",
+      "built": "2026-10-27T11:19:17Z",
+      "minutes": 6,
+      "model": "sonnet-5.5",
+      "approved": false,
+      "wave": 2
+    },
+    {
+      "slug": "regex-plain-words-translator",
+      "status": "pass",
+      "kb": 12.9,
+      "tests": "6/6",
+      "built": "2026-10-27T11:19:19Z",
+      "minutes": 6,
+      "model": "sonnet-5.5",
+      "approved": false,
+      "wave": 2
     }
   ]
 }
