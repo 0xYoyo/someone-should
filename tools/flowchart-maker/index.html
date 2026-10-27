@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app that draws flowcharts</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+#chart-wrap { border: 1.5px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+#chart { display: block; width: 100%; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+#chart .node { cursor: grab; touch-action: none; }
+#chart .shape { fill: var(--paper); stroke: var(--ink); stroke-width: 1.5; }
+#chart .node.sel .shape { stroke-width: 3; }
+#chart .node.src .shape { stroke-dasharray: 5 4; }
+#chart text { fill: var(--ink); font: 16px var(--sans); pointer-events: none; }
+#chart .edge path.line { stroke: var(--ink); stroke-width: 1.5; fill: none; }
+#chart .edge path.hit { stroke: transparent; stroke-width: 22; fill: none; cursor: pointer; }
+#chart .edge.sel path.line { stroke-width: 3.5; }
+#chart .elabel rect { fill: var(--paper); }
+#chart marker path { fill: var(--ink); }
+#tools button, #out button { flex: 1 1 auto; padding: 0 12px; }
+#hint { color: var(--meta); font-size: 16px; min-height: 1.45em; margin: 0; }
+#hint.err { color: var(--no); }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make an app that draws flowcharts</h1>
+
+<main id="app" class="stack">
+  <div class="row" id="tools">
+    <button id="add-step" type="button">+ Step</button>
+    <button id="add-decision" type="button">+ Decision</button>
+    <button id="add-end" type="button">+ End</button>
+    <button id="link" type="button">Arrow to…</button>
+    <button id="del" type="button">Delete</button>
+  </div>
+  <input id="label" type="text" placeholder="Label" aria-label="Label of selected shape or arrow" autocomplete="off" disabled>
+  <p id="hint" aria-live="polite"></p>
+  <div id="chart-wrap"><svg id="chart" role="img" aria-label="Flowchart"></svg></div>
+  <div class="row" id="out">
+    <button id="svg" type="button">Save SVG</button>
+    <button id="png" type="button">Save PNG</button>
+    <button id="clear" type="button">Clear</button>
+  </div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  // storage helper — never throws
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  const KEY = 'flowchart-maker:v1';
+  const SIZE = { start: [140, 48], step: [150, 60], decision: [170, 92], end: [140, 48] };
+  const LINE_CHARS = { start: 14, step: 15, decision: 12, end: 14 };
+  const svg = $('#chart'), wrap = $('#chart-wrap'), label = $('#label'), hint = $('#hint');
+
+  const fresh = () => ({ nodes: [{ id: 1, kind: 'start', x: 0.5, y: 50, text: 'Start' }], edges: [], next: 2 });
+  let chart = store.get(KEY, null);
+  if (!chart || !Array.isArray(chart.nodes) || !Array.isArray(chart.edges)) chart = fresh();
+  // selection: {type:'node'|'edge', id}; linking: id of source node waiting for a target
+  let sel = chart.nodes.length ? { type: 'node', id: chart.nodes[chart.nodes.length - 1].id } : null;
+  let linking = null;
+  let W = 320;
+
+  const save = () => store.set(KEY, chart);
+  const node = id => chart.nodes.find(n => n.id === id);
+  const edge = id => chart.edges.find(e => e.id === id);
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  // node x is stored as a fraction of the width so charts survive a resize; y in px
+  const px = n => Math.min(Math.max(n.x * W, SIZE[n.kind][0] / 2 + 4), W - SIZE[n.kind][0] / 2 - 4);
+
+  function say(text, err) { hint.textContent = text; hint.classList.toggle('err', !!err); }
+
+  function wrapText(text, max) {
+    const words = String(text).split(/\s+/).filter(Boolean), lines = [];
+    let cur = '';
+    for (let w of words) {
+      while (w.length > max) { if (cur) { lines.push(cur); cur = ''; } lines.push(w.slice(0, max)); w = w.slice(max); }
+      if (!cur) cur = w; else if ((cur + ' ' + w).length <= max) cur += ' ' + w; else { lines.push(cur); cur = w; }
+    }
+    if (cur) lines.push(cur);
+    return lines.slice(0, 3);
+  }
+
+  function shapeSVG(n, cx, cy) {
+    const [w, h] = SIZE[n.kind], x = cx - w / 2, y = cy - h / 2;
+    if (n.kind === 'decision') return `<polygon class="shape" points="${cx},${y} ${x + w},${cy} ${cx},${y + h} ${x},${cy}"/>`;
+    const r = n.kind === 'step' ? 4 : h / 2;
+    return `<rect class="shape" x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}"/>`;
+  }
+
+  function textSVG(text, cx, cy, max) {
+    const lines = wrapText(text, max), lh = 19, top = cy - (lines.length - 1) * lh / 2;
+    return lines.map((l, i) => `<text x="${cx}" y="${top + i * lh}" text-anchor="middle" dominant-baseline="central">${esc(l)}</text>`).join('');
+  }
+
+  // point where the line from the centre toward (tx,ty) leaves the shape
+  function border(n, cx, cy, tx, ty) {
+    const [w, h] = SIZE[n.kind], dx = tx - cx, dy = ty - cy;
+    if (!dx && !dy) return [cx, cy];
+    const t = n.kind === 'decision'
+      ? 1 / (Math.abs(dx) / (w / 2) + Math.abs(dy) / (h / 2))
+      : Math.min(dx ? (w / 2) / Math.abs(dx) : Infinity, dy ? (h / 2) / Math.abs(dy) : Infinity);
+    return [cx + dx * t, cy + dy * t];
+  }
+
+  function edgeSVG(e) {
+    const a = node(e.from), b = node(e.to);
+    if (!a || !b) return ['', ''];
+    const ax = px(a), bx = px(b);
+    const [x1, y1] = border(a, ax, a.y, bx, b.y), [x2, y2] = border(b, bx, b.y, ax, a.y);
+    const d = `M${x1.toFixed(1)},${y1.toFixed(1)} L${x2.toFixed(1)},${y2.toFixed(1)}`;
+    let lab = '';
+    if (e.text) {
+      const mx = (x1 + x2) / 2, my = (y1 + y2) / 2, tw = e.text.length * 9 + 12;
+      lab = `<g class="elabel"><rect x="${mx - tw / 2}" y="${my - 13}" width="${tw}" height="26" rx="3"/><text x="${mx}" y="${my}" text-anchor="middle" dominant-baseline="central">${esc(e.text)}</text></g>`;
+    }
+    const cls = 'edge' + (sel && sel.type === 'edge' && sel.id === e.id ? ' sel' : '');
+    return [`<g class="${cls}" data-edge="${e.id}"><path class="hit" d="${d}"/><path class="line" d="${d}" marker-end="url(#arrow)"/></g>`,
+      lab && `<g data-edge="${e.id}">${lab}</g>`];
+  }
+
+  function height() { return Math.max(360, ...chart.nodes.map(n => n.y + SIZE[n.kind][1] / 2 + 60)); }
+
+  function render() {
+    W = Math.max(280, wrap.clientWidth || 320);
+    const H = height();
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    svg.setAttribute('height', H);
+    let out = '<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z"/></marker></defs>';
+    const edges = chart.edges.map(edgeSVG);
+    out += edges.map(e => e[0]).join('');
+    for (const n of chart.nodes) {
+      const cx = px(n);
+      let cls = 'node';
+      if (sel && sel.type === 'node' && sel.id === n.id) cls += ' sel';
+      if (linking === n.id) cls += ' src';
+      out += `<g class="${cls}" data-node="${n.id}">${shapeSVG(n, cx, n.y)}${textSVG(n.text, cx, n.y, LINE_CHARS[n.kind])}</g>`;
+    }
+    out += edges.map(e => e[1]).join('');
+    svg.innerHTML = out;
+    const item = sel && (sel.type === 'node' ? node(sel.id) : edge(sel.id));
+    if (!item) sel = null;
+    label.disabled = !item;
+    if (document.activeElement !== label) label.value = item ? item.text || '' : '';
+    label.placeholder = !item ? 'Select a shape or arrow' : sel.type === 'edge' ? 'Arrow label (e.g. Yes)' : 'Label';
+    if (!chart.nodes.length) say('Empty. Add a step to begin.');
+  }
+
+  function free(x, y, kind) {
+    return !chart.nodes.some(n => Math.abs(px(n) - x) < (SIZE[n.kind][0] + SIZE[kind][0]) / 2 + 8 && Math.abs(n.y - y) < (SIZE[n.kind][1] + SIZE[kind][1]) / 2 + 12);
+  }
+
+  function add(kind) {
+    const from = sel && sel.type === 'node' ? node(sel.id) : null;
+    const text = { step: 'Step', decision: 'Decision?', end: 'End' }[kind];
+    let x, y;
+    if (from) {
+      const outs = chart.edges.filter(e => e.from === from.id).length;
+      const fx = px(from);
+      y = from.y + SIZE[from.kind][1] / 2 + 50 + SIZE[kind][1] / 2;
+      x = fx;
+      if (outs) {
+        // further branches go beside the first child, on whichever side has room
+        const gap = SIZE[kind][0] + 20, lo = SIZE[kind][0] / 2 + 4, hi = W - SIZE[kind][0] / 2 - 4;
+        const opts = [fx + gap, fx - gap, fx + gap / 2 + 10, fx - gap / 2 - 10].filter(v => v >= lo && v <= hi);
+        x = opts.find(v => free(v, y, kind)) ?? (opts[0] ?? fx);
+      }
+    } else {
+      x = W / 2;
+      y = chart.nodes.length ? Math.max(...chart.nodes.map(n => n.y + SIZE[n.kind][1] / 2)) + 50 + SIZE[kind][1] / 2 : 50;
+    }
+    x = Math.min(Math.max(x, SIZE[kind][0] / 2 + 4), W - SIZE[kind][0] / 2 - 4);
+    for (let i = 0; i < 20 && !free(x, y, kind); i++) {
+      if (x + SIZE[kind][0] + 20 <= W - SIZE[kind][0] / 2) x += SIZE[kind][0] + 20; else { x = SIZE[kind][0] / 2 + 4 + (i % 2) * 20; y += SIZE[kind][1] + 30; }
+    }
+    const n = { id: chart.next++, kind, x: x / W, y, text };
+    chart.nodes.push(n);
+    if (from) {
+      let et = '';
+      if (from.kind === 'decision') {
+        const used = chart.edges.filter(e => e.from === from.id).map(e => e.text);
+        et = !used.includes('Yes') ? 'Yes' : !used.includes('No') ? 'No' : '';
+      }
+      chart.edges.push({ id: chart.next++, from: from.id, to: n.id, text: et });
+    }
+    sel = { type: 'node', id: n.id };
+    linking = null;
+    save(); render();
+    say('Type a label, or drag it where you want.');
+  }
+
+  function connect(a, b) {
+    if (a === b) { say('Pick a different shape.', true); return; }
+    if (chart.edges.some(e => e.from === a && e.to === b)) { say('That arrow already exists.', true); return; }
+    chart.edges.push({ id: chart.next++, from: a, to: b, text: '' });
+    save();
+    say('Arrow added.');
+  }
+
+  // dragging and tapping on the chart
+  let drag = null;
+  svg.addEventListener('pointerdown', ev => {
+    const g = ev.target.closest('[data-node]');
+    if (!g) return;
+    const n = node(+g.dataset.node);
+    const r = svg.getBoundingClientRect(), k = W / r.width;
+    drag = { n, k, sx: ev.clientX, sy: ev.clientY, ox: px(n), oy: n.y, moved: false, pid: ev.pointerId };
+    try { svg.setPointerCapture(ev.pointerId); } catch {}
+    ev.preventDefault();
+  });
+  svg.addEventListener('pointermove', ev => {
+    if (!drag || ev.pointerId !== drag.pid) return;
+    const dx = (ev.clientX - drag.sx) * drag.k, dy = (ev.clientY - drag.sy) * drag.k;
+    if (!drag.moved && Math.hypot(dx, dy) < 6) return;
+    drag.moved = true;
+    const n = drag.n, [w, h] = SIZE[n.kind];
+    n.x = Math.min(Math.max(drag.ox + dx, w / 2 + 4), W - w / 2 - 4) / W;
+    n.y = Math.max(drag.oy + dy, h / 2 + 4);
+    render();
+  });
+  const end = ev => {
+    if (!drag || ev.pointerId !== drag.pid) return;
+    const { n, moved } = drag;
+    drag = null;
+    if (moved) { save(); return; }
+    if (linking != null) { const a = linking; linking = null; connect(a, n.id); }
+    sel = { type: 'node', id: n.id };
+    render();
+  };
+  svg.addEventListener('pointerup', end);
+  svg.addEventListener('pointercancel', ev => { if (drag && drag.moved) save(); drag = null; });
+  svg.addEventListener('click', ev => {
+    if (ev.target.closest('[data-node]')) return;
+    const g = ev.target.closest('[data-edge]');
+    sel = g ? { type: 'edge', id: +g.dataset.edge } : null;
+    if (linking != null) { linking = null; say(''); }
+    render();
+  });
+
+  $('#add-step').addEventListener('click', () => add('step'));
+  $('#add-decision').addEventListener('click', () => add('decision'));
+  $('#add-end').addEventListener('click', () => add('end'));
+  $('#link').addEventListener('click', () => {
+    if (!sel || sel.type !== 'node') { say('Select the shape the arrow starts from.', true); return; }
+    linking = sel.id;
+    say('Now tap the shape it points to.');
+    render();
+  });
+  $('#del').addEventListener('click', () => {
+    if (!sel) { say('Select a shape or arrow first.', true); return; }
+    if (sel.type === 'node') {
+      chart.nodes = chart.nodes.filter(n => n.id !== sel.id);
+      chart.edges = chart.edges.filter(e => e.from !== sel.id && e.to !== sel.id);
+    } else chart.edges = chart.edges.filter(e => e.id !== sel.id);
+    sel = null; linking = null;
+    save(); render();
+    if (chart.nodes.length) say('Deleted.');
+  });
+  label.addEventListener('input', () => {
+    const item = sel && (sel.type === 'node' ? node(sel.id) : edge(sel.id));
+    if (!item) return;
+    item.text = label.value.slice(0, 60);
+    save(); render();
+  });
+  label.addEventListener('keydown', ev => { if (ev.key === 'Enter') label.blur(); });
+  $('#clear').addEventListener('click', () => {
+    if (hint.dataset.confirm !== '1') { hint.dataset.confirm = '1'; say('Tap Clear again to erase the chart.', true); setTimeout(() => { hint.dataset.confirm = ''; }, 3000); return; }
+    hint.dataset.confirm = '';
+    chart = fresh(); sel = { type: 'node', id: 1 }; linking = null;
+    save(); render(); say('Cleared.');
+  });
+
+  // export: a standalone light-theme SVG cropped to the drawing
+  function exportSVG() {
+    if (!chart.nodes.length) return null;
+    const keepSel = sel, keepLink = linking;
+    sel = null; linking = null; render();
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const n of chart.nodes) {
+      const [w, h] = SIZE[n.kind], cx = px(n);
+      x0 = Math.min(x0, cx - w / 2); x1 = Math.max(x1, cx + w / 2); y0 = Math.min(y0, n.y - h / 2); y1 = Math.max(y1, n.y + h / 2);
+    }
+    x0 -= 16; y0 -= 16; x1 += 16; y1 += 16;
+    const body = svg.innerHTML.replace(/<path class="hit"[^>]*\/>/g, '').replace(/<path class="hit"[^>]*><\/path>/g, '');
+    sel = keepSel; linking = keepLink; render();
+    const css = '.shape{fill:#fff;stroke:#141414;stroke-width:1.5}text{fill:#141414;font:16px -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}.line{stroke:#141414;stroke-width:1.5;fill:none}.elabel rect{fill:#fff}marker path{fill:#141414}';
+    const w = Math.round(x1 - x0), h = Math.round(y1 - y0);
+    return { w, h, text: `<svg xmlns="${svg.namespaceURI}" width="${w}" height="${h}" viewBox="${x0} ${y0} ${w} ${h}"><style>${css}</style><rect x="${x0}" y="${y0}" width="${w}" height="${h}" fill="#fff"/>${body}</svg>` };
+  }
+
+  function download(href, name) {
+    const a = document.createElement('a');
+    a.href = href; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+  }
+
+  $('#svg').addEventListener('click', () => {
+    const out = exportSVG();
+    if (!out) { say('Nothing to save yet.', true); return; }
+    download('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(out.text), 'flowchart.svg');
+    say('Saved flowchart.svg');
+  });
+  $('#png').addEventListener('click', () => {
+    const out = exportSVG();
+    if (!out) { say('Nothing to save yet.', true); return; }
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const c = document.createElement('canvas'), s = 2;
+        c.width = out.w * s; c.height = out.h * s;
+        const ctx = c.getContext('2d');
+        ctx.scale(s, s); ctx.drawImage(img, 0, 0, out.w, out.h);
+        download(c.toDataURL('image/png'), 'flowchart.png');
+        say('Saved flowchart.png');
+      } catch { say('PNG failed here. Try Save SVG.', true); }
+    };
+    img.onerror = () => say('PNG failed here. Try Save SVG.', true);
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(out.text);
+  });
+
+  let rt;
+  addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(render, 100); });
+  render();
+  say('Tap a shape to select it. Drag to move.');
+})();
+</script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T01:57:27.251Z",
+ "updated": "2026-10-27T01:57:31.683Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -665,9 +665,14 @@
   },
   {
    "slug": "flowchart-maker",
-   "status": "pending",
+   "status": "pass",
    "attempts": 1,
-   "model": "opus-5.5"
+   "model": "opus-5.5",
+   "kb": 17.9,
+   "tests": "6/6",
+   "built": "2026-10-27T01:56:23Z",
+   "minutes": 14,
+   "approved": false
   },
   {
    "slug": "visual-equation-editor",

@@ -1,0 +1,61 @@
+{
+  "slug": "flowchart-maker",
+  "wish": "someone should make an app that draws flowcharts",
+  "year": 2014,
+  "agreed": 29,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/10371/free-open-source-tool-for-creating-flowcharts",
+      "date": "2014-08-01",
+      "points": 17,
+      "comments": 2
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/21129/flowchart-editor-for-windows-mac-linux-graphical-works-offline",
+      "date": "2015-07-14",
+      "points": 6,
+      "comments": 4
+    }
+  ],
+  "spec": "Draws flowcharts: start, steps, decisions and end shapes joined by arrows, with labels on shapes and arrows.\nAdd a shape and it is placed and linked below the selected one; drag to move, tap Arrow to… then a shape to connect, type to relabel; saves SVG or PNG.\nDoes not auto-layout, route arrows around shapes, or share charts online; the chart is kept on this device only.",
+  "tests": [
+    {
+      "tap": "#add-step"
+    },
+    {
+      "type": {
+        "sel": "#label",
+        "text": "Check stock"
+      }
+    },
+    {
+      "tap": "#add-decision"
+    },
+    {
+      "expect": {
+        "sel": "#chart .node",
+        "count": 3
+      }
+    },
+    {
+      "expect": {
+        "sel": "#chart",
+        "contains": "Check stock"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#chart .edge",
+        "count": 2
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:56:23Z",
+  "model": "opus-5.5",
+  "minutes": 14,
+  "approved": false,
+  "notes": ""
+}
