@@ -1,0 +1,54 @@
+{
+  "slug": "graph-image-digitizer",
+  "wish": "someone should make a tool that makes a plot when I click on a graph",
+  "year": 2014,
+  "agreed": 10,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/2239/click-on-graph-to-create-plot",
+      "date": "2014-03-11",
+      "points": 8,
+      "comments": 2
+    }
+  ],
+  "spec": "Turns a picture of a chart back into numbers and a fresh plot.\nOpen or paste a chart image, tap two known spots on each axis and type their values, then tap points on the curve; copy or download the CSV.\nDoes not trace curves automatically or read text on the chart; one data series at a time.",
+  "tests": [
+    {
+      "tap": "#sample"
+    },
+    {
+      "tap": "#board"
+    },
+    {
+      "expect": {
+        "sel": "#count",
+        "contains": "1 point"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#out li span",
+        "matches": "x 4\\.\\d+ +y 4\\d\\.\\d"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#csv",
+        "matches": "x,y\\n4\\.7\\d*,46\\."
+      }
+    },
+    {
+      "expect": {
+        "sel": "#replot circle",
+        "count": 1
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T02:00:22Z",
+  "model": "opus-5.5",
+  "minutes": 8,
+  "approved": false,
+  "notes": "Linear and log axes. Calibration projects onto each axis line, so slightly rotated scans still read correctly. Sample chart is y = x^2 for trying it without a file."
+}

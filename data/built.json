@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T02:02:05.476Z",
+ "updated": "2026-10-27T02:02:27.718Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -719,9 +719,14 @@
   },
   {
    "slug": "graph-image-digitizer",
-   "status": "pending",
+   "status": "pass",
    "attempts": 1,
-   "model": "opus-5.5"
+   "model": "opus-5.5",
+   "kb": 18.3,
+   "tests": "6/6",
+   "built": "2026-10-27T02:00:22Z",
+   "minutes": 8,
+   "approved": false
   },
   {
    "slug": "brainfuck-debugger",
