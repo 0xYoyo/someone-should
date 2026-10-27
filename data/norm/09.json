@@ -1,0 +1,1680 @@
+[
+ {
+  "k": "se:11041",
+  "drop": null,
+  "wish": "someone should make a tool that lets you fix OCR mistakes in a visual editor",
+  "topic": "ocr-correction-editor",
+  "category": "text",
+  "buildable": false,
+  "why": "ML recognition needed",
+  "no": "too vague"
+ },
+ {
+  "k": "se:11065",
+  "drop": null,
+  "wish": "someone should make a site that checks whether a URL is censored in your country",
+  "topic": "url-censorship-checker",
+  "category": "privacy",
+  "buildable": false,
+  "why": "needs live probes from servers",
+  "no": "needs: a server"
+ },
+ {
+  "k": "se:11593",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "se:12004",
+  "drop": null,
+  "wish": "someone should make an app that manages relational databases with a visual interface",
+  "topic": "relational-database-gui",
+  "category": "dev",
+  "buildable": false,
+  "why": "real database engines are not one HTML file",
+  "no": "exists: DBeaver"
+ },
+ {
+  "k": "se:13338",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:13353",
+  "drop": null,
+  "wish": "someone should make a tool that blacks out information in scanned documents",
+  "topic": "redact-scanned-document",
+  "category": "privacy",
+  "buildable": true,
+  "why": "canvas drawing on a loaded image",
+  "no": null
+ },
+ {
+  "k": "se:14691",
+  "drop": null,
+  "wish": "someone should make an extension that delays visits to distracting sites",
+  "topic": "delay-distracting-sites",
+  "category": "time",
+  "buildable": false,
+  "why": "needs a browser extension",
+  "no": "exists: LeechBlock"
+ },
+ {
+  "k": "se:14886",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:15005",
+  "drop": null,
+  "wish": "someone should make an app that shows several subtitle tracks at once over a video",
+  "topic": "multi-subtitle-player",
+  "category": "media",
+  "buildable": true,
+  "why": "HTML video plus parsed subtitle files",
+  "no": null
+ },
+ {
+  "k": "se:16202",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:16442",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "se:16898",
+  "drop": null,
+  "wish": "someone should make an app that does Getting Things Done",
+  "topic": "gtd-task-app",
+  "category": "work",
+  "buildable": true,
+  "why": "lists in localStorage",
+  "no": null
+ },
+ {
+  "k": "se:17710",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:18728",
+  "drop": null,
+  "wish": "someone should make a tool that extracts the content of PDFs",
+  "topic": "pdf-content-extractor",
+  "category": "files",
+  "buildable": false,
+  "why": "needs a PDF engine and vague ask",
+  "no": "too vague"
+ },
+ {
+  "k": "se:19709",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:20098",
+  "drop": null,
+  "wish": "someone should make an app that makes family trees simple enough for anyone",
+  "topic": "family-tree-builder",
+  "category": "other",
+  "buildable": true,
+  "why": "drawn tree saved in localStorage",
+  "no": null
+ },
+ {
+  "k": "se:23438",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:24983",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "se:25707",
+  "drop": null,
+  "wish": "someone should make a tool that runs relational algebra queries",
+  "topic": "relational-algebra-queries",
+  "category": "learning",
+  "buildable": true,
+  "why": "small interpreter over typed tables",
+  "no": null
+ },
+ {
+  "k": "se:25802",
+  "drop": null,
+  "wish": "someone should make a site that stores large files",
+  "topic": "upload-store-large-files",
+  "category": "files",
+  "buildable": false,
+  "why": "storage needs a server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "se:26501",
+  "drop": null,
+  "wish": "someone should make a platform for running open conferences",
+  "topic": "open-conference-platform",
+  "category": "work",
+  "buildable": false,
+  "why": "accounts and submissions need a server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "se:31811",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "se:32288",
+  "drop": null,
+  "wish": "someone should make a tool that measures the speed of objects in videos",
+  "topic": "video-object-speed",
+  "category": "math",
+  "buildable": false,
+  "why": "needs object tracking",
+  "no": "too vague"
+ },
+ {
+  "k": "se:32574",
+  "drop": null,
+  "wish": "someone should make an app that manages a personal CV and outputs custom versions",
+  "topic": "cv-manager",
+  "category": "work",
+  "buildable": true,
+  "why": "structured data and printable output",
+  "no": null
+ },
+ {
+  "k": "se:32617",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:33739",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:34017",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:34765",
+  "drop": null,
+  "wish": "someone should make a tool that crops empty regions out of screenshots",
+  "topic": "crop-empty-screenshot-regions",
+  "category": "photo",
+  "buildable": true,
+  "why": "canvas pixel scan",
+  "no": null
+ },
+ {
+  "k": "se:34931",
+  "drop": null,
+  "wish": "someone should make a note-taking app with tags",
+  "topic": "tagged-notes",
+  "category": "writing",
+  "buildable": true,
+  "why": "notes and tags in localStorage",
+  "no": null
+ },
+ {
+  "k": "se:38096",
+  "drop": null,
+  "wish": "someone should make a video editor for occasional use",
+  "topic": "simple-video-editor",
+  "category": "media",
+  "buildable": false,
+  "why": "video editing is too heavy for one file",
+  "no": "exists: DaVinci Resolve"
+ },
+ {
+  "k": "se:43554",
+  "drop": null,
+  "wish": "someone should make an app that draws mind maps as directed acyclic graphs",
+  "topic": "dag-mind-map",
+  "category": "design",
+  "buildable": true,
+  "why": "canvas node drawing",
+  "no": null
+ },
+ {
+  "k": "se:43686",
+  "drop": null,
+  "wish": "someone should make a remote control tool that replaces TeamViewer",
+  "topic": "remote-desktop-control",
+  "category": "work",
+  "buildable": false,
+  "why": "needs a relay server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "se:51330",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "se:51338",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:74505",
+  "drop": null,
+  "wish": "someone should make a tool that converts JSON to an OpenAPI spec",
+  "topic": "json-to-openapi",
+  "category": "dev",
+  "buildable": true,
+  "why": "pure JSON transformation",
+  "no": null
+ },
+ {
+  "k": "se:93596",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "se:94917",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:16",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:359",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "se:432",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:873",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:962",
+  "drop": null,
+  "wish": "someone should make a tool that edits and searches image metadata",
+  "topic": "image-metadata-editor",
+  "category": "photo",
+  "buildable": true,
+  "why": "reads and writes EXIF locally",
+  "no": null
+ },
+ {
+  "k": "se:1633",
+  "drop": null,
+  "wish": "someone should make a presentation tool that shows a map of the slides",
+  "topic": "slide-map-presentation",
+  "category": "work",
+  "buildable": true,
+  "why": "HTML slides with an overview view",
+  "no": null
+ },
+ {
+  "k": "se:1671",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "se:2425",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:2877",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:4029",
+  "drop": null,
+  "wish": "someone should make an app that combines projects, routines and a daily to-do list",
+  "topic": "daily-routine-todo",
+  "category": "work",
+  "buildable": true,
+  "why": "lists and recurring items locally",
+  "no": null
+ },
+ {
+  "k": "se:3346",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:3594",
+  "drop": null,
+  "wish": "someone should make an app for direct video chat between two computers",
+  "topic": "p2p-video-chat",
+  "category": "social",
+  "buildable": false,
+  "why": "needs signaling server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "se:3708",
+  "drop": null,
+  "wish": "someone should make a player that raises volume above 100 percent",
+  "topic": "boost-volume-over-100",
+  "category": "media",
+  "buildable": true,
+  "why": "Web Audio gain node",
+  "no": null
+ },
+ {
+  "k": "se:3736",
+  "drop": null,
+  "wish": "someone should make a tool that cuts audio files",
+  "topic": "audio-cutter",
+  "category": "music",
+  "buildable": true,
+  "why": "decode and trim audio in browser",
+  "no": null
+ },
+ {
+  "k": "se:3929",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:3943",
+  "drop": null,
+  "wish": "someone should make a thesaurus that works offline",
+  "topic": "offline-thesaurus",
+  "category": "writing",
+  "buildable": false,
+  "why": "needs a large word dataset",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "se:4158",
+  "drop": null,
+  "wish": "someone should make a tool that makes Android apps easily",
+  "topic": "easy-app-maker",
+  "category": "dev",
+  "buildable": false,
+  "why": "too broad",
+  "no": "too vague"
+ },
+ {
+  "k": "se:4299",
+  "drop": null,
+  "wish": "someone should make an app that blocks calls and texts",
+  "topic": "block-calls-texts",
+  "category": "everyday",
+  "buildable": false,
+  "why": "OS feature",
+  "no": "your phone does this"
+ },
+ {
+  "k": "se:4434",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:4584",
+  "drop": null,
+  "wish": "someone should make a camera app that overlays the last photo for taking a photo over a photo",
+  "topic": "photo-overlay-camera",
+  "category": "photo",
+  "buildable": true,
+  "why": "camera stream with translucent overlay",
+  "no": null
+ },
+ {
+  "k": "se:7082",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:7414",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:7617",
+  "drop": null,
+  "wish": "someone should make a tool that removes dark margins from scanned pages",
+  "topic": "remove-scan-margins",
+  "category": "photo",
+  "buildable": true,
+  "why": "canvas edge detection and crop",
+  "no": null
+ },
+ {
+  "k": "se:9908",
+  "drop": null,
+  "wish": "someone should make a site that cuts GIF files",
+  "topic": "gif-trimmer",
+  "category": "media",
+  "buildable": true,
+  "why": "GIF frames decoded and re-encoded locally",
+  "no": null
+ },
+ {
+  "k": "se:10047",
+  "drop": null,
+  "wish": "someone should make a tool that generates all layouts from a set of colors",
+  "topic": "color-layout-generator",
+  "category": "design",
+  "buildable": true,
+  "why": "combinatorics over chosen colors",
+  "no": null
+ },
+ {
+  "k": "se:10170",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:10272",
+  "drop": null,
+  "wish": "someone should make a tool that manages photos for several users",
+  "topic": "multi-user-photo-manager",
+  "category": "photo",
+  "buildable": false,
+  "why": "shared users need a server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "se:10565",
+  "drop": null,
+  "wish": "someone should make a tool that removes text from the tags of many MP3 files at once",
+  "topic": "batch-mp3-tag-editor",
+  "category": "music",
+  "buildable": true,
+  "why": "ID3 edit on loaded files",
+  "no": null
+ },
+ {
+  "k": "se:10950",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:11769",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:11834",
+  "drop": null,
+  "wish": "someone should make a tool that hides data inside images",
+  "topic": "hide-data-in-image",
+  "category": "privacy",
+  "buildable": true,
+  "why": "pixel bit manipulation on canvas",
+  "no": null
+ },
+ {
+  "k": "se:12011",
+  "drop": null,
+  "wish": "someone should make a tool that blurs parts of a video automatically",
+  "topic": "auto-blur-video",
+  "category": "photo",
+  "buildable": false,
+  "why": "needs detection models",
+  "no": "too vague"
+ },
+ {
+  "k": "se:14073",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:14341",
+  "drop": "unsafe"
+ },
+ {
+  "k": "se:14667",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:14873",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:16223",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "se:16576",
+  "drop": null,
+  "wish": "someone should make an app that picks a random item from a list",
+  "topic": "random-picker",
+  "category": "everyday",
+  "buildable": true,
+  "why": "random choice from typed list",
+  "no": null
+ },
+ {
+  "k": "se:16812",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:17012",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:17317",
+  "drop": null,
+  "wish": "someone should make a tool that beautifies code",
+  "topic": "code-formatter",
+  "category": "dev",
+  "buildable": true,
+  "why": "text formatting in browser",
+  "no": null
+ },
+ {
+  "k": "se:17650",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:17996",
+  "drop": null,
+  "wish": "someone should make a simple video editor",
+  "topic": "simple-video-editor",
+  "category": "media",
+  "buildable": false,
+  "why": "video editing is too heavy for one file",
+  "no": "exists: DaVinci Resolve"
+ },
+ {
+  "k": "se:18026",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "se:18080",
+  "drop": null,
+  "wish": "someone should make a tool that tells which country a latitude and longitude is in",
+  "topic": "country-from-coordinates",
+  "category": "travel",
+  "buildable": false,
+  "why": "needs border dataset",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "se:18574",
+  "drop": null,
+  "wish": "someone should make an instant messenger with audio and video calls",
+  "topic": "instant-messenger-calls",
+  "category": "social",
+  "buildable": false,
+  "why": "needs a server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "se:19502",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:20103",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:20320",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:20482",
+  "drop": null,
+  "wish": "someone should make a tool that turns Markdown into static HTML documentation",
+  "topic": "markdown-to-html-docs",
+  "category": "writing",
+  "buildable": true,
+  "why": "Markdown conversion in browser",
+  "no": null
+ },
+ {
+  "k": "se:20758",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:22854",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:22896",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:23179",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:23214",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:23429",
+  "drop": null,
+  "wish": "someone should make an app that changes your voice into character voices",
+  "topic": "voice-changer",
+  "category": "music",
+  "buildable": true,
+  "why": "Web Audio pitch and filter effects",
+  "no": null
+ },
+ {
+  "k": "se:24715",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:24776",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:24781",
+  "drop": null,
+  "wish": "someone should make a service that alerts me when my server fails",
+  "topic": "server-down-alert",
+  "category": "dev",
+  "buildable": false,
+  "why": "needs a server to watch",
+  "no": "needs: a server"
+ },
+ {
+  "k": "se:25087",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "se:25287",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:25495",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:25623",
+  "drop": null,
+  "wish": "someone should make a site for building surveys",
+  "topic": "survey-builder",
+  "category": "work",
+  "buildable": false,
+  "why": "collecting answers needs a server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "se:26078",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:26400",
+  "drop": null,
+  "wish": "someone should make an app that organizes tasks by project, priority and urgency",
+  "topic": "task-priority-matrix",
+  "category": "work",
+  "buildable": true,
+  "why": "task lists in localStorage",
+  "no": null
+ },
+ {
+  "k": "se:28138",
+  "drop": null,
+  "wish": "someone should make a tool that converts EML files to plain text",
+  "topic": "eml-to-text",
+  "category": "files",
+  "buildable": true,
+  "why": "parse loaded file in browser",
+  "no": null
+ },
+ {
+  "k": "se:28273",
+  "drop": null,
+  "wish": "someone should make a program that shows 3D chemical molecules",
+  "topic": "molecule-viewer",
+  "category": "learning",
+  "buildable": false,
+  "why": "needs molecule data and renderer",
+  "no": "too vague"
+ },
+ {
+  "k": "se:28569",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:30060",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:31417",
+  "drop": null,
+  "wish": "someone should make an app for video chat on limited bandwidth",
+  "topic": "p2p-video-chat",
+  "category": "social",
+  "buildable": false,
+  "why": "needs signaling server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "se:32145",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:35567",
+  "drop": null,
+  "wish": "someone should make a scheduling site that accounts for varying transit times",
+  "topic": "transit-aware-scheduling",
+  "category": "time",
+  "buildable": false,
+  "why": "needs live transit data",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "se:35572",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:36170",
+  "drop": null,
+  "wish": "someone should make a to-do manager with dependencies and events",
+  "topic": "task-dependencies-todo",
+  "category": "work",
+  "buildable": true,
+  "why": "task graph in localStorage",
+  "no": null
+ },
+ {
+  "k": "se:36652",
+  "drop": null,
+  "wish": "someone should make a tool that decrypts into different files depending on the password",
+  "topic": "deniable-encryption",
+  "category": "privacy",
+  "buildable": true,
+  "why": "WebCrypto on loaded files",
+  "no": null
+ },
+ {
+  "k": "se:37633",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:37849",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:38274",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:44914",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:46986",
+  "drop": null,
+  "wish": "someone should make a helpdesk that works over email",
+  "topic": "email-helpdesk",
+  "category": "work",
+  "buildable": false,
+  "why": "needs mail server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "se:46987",
+  "drop": "unsafe"
+ },
+ {
+  "k": "se:47850",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "se:51193",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:224",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:874",
+  "drop": null,
+  "wish": "someone should make a digital audio workstation",
+  "topic": "digital-audio-workstation",
+  "category": "music",
+  "buildable": false,
+  "why": "too large for one file",
+  "no": "exists: Ardour"
+ },
+ {
+  "k": "se:1044",
+  "drop": null,
+  "wish": "someone should make a service that schedules cross-posts to social networks",
+  "topic": "scheduled-cross-posting",
+  "category": "social",
+  "buildable": false,
+  "why": "needs a server and accounts",
+  "no": "needs: a server"
+ },
+ {
+  "k": "se:1437",
+  "drop": null,
+  "wish": "someone should make an app for collaborating on plain text with revisions",
+  "topic": "revision-text-collaboration",
+  "category": "writing",
+  "buildable": false,
+  "why": "collaboration needs a server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "se:2165",
+  "drop": "hardware"
+ },
+ {
+  "k": "se:2308",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:2323",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "se:2390",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:2421",
+  "drop": "unsafe"
+ },
+ {
+  "k": "se:3198",
+  "drop": null,
+  "wish": "someone should make a tool that turns an audio file into a text file",
+  "topic": "audio-to-text",
+  "category": "text",
+  "buildable": false,
+  "why": "needs speech models",
+  "no": "too vague"
+ },
+ {
+  "k": "se:3333",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:3608",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:3872",
+  "drop": "hardware"
+ },
+ {
+  "k": "se:4023",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:5623",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:5636",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:5677",
+  "drop": null,
+  "wish": "someone should make a tool that sends HTTP requests and shows responses with history",
+  "topic": "http-request-tester",
+  "category": "dev",
+  "buildable": false,
+  "why": "browser blocks cross-origin requests",
+  "no": "exists: Postman"
+ },
+ {
+  "k": "se:5699",
+  "drop": null,
+  "wish": "someone should make a simple 3D modelling tool for jewelry design",
+  "topic": "jewelry-3d-modelling",
+  "category": "design",
+  "buildable": false,
+  "why": "too broad",
+  "no": "too vague"
+ },
+ {
+  "k": "se:5754",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:7268",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "se:7493",
+  "drop": null,
+  "wish": "someone should make an app that tracks arbitrary personal statistics",
+  "topic": "personal-stats-tracker",
+  "category": "data",
+  "buildable": true,
+  "why": "entries and charts in localStorage",
+  "no": null
+ },
+ {
+  "k": "se:7541",
+  "drop": "unsafe"
+ },
+ {
+  "k": "se:9687",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:10970",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:11817",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "se:11880",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:12052",
+  "drop": null,
+  "wish": "someone should make a regular expression tool",
+  "topic": "regex-tester",
+  "category": "dev",
+  "buildable": true,
+  "why": "JS regex engine in browser",
+  "no": null
+ },
+ {
+  "k": "se:13975",
+  "drop": null,
+  "wish": "someone should make a tool for prototyping in 3D",
+  "topic": "3d-prototyping",
+  "category": "design",
+  "buildable": false,
+  "why": "too broad",
+  "no": "too vague"
+ },
+ {
+  "k": "se:14002",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:14192",
+  "drop": null,
+  "wish": "someone should make a tool that sketches network diagrams",
+  "topic": "network-diagram-sketcher",
+  "category": "design",
+  "buildable": true,
+  "why": "canvas nodes and links",
+  "no": null
+ },
+ {
+  "k": "se:14354",
+  "drop": null,
+  "wish": "someone should make a tool that converts SVG files to PNG in batches",
+  "topic": "svg-to-png",
+  "category": "files",
+  "buildable": true,
+  "why": "canvas rasterizing",
+  "no": null
+ },
+ {
+  "k": "se:16788",
+  "drop": null,
+  "wish": "someone should make a tool for documentation built around screenshots",
+  "topic": "screenshot-documentation",
+  "category": "writing",
+  "buildable": true,
+  "why": "images plus captions exported locally",
+  "no": null
+ },
+ {
+  "k": "se:17967",
+  "drop": null,
+  "wish": "someone should make a personal knowledge management system that is easy to learn",
+  "topic": "linked-notes",
+  "category": "writing",
+  "buildable": true,
+  "why": "linked notes in localStorage",
+  "no": null
+ },
+ {
+  "k": "se:18150",
+  "drop": null,
+  "wish": "someone should make a tool for tasks and resources that are not projects",
+  "topic": "task-resource-management",
+  "category": "work",
+  "buildable": false,
+  "why": "ask too unclear",
+  "no": "too vague"
+ },
+ {
+  "k": "se:19169",
+  "drop": null,
+  "wish": "someone should make a cheap CRM",
+  "topic": "simple-crm",
+  "category": "work",
+  "buildable": false,
+  "why": "contacts and sync need a service",
+  "no": "exists: HubSpot"
+ },
+ {
+  "k": "se:19252",
+  "drop": null,
+  "wish": "someone should make a tool that converts video frames to JPEGs",
+  "topic": "video-frames-to-images",
+  "category": "media",
+  "buildable": true,
+  "why": "video element and canvas capture",
+  "no": null
+ },
+ {
+  "k": "se:19704",
+  "drop": null,
+  "wish": "someone should make an app that counts how often the screen turns on",
+  "topic": "screen-on-counter",
+  "category": "health",
+  "buildable": false,
+  "why": "OS usage stats",
+  "no": "your phone does this"
+ },
+ {
+  "k": "se:20020",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:20082",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "se:20437",
+  "drop": null,
+  "wish": "someone should make accounting software for small businesses",
+  "topic": "small-business-accounting",
+  "category": "money",
+  "buildable": false,
+  "why": "ask too broad",
+  "no": "too vague"
+ },
+ {
+  "k": "se:21690",
+  "drop": null,
+  "wish": "someone should make a tool for learning binary file formats",
+  "topic": "binary-file-explorer",
+  "category": "learning",
+  "buildable": true,
+  "why": "hex view of a loaded file",
+  "no": null
+ },
+ {
+  "k": "se:21741",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:23325",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:25285",
+  "drop": "hardware"
+ },
+ {
+  "k": "se:25559",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:25640",
+  "drop": null,
+  "wish": "someone should make a tool that imports a CSV into MP3 tags",
+  "topic": "batch-mp3-tag-editor",
+  "category": "music",
+  "buildable": true,
+  "why": "ID3 edit on loaded files",
+  "no": null
+ },
+ {
+  "k": "se:26193",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:27488",
+  "drop": null,
+  "wish": "someone should make a peer-to-peer VPN",
+  "topic": "p2p-vpn",
+  "category": "privacy",
+  "buildable": false,
+  "why": "needs network layer",
+  "no": "needs: a server"
+ },
+ {
+  "k": "se:28571",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:30175",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:30755",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:31484",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:32497",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:34731",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:36295",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "se:39176",
+  "drop": null,
+  "wish": "someone should make an app that blocks distracting sites like LeechBlock",
+  "topic": "block-distracting-sites",
+  "category": "time",
+  "buildable": false,
+  "why": "OS feature",
+  "no": "your phone does this"
+ },
+ {
+  "k": "se:42394",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:43614",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:45663",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:47145",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:47704",
+  "drop": null,
+  "wish": "someone should make a tool for drawing GUI mockups",
+  "topic": "gui-mockup-drawer",
+  "category": "design",
+  "buildable": true,
+  "why": "canvas shapes and export",
+  "no": null
+ },
+ {
+  "k": "se:48758",
+  "drop": null,
+  "wish": "someone should make a tool that compares two images and returns a similarity percentage",
+  "topic": "image-similarity",
+  "category": "photo",
+  "buildable": true,
+  "why": "canvas pixel comparison",
+  "no": null
+ },
+ {
+  "k": "se:49201",
+  "drop": null,
+  "wish": "someone should make a timer app",
+  "topic": "timer",
+  "category": "time",
+  "buildable": true,
+  "why": "JS timer with sound",
+  "no": null
+ },
+ {
+  "k": "se:50269",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:51520",
+  "drop": null,
+  "wish": "someone should make a tool for private folder sharing",
+  "topic": "private-folder-sharing",
+  "category": "files",
+  "buildable": false,
+  "why": "sharing needs a server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "se:51580",
+  "drop": null,
+  "wish": "someone should make a simple text editor",
+  "topic": "plain-text-editor",
+  "category": "writing",
+  "buildable": true,
+  "why": "textarea with local save",
+  "no": null
+ },
+ {
+  "k": "se:52252",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:52391",
+  "drop": null,
+  "wish": "someone should make a tool that turns a huge PNG into a zoomable map",
+  "topic": "image-zoom-viewer",
+  "category": "photo",
+  "buildable": true,
+  "why": "canvas pan and zoom",
+  "no": null
+ },
+ {
+  "k": "se:52682",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:52692",
+  "drop": null,
+  "wish": "someone should make a tool that draws diagrams as an alternative to Dia",
+  "topic": "diagram-drawer",
+  "category": "design",
+  "buildable": true,
+  "why": "canvas shapes and export",
+  "no": null
+ },
+ {
+  "k": "se:53871",
+  "drop": null,
+  "wish": "someone should make a game that teaches the Unix command line",
+  "topic": "command-line-learning-game",
+  "category": "learning",
+  "buildable": true,
+  "why": "simulated shell in the page",
+  "no": null
+ },
+ {
+  "k": "se:54015",
+  "drop": null,
+  "wish": "someone should make an app that visually organizes family trees",
+  "topic": "family-tree-builder",
+  "category": "other",
+  "buildable": true,
+  "why": "drawn tree saved in localStorage",
+  "no": null
+ },
+ {
+  "k": "se:56953",
+  "drop": null,
+  "wish": "someone should make an app that simulates pen and paper",
+  "topic": "pen-and-paper-sketchpad",
+  "category": "design",
+  "buildable": true,
+  "why": "canvas drawing",
+  "no": null
+ },
+ {
+  "k": "se:67473",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:67620",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:71033",
+  "drop": null,
+  "wish": "someone should make an app that sounds an alarm when you reach your destination",
+  "topic": "arrival-alarm",
+  "category": "travel",
+  "buildable": true,
+  "why": "geolocation distance check on tap",
+  "no": null
+ },
+ {
+  "k": "se:72553",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:85348",
+  "drop": null,
+  "wish": "someone should make a tool that formats SQL",
+  "topic": "sql-formatter",
+  "category": "dev",
+  "buildable": true,
+  "why": "text formatting in browser",
+  "no": null
+ },
+ {
+  "k": "se:86920",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:93434",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "se:732",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:841",
+  "drop": null,
+  "wish": "someone should make an app that translates web pages",
+  "topic": "translate-web-page",
+  "category": "text",
+  "buildable": false,
+  "why": "OS feature",
+  "no": "your phone does this"
+ },
+ {
+  "k": "se:853",
+  "drop": null,
+  "wish": "someone should make a tool that makes CSV lists from Wikidata",
+  "topic": "wikidata-to-csv",
+  "category": "data",
+  "buildable": false,
+  "why": "needs Wikidata queries",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "se:2638",
+  "drop": null,
+  "wish": "someone should make a tool that beautifies C# code",
+  "topic": "code-formatter",
+  "category": "dev",
+  "buildable": true,
+  "why": "text formatting in browser",
+  "no": null
+ },
+ {
+  "k": "se:2930",
+  "drop": null,
+  "wish": "someone should make a program that simulates constructing a 3D building",
+  "topic": "building-construction-sim",
+  "category": "design",
+  "buildable": false,
+  "why": "ask too broad",
+  "no": "too vague"
+ },
+ {
+  "k": "se:3080",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:3298",
+  "drop": null,
+  "wish": "someone should make a file sync service built on a standard protocol",
+  "topic": "standard-protocol-file-sync",
+  "category": "files",
+  "buildable": false,
+  "why": "needs a server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "se:3493",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:4524",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:11009",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "se:11056",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "se:11185",
+  "drop": null,
+  "wish": "someone should make a site for polls with range voting",
+  "topic": "range-voting-poll",
+  "category": "social",
+  "buildable": false,
+  "why": "collecting votes needs a server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "se:11378",
+  "drop": null,
+  "wish": "someone should make an app that saves web pages for offline reading",
+  "topic": "save-pages-offline",
+  "category": "media",
+  "buildable": false,
+  "why": "OS feature",
+  "no": "your phone does this"
+ },
+ {
+  "k": "se:11783",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:11898",
+  "drop": null,
+  "wish": "someone should make a CMS with real-time co-authoring",
+  "topic": "realtime-collab-editor",
+  "category": "writing",
+  "buildable": false,
+  "why": "needs a server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "se:15105",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:16794",
+  "drop": null,
+  "wish": "someone should make a tool that generates QR codes without a web service",
+  "topic": "qr-code-generator",
+  "category": "everyday",
+  "buildable": true,
+  "why": "QR encoder runs in browser",
+  "no": null
+ },
+ {
+  "k": "se:17366",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "se:17837",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:18380",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:18906",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:19756",
+  "drop": null,
+  "wish": "someone should make an app that plays a slideshow of images",
+  "topic": "image-slideshow",
+  "category": "photo",
+  "buildable": true,
+  "why": "local images in a timed loop",
+  "no": null
+ },
+ {
+  "k": "se:20215",
+  "drop": "unsafe"
+ },
+ {
+  "k": "se:20605",
+  "drop": "too-specific"
+ },
+ {
+  "k": "se:21583",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "se:25030",
+  "drop": null,
+  "wish": "someone should make a site that publishes interactive graphs online",
+  "topic": "publish-interactive-charts",
+  "category": "data",
+  "buildable": false,
+  "why": "publishing needs hosting",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:40096424",
+  "drop": null,
+  "wish": "someone should make a tool that learns from all my emails and drafts replies",
+  "topic": "email-reply-drafter",
+  "category": "work",
+  "buildable": false,
+  "why": "needs language models",
+  "no": "too vague"
+ },
+ {
+  "k": "hn:33663134",
+  "drop": null,
+  "wish": "someone should make a tool that finds the people I follow on Twitter on Mastodon",
+  "topic": "twitter-to-mastodon-follows",
+  "category": "social",
+  "buildable": false,
+  "why": "needs account lookups",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "hn:1705388",
+  "drop": null,
+  "wish": "someone should make a tool that sends web pages to my Kindle",
+  "topic": "webpage-to-kindle",
+  "category": "media",
+  "buildable": false,
+  "why": "needs email delivery",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:25913949",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "hn:2303181",
+  "drop": null,
+  "wish": "someone should make a tool like GitHub for product design",
+  "topic": "product-design-versioning",
+  "category": "design",
+  "buildable": false,
+  "why": "ask too vague",
+  "no": "too vague"
+ },
+ {
+  "k": "hn:8050623",
+  "drop": null,
+  "wish": "someone should make a tool that finds similar fonts across platforms",
+  "topic": "similar-font-finder",
+  "category": "design",
+  "buildable": false,
+  "why": "needs font database",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "hn:7486544",
+  "drop": null,
+  "wish": "someone should make an app that shares data only by geolocation",
+  "topic": "geolocation-sharing",
+  "category": "social",
+  "buildable": false,
+  "why": "needs a server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "hn:3506442",
+  "drop": null,
+  "wish": "someone should make a site like Yelp for special dietary needs",
+  "topic": "dietary-needs-reviews",
+  "category": "food",
+  "buildable": false,
+  "why": "needs reviews from others",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "hn:2132439",
+  "drop": null,
+  "wish": "someone should make an app with a daily recurring checklist",
+  "topic": "daily-checklist",
+  "category": "everyday",
+  "buildable": true,
+  "why": "checklist resets daily in localStorage",
+  "no": null
+ },
+ {
+  "k": "hn:22499269",
+  "drop": null,
+  "wish": "someone should make a site with advanced CSS puzzles",
+  "topic": "css-puzzles",
+  "category": "learning",
+  "buildable": true,
+  "why": "puzzles checked in the page",
+  "no": null
+ },
+ {
+  "k": "hn:15781170",
+  "drop": null,
+  "wish": "someone should make a site with a feed of events, exhibits and trade shows",
+  "topic": "events-feed",
+  "category": "other",
+  "buildable": false,
+  "why": "needs event listings",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "hn:15171955",
+  "drop": null,
+  "wish": "someone should make a site that converts designs into HTML, CSS and JS",
+  "topic": "design-to-code",
+  "category": "design",
+  "buildable": false,
+  "why": "needs image understanding",
+  "no": "too vague"
+ },
+ {
+  "k": "hn:30475318",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "hn:5275269",
+  "drop": null,
+  "wish": "someone should make a site that tells where to recycle electronics",
+  "topic": "recycle-electronics-finder",
+  "category": "home",
+  "buildable": false,
+  "why": "needs local listings",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "hn:377118",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "hn:41102781",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "hn:3700512",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "hn:48982796",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "hn:43809559",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "hn:33516072",
+  "drop": null,
+  "wish": "someone should make a counter of junk mail deleted worldwide each day",
+  "topic": "junk-mail-counter",
+  "category": "other",
+  "buildable": false,
+  "why": "needs data from others",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "hn:2875226",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "hn:22826455",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "hn:17466873",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "hn:14694189",
+  "drop": null,
+  "wish": "someone should make a random chat site without bots",
+  "topic": "random-chat-site",
+  "category": "social",
+  "buildable": false,
+  "why": "needs a server",
+  "no": "needs: a server"
+ }
+]
