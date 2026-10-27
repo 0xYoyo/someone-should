@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that diffs two texts pasted into it</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+
+/* ---- tool styles below ---- */
+textarea { min-height: 140px; resize: vertical; font: 16px/1.4 var(--mono); white-space: pre; overflow-wrap: normal; overflow-x: auto; }
+.pair { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
+@media (max-width: 600px) { .pair { grid-template-columns: 1fr; } }
+.field { display: grid; gap: 6px; }
+.field .row { justify-content: space-between; }
+.lbl { font: 16px/1.3 var(--mono); color: var(--meta); }
+.file { position: relative; overflow: hidden; display: inline-flex; align-items: center; min-height: var(--tap); padding: 0 14px; border: 1.5px solid var(--line); border-radius: var(--radius); cursor: pointer; font-size: 16px; }
+.file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; min-height: 0; padding: 0; }
+button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+#summary { font: 16px/1.4 var(--mono); color: var(--meta); }
+#out { border: 1.5px solid var(--line); border-radius: var(--radius); overflow: hidden; font: 16px/1.45 var(--mono); }
+#out:empty { display: none; }
+.ln { display: grid; grid-template-columns: 1.4em 1fr; }
+.ln > span { padding: 1px 6px; white-space: pre-wrap; overflow-wrap: anywhere; min-width: 0; }
+.ln > .sg { color: var(--meta); text-align: center; padding: 1px 0; }
+.ln.del { background: rgba(200, 50, 30, .10); }
+.ln.ins { background: rgba(46, 125, 79, .12); }
+.ln.del .sg { color: var(--no); }
+.ln.ins .sg { color: var(--built); }
+.del-word { background: rgba(200, 50, 30, .30); text-decoration: line-through; text-decoration-thickness: 1px; border-radius: 2px; }
+.ins-word { background: rgba(46, 125, 79, .32); border-radius: 2px; }
+.sbs { display: grid; grid-template-columns: 1fr 1fr; }
+.sbs > div { padding: 1px 6px; white-space: pre-wrap; overflow-wrap: anywhere; min-width: 0; border-right: 1px solid var(--line); }
+.sbs > div:last-child { border-right: 0; }
+.sbs .del { background: rgba(200, 50, 30, .10); }
+.sbs .ins { background: rgba(46, 125, 79, .12); }
+.sbs .gap { background: repeating-linear-gradient(135deg, transparent 0 6px, var(--line) 6px 7px); }
+.fold { display: block; width: 100%; border: 0; border-top: 1px dashed var(--line); border-bottom: 1px dashed var(--line); border-radius: 0; color: var(--meta); font: 16px/1.3 var(--mono); text-align: left; padding: 0 12px; }
+.err { color: var(--no); }
+
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that diffs two texts pasted into it</h1>
+
+<main id="app" class="stack">
+  <div class="pair">
+    <div class="field">
+      <div class="row"><span class="lbl">before</span><label class="file">open file<input type="file" id="fa" aria-label="open file for before"></label></div>
+      <textarea id="a" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="paste the first text"></textarea>
+    </div>
+    <div class="field">
+      <div class="row"><span class="lbl">after</span><label class="file">open file<input type="file" id="fb" aria-label="open file for after"></label></div>
+      <textarea id="b" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="paste the second text"></textarea>
+    </div>
+  </div>
+  <div class="row">
+    <button class="primary" id="compare">compare</button>
+    <button id="mode" aria-pressed="false">side by side</button>
+    <button id="ws" aria-pressed="false">ignore spaces</button>
+    <button id="case" aria-pressed="false">ignore case</button>
+    <button id="swap">swap</button>
+    <button id="clear">clear</button>
+  </div>
+  <div id="summary" aria-live="polite">Paste two texts to compare.</div>
+  <div id="out"></div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  // storage helper — never throws
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+
+  const A = $('#a'), B = $('#b'), out = $('#out'), summary = $('#summary');
+  const opts = store.get('td-opts', { side: false, ws: false, cs: false });
+  A.value = store.get('td-a', '');
+  B.value = store.get('td-b', '');
+
+  // Myers O(ND) diff over arrays using an equality key per item.
+  // Returns [{op:'=',a,b} | {op:'-',a} | {op:'+',b}] in order.
+  function diff(a, b, key) {
+    const ka = a.map(key), kb = b.map(key);
+    let s = 0, ea = ka.length, eb = kb.length;
+    while (s < ea && s < eb && ka[s] === kb[s]) s++;
+    while (ea > s && eb > s && ka[ea - 1] === kb[eb - 1]) { ea--; eb--; }
+    const x0 = ka.slice(s, ea), y0 = kb.slice(s, eb);
+    const n = x0.length, m = y0.length, max = n + m, off = max + 1;
+    const v = new Int32Array(2 * max + 3), trace = [];
+    let found = n === 0 && m === 0;
+    for (let d = 0; d <= max && !found; d++) {
+      trace.push(v.slice());
+      for (let k = -d; k <= d; k += 2) {
+        let x = (k === -d || (k !== d && v[off + k - 1] < v[off + k + 1])) ? v[off + k + 1] : v[off + k - 1] + 1;
+        let y = x - k;
+        while (x < n && y < m && x0[x] === y0[y]) { x++; y++; }
+        v[off + k] = x;
+        if (x >= n && y >= m) { found = true; break; }
+      }
+    }
+    const mid = [];
+    let x = n, y = m;
+    for (let d = trace.length - 1; d >= 0 && (x > 0 || y > 0); d--) {
+      const vv = trace[d], k = x - y;
+      const down = k === -d || (k !== d && vv[off + k - 1] < vv[off + k + 1]);
+      const pk = down ? k + 1 : k - 1;
+      const px = vv[off + pk], py = px - pk;
+      while (x > px && y > py) { x--; y--; mid.push({ op: '=', a: s + x, b: s + y }); }
+      if (d === 0) break;
+      if (down) { y--; mid.push({ op: '+', b: s + y }); } else { x--; mid.push({ op: '-', a: s + x }); }
+    }
+    mid.reverse();
+    const ops = [];
+    for (let i = 0; i < s; i++) ops.push({ op: '=', a: i, b: i });
+    ops.push(...mid);
+    for (let i = 0; i < ka.length - ea; i++) ops.push({ op: '=', a: ea + i, b: eb + i });
+    return ops;
+  }
+
+  const norm = (t) => {
+    if (opts.ws) t = t.replace(/\s+/g, ' ').trim();
+    if (opts.cs) t = t.toLowerCase();
+    return t;
+  };
+  const splitLines = (t) => t === '' ? [] : t.replace(/\r\n?/g, '\n').replace(/\n$/, '').split('\n');
+  const words = (t) => t.match(/\s+|[\p{L}\p{N}_]+|[^\s\p{L}\p{N}_]/gu) || [];
+
+  function el(tag, cls, text) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  // Word-level highlights for a changed line pair; returns [fragA, fragB].
+  function wordDiff(la, lb) {
+    const wa = words(la), wb = words(lb);
+    const fa = document.createDocumentFragment(), fb = document.createDocumentFragment();
+    if (wa.length * wb.length > 250000) {
+      fa.append(el('span', 'del-word', la)); fb.append(el('span', 'ins-word', lb));
+      return [fa, fb];
+    }
+    for (const o of diff(wa, wb, norm)) {
+      if (o.op === '=') { fa.append(wa[o.a]); fb.append(wb[o.b]); }
+      else if (o.op === '-') fa.append(el('span', 'del-word', wa[o.a]));
+      else fb.append(el('span', 'ins-word', wb[o.b]));
+    }
+    return [fa, fb];
+  }
+
+  // Group ops into rows: equal rows, and change blocks where dels and ins are paired.
+  function rows(ops, la, lb) {
+    const r = [];
+    for (let i = 0; i < ops.length;) {
+      if (ops[i].op === '=') { r.push({ t: '=', a: la[ops[i].a], b: lb[ops[i].b] }); i++; continue; }
+      const dels = [], ins = [];
+      while (i < ops.length && ops[i].op !== '=') { (ops[i].op === '-' ? dels : ins).push(ops[i]); i++; }
+      const n = Math.max(dels.length, ins.length);
+      for (let j = 0; j < n; j++) r.push({ t: 'c', a: dels[j] ? la[dels[j].a] : null, b: ins[j] ? lb[ins[j].b] : null });
+    }
+    return r;
+  }
+
+  function renderRow(r, frag) {
+    if (opts.side) {
+      const row = el('div', 'sbs');
+      if (r.t === '=') { row.append(el('div', '', r.a || ' '), el('div', '', r.b || ' ')); }
+      else {
+        const ca = el('div', r.a == null ? 'gap' : 'del'), cb = el('div', r.b == null ? 'gap' : 'ins');
+        if (r.a != null && r.b != null) { const [fa, fb] = wordDiff(r.a, r.b); ca.append(fa); cb.append(fb); }
+        else { if (r.a != null) ca.textContent = r.a || ' '; if (r.b != null) cb.textContent = r.b || ' '; }
+        if (r.a == null) ca.textContent = ' ';
+        if (r.b == null) cb.textContent = ' ';
+        row.append(ca, cb);
+      }
+      frag.append(row);
+      return;
+    }
+    const line = (cls, sign, content) => {
+      const d = el('div', 'ln ' + cls); d.append(el('span', 'sg', sign));
+      const t = el('span'); if (typeof content === 'string') t.textContent = content || ' '; else t.append(content);
+      d.append(t); frag.append(d);
+    };
+    if (r.t === '=') return line('eq', ' ', r.a);
+    if (r.a != null && r.b != null) {
+      const [fa, fb] = wordDiff(r.a, r.b);
+      line('del', '−', fa); line('ins', '+', fb);
+    } else if (r.a != null) line('del', '−', r.a);
+    else line('ins', '+', r.b);
+  }
+
+  const CTX = 3;
+  function render() {
+    out.textContent = '';
+    summary.classList.remove('err');
+    const la = splitLines(A.value), lb = splitLines(B.value);
+    if (!la.length && !lb.length) { summary.textContent = 'Paste two texts to compare.'; return; }
+    if (la.length + lb.length > 40000) { summary.textContent = 'Too long: keep it under 20,000 lines each.'; summary.classList.add('err'); return; }
+    const ops = diff(la, lb, norm);
+    const removed = ops.filter(o => o.op === '-').length, added = ops.filter(o => o.op === '+').length;
+    if (!removed && !added) { summary.textContent = la.length ? 'No differences.' : 'Paste two texts to compare.'; return; }
+    summary.textContent = `${removed} line${removed === 1 ? '' : 's'} removed, ${added} added`;
+    const rs = rows(ops, la, lb), frag = document.createDocumentFragment();
+    for (let i = 0; i < rs.length;) {
+      if (rs[i].t !== '=') { renderRow(rs[i], frag); i++; continue; }
+      let j = i; while (j < rs.length && rs[j].t === '=') j++;
+      const head = i === 0 ? 0 : CTX, tail = j === rs.length ? 0 : CTX;
+      if (j - i > head + tail + 2) {
+        for (let k = i; k < i + head; k++) renderRow(rs[k], frag);
+        const hidden = rs.slice(i + head, j - tail);
+        const btn = el('button', 'fold', `${hidden.length} unchanged lines`);
+        btn.addEventListener('click', () => {
+          const f = document.createDocumentFragment(); hidden.forEach(r => renderRow(r, f)); btn.replaceWith(f);
+        });
+        frag.append(btn);
+        for (let k = j - tail; k < j; k++) renderRow(rs[k], frag);
+      } else for (let k = i; k < j; k++) renderRow(rs[k], frag);
+      i = j;
+    }
+    out.append(frag);
+  }
+
+  function save() { store.set('td-a', A.value); store.set('td-b', B.value); store.set('td-opts', opts); }
+  let timer;
+  const schedule = () => { clearTimeout(timer); timer = setTimeout(() => { save(); render(); }, 250); };
+  A.addEventListener('input', schedule);
+  B.addEventListener('input', schedule);
+  $('#compare').addEventListener('click', () => { clearTimeout(timer); save(); render(); });
+
+  const toggles = { mode: 'side', ws: 'ws', case: 'cs' };
+  for (const [id, k] of Object.entries(toggles)) {
+    const b = $('#' + id);
+    b.setAttribute('aria-pressed', String(!!opts[k]));
+    b.addEventListener('click', () => { opts[k] = !opts[k]; b.setAttribute('aria-pressed', String(opts[k])); save(); render(); });
+  }
+  $('#swap').addEventListener('click', () => { [A.value, B.value] = [B.value, A.value]; save(); render(); });
+  $('#clear').addEventListener('click', () => { A.value = ''; B.value = ''; save(); render(); A.focus(); });
+
+  for (const [id, ta] of [['#fa', A], ['#fb', B]]) {
+    $(id).addEventListener('change', (e) => {
+      const f = e.target.files && e.target.files[0];
+      if (!f) return;
+      const rd = new FileReader();
+      rd.onload = () => { ta.value = String(rd.result); save(); render(); };
+      rd.onerror = () => { summary.textContent = 'Could not read that file.'; summary.classList.add('err'); };
+      rd.readAsText(f);
+      e.target.value = '';
+    });
+  }
+
+  if (A.value || B.value) setTimeout(render, 0);
+})();
+</script>
+</body>
+</html>
