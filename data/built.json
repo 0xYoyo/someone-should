@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T02:06:19.637Z",
+ "updated": "2026-10-27T02:06:20.875Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -839,9 +839,14 @@
   },
   {
    "slug": "draw-on-video",
-   "status": "pending",
+   "status": "pass",
    "attempts": 1,
-   "model": "opus-5.5"
+   "model": "opus-5.5",
+   "kb": 17.1,
+   "tests": "6/6",
+   "built": "2026-10-27T02:04:27Z",
+   "minutes": 9,
+   "approved": false
   },
   {
    "slug": "videos-side-by-side",

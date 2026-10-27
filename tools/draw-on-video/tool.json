@@ -1,0 +1,61 @@
+{
+  "slug": "draw-on-video",
+  "wish": "someone should make an app that annotates video by drawing on frames",
+  "year": 2014,
+  "agreed": 42,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/266/simple-video-annotation-software-that-allows-drawing-in-frames-windows-or-linux",
+      "date": "2014-02-05",
+      "points": 28,
+      "comments": 6
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/18510/simple-and-local-software-to-annotate-videos",
+      "date": "2015-04-06",
+      "points": 7,
+      "comments": 1
+    }
+  ],
+  "spec": "Opens a local video and lets you draw in colour and add a caption on any frame; drawings reappear at their time during playback.\nPause, step frame by frame or type a time, draw with finger or mouse, mark frames, then save any annotated frame as a PNG.\nDoes not upload anything, does not render a new video file, and keeps marks per video file in this browser only.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#at",
+        "text": "0:07.50"
+      }
+    },
+    {
+      "type": {
+        "sel": "#note",
+        "text": "watch the elbow"
+      }
+    },
+    {
+      "tap": "#add"
+    },
+    {
+      "expect": {
+        "sel": "#list li",
+        "contains": "0:07.50watch the elbow"
+      }
+    },
+    {
+      "tap": "#fwd"
+    },
+    {
+      "expect": {
+        "sel": "#time",
+        "contains": "0:07.53"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T02:04:27Z",
+  "model": "opus-5.5",
+  "minutes": 9,
+  "approved": false,
+  "notes": "The template CSP allows only data: media, so the chosen video is read into memory as a data URL; very large files (several hundred MB) may be slow or fail on phones. Export is per-frame PNG, not a re-encoded video."
+}

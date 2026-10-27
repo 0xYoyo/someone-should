@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app that annotates video by drawing on frames</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+main { max-width: 760px; }
+.stage { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius); overflow: hidden; }
+.stage video, .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.stage video { object-fit: contain; }
+.stage canvas { touch-action: none; cursor: crosshair; }
+.file { display: inline-flex; align-items: center; min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); border-radius: var(--radius); cursor: pointer; }
+.file input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.file:focus-within { outline: 2px solid var(--ink); outline-offset: 2px; }
+.small { font-size: 16px; color: var(--meta); font-family: var(--mono); }
+.time { font: 16px/1 var(--mono); font-variant-numeric: tabular-nums; min-width: 9ch; }
+input[type=range] { padding: 0; border: 0; accent-color: var(--ink); }
+.sw { width: var(--tap); padding: 0; border-color: var(--line); }
+.sw span { display: block; width: 22px; height: 22px; margin: auto; border-radius: 50%; border: 1px solid var(--line); }
+.sw[aria-pressed=true] { border-color: var(--ink); border-width: 3px; }
+.grow { flex: 1 1 140px; }
+.fit { width: auto; }
+ul.plain li button { padding: 0 12px; }
+.seek { flex: 1; text-align: left; border: 0; padding: 0; min-width: 0; overflow-wrap: anywhere; }
+.seek b { font: 500 16px var(--mono); margin-right: 10px; }
+.seek.on b { text-decoration: underline; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make an app that annotates video by drawing on frames</h1>
+
+<main id="app" class="stack">
+  <div class="row">
+    <label class="file" id="openlbl">Open video<input type="file" id="file" accept="video/*"></label>
+    <span id="status" class="small">Open a video, pause, draw on the frame.</span>
+  </div>
+
+  <div class="stage" id="stage">
+    <video id="video" playsinline preload="auto"></video>
+    <canvas id="ink" aria-label="drawing layer"></canvas>
+  </div>
+
+  <div class="row">
+    <button id="play" class="primary" aria-label="play">Play</button>
+    <button id="back" aria-label="previous frame">&lsaquo;</button>
+    <button id="fwd" aria-label="next frame">&rsaquo;</button>
+    <span id="time" class="time">0:00.00</span>
+  </div>
+  <input type="range" id="scrub" min="0" max="0" step="0.01" value="0" aria-label="position">
+
+  <div class="row" id="tools">
+    <button class="sw" data-c="#e53935" aria-pressed="true" aria-label="red"><span style="background:#e53935"></span></button>
+    <button class="sw" data-c="#fdd835" aria-pressed="false" aria-label="yellow"><span style="background:#fdd835"></span></button>
+    <button class="sw" data-c="#ffffff" aria-pressed="false" aria-label="white"><span style="background:#ffffff"></span></button>
+    <button class="sw" data-c="#1e88e5" aria-pressed="false" aria-label="blue"><span style="background:#1e88e5"></span></button>
+    <select id="width" class="fit" aria-label="pen width"><option value="0.004">thin</option><option value="0.008" selected>medium</option><option value="0.016">thick</option></select>
+    <button id="undo">Undo</button>
+  </div>
+
+  <div class="row">
+    <input id="at" class="fit" style="width:7.5em" placeholder="0:00.00" aria-label="frame time">
+    <input id="note" class="grow" placeholder="caption (optional)" aria-label="caption">
+    <button id="add">Mark</button>
+  </div>
+  <div class="row">
+    <label class="small" for="hold">shown for</label>
+    <select id="hold" class="fit"><option value="0.04">1 frame</option><option value="1">1 s</option><option value="2" selected>2 s</option><option value="4">4 s</option><option value="1e9">rest of video</option></select>
+    <button id="png">Save frame PNG</button>
+  </div>
+
+  <ul class="plain" id="list"></ul>
+  <p id="empty" class="empty">No marked frames yet.</p>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  const video = $('#video'), cv = $('#ink'), ctx = cv.getContext('2d'), stage = $('#stage');
+  const status = $('#status'), list = $('#list');
+  const FPS = 30, NEAR = 0.5 / FPS;
+
+  let key = 'dov:none';            // storage key for the open video
+  let marks = [];                   // [{t, text, strokes:[{c, w, p:[[x,y],...]}]}], x/y normalised 0..1
+  let color = '#e53935', hold = 2, now = 0, drawing = null, history = [];
+  let hasVideo = false;
+
+  const fmt = t => { const m = Math.floor(t / 60), s = t - m * 60; return m + ':' + s.toFixed(2).padStart(5, '0'); };
+  const parse = str => {
+    const v = String(str).trim(); if (!v) return null;
+    const parts = v.split(':').map(Number);
+    if (parts.some(n => !isFinite(n) || n < 0)) return null;
+    return parts.reduce((a, n) => a * 60 + n, 0);
+  };
+  const save = () => { if (hasVideo) store.set(key, { hold, marks }); };
+  const sorted = () => marks.sort((a, b) => a.t - b.t);
+  const markAt = t => marks.find(m => Math.abs(m.t - t) < NEAR);
+  const visible = t => {
+    const exact = markAt(t);
+    if (exact) return exact;
+    let best = null;
+    for (const m of marks) if (m.t <= t && t < m.t + hold) best = m;
+    return best;
+  };
+
+  // ---- drawing ----
+  function frameBox() {
+    // the area the video picture actually occupies inside the stage
+    const W = cv.width, H = cv.height;
+    const vw = video.videoWidth || 16, vh = video.videoHeight || 9;
+    const s = Math.min(W / vw, H / vh), w = vw * s, h = vh * s;
+    return { x: (W - w) / 2, y: (H - h) / 2, w, h };
+  }
+  function paint(c, box, m) {
+    if (!m) return;
+    c.lineCap = c.lineJoin = 'round';
+    for (const st of m.strokes) {
+      c.strokeStyle = st.c; c.fillStyle = st.c; c.lineWidth = Math.max(1, st.w * box.w);
+      const p = st.p;
+      if (p.length === 1) { c.beginPath(); c.arc(box.x + p[0][0] * box.w, box.y + p[0][1] * box.h, c.lineWidth / 2, 0, 7); c.fill(); continue; }
+      c.beginPath(); c.moveTo(box.x + p[0][0] * box.w, box.y + p[0][1] * box.h);
+      for (let i = 1; i < p.length; i++) c.lineTo(box.x + p[i][0] * box.w, box.y + p[i][1] * box.h);
+      c.stroke();
+    }
+    if (m.text) {
+      const fs = Math.round(box.h * 0.06);
+      c.font = '600 ' + fs + 'px ' + getComputedStyle(document.body).fontFamily;
+      c.textAlign = 'center'; c.textBaseline = 'bottom';
+      c.lineWidth = Math.max(2, fs / 6); c.strokeStyle = '#000'; c.fillStyle = '#fff';
+      const y = box.y + box.h - fs * 0.6;
+      c.strokeText(m.text, box.x + box.w / 2, y, box.w * 0.94);
+      c.fillText(m.text, box.x + box.w / 2, y, box.w * 0.94);
+    }
+  }
+  function render() {
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    const m = drawing ? drawing.mark : visible(now);
+    paint(ctx, frameBox(), m);
+  }
+  function resize() {
+    const r = stage.getBoundingClientRect(), d = Math.min(2, window.devicePixelRatio || 1);
+    cv.width = Math.round(r.width * d); cv.height = Math.round(r.height * d);
+    render();
+  }
+  function pt(e) {
+    const r = cv.getBoundingClientRect(), d = cv.width / r.width, b = frameBox();
+    return [((e.clientX - r.left) * d - b.x) / b.w, ((e.clientY - r.top) * d - b.y) / b.h].map(v => Math.round(Math.min(1, Math.max(0, v)) * 1e4) / 1e4);
+  }
+  cv.addEventListener('pointerdown', e => {
+    if (!video.paused) video.pause();
+    let m = markAt(now);
+    if (!m) { m = { t: now, text: '', strokes: [] }; marks.push(m); sorted(); }
+    const st = { c: color, w: +$('#width').value, p: [pt(e)] };
+    m.strokes.push(st); history.push(m);
+    drawing = { mark: m, st };
+    cv.setPointerCapture(e.pointerId);
+    render();
+  });
+  cv.addEventListener('pointermove', e => {
+    if (!drawing) return;
+    const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+    for (const ev of (evs.length ? evs : [e])) drawing.st.p.push(pt(ev));
+    render();
+  });
+  const end = () => { if (!drawing) return; drawing = null; save(); renderList(); render(); };
+  cv.addEventListener('pointerup', end);
+  cv.addEventListener('pointercancel', end);
+
+  $('#undo').addEventListener('click', () => {
+    const m = history.pop();
+    if (!m) { status.textContent = 'Nothing to undo.'; return; }
+    m.strokes.pop();
+    if (!m.strokes.length && !m.text) marks = marks.filter(x => x !== m);
+    save(); renderList(); render();
+  });
+
+  $$('.sw').forEach(b => b.addEventListener('click', () => {
+    color = b.dataset.c; $$('.sw').forEach(x => x.setAttribute('aria-pressed', x === b));
+  }));
+  $('#hold').addEventListener('change', e => { hold = +e.target.value; save(); render(); });
+
+  // ---- time ----
+  function setNow(t) {
+    now = Math.max(0, t);
+    $('#time').textContent = fmt(now);
+    if (document.activeElement !== $('#at')) $('#at').value = fmt(now);
+    $('#scrub').value = now;
+    render(); highlight();
+  }
+  function seek(t) {
+    if (hasVideo) { t = Math.min(t, video.duration || t); video.currentTime = t; }
+    setNow(t);
+  }
+  video.addEventListener('timeupdate', () => setNow(video.currentTime));
+  video.addEventListener('seeked', () => setNow(video.currentTime));
+  video.addEventListener('play', () => { $('#play').textContent = 'Pause'; tick(); });
+  video.addEventListener('pause', () => { $('#play').textContent = 'Play'; });
+  video.addEventListener('ended', () => { $('#play').textContent = 'Play'; });
+  function tick() { if (video.paused) return; setNow(video.currentTime); requestAnimationFrame(tick); }
+
+  $('#play').addEventListener('click', () => {
+    if (!hasVideo) { status.textContent = 'Open a video first.'; return; }
+    video.paused ? video.play().catch(() => { status.textContent = 'This video will not play here.'; }) : video.pause();
+  });
+  const step = d => { if (hasVideo) video.pause(); seek(Math.max(0, now + d / FPS)); };
+  $('#back').addEventListener('click', () => step(-1));
+  $('#fwd').addEventListener('click', () => step(1));
+  $('#scrub').addEventListener('input', e => { if (hasVideo) video.pause(); seek(+e.target.value); });
+  $('#at').addEventListener('change', e => { const t = parse(e.target.value); if (t != null) seek(t); });
+  $('#at').addEventListener('keydown', e => { if (e.key === 'Enter') { const t = parse(e.target.value); if (t != null) seek(t); } });
+
+  // ---- marks ----
+  $('#add').addEventListener('click', () => {
+    const t = parse($('#at').value);
+    if (t == null) { status.textContent = 'Time looks wrong. Use 1:05.20'; return; }
+    if (t !== now) seek(t);
+    const text = $('#note').value.trim();
+    let m = markAt(now);
+    if (!m) { m = { t: now, text: '', strokes: [] }; marks.push(m); sorted(); }
+    if (text) m.text = text;
+    $('#note').value = '';
+    status.textContent = 'Marked ' + fmt(m.t) + '.';
+    save(); renderList(); render();
+  });
+  $('#note').addEventListener('keydown', e => { if (e.key === 'Enter') $('#add').click(); });
+
+  function renderList() {
+    list.textContent = '';
+    for (const m of sorted()) {
+      const li = document.createElement('li');
+      const b = document.createElement('button');
+      b.className = 'seek'; b.dataset.t = m.t;
+      const tb = document.createElement('b'); tb.textContent = fmt(m.t);
+      b.append(tb, document.createTextNode(m.text || (m.strokes.length + (m.strokes.length === 1 ? ' stroke' : ' strokes'))));
+      b.addEventListener('click', () => { if (hasVideo) video.pause(); seek(m.t); });
+      const p = document.createElement('button'); p.textContent = 'PNG'; p.className = 'rowpng';
+      p.addEventListener('click', () => exportAt(m.t));
+      const x = document.createElement('button'); x.textContent = 'Delete'; x.className = 'del';
+      x.addEventListener('click', () => { marks = marks.filter(y => y !== m); history = history.filter(y => y !== m); save(); renderList(); render(); });
+      li.append(b, p, x); list.append(li);
+    }
+    $('#empty').hidden = marks.length > 0;
+    highlight();
+  }
+  function highlight() {
+    const m = visible(now);
+    $$('.seek', list).forEach(b => b.classList.toggle('on', m && +b.dataset.t === m.t));
+  }
+
+  // ---- export ----
+  function waitSeek(t) {
+    return new Promise(res => {
+      if (!hasVideo || Math.abs(video.currentTime - t) < 1e-3) return res();
+      video.addEventListener('seeked', res, { once: true });
+      video.currentTime = t;
+    });
+  }
+  async function exportAt(t) {
+    if (hasVideo) video.pause();
+    await waitSeek(t); setNow(t);
+    const w = video.videoWidth || 1280, h = video.videoHeight || 720;
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    const x = c.getContext('2d');
+    x.fillStyle = '#000'; x.fillRect(0, 0, w, h);
+    if (hasVideo) x.drawImage(video, 0, 0, w, h);
+    paint(x, { x: 0, y: 0, w, h }, visible(t));
+    let url;
+    try { url = c.toDataURL('image/png'); } catch { status.textContent = 'This browser blocked saving the frame.'; return; }
+    const a = document.createElement('a');
+    a.href = url; a.download = (hasVideo ? key.slice(4).split('|')[0].replace(/\.[^.]+$/, '') : 'frame') + '-' + fmt(t).replace(/[:.]/g, '-') + '.png';
+    document.body.append(a); a.click(); a.remove();
+    status.textContent = 'Saved ' + fmt(t) + ' as PNG.';
+  }
+  $('#png').addEventListener('click', () => exportAt(now));
+
+  // ---- open ----
+  $('#file').addEventListener('change', e => {
+    const f = e.target.files[0]; if (!f) return;
+    status.textContent = 'Loading ' + f.name + '...';
+    // the page's CSP only allows data: media, so the file is read into a data URL
+    const r = new FileReader();
+    r.onerror = () => { status.textContent = 'Could not read that file.'; };
+    r.onload = () => {
+      video.src = r.result;
+      key = 'dov:' + f.name + '|' + f.size;
+      const saved = store.get(key, null);
+      marks = saved && Array.isArray(saved.marks) ? saved.marks : [];
+      if (saved && saved.hold) { hold = saved.hold; $('#hold').value = String(hold); }
+      history = [];
+      hasVideo = true;
+    };
+    r.readAsDataURL(f);
+  });
+  video.addEventListener('loadedmetadata', () => {
+    $('#scrub').max = video.duration || 0;
+    stage.style.aspectRatio = video.videoWidth && video.videoHeight ? video.videoWidth + ' / ' + video.videoHeight : '';
+    const n = marks.length;
+    status.textContent = n ? n + (n === 1 ? ' marked frame restored.' : ' marked frames restored.') : 'Pause anywhere and draw.';
+    resize(); renderList(); setNow(0);
+  });
+  video.addEventListener('error', () => { if (hasVideo) status.textContent = 'This browser cannot play that video.'; });
+
+  new ResizeObserver(resize).observe(stage);
+  renderList(); setNow(0);
+})();
+</script>
+</body>
+</html>
