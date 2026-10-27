@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a game where you are the zombie</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+#field { position: relative; width: 100%; max-width: 560px; margin: 0 auto; }
+canvas { display: block; width: 100%; height: auto; border: 1.5px solid var(--line); border-radius: var(--radius); touch-action: none; background: transparent; }
+#cover { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 10px; padding: 16px; }
+#cover[hidden] { display: none; }
+#stats { display: flex; justify-content: space-between; max-width: 560px; margin: 0 auto; width: 100%; }
+#stats span { font: 16px/1.4 var(--mono); color: var(--meta); }
+#stats b { color: var(--ink); font-weight: 500; }
+#msg { max-width: 560px; margin: 0 auto; width: 100%; min-height: 24px; }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a game where you are the zombie</h1>
+
+<main id="app" class="stack">
+  <div id="stats">
+    <span>horde <b id="horde">1</b></span>
+    <span>left <b id="left">0</b></span>
+    <span>level <b id="level">1</b></span>
+    <span>best <b id="best">0</b></span>
+  </div>
+  <div id="field">
+    <canvas id="cv" width="360" height="440" aria-label="top-down field with a zombie horde chasing survivors"></canvas>
+    <div id="cover"><button id="start" class="primary">tap to start</button></div>
+  </div>
+  <div id="msg" class="meta">drag to lurch. the horde follows and hunts.</div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const cv = $('#cv'), ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  const css = getComputedStyle(document.documentElement);
+  const col = n => css.getPropertyValue(n).trim() || '#888';
+  let ZC = col('--built'), SC = col('--ink'), NO = col('--no');
+
+  let zombies, people, level, best = store.get('zombie-best', 0), running = false;
+  let target = null, keys = {}, last = 0, bites = 0;
+  $('#best').textContent = best;
+
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+
+  function spawnLevel(n) {
+    level = n;
+    const lead = zombies[0];
+    people = [];
+    // one dazed survivor close to the leader so the first bite comes quickly
+    people.push({ x: Math.min(W - 20, lead.x + 45), y: lead.y - 25, v: 26 + n * 6 });
+    const count = 5 + n * 3;
+    for (let i = 1; i < count; i++) {
+      let x, y;
+      do { x = rnd(20, W - 20); y = rnd(20, H - 20); } while (Math.hypot(x - lead.x, y - lead.y) < 140);
+      people.push({ x, y, v: 34 + n * 7 + rnd(0, 14) });
+    }
+    $('#level').textContent = n;
+  }
+
+  function reset() {
+    zombies = [{ x: W / 2, y: H - 80, lead: true }];
+    spawnLevel(1);
+    bites = 0;
+    hud();
+  }
+
+  function hud() {
+    $('#horde').textContent = zombies.length;
+    $('#left').textContent = people.length;
+    $('#best').textContent = best;
+  }
+
+  function nearest(from, list) {
+    let b = null, bd = 1e9;
+    for (const o of list) { const d = dist(from, o); if (d < bd) { bd = d; b = o; } }
+    return b;
+  }
+
+  function step(dt) {
+    const lead = zombies[0];
+    // leader: follows touch / arrow keys, otherwise shambles toward the nearest survivor
+    let tx = null, ty = null;
+    if (target) { tx = target.x; ty = target.y; }
+    else if (keys.l || keys.r || keys.u || keys.d) {
+      lead.x += ((keys.r ? 1 : 0) - (keys.l ? 1 : 0)) * 100 * dt;
+      lead.y += ((keys.d ? 1 : 0) - (keys.u ? 1 : 0)) * 100 * dt;
+    } else {
+      const n = nearest(lead, people);
+      if (n) { tx = n.x; ty = n.y; }
+    }
+    if (tx !== null) {
+      const d = Math.hypot(tx - lead.x, ty - lead.y);
+      if (d > 3) { const s = Math.min(100 * dt, d); lead.x += (tx - lead.x) / d * s; lead.y += (ty - lead.y) / d * s; }
+    }
+    // the rest of the horde hunts the nearest survivor, or trails the leader
+    for (let i = 1; i < zombies.length; i++) {
+      const z = zombies[i];
+      const n = nearest(z, people);
+      let gx = lead.x, gy = lead.y, sp = 70;
+      if (n && dist(z, n) < 150) { gx = n.x; gy = n.y; sp = 78; }
+      const d = Math.hypot(gx - z.x, gy - z.y);
+      if (d > 22 || (n && dist(z, n) < 150)) { z.x += (gx - z.x) / d * sp * dt + rnd(-8, 8) * dt; z.y += (gy - z.y) / d * sp * dt + rnd(-8, 8) * dt; }
+    }
+    // survivors run from the closest zombie
+    for (const p of people) {
+      const z = nearest(p, zombies);
+      const d = dist(p, z);
+      if (d < 130) {
+        p.x += (p.x - z.x) / d * p.v * dt;
+        p.y += (p.y - z.y) / d * p.v * dt;
+      } else {
+        p.x += rnd(-6, 6) * dt; p.y += rnd(-6, 6) * dt;
+      }
+      p.x = Math.max(8, Math.min(W - 8, p.x));
+      p.y = Math.max(8, Math.min(H - 8, p.y));
+    }
+    // bites
+    for (let i = people.length - 1; i >= 0; i--) {
+      const p = people[i];
+      if (zombies.some(z => dist(z, p) < 16)) {
+        zombies.push({ x: p.x, y: p.y });
+        people.splice(i, 1);
+        bites++;
+        if (zombies.length - 1 > best) { best = zombies.length - 1; store.set('zombie-best', best); }
+      }
+    }
+    for (const z of zombies) { z.x = Math.max(8, Math.min(W - 8, z.x)); z.y = Math.max(8, Math.min(H - 8, z.y)); }
+    if (people.length === 0 && running) {
+      spawnLevel(level + 1);
+      $('#msg').textContent = 'level ' + level + '. they run faster now.';
+    }
+    hud();
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    for (const p of people) {
+      ctx.fillStyle = SC;
+      ctx.beginPath(); ctx.arc(p.x, p.y, 7, 0, 7); ctx.fill();
+    }
+    zombies.forEach((z, i) => {
+      ctx.fillStyle = ZC;
+      ctx.beginPath(); ctx.arc(z.x, z.y, i === 0 ? 11 : 8, 0, 7); ctx.fill();
+      if (i === 0) { ctx.strokeStyle = SC; ctx.lineWidth = 2; ctx.stroke(); }
+    });
+    if (target) {
+      ctx.strokeStyle = NO; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(target.x, target.y, 10, 0, 7); ctx.stroke();
+    }
+  }
+
+  function loop(t) {
+    const dt = Math.min(0.05, (t - last) / 1000 || 0.016);
+    last = t;
+    step(dt);
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  function pos(e) {
+    const r = cv.getBoundingClientRect();
+    return { x: (e.clientX - r.left) * W / r.width, y: (e.clientY - r.top) * H / r.height };
+  }
+  cv.addEventListener('pointerdown', e => { target = pos(e); try { cv.setPointerCapture(e.pointerId); } catch {} });
+  cv.addEventListener('pointermove', e => { if (target) target = pos(e); });
+  const up = () => { target = null; };
+  cv.addEventListener('pointerup', up);
+  cv.addEventListener('pointercancel', up);
+  const kmap = { ArrowLeft: 'l', ArrowRight: 'r', ArrowUp: 'u', ArrowDown: 'd' };
+  addEventListener('keydown', e => { if (kmap[e.key]) { keys[kmap[e.key]] = true; e.preventDefault(); } });
+  addEventListener('keyup', e => { if (kmap[e.key]) keys[kmap[e.key]] = false; });
+
+  $('#start').addEventListener('click', () => {
+    reset();
+    running = true;
+    $('#cover').hidden = true;
+    $('#msg').textContent = 'drag to lurch. the horde follows and hunts.';
+  });
+
+  // first frame: a small horde already hunting, so the thumbnail shows the game
+  reset();
+  zombies.push({ x: W / 2 - 22, y: H - 62 }, { x: W / 2 + 24, y: H - 56 });
+  hud();
+  draw();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+{
+  "slug": "hidden-ideas-list",
+  "wish": "someone should make a note app for jokes and ideas that hides the whole list until you want to see it",
+  "year": 2019,
+  "agreed": 111,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/AppIdeas/comments/elwi0e/",
+      "date": "2020-01-08",
+      "points": 15,
+      "comments": 28
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/AppIdeas/comments/oyysvv/",
+      "date": "2021-08-06",
+      "points": 16,
+      "comments": 19
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/e8bfv9/",
+      "date": "2019-12-09",
+      "points": 27,
+      "comments": 6
+    }
+  ],
+  "spec": "Saves one-line jokes and ideas and keeps the whole list out of sight, showing only a count.\nType a note and tap Add; tap Show to reveal the list and Hide to put it away.\nIt does not sync, search, or share; notes stay in this browser only.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#text",
+        "text": "knock knock"
+      }
+    },
+    {
+      "tap": "#add"
+    },
+    {
+      "expect": {
+        "sel": "#count",
+        "contains": "3 notes hidden"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#list li",
+        "count": 0
+      }
+    },
+    {
+      "tap": "#toggle"
+    },
+    {
+      "expect": {
+        "sel": "#list li",
+        "contains": "knock knock"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:43:30Z",
+  "model": "sonnet-5.5",
+  "minutes": 3,
+  "approved": false,
+  "notes": ""
+}

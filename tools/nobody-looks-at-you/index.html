@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a video game where all the NPCs avoid eye contact with you</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+#board { width: 100%; max-width: 360px; aspect-ratio: 1; display: block; border: 1.5px solid var(--line); border-radius: var(--radius); touch-action: manipulation; }
+.pad { display: grid; grid-template-columns: repeat(3, 56px); grid-template-rows: repeat(2, 48px); gap: 8px; }
+.pad button { padding: 0; min-width: 56px; }
+#up { grid-column: 2; grid-row: 1; }
+#left { grid-column: 1; grid-row: 2; }
+#down { grid-column: 2; grid-row: 2; }
+#right { grid-column: 3; grid-row: 2; }
+#talk { min-width: 96px; height: 104px; }
+#status, #said { min-height: 1.45em; margin: 0; }
+#said { font-style: italic; }
+#why { margin: 0; font-weight: 500; }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a video game where all the NPCs avoid eye contact with you</h1>
+
+<main id="app" class="stack">
+  <canvas id="board" width="360" height="360" aria-label="Town map"></canvas>
+  <p id="status">Walk up to someone.</p>
+  <p id="said"></p>
+  <div class="row">
+    <div class="pad">
+      <button id="up" aria-label="Up">&uarr;</button>
+      <button id="left" aria-label="Left">&larr;</button>
+      <button id="down" aria-label="Down">&darr;</button>
+      <button id="right" aria-label="Right">&rarr;</button>
+    </div>
+    <button id="talk" class="primary">Talk</button>
+  </div>
+  <p class="meta" id="count">spoken to 0 of 5</p>
+  <p id="why" hidden></p>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const N = 9, T = 40, RANGE = 5;
+  const DIRS = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
+  const npcs = [
+    { name: 'the baker', x: 4, y: 4, line: 'Nice weather. Not that I looked.' },
+    { name: 'the fisher', x: 1, y: 2, line: 'The river is low. I think. I was not watching you.' },
+    { name: 'the child', x: 7, y: 2, line: 'Mum says not to stare. So I do not.' },
+    { name: 'the clerk', x: 2, y: 6, line: 'Next. Not you. Anyone but you.' },
+    { name: 'the mayor', x: 6, y: 6, line: 'Welcome. Please walk on. Facing forward.' }
+  ];
+  const WHY = 'They only look when you are not looking. You are seen from behind.';
+  const me = { x: 4, y: 7, f: DIRS.up };
+  const talked = new Set(store.get('nly-talked', []).filter(i => i >= 0 && i < npcs.length));
+
+  const cv = $('#board'), ctx = cv.getContext('2d');
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+  const dist = n => Math.max(Math.abs(n.x - me.x), Math.abs(n.y - me.y));
+  // true when the player is facing this villager from within range
+  function watched(n) {
+    const dx = n.x - me.x, dy = n.y - me.y, d = Math.hypot(dx, dy);
+    if (d === 0 || dist(n) > RANGE) return false;
+    return (dx * me.f[0] + dy * me.f[1]) / d > 0.5;
+  }
+  // villagers turn away when watched, otherwise face you when near
+  function gaze(n) {
+    const dx = me.x - n.x, dy = me.y - n.y, d = Math.hypot(dx, dy) || 1;
+    const s = watched(n) ? -1 : (dist(n) <= RANGE ? 1 : 0);
+    return [s * dx / d, s * dy / d];
+  }
+
+  function draw() {
+    const ink = css('--ink'), line = css('--line'), meta = css('--meta');
+    ctx.clearRect(0, 0, 360, 360);
+    ctx.strokeStyle = line; ctx.lineWidth = 1;
+    for (let i = 1; i < N; i++) {
+      ctx.beginPath(); ctx.moveTo(i * T, 0); ctx.lineTo(i * T, 360); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, i * T); ctx.lineTo(360, i * T); ctx.stroke();
+    }
+    npcs.forEach((n, i) => {
+      const cx = n.x * T + T / 2, cy = n.y * T + T / 2, g = gaze(n);
+      ctx.fillStyle = talked.has(i) ? meta : ink;
+      ctx.beginPath(); ctx.arc(cx, cy, 13, 0, 7); ctx.fill();
+      // eye dot shows where they look
+      ctx.fillStyle = css('--paper');
+      ctx.beginPath(); ctx.arc(cx + g[0] * 8, cy + g[1] * 8, 4, 0, 7); ctx.fill();
+    });
+    const px = me.x * T + T / 2, py = me.y * T + T / 2;
+    ctx.strokeStyle = ink; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(px, py, 13, 0, 7); ctx.stroke();
+    ctx.fillStyle = ink;
+    ctx.beginPath(); ctx.arc(px + me.f[0] * 8, py + me.f[1] * 8, 4, 0, 7); ctx.fill();
+  }
+
+  function nearby() {
+    return npcs.findIndex(n => Math.abs(n.x - me.x) + Math.abs(n.y - me.y) === 1);
+  }
+
+  function update() {
+    const w = npcs.filter(watched), s = npcs.filter(n => !watched(n) && dist(n) <= RANGE);
+    let msg = 'Walk up to someone.';
+    if (w.length) msg = cap(w[0].name) + ' looks away.';
+    else if (s.length) msg = cap(s[0].name) + ' is looking at you.';
+    $('#status').textContent = msg;
+    $('#count').textContent = 'spoken to ' + talked.size + ' of ' + npcs.length;
+    if (talked.size === npcs.length) { $('#why').hidden = false; $('#why').textContent = WHY; }
+    draw();
+  }
+  const cap = s => s[0].toUpperCase() + s.slice(1);
+
+  function move(key) {
+    const d = DIRS[key], nx = me.x + d[0], ny = me.y + d[1];
+    me.f = d;
+    $('#said').textContent = '';
+    const free = nx >= 0 && ny >= 0 && nx < N && ny < N && !npcs.some(n => n.x === nx && n.y === ny);
+    if (free) { me.x = nx; me.y = ny; }
+    update();
+  }
+
+  function talk() {
+    const i = nearby();
+    if (i < 0) { $('#said').textContent = 'No one is close enough.'; return; }
+    $('#said').textContent = cap(npcs[i].name) + ': ' + npcs[i].line;
+    talked.add(i);
+    store.set('nly-talked', [...talked]);
+    update();
+  }
+
+  Object.keys(DIRS).forEach(k => $('#' + k).addEventListener('click', () => move(k)));
+  $('#talk').addEventListener('click', talk);
+  document.addEventListener('keydown', e => {
+    const m = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' }[e.key];
+    if (m) { e.preventDefault(); move(m); } else if (e.key === ' ' || e.key === 'Enter') { if (document.activeElement.tagName !== 'BUTTON') talk(); }
+  });
+  update();
+})();
+</script>
+</body>
+</html>

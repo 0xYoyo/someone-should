@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a game where you lose weapons as you level up instead of unlocking them</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+canvas { display: block; width: 100%; max-width: 420px; aspect-ratio: 3 / 4; border: 1.5px solid var(--line); border-radius: var(--radius); touch-action: none; background: transparent; }
+.stat { display: flex; gap: 16px; flex-wrap: wrap; font: 16px/1.4 var(--mono); }
+.stat b { font-weight: 500; }
+#arsenal { display: flex; gap: 8px; flex-wrap: wrap; list-style: none; margin: 0; padding: 0; font: 16px/1.4 var(--mono); }
+#arsenal li { padding: 6px 10px; border: 1.5px solid var(--ink); border-radius: var(--radius); }
+#arsenal li.gone { display: none; }
+#msg { min-height: 24px; margin: 0; }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a game where you lose weapons as you level up instead of unlocking them</h1>
+<main id="app" class="stack">
+  <div class="stat"><span>level <b id="level">1</b></span><span>kills <b id="kills">0</b>/<span id="goal">6</span></span><span>hp <b id="hp">100</b></span><span class="meta">best <span id="best">1</span></span></div>
+  <canvas id="field" width="300" height="400" aria-label="arena"></canvas>
+  <ul id="arsenal"></ul>
+  <p id="msg" class="meta">drag to move. weapons fire on their own.</p>
+  <div class="row"><button id="levelup" class="primary">level up now</button><button id="restart">restart</button></div>
+</main>
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const W = 300, H = 400;
+  // strongest first: each level up takes the first one away
+  const WEAPONS = [
+    { name: 'rocket launcher', range: 170, cd: 0.9, dmg: 6, w: 4 },
+    { name: 'shotgun', range: 110, cd: 0.6, dmg: 4, w: 3 },
+    { name: 'rifle', range: 200, cd: 0.35, dmg: 2, w: 1.5 },
+    { name: 'pistol', range: 140, cd: 0.5, dmg: 1.5, w: 1 },
+    { name: 'knife', range: 34, cd: 0.3, dmg: 2, w: 2 },
+    { name: 'bare hands', range: 26, cd: 0.35, dmg: 1, w: 2 }
+  ];
+  const LAST = WEAPONS.length;
+  const GOAL = 6;
+  const cv = $('#field'), ctx = cv.getContext('2d');
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+  let s, target = null, best = store.get('best', 1), last = 0;
+
+  function reset() {
+    s = { level: 1, kills: 0, hp: 100, p: { x: W / 2, y: H / 2 }, en: [], fx: [], cds: WEAPONS.map(() => 0),
+          spawn: 0, state: 'play', t: 0 };
+    for (let i = 0; i < 3; i++) spawnEnemy(true);
+    msg('drag to move. weapons fire on their own.');
+    ui();
+  }
+  function msg(t) { $('#msg').textContent = t; }
+
+  function spawnEnemy(near) {
+    const a = Math.random() * Math.PI * 2, d = near ? 90 + Math.random() * 40 : 230;
+    s.en.push({ x: s.p.x + Math.cos(a) * d, y: s.p.y + Math.sin(a) * d, hp: 3 + s.level });
+  }
+
+  function ui() {
+    $('#level').textContent = s.level;
+    $('#kills').textContent = s.kills;
+    $('#goal').textContent = s.level === LAST ? GOAL + 4 : GOAL;
+    $('#hp').textContent = Math.max(0, Math.round(s.hp));
+    $('#best').textContent = best;
+    const ul = $('#arsenal');
+    if (ul.children.length !== LAST) {
+      ul.innerHTML = '';
+      WEAPONS.forEach(w => { const li = document.createElement('li'); li.textContent = w.name; ul.appendChild(li); });
+    }
+    [...ul.children].forEach((li, i) => li.classList.toggle('gone', i < s.level - 1));
+  }
+
+  function levelUp() {
+    if (s.state !== 'play') return;
+    if (s.level >= LAST) { msg('nothing left to lose.'); return; }
+    const lost = WEAPONS[s.level - 1].name;
+    s.level++; s.kills = 0;
+    s.hp = Math.min(100, s.hp + 30);
+    best = Math.max(best, s.level); store.set('best', best);
+    msg('level ' + s.level + '. lost: ' + lost + '.');
+    ui();
+  }
+
+  function die() {
+    s.state = 'dead';
+    msg('dead at level ' + s.level + ' with ' + WEAPONS.slice(s.level - 1).map(w => w.name).join(', ') + '.');
+  }
+
+  function step(dt) {
+    if (s.state !== 'play') return;
+    const p = s.p;
+    if (target) {
+      const dx = target.x - p.x, dy = target.y - p.y, d = Math.hypot(dx, dy);
+      if (d > 3) { const m = Math.min(d, 95 * dt); p.x += dx / d * m; p.y += dy / d * m; }
+    }
+    p.x = Math.max(8, Math.min(W - 8, p.x)); p.y = Math.max(8, Math.min(H - 8, p.y));
+    s.spawn -= dt;
+    if (s.spawn <= 0) { spawnEnemy(false); s.spawn = Math.max(0.6, 1.5 - s.level * 0.12); }
+    const sp = 26 + s.level * 5;
+    for (const e of s.en) {
+      const dx = p.x - e.x, dy = p.y - e.y, d = Math.hypot(dx, dy) || 1;
+      e.x += dx / d * sp * dt; e.y += dy / d * sp * dt;
+      if (d < 16) s.hp -= 9 * dt;
+    }
+    // each weapon you still have fires at the nearest enemy in its range
+    for (let i = s.level - 1; i < LAST; i++) {
+      s.cds[i] -= dt;
+      if (s.cds[i] > 0) continue;
+      const w = WEAPONS[i];
+      let tgt = null, bd = w.range;
+      for (const e of s.en) { const d = Math.hypot(e.x - p.x, e.y - p.y); if (d <= bd) { bd = d; tgt = e; } }
+      if (!tgt) continue;
+      s.cds[i] = w.cd;
+      tgt.hp -= w.dmg;
+      s.fx.push({ x1: p.x, y1: p.y, x2: tgt.x, y2: tgt.y, w: w.w, t: 0.12 });
+    }
+    const before = s.en.length;
+    s.en = s.en.filter(e => e.hp > 0);
+    s.kills += before - s.en.length;
+    s.fx.forEach(f => f.t -= dt); s.fx = s.fx.filter(f => f.t > 0);
+    const goal = s.level === LAST ? GOAL + 4 : GOAL;
+    if (s.kills >= goal) {
+      if (s.level === LAST) { s.state = 'won'; msg('level ' + LAST + ' cleared with bare hands.'); }
+      else levelUp();
+    }
+    if (s.hp <= 0) die();
+    ui();
+  }
+
+  function draw() {
+    const ink = css('--ink'), no = css('--no'), line = css('--line');
+    ctx.clearRect(0, 0, W, H);
+    ctx.strokeStyle = line; ctx.lineWidth = 1;
+    ctx.strokeRect(0.5, 0.5, W - 1, H - 1);
+    ctx.strokeStyle = ink;
+    for (const f of s.fx) { ctx.lineWidth = f.w; ctx.beginPath(); ctx.moveTo(f.x1, f.y1); ctx.lineTo(f.x2, f.y2); ctx.stroke(); }
+    ctx.fillStyle = no;
+    for (const e of s.en) { ctx.beginPath(); ctx.arc(e.x, e.y, 7, 0, 7); ctx.fill(); }
+    ctx.fillStyle = ink;
+    ctx.beginPath(); ctx.arc(s.p.x, s.p.y, 8, 0, 7); ctx.fill();
+    // weapon range ring of the longest weapon left
+    ctx.strokeStyle = line; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(s.p.x, s.p.y, WEAPONS.slice(s.level - 1).reduce((m, w) => Math.max(m, w.range), 0), 0, 7); ctx.stroke();
+  }
+
+  function loop(t) {
+    const dt = Math.min(0.05, (t - last) / 1000 || 0); last = t;
+    step(dt); draw();
+    requestAnimationFrame(loop);
+  }
+
+  function pos(e) {
+    const r = cv.getBoundingClientRect();
+    return { x: (e.clientX - r.left) / r.width * W, y: (e.clientY - r.top) / r.height * H };
+  }
+  cv.addEventListener('pointerdown', e => { target = pos(e); });
+  cv.addEventListener('pointermove', e => { if (e.buttons || e.pointerType === 'touch') target = pos(e); });
+  $('#levelup').addEventListener('click', levelUp);
+  $('#restart').addEventListener('click', reset);
+
+  reset();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

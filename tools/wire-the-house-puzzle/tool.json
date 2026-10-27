@@ -1,0 +1,48 @@
+{
+  "slug": "wire-the-house-puzzle",
+  "wish": "someone should make an electrician simulator game that teaches wiring household circuits",
+  "year": 2020,
+  "agreed": 117,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/SomebodyMakeThis/comments/k8oidu/",
+      "date": "2020-12-07",
+      "points": 94,
+      "comments": 23
+    }
+  ],
+  "spec": "Wire household circuits by tapping one terminal, then another, then flip the breaker on to test.\nThree circuits: a lamp on a switch, an outlet, and both on one circuit, checked for correct live, neutral and ground.\nIt does not simulate loads, wire gauges or local code, and does not replace a licensed electrician.",
+  "tests": [
+    {
+      "tap": "#t-swOut"
+    },
+    {
+      "tap": "#t-lampL"
+    },
+    {
+      "tap": "#test"
+    },
+    {
+      "expect": {
+        "sel": "#msg",
+        "contains": "Lamp lit"
+      }
+    },
+    {
+      "tap": "#next"
+    },
+    {
+      "expect": {
+        "sel": "#level",
+        "contains": "Circuit 2"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:44:35Z",
+  "model": "sonnet-5.5",
+  "minutes": 7,
+  "approved": false,
+  "notes": ""
+}

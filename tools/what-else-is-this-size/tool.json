@@ -1,0 +1,71 @@
+{
+  "slug": "what-else-is-this-size",
+  "wish": "someone should make a website that shows objects of similar size to the dimensions you enter",
+  "year": 2014,
+  "agreed": 121,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/2g40sc/",
+      "date": "2014-09-11",
+      "points": 57,
+      "comments": 10
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/SomebodyMakeThis/comments/206fos/",
+      "date": "2014-03-11",
+      "points": 27,
+      "comments": 16
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/AppIdeas/comments/iwqkly/",
+      "date": "2020-09-21",
+      "points": 6,
+      "comments": 5
+    }
+  ],
+  "spec": "Shows everyday objects closest in size to the length, width and height you enter, from a built-in table of about 60 objects.\nType one to three sizes and pick a unit; the six nearest objects update live, and tapping one draws it to scale against your size.\nIt does not measure anything, look anything up online, or know brand-specific sizes.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#d1",
+        "text": "8.5"
+      }
+    },
+    {
+      "type": {
+        "sel": "#d2",
+        "text": "5.4"
+      }
+    },
+    {
+      "type": {
+        "sel": "#d3",
+        "text": "0.1"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#list button",
+        "contains": "credit card"
+      }
+    },
+    {
+      "tap": "#list button:nth-child(2)"
+    },
+    {
+      "expect": {
+        "sel": "#draw text:last-child",
+        "contains": "solid"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:44:08Z",
+  "model": "sonnet-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": ""
+}

@@ -1,0 +1,54 @@
+{
+  "slug": "semi-truck-spotter-dex",
+  "wish": "someone should make a Pokedex that records all the semi-trucks you have seen, with images and descriptions",
+  "year": 2018,
+  "agreed": 99,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/9dy3fm/",
+      "date": "2018-09-07",
+      "points": 83,
+      "comments": 16
+    }
+  ],
+  "spec": "A dex of 15 common North American semi-truck models, each with a silhouette, short description and how to tell it apart.\nTap a model, tap Seen one, optionally add a place and a photo; sightings are saved on the device.\nIt does not identify trucks from photos and has no network access.",
+  "tests": [
+    {
+      "expect": {
+        "sel": "#count",
+        "contains": "0 / 15"
+      }
+    },
+    {
+      "tap": ".tile[data-id='kenworth-w900']"
+    },
+    {
+      "type": {
+        "sel": "#place",
+        "text": "I-80"
+      }
+    },
+    {
+      "tap": "#seen"
+    },
+    {
+      "expect": {
+        "sel": "#count",
+        "contains": "1 / 15"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#log",
+        "contains": "I-80"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:45:13Z",
+  "model": "sonnet-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Photos are downscaled to 200px and stored in localStorage."
+}

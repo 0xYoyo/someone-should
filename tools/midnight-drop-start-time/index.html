@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a website that tells you when to start a song so the bass drops at midnight</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+label { display: grid; gap: 6px; }
+.out { border-top: 1px solid var(--line); padding-top: 16px; display: grid; gap: 6px; }
+.err { color: var(--no); min-height: 1.45em; }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a website that tells you when to start a song so the bass drops at midnight</h1>
+<main id="app" class="stack">
+  <label>Drop happens at (hh:mm or hh:mm:ss)
+    <input id="target" type="text" inputmode="numeric" autocomplete="off" value="00:00:00">
+  </label>
+  <label>Drop is this far into the song (m:ss)
+    <input id="drop" type="text" inputmode="numeric" autocomplete="off" value="1:12">
+  </label>
+  <div class="err" id="err" role="status"></div>
+  <div class="out">
+    <div class="meta">press play at</div>
+    <div class="big" id="startat">23:58:48</div>
+    <div class="meta" id="countdown">&nbsp;</div>
+    <div class="meta" id="now">&nbsp;</div>
+  </div>
+</main>
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const p2 = n => String(n).padStart(2, '0');
+  const DAY = 86400;
+
+  // "hh:mm[:ss]" -> seconds since midnight, or null
+  function parseClock(s) {
+    const m = /^\s*(\d{1,2}):(\d{2})(?::(\d{2}))?\s*$/.exec(s);
+    if (!m) return null;
+    const h = +m[1], mi = +m[2], se = +(m[3] || 0);
+    if (h > 23 || mi > 59 || se > 59) return null;
+    return h * 3600 + mi * 60 + se;
+  }
+  // "m:ss" or plain seconds -> seconds
+  function parseDrop(s) {
+    const m = /^\s*(\d{1,3}):([0-5]\d)\s*$/.exec(s);
+    if (m) return +m[1] * 60 + +m[2];
+    const n = /^\s*(\d{1,5})\s*$/.exec(s);
+    return n ? +n[1] : null;
+  }
+  const clock = t => { t = ((t % DAY) + DAY) % DAY; return p2(Math.floor(t / 3600)) + ':' + p2(Math.floor(t % 3600 / 60)) + ':' + p2(Math.floor(t % 60)); };
+  const ms = t => Math.floor(t / 60) + ':' + p2(Math.floor(t % 60));
+
+  const tIn = $('#target'), dIn = $('#drop');
+  const saved = store.get('mdst', null);
+  if (saved) { tIn.value = saved.t || tIn.value; dIn.value = saved.d || dIn.value; }
+
+  function render() {
+    const t = parseClock(tIn.value), d = parseDrop(dIn.value);
+    const err = $('#err');
+    const d0 = new Date();
+    const nowS = d0.getHours() * 3600 + d0.getMinutes() * 60 + d0.getSeconds() + d0.getMilliseconds() / 1000;
+    $('#now').textContent = 'now ' + clock(nowS);
+    if (t == null || d == null) {
+      err.textContent = t == null ? 'Time looks wrong. Try 00:00 or 23:59:30.' : 'Drop time looks wrong. Try 1:12.';
+      $('#startat').textContent = '--:--:--';
+      $('#countdown').textContent = '';
+      return;
+    }
+    err.textContent = '';
+    store.set('mdst', { t: tIn.value, d: dIn.value });
+    $('#startat').textContent = clock(t - d);
+    // next occurrence of the drop moment that is still ahead
+    let wait = t - nowS;
+    if (wait <= 0) wait += DAY;
+    const toStart = wait - d;
+    const cd = $('#countdown');
+    if (toStart > 0) {
+      const s = Math.ceil(toStart);
+      cd.textContent = 'in ' + (s >= 3600 ? Math.floor(s / 3600) + ':' + p2(Math.floor(s % 3600 / 60)) : Math.floor(s / 60)) + ':' + p2(s % 60);
+    } else {
+      cd.textContent = 'start now, skip to ' + ms(-toStart);
+    }
+  }
+  tIn.addEventListener('input', render);
+  dIn.addEventListener('input', render);
+  render();
+  setInterval(render, 250);
+})();
+</script>
+</body>
+</html>

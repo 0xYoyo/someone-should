@@ -1,0 +1,48 @@
+{
+  "slug": "fighting-words-scrabble",
+  "wish": "someone should make a scrabble game where the words you build fight each other",
+  "year": 2018,
+  "agreed": 194,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/9rmi0i/",
+      "date": "2018-10-26",
+      "points": 157,
+      "comments": 37
+    }
+  ],
+  "spec": "Spell a word from eight letter tiles; its letter points are the hit and its vowels are the shield. Tap tiles, press Fight, and your word trades blows with the computer's word until one side's 40 health is gone. It has no multiplayer, no board and no online dictionary, only a built-in list of common words.",
+  "tests": [
+    {
+      "expect": {
+        "sel": "#word",
+        "contains": "STAR"
+      }
+    },
+    {
+      "tap": "#rack button[data-l=\"E\"]"
+    },
+    {
+      "expect": {
+        "sel": "#word",
+        "contains": "STARE"
+      }
+    },
+    {
+      "tap": "#fight"
+    },
+    {
+      "expect": {
+        "sel": "#log",
+        "contains": "STARE"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:43:12Z",
+  "model": "sonnet-5.5",
+  "minutes": 8,
+  "approved": false,
+  "notes": "Offline word list of about 2100 common words; the computer picks from the same list."
+}

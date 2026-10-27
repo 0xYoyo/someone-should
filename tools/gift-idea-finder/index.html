@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app to help choose the right gift for someone when out of ideas</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+
+
+.group{display:grid;gap:8px}
+.lab{font:500 16px/1.3 var(--mono);color:var(--meta)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:44px;padding:0 14px;border-radius:22px;border:1.5px solid var(--line);font-size:16px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+#results li{display:block;padding:12px 0}
+.gname{font-weight:500}
+.why{font:16px/1.4 var(--mono);color:var(--meta)}
+.save{margin-top:8px;min-height:44px}
+#more{justify-self:start}
+#saved li{padding:10px 0;display:flex;justify-content:space-between;align-items:center}
+.cap{font:16px/1.4 var(--mono);color:var(--meta)}
+
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make an app to help choose the right gift for someone when out of ideas</h1>
+
+<!-- the tool. Smallest thing that fully does the wish. -->
+<main id="app" class="stack">
+<div class="group"><div class="lab">who for</div><div class="chips" id="who"></div></div>
+<div class="group"><div class="lab">spend</div><div class="chips" id="bud"></div></div>
+<div class="group"><div class="lab">they like (pick any)</div><div class="chips" id="int"></div></div>
+<ul class="plain" id="results" aria-live="polite"></ul>
+<button id="more" type="button">Other ideas</button>
+<div id="savedwrap" hidden><div class="lab">shortlist</div><ul class="plain" id="saved"></ul></div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const WHO = [['partner','Partner'],['parent','Parent'],['friend','Friend'],['kid','Kid'],['coworker','Coworker']];
+  const BUD = [['Under 20'],['20 to 50'],['50 to 100'],['100 and up']];
+  const INT = ['food','cooking','coffee','reading','music','games','outdoors','fitness','home','tech','art','travel','plants','pets','beauty','cozy'];
+  // [idea, who letters (p=partner a=parent f=friend k=kid c=coworker), budget band 0-3, interests]
+  const G = [
+    ['A good bar of dark chocolate and a handwritten note','pafkc',0,['food','cozy']],
+    ['Small potted succulent in a nice pot','pafc',0,['plants','home']],
+    ['Paperback from a genre they love, with a bookmark','pafc',0,['reading']],
+    ['Scented candle','pafc',0,['cozy','home','beauty']],
+    ['Specialty coffee beans from a local roaster','pafc',0,['coffee','food']],
+    ['Deck of cards or a small card game','pfk',0,['games']],
+    ['Sketchbook and a nice pen','pfkc',0,['art']],
+    ['Fancy hot sauce or olive oil','pafc',0,['food','cooking']],
+    ['Dog or cat treats from a good shop','pafkc',0,['pets']],
+    ['Phone stand or cable organizer','pafc',0,['tech']],
+    ['Playlist of songs that remind you of them, plus a card','pafk',0,['music']],
+    ['Seed packets and a herb pot','pafc',0,['plants','cooking']],
+    ['Lip balm and hand cream set','pafc',0,['beauty','cozy']],
+    ['Funny mug filled with tea bags','pafc',0,['coffee','cozy']],
+    ['Building-block set or sticker book','k',0,['art','games']],
+    ['Insulated water bottle','pafkc',1,['fitness','outdoors']],
+    ['Cookbook for a cuisine they like','pafc',1,['cooking','food','reading']],
+    ['Cozy throw blanket','pafc',1,['cozy','home']],
+    ['Board game for two to four players','pafk',1,['games']],
+    ['Plant with a self-watering pot','pafc',1,['plants','home']],
+    ['Pour-over coffee set or good tea sampler','pafc',1,['coffee','food']],
+    ['Vinyl record of an album they love','pf',1,['music']],
+    ['Wireless earbuds case and cleaning kit, or a spare charger','pafc',1,['tech']],
+    ['Resistance bands set','pafc',1,['fitness']],
+    ['Book of local hikes or a trail map','pafc',1,['outdoors','travel','reading']],
+    ['Watercolor set with paper','pafk',1,['art']],
+    ['Skincare set for their skin type','paf',1,['beauty']],
+    ['Cat scratcher or dog chew toy','pafkc',1,['pets']],
+    ['Sturdy tote or day bag','pafc',1,['travel','outdoors']],
+    ['Science kit or craft kit for their age','k',1,['art','games','tech']],
+    ['Cheese board and knife','pafc',1,['food','cooking','home']],
+    ['Book light and a hardcover','pafc',1,['reading','cozy']],
+    ['Jigsaw puzzle, 1000 pieces','pafc',1,['games','cozy','home']],
+    ['Travel organizer pouch set','pafc',1,['travel']],
+    ['Class voucher: pottery, cooking or painting','paf',2,['art','cooking','food']],
+    ['Cast iron skillet or a good chef knife','pafc',2,['cooking','home']],
+    ['Bluetooth speaker','pafkc',2,['music','tech','outdoors']],
+    ['Weighted blanket','paf',2,['cozy','home']],
+    ['Day-trip planned for two: tickets plus a picnic','paf',2,['travel','outdoors','food']],
+    ['Gift card to their favorite bookstore, with a hand-picked book','pafc',2,['reading']],
+    ['Running socks, a headlamp or a good water pack','paf',2,['fitness','outdoors']],
+    ['Smart plug set or smart bulbs','pafc',2,['tech','home']],
+    ['Game they have been eyeing, or a controller','pfk',2,['games','tech']],
+    ['Framed print from an artist they like','pafc',2,['art','home']],
+    ['Pet bed or automatic feeder','pafkc',2,['pets','home']],
+    ['Electric kettle or milk frother','pafc',2,['coffee','cozy','home']],
+    ['Spa treatment or a nice massage voucher','pa',2,['beauty','cozy']],
+    ['Dinner at a place they have mentioned, booked for you both','paf',2,['food']],
+    ['Bike light set and a lock, or a good helmet','paf',2,['fitness','outdoors']],
+    ['Nice headphones','pafk',3,['music','tech']],
+    ['Espresso machine or burr grinder','paf',3,['coffee','cooking','home']],
+    ['E-reader','pafc',3,['reading','tech','travel']],
+    ['Weekend away for two','pa',3,['travel','cozy','food']],
+    ['Quality running shoes or fitness tracker','paf',3,['fitness','tech']],
+    ['Instant camera with film','pafk',3,['art','travel','tech']],
+    ['Concert or show tickets','paf',3,['music']],
+    ['Cooking class for two','pafc',3,['cooking','food']],
+    ['Good backpack for travel or hiking','paf',3,['travel','outdoors']],
+    ['Robot vacuum or air purifier','pa',3,['home','tech']],
+    ['Camping chair, lantern and a thermos','paf',3,['outdoors','coffee']],
+    ['Houseplant starter collection with pots','paf',3,['plants','home']],
+    ['Pet camera or GPS tracker','pafk',3,['pets','tech']]
+  ];
+  const st = Object.assign({ who:'friend', bud:1, int:['food','music'], skip:0, saved:[] }, store.get('gift', {}));
+  if (!Array.isArray(st.int)) st.int = [];
+  if (!Array.isArray(st.saved)) st.saved = [];
+
+  function chip(id, label, on, fn) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.id = id; b.className = 'chip';
+    b.textContent = label; b.setAttribute('aria-pressed', on);
+    b.onclick = fn; return b;
+  }
+  function save() { store.set('gift', st); }
+
+  function pick() {
+    const code = { partner:'p', parent:'a', friend:'f', kid:'k', coworker:'c' }[st.who];
+    let list = G.filter(g => g[1].includes(code) && g[2] === st.bud);
+    // too few in this band: borrow from the band below
+    if (list.length < 4 && st.bud > 0) list = list.concat(G.filter(g => g[1].includes(code) && g[2] === st.bud - 1));
+    list = list.map(g => {
+      const hits = g[3].filter(i => st.int.includes(i));
+      return { name: g[0], hits, score: hits.length * 2 + (g[2] === st.bud ? 1 : 0) };
+    });
+    if (st.int.length) {
+      const m = list.filter(x => x.hits.length);
+      if (m.length) list = m;
+    }
+    list.sort((a, b) => b.score - a.score || (a.name < b.name ? -1 : 1));
+    return list;
+  }
+
+  function render() {
+    const ul = $('#results');
+    ul.textContent = '';
+    const all = pick();
+    if (!all.length) {
+      const li = document.createElement('li'); li.className = 'empty';
+      li.textContent = 'Nothing fits. Try another budget.'; ul.append(li);
+      $('#more').hidden = true; renderSaved(); return;
+    }
+    const start = (st.skip * 4) % all.length;
+    const shown = [];
+    for (let i = 0; i < Math.min(4, all.length); i++) shown.push(all[(start + i) % all.length]);
+    for (const x of shown) {
+      const li = document.createElement('li');
+      const n = document.createElement('div'); n.className = 'gname'; n.textContent = x.name;
+      const w = document.createElement('div'); w.className = 'why';
+      w.textContent = x.hits.length ? 'fits: ' + x.hits.join(', ') : 'safe pick';
+      const s = document.createElement('button'); s.type = 'button'; s.className = 'save';
+      const has = st.saved.includes(x.name);
+      s.textContent = has ? 'Saved' : 'Save';
+      s.onclick = () => {
+        st.saved = has ? st.saved.filter(y => y !== x.name) : st.saved.concat(x.name).slice(-20);
+        save(); render();
+      };
+      li.append(n, w, s); ul.append(li);
+    }
+    $('#more').hidden = all.length <= 4;
+    renderSaved();
+  }
+
+  function renderSaved() {
+    const ul = $('#saved'); ul.textContent = '';
+    $('#savedwrap').hidden = !st.saved.length;
+    for (const name of st.saved) {
+      const li = document.createElement('li');
+      const t = document.createElement('span'); t.textContent = name;
+      const x = document.createElement('button'); x.type = 'button'; x.textContent = 'Remove';
+      x.setAttribute('aria-label', 'Remove ' + name);
+      x.onclick = () => { st.saved = st.saved.filter(y => y !== name); save(); render(); };
+      li.append(t, x); ul.append(li);
+    }
+  }
+
+  function build() {
+    const who = $('#who'), bud = $('#bud'), int = $('#int');
+    WHO.forEach(([k, l]) => who.append(chip('w-' + k, l, st.who === k, () => {
+      st.who = k; st.skip = 0; save();
+      who.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', c.id === 'w-' + k));
+      render();
+    })));
+    BUD.forEach(([l], i) => bud.append(chip('b-' + i, l, st.bud === i, () => {
+      st.bud = i; st.skip = 0; save();
+      bud.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', c.id === 'b-' + i));
+      render();
+    })));
+    INT.forEach(k => {
+      const b = chip('i-' + k, k, st.int.includes(k), () => {
+        st.int = st.int.includes(k) ? st.int.filter(y => y !== k) : st.int.concat(k);
+        st.skip = 0; save(); b.setAttribute('aria-pressed', st.int.includes(k)); render();
+      });
+      int.append(b);
+    });
+    $('#more').onclick = () => { st.skip++; save(); render(); };
+    render();
+  }
+  build();
+})();
+</script>
+</body>
+</html>

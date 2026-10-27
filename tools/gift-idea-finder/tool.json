@@ -1,0 +1,62 @@
+{
+  "slug": "gift-idea-finder",
+  "wish": "someone should make an app to help choose the right gift for someone when out of ideas",
+  "year": 2015,
+  "agreed": 93,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/3rb297/",
+      "date": "2015-11-03",
+      "points": 35,
+      "comments": 9
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/AppIdeas/comments/jfay8b/",
+      "date": "2020-10-21",
+      "points": 20,
+      "comments": 7
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/AppIdeas/comments/jvcqr3/",
+      "date": "2020-11-16",
+      "points": 13,
+      "comments": 9
+    }
+  ],
+  "spec": "Picks gift ideas from a built-in list of about 60, filtered by recipient, spend band and interests.\nTap who it is for, a spend, and what they like; four ideas appear, Other ideas rotates, Save keeps a shortlist.\nIt does not search shops, show prices or links, or know the person beyond the chips.",
+  "tests": [
+    {
+      "tap": "#w-partner"
+    },
+    {
+      "tap": "#b-3"
+    },
+    {
+      "tap": "#i-travel"
+    },
+    {
+      "expect": {
+        "sel": "#results li .gname",
+        "contains": "Weekend away"
+      }
+    },
+    {
+      "tap": ".save"
+    },
+    {
+      "expect": {
+        "sel": "#saved li",
+        "contains": "Weekend away"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:45:11Z",
+  "model": "sonnet-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": ""
+}

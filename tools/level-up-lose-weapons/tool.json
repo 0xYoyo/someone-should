@@ -1,0 +1,54 @@
+{
+  "slug": "level-up-lose-weapons",
+  "wish": "someone should make a game where you lose weapons as you level up instead of unlocking them",
+  "year": 2014,
+  "agreed": 128,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/2mqkfp/",
+      "date": "2014-11-19",
+      "points": 110,
+      "comments": 18
+    }
+  ],
+  "spec": "A top-down arena game that starts with six weapons; every level up takes the strongest one away until only bare hands remain.\nDrag to move; weapons fire automatically at the nearest enemy in range; kill enough enemies to level up, or tap level up now.\nIt does not save runs, has no sound, and has one enemy type.",
+  "tests": [
+    {
+      "expect": {
+        "sel": "#arsenal li:not(.gone)",
+        "contains": "rocket launcher"
+      }
+    },
+    {
+      "tap": "#levelup"
+    },
+    {
+      "expect": {
+        "sel": "#level",
+        "contains": "2"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#msg",
+        "contains": "lost: rocket launcher"
+      }
+    },
+    {
+      "tap": "#restart"
+    },
+    {
+      "expect": {
+        "sel": "#level",
+        "contains": "1"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:44:06Z",
+  "model": "sonnet-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": ""
+}

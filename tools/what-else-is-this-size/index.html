@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a website that shows objects of similar size to the dimensions you enter</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+.dims { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+label span { display: block; font: 16px/1.4 var(--mono); color: var(--meta); }
+.unit { max-width: 140px; }
+.hint { font: 16px/1.4 var(--mono); color: var(--meta); }
+#draw { width: 100%; height: auto; border: 1px solid var(--line); border-radius: var(--radius); display: block; }
+#draw text { font: 16px var(--mono); fill: var(--meta); }
+.mine { fill: none; stroke: var(--meta); stroke-width: 1.5; stroke-dasharray: 5 4; }
+.obj { fill: none; stroke: var(--ink); stroke-width: 2; }
+#list button { width: 100%; display: flex; justify-content: space-between; gap: 12px; text-align: left; border-color: var(--line); padding: 8px 12px; }
+#list button[aria-pressed="true"] { border-color: var(--ink); }
+#list small { font: 16px var(--mono); color: var(--meta); white-space: nowrap; }
+#list { display: grid; gap: 8px; }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a website that shows objects of similar size to the dimensions you enter</h1>
+
+<main id="app" class="stack">
+  <div class="dims">
+    <label><span>length</span><input id="d1" type="number" inputmode="decimal" min="0" step="any" value="30"></label>
+    <label><span>width</span><input id="d2" type="number" inputmode="decimal" min="0" step="any" value="20"></label>
+    <label><span>height</span><input id="d3" type="number" inputmode="decimal" min="0" step="any" value="10"></label>
+  </div>
+  <select id="unit" class="unit" aria-label="unit">
+    <option value="1">cm</option>
+    <option value="0.1">mm</option>
+    <option value="2.54">in</option>
+    <option value="30.48">ft</option>
+    <option value="100">m</option>
+  </select>
+  <svg id="draw" viewBox="0 0 320 170" role="img" aria-label="scaled outlines"></svg>
+  <div id="list"></div>
+  <div id="msg" class="hint"></div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  // name, length, width, height in cm (approximate, typical sizes)
+  const OBJECTS = [
+    ['a coin', 2.4, 2.4, 0.2], ['a die', 1.6, 1.6, 1.6], ['a Lego 2x4 brick', 3.2, 1.6, 1.1],
+    ['a golf ball', 4.3, 4.3, 4.3], ['an egg', 5.7, 4.4, 4.4], ['a matchbox', 5.2, 3.6, 1.5],
+    ['an AA battery', 5, 1.4, 1.4], ['a tennis ball', 6.7, 6.7, 6.7], ['a deck of cards', 9, 6.3, 1.8],
+    ['a credit card', 8.56, 5.4, 0.08], ['an apple', 8, 8, 8], ['a coffee mug', 9.5, 8, 8],
+    ['a computer mouse', 11, 6, 4], ['a soda can', 12.2, 6.6, 6.6], ['a smartphone', 15, 7.5, 0.8],
+    ['a paperback book', 18, 11, 2], ['a TV remote', 19, 5, 2.5], ['a toothbrush', 19, 3, 1.5],
+    ['a pencil', 19, 0.7, 0.7], ['a banana', 20, 3.5, 3.5], ['an envelope', 22, 11, 0.1],
+    ['a brick', 21.5, 10.2, 6.5], ['a milk carton', 24, 7, 7], ['a tablet', 24, 17, 0.7],
+    ['a hardcover book', 24, 16, 3], ['a soccer ball', 22, 22, 22], ['a basketball', 24, 24, 24],
+    ['a loaf of bread', 25, 12, 12], ['a loaf pan', 25, 13, 7], ['a wine bottle', 30, 7.5, 7.5],
+    ['a ruler', 30, 3, 0.3], ['a vinyl record', 31, 31, 0.3], ['a sheet of A4 paper', 29.7, 21, 0.01],
+    ['a laptop', 33, 23, 2], ['a shoe box', 33, 20, 12], ['a 2-litre bottle', 33, 10, 10],
+    ['a toaster', 30, 18, 20], ['a pillow', 50, 30, 12], ['a pizza box', 35, 35, 4],
+    ['a watermelon', 40, 25, 25], ['a microwave', 45, 35, 26], ['a house cat', 46, 20, 25],
+    ['a traffic cone', 45, 45, 70], ['a carry-on suitcase', 55, 40, 23], ['a kitchen chair', 45, 45, 90],
+    ['a washing machine', 60, 60, 85], ['a skateboard', 80, 20, 10], ['a baseball bat', 86, 6.5, 6.5],
+    ['an acoustic guitar', 100, 38, 10], ['a shipping pallet', 120, 100, 15], ['a door', 203, 80, 4],
+    ['a refrigerator', 180, 70, 70], ['a dining table', 180, 90, 75], ['a sofa', 200, 90, 85],
+    ['a queen bed', 203, 152, 50], ['a bicycle', 175, 60, 105], ['a compact car', 420, 180, 145],
+    ['a bus', 1200, 255, 320]
+  ];
+
+  const f = (n) => (n >= 100 ? Math.round(n) : n >= 10 ? Math.round(n * 10) / 10 : Math.round(n * 100) / 100);
+  const NS = 'http:' + '//www.w3.org/2000/svg';
+  let picked = 0, ranked = [], mine = [];
+
+  function read() {
+    const k = parseFloat($('#unit').value);
+    return ['#d1', '#d2', '#d3'].map(s => parseFloat($(s).value) * k).filter(v => v > 0).sort((a, b) => b - a);
+  }
+
+  function rank(dims) {
+    return OBJECTS.map((o, i) => {
+      const od = o.slice(1).sort((a, b) => b - a);
+      let d = 0;
+      dims.forEach((v, j) => { d += Math.pow(Math.log(v / od[j]), 2); });
+      return { i, name: o[0], d, dims: od };
+    }).sort((a, b) => a.d - b.d).slice(0, 6);
+  }
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+
+  function draw() {
+    const svg = $('#draw');
+    svg.textContent = '';
+    if (!ranked.length) return;
+    const o = ranked[picked].dims;
+    // outlines of the two longest sides, same scale, left-aligned
+    const a = mine.length > 1 ? [mine[0], mine[1]] : [mine[0], mine[0] * 0.08];
+    const b = [o[0], o[1]];
+    const scale = Math.min(290 / Math.max(a[0], b[0]), 100 / Math.max(a[1], b[1]));
+    const h = (v) => Math.max(v * scale, 2);
+    svg.appendChild(el('rect', { class: 'mine', x: 15, y: 10, width: h(a[0]), height: h(a[1]) }));
+    svg.appendChild(el('rect', { class: 'obj', x: 15, y: 10, width: h(b[0]), height: h(b[1]) }));
+    const t1 = el('text', { x: 15, y: 140 }); t1.textContent = 'dashed: yours';
+    const t2 = el('text', { x: 15, y: 162 }); t2.textContent = 'solid: ' + ranked[picked].name;
+    svg.appendChild(t1); svg.appendChild(t2);
+  }
+
+  function render() {
+    mine = read();
+    const list = $('#list');
+    list.textContent = '';
+    $('#msg').textContent = '';
+    if (!mine.length) {
+      ranked = [];
+      $('#draw').textContent = '';
+      $('#msg').textContent = 'Enter at least one size.';
+      return;
+    }
+    ranked = rank(mine);
+    if (picked >= ranked.length) picked = 0;
+    ranked.forEach((r, n) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'item';
+      b.setAttribute('aria-pressed', n === picked ? 'true' : 'false');
+      const name = document.createElement('span');
+      name.textContent = r.name;
+      const sz = document.createElement('small');
+      sz.textContent = r.dims.map(f).join(' x ') + ' cm';
+      b.append(name, sz);
+      b.addEventListener('click', () => { picked = n; render(); });
+      list.appendChild(b);
+    });
+    draw();
+    store.set('sizes', { v: ['#d1', '#d2', '#d3'].map(s => $(s).value), u: $('#unit').value });
+  }
+
+  const saved = store.get('sizes', null);
+  if (saved && Array.isArray(saved.v)) {
+    ['#d1', '#d2', '#d3'].forEach((s, i) => { $(s).value = saved.v[i] == null ? '' : saved.v[i]; });
+    if (saved.u) $('#unit').value = saved.u;
+  }
+  ['#d1', '#d2', '#d3'].forEach(s => $(s).addEventListener('input', () => { picked = 0; render(); }));
+  $('#unit').addEventListener('change', () => { picked = 0; render(); });
+  render();
+})();
+</script>
+</body>
+</html>

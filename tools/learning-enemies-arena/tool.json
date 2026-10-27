@@ -1,0 +1,51 @@
+{
+  "slug": "learning-enemies-arena",
+  "wish": "someone should make a game where the enemies are neural networks that get better at fighting you over time",
+  "year": 2017,
+  "agreed": 136,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/7hxu03/",
+      "date": "2017-12-06",
+      "points": 122,
+      "comments": 14
+    }
+  ],
+  "spec": "Five red enemies, each steered by a small neural network, hunt you in a top-down arena.\nTap or drag in the arena to run; when a round ends, the enemy population is evolved against the path you just ran.\nNo network, no pretrained data: the learning is a quick evolutionary search on your device, and it is single-player only.",
+  "tests": [
+    {
+      "tap": "#start"
+    },
+    {
+      "wait": 800
+    },
+    {
+      "expect": {
+        "sel": "#state",
+        "contains": "round 1 playing"
+      }
+    },
+    {
+      "tap": "#end"
+    },
+    {
+      "expect": {
+        "sel": "#history li",
+        "count": 1
+      }
+    },
+    {
+      "expect": {
+        "sel": "#best",
+        "contains": "best"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:45:18Z",
+  "model": "sonnet-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": ""
+}

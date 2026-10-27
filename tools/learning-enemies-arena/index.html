@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a game where the enemies are neural networks that get better at fighting you over time</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+.meta { font-size: 16px; }
+h1 { font-size: 16px; }
+#arena { display: block; width: 100%; max-width: 480px; aspect-ratio: 1; border: 1.5px solid var(--line); border-radius: var(--radius); touch-action: none; margin: 0 auto; }
+#app { max-width: 480px; margin: 0 auto; }
+#state { min-height: 48px; }
+#history { max-height: 132px; overflow: auto; }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a game where the enemies are neural networks that get better at fighting you over time</h1>
+<main id="app" class="stack">
+  <canvas id="arena" width="300" height="300" aria-label="arena"></canvas>
+  <div id="state" class="meta">watching</div>
+  <div class="row">
+    <button id="start" class="primary">play</button>
+    <button id="end">end round</button>
+    <button id="reset">start over</button>
+  </div>
+  <div class="meta" id="best">best 0.0s</div>
+  <ul id="history" class="plain"></ul>
+</main>
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const W = 300, DT = 1 / 30, PS = 120, ES = 100, HIT = 15, CAP = 30;
+  const NI = 6, NH = 8, NO = 2, NW = NI * NH + NH + NH * NO + NO;
+  const POP = 24, LIVE = 5, TRAIN_STEPS = 600;
+  const SPAWNS = [[20, 20], [280, 20], [20, 280], [280, 280], [150, 14]];
+
+  const rnd = (a = 1) => (Math.random() * 2 - 1) * a;
+  const gauss = () => (Math.random() + Math.random() + Math.random() - 1.5) * 1.6;
+  const newNet = () => Array.from({ length: NW }, () => rnd(1));
+
+  // 6 inputs -> 8 tanh -> 2 tanh: desired heading
+  function think(w, inp) {
+    const bo = NI * NH + NH;
+    let o0 = w[NW - 2], o1 = w[NW - 1];
+    for (let h = 0; h < NH; h++) {
+      let s = w[NI * NH + h];
+      for (let i = 0; i < NI; i++) s += w[h * NI + i] * inp[i];
+      const a = Math.tanh(s);
+      o0 += w[bo + h * NO] * a;
+      o1 += w[bo + h * NO + 1] * a;
+    }
+    return [Math.tanh(o0), Math.tanh(o1)];
+  }
+
+  function step(e, w, px, py, pvx, pvy) {
+    const dx = (px - e.x) / W, dy = (py - e.y) / W;
+    const o = think(w, [dx * 2, dy * 2, pvx, pvy, e.vx / ES, e.vy / ES]);
+    e.vx = e.vx * 0.8 + o[0] * ES * 0.2;
+    e.vy = e.vy * 0.8 + o[1] * ES * 0.2;
+    e.x = Math.min(W, Math.max(0, e.x + e.vx * DT));
+    e.y = Math.min(W, Math.max(0, e.y + e.vy * DT));
+    return Math.hypot(px - e.x, py - e.y);
+  }
+
+  // Player dynamics: walk toward a target at fixed speed
+  function walk(p, tx, ty) {
+    const dx = tx - p.x, dy = ty - p.y, d = Math.hypot(dx, dy);
+    p.vx = 0; p.vy = 0;
+    if (d > 3) { p.vx = dx / d; p.vy = dy / d; }
+    p.x += p.vx * PS * DT; p.y += p.vy * PS * DT;
+  }
+
+  function botPath(n) {
+    const p = { x: 150, y: 150, vx: 0, vy: 0 }, out = [];
+    const f1 = 0.7 + Math.random() * 0.5, f2 = 1.1 + Math.random() * 0.5;
+    for (let i = 0; i < n; i++) {
+      const t = i * DT;
+      walk(p, 150 + 120 * Math.sin(t * f1), 150 + 120 * Math.cos(t * f2));
+      out.push([p.x, p.y, p.vx, p.vy]);
+    }
+    return out;
+  }
+
+  // Score one net against a recorded player path (higher = better hunter)
+  function fitness(w, path) {
+    const n = path.length;
+    let total = 0;
+    for (let k = 0; k < 2; k++) {
+      const s = SPAWNS[Math.floor(Math.random() * 4)];
+      const e = { x: s[0], y: s[1], vx: 0, vy: 0 };
+      let close = 0;
+      for (let i = 0; i < n; i++) {
+        const q = path[i];
+        const d = step(e, w, q[0], q[1], q[2], q[3]);
+        close += 1 - Math.min(d, W) / W;
+        if (d < HIT) { close += (n - i) * 0.1 + 20; break; }
+      }
+      total += close / n;
+    }
+    return total;
+  }
+
+  function evolve(pop, path, gens) {
+    path = path.slice(0, TRAIN_STEPS);
+    if (path.length < 60) { const last = path[path.length - 1] || [150, 150, 0, 0]; while (path.length < 60) path.push(last); }
+    let scored = pop.map(w => ({ w, f: 0 }));
+    for (let g = 0; g < gens; g++) {
+      for (const s of scored) s.f = fitness(s.w, path);
+      scored.sort((a, b) => b.f - a.f);
+      if (g === gens - 1) break;
+      const next = scored.slice(0, 4);
+      while (next.length < POP) {
+        const par = scored[Math.floor(Math.random() * 6)].w;
+        next.push({ w: par.map(v => v + (Math.random() < 0.3 ? gauss() * 0.35 : 0)), f: 0 });
+      }
+      scored = next;
+    }
+    return scored.map(s => s.w);
+  }
+
+  // ---- state ----
+  const saved = store.get('lea-v1', null);
+  let pop, hist;
+  if (saved && Array.isArray(saved.pop) && saved.pop.length === POP && saved.pop[0].length === NW && Array.isArray(saved.hist)) {
+    pop = saved.pop; hist = saved.hist;
+  } else {
+    pop = evolve(Array.from({ length: POP }, newNet), botPath(TRAIN_STEPS), 6);
+    hist = [];
+  }
+  const persist = () => store.set('lea-v1', { pop: pop.map(w => w.map(v => Math.round(v * 1000) / 1000)), hist: hist.slice(-50) });
+
+  const cv = $('#arena'), ctx = cv.getContext('2d');
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = cv.height = 300 * dpr;
+  ctx.scale(dpr, dpr);
+  const css = getComputedStyle(document.documentElement);
+  const col = n => css.getPropertyValue(n).trim() || '#888';
+
+  let mode = 'demo';          // demo | play | over
+  let player, enemies, target, path, t, trail, demoPath, acc = 0, last = 0;
+  const keys = {};
+
+  function setState(s) { $('#state').textContent = s; }
+
+  function spawn() {
+    player = { x: 150, y: 150, vx: 0, vy: 0 };
+    target = { x: 150, y: 150 };
+    enemies = pop.slice(0, LIVE).map((w, i) => ({ w, x: SPAWNS[i][0], y: SPAWNS[i][1], vx: 0, vy: 0 }));
+    path = []; trail = []; t = 0;
+  }
+  function startDemo() {
+    mode = 'demo'; spawn();
+    demoPath = botPath(CAP * 30 + 5);
+    $('#end').disabled = true;
+    $('#start').textContent = 'play';
+    setState('watching. press play, then tap or drag in the arena to run.');
+  }
+  function startPlay() {
+    mode = 'play'; spawn();
+    $('#end').disabled = false;
+    $('#start').textContent = 'restart';
+    setState('round ' + (hist.length + 1) + ' playing');
+  }
+
+  function endRound(caught) {
+    if (mode !== 'play') return;
+    mode = 'over';
+    const secs = Math.round(t * 10) / 10;
+    hist.push(secs);
+    const n = hist.length;
+    const head = 'round ' + n + (caught ? ' caught at ' : ' survived ') + secs.toFixed(1) + 's. ';
+    setState(head + 'enemies are learning your moves.');
+    $('#end').disabled = true;
+    $('#start').textContent = 'next round';
+    renderHist();
+    // let the message paint, then train against this round's path
+    setTimeout(() => {
+      pop = evolve(pop, path, 20);
+      persist();
+      setState(head + 'enemies learned. round ' + (n + 1) + ' next.');
+    }, 30);
+  }
+
+  function renderHist() {
+    const ul = $('#history');
+    ul.innerHTML = '';
+    hist.slice(-8).reverse().forEach((s, i) => {
+      const li = document.createElement('li');
+      li.innerHTML = '<span>round ' + (hist.length - i) + '</span><span>' + s.toFixed(1) + 's</span>';
+      ul.appendChild(li);
+    });
+    const b = hist.length ? Math.max.apply(null, hist) : 0;
+    $('#best').textContent = hist.length ? 'best ' + b.toFixed(1) + 's over ' + hist.length + ' rounds' : 'best 0.0s';
+  }
+
+  function tick() {
+    t += DT;
+    if (mode === 'demo') {
+      const q = demoPath[Math.min(Math.floor(t / DT), demoPath.length - 1)];
+      player.x = q[0]; player.y = q[1]; player.vx = q[2]; player.vy = q[3];
+    } else {
+      const kx = (keys.ArrowRight ? 1 : 0) - (keys.ArrowLeft ? 1 : 0), ky = (keys.ArrowDown ? 1 : 0) - (keys.ArrowUp ? 1 : 0);
+      if (kx || ky) { target.x = player.x + kx * 60; target.y = player.y + ky * 60; }
+      target.x = Math.min(W, Math.max(0, target.x)); target.y = Math.min(W, Math.max(0, target.y));
+      walk(player, target.x, target.y);
+      path.push([player.x, player.y, player.vx, player.vy]);
+    }
+    trail.push([player.x, player.y]); if (trail.length > 24) trail.shift();
+    let hit = false;
+    for (const e of enemies) {
+      if (step(e, e.w, player.x, player.y, player.vx, player.vy) < HIT) hit = true;
+    }
+    if (mode === 'play') {
+      if (hit) endRound(true);
+      else if (t >= CAP) endRound(false);
+      else if (path.length % 5 === 0) setState('round ' + (hist.length + 1) + ' playing ' + t.toFixed(1) + 's');
+    } else if (mode === 'demo' && (hit || t >= CAP)) {
+      spawn();
+    }
+  }
+
+  function draw() {
+    ctx.fillStyle = col('--paper'); ctx.fillRect(0, 0, W, W);
+    ctx.strokeStyle = col('--line'); ctx.lineWidth = 1;
+    for (let i = 50; i < W; i += 50) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, W); ctx.moveTo(0, i); ctx.lineTo(W, i); ctx.stroke(); }
+    ctx.strokeStyle = col('--meta'); ctx.lineWidth = 2;
+    ctx.beginPath();
+    trail.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]));
+    ctx.stroke();
+    if (mode === 'play') { ctx.beginPath(); ctx.arc(target.x, target.y, 5, 0, 7); ctx.stroke(); }
+    ctx.fillStyle = col('--no');
+    for (const e of enemies) { ctx.beginPath(); ctx.arc(e.x, e.y, 9, 0, 7); ctx.fill(); }
+    ctx.fillStyle = col('--ink');
+    ctx.beginPath(); ctx.arc(player.x, player.y, 8, 0, 7); ctx.fill();
+  }
+
+  function frame(ts) {
+    if (!last) last = ts;
+    acc += Math.min(0.25, (ts - last) / 1000); last = ts;
+    while (acc >= DT) {
+      acc -= DT;
+      if (mode !== 'over') tick();
+    }
+    draw();
+    requestAnimationFrame(frame);
+  }
+
+  // input: tap or drag sets where the player runs to
+  function aim(ev) {
+    const r = cv.getBoundingClientRect();
+    target.x = (ev.clientX - r.left) / r.width * W;
+    target.y = (ev.clientY - r.top) / r.height * W;
+  }
+  let down = false;
+  cv.addEventListener('pointerdown', ev => { down = true; if (mode === 'play') aim(ev); });
+  cv.addEventListener('pointermove', ev => { if (down && mode === 'play') aim(ev); });
+  window.addEventListener('pointerup', () => { down = false; });
+  window.addEventListener('keydown', ev => { if (ev.key.indexOf('Arrow') === 0) { keys[ev.key] = true; ev.preventDefault(); } });
+  window.addEventListener('keyup', ev => { delete keys[ev.key]; });
+
+  $('#start').addEventListener('click', startPlay);
+  $('#end').addEventListener('click', () => endRound(false));
+  $('#reset').addEventListener('click', () => {
+    hist = [];
+    pop = evolve(Array.from({ length: POP }, newNet), botPath(TRAIN_STEPS), 6);
+    persist(); renderHist(); startDemo();
+  });
+
+  renderHist();
+  startDemo();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

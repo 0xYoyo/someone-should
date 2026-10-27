@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a Pokedex that records all the semi-trucks you have seen, with images and descriptions</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* tool */
+.top{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+#count{font:500 17px var(--mono)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{display:grid;gap:4px;justify-items:start;text-align:left;padding:10px;min-height:120px;align-content:start;border:1.5px solid var(--line);position:relative;overflow:hidden}
+.tile.seen{border-color:var(--ink)}
+.tile svg{width:100%;height:44px;color:var(--line)}
+.tile.seen svg{color:var(--ink)}
+.tile img{width:100%;height:44px;object-fit:cover;border-radius:2px}
+.tile b{font-weight:500;font-size:16px;line-height:1.25}
+.tile span{font-size:16px;color:var(--meta)}
+.tile.on{outline:2px solid var(--ink);outline-offset:2px}
+#detail{border-top:1.5px solid var(--ink);padding-top:14px}
+#detail svg.hero{width:100%;max-width:260px;height:80px}
+#detail h2{font:500 22px/1.2 var(--sans);margin:6px 0 2px}
+#detail p{margin:6px 0}
+.sub{color:var(--meta);font-size:16px}
+.photo{display:inline-flex;align-items:center;min-height:var(--tap);padding:0 18px;border:1.5px solid var(--ink);border-radius:var(--radius);cursor:pointer}
+.photo input{position:absolute;opacity:0;width:1px;height:1px;min-height:0;padding:0;border:0}
+.photo:focus-within{outline:2px solid var(--ink);outline-offset:2px}
+.sight{align-items:center}
+.sight img{width:56px;height:44px;object-fit:cover;border-radius:2px}
+#msg{color:var(--no);min-height:0;font-size:16px}
+[hidden]{display:none!important}
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a Pokedex that records all the semi-trucks you have seen, with images and descriptions</h1>
+<main id="app" class="stack">
+<div class="top"><span>Truckdex</span><span id="count">0 / 15</span></div>
+<div id="grid" class="grid"></div>
+<section id="detail" class="stack" hidden>
+<svg class="hero" id="hero" viewBox="0 0 120 40" aria-hidden="true"></svg>
+<div><h2 id="dname"></h2><div class="sub" id="dmeta"></div><p id="ddesc"></p><p class="sub" id="dtell"></p></div>
+<input id="place" type="text" placeholder="where (optional)" maxlength="60" aria-label="where">
+<div class="row">
+<button id="seen" class="primary">Seen one</button>
+<label class="photo">Add photo<input id="photo" type="file" accept="image/*" capture="environment"></label>
+<span id="pname" class="sub"></span>
+</div>
+<div id="msg"></div>
+<ul id="log" class="plain"></ul>
+</section>
+</main>
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  // L = long hood, S = short hood, C = cab-over
+  const T = [
+    ['freightliner-cascadia','Freightliner','Cascadia','2007 on','S','The most common highway tractor in North America. Smooth sloped hood, wide grille, large sleeper.','Sloped aero hood, Freightliner badge on a wide grille.'],
+    ['kenworth-w900','Kenworth','W900','1961 on','L','The classic long-nose. Flat, upright windshield and a long square hood.','Tall flat grille, very long hood, boxy cab.'],
+    ['kenworth-t680','Kenworth','T680','2012 on','S','Aerodynamic Kenworth built for fuel economy on long hauls.','Rounded hood, swept headlights, Kenworth badge.'],
+    ['kenworth-t800','Kenworth','T800','1994 on','S','Short-nose workhorse for heavy hauling, dump and construction work.','Short hood, flat front, sloped fenders.'],
+    ['peterbilt-379','Peterbilt','379','1987 to 2007','L','Owner-operator favorite. Long hood, chrome, and a tall upright grille.','Oval-edged hood, two-piece flat windshield.'],
+    ['peterbilt-389','Peterbilt','389','2007 on','L','Replaced the 379 with the same long-hood look and a cleaner interior.','Long hood with a bigger grille and square headlights.'],
+    ['peterbilt-579','Peterbilt','579','2012 on','S','Peterbilt\'s aerodynamic highway truck.','Sloped hood, rounded headlights, bumper-width grille.'],
+    ['volvo-vnl','Volvo','VNL','1996 on','S','Rounded, very quiet cab with a big sleeper option.','Smooth rounded nose, Volvo iron mark on the grille.'],
+    ['mack-anthem','Mack','Anthem','2018 on','S','Mack\'s highway tractor with the bulldog on the hood.','Gold or chrome bulldog hood ornament, tall angular grille.'],
+    ['mack-pinnacle','Mack','Pinnacle','2006 on','S','Mack\'s highway and regional tractor, built tough.','Bulldog ornament, squared hood, large central grille.'],
+    ['international-lt','International','LT','2017 on','S','Aerodynamic highway tractor from International, with a steeply sloped hood.','Slim sloped hood, International badge, narrow headlights.'],
+    ['international-prostar','International','ProStar','2008 to 2017','S','Earlier International highway tractor with a rounded hood.','Wide curved hood, large grille, bold headlights.'],
+    ['western-star-4900','Western Star','4900','1990s on','L','Heavy vocational and long-haul truck with a long, upright hood.','Star badge, flat upright grille, big headlights.'],
+    ['freightliner-coronado','Freightliner','Coronado','2005 on','L','Freightliner\'s long-hood: classic lines with modern cab comfort.','Long hood, tall grille, Freightliner badge.'],
+    ['other','Other','Truck','unknown','S','A semi you cannot place yet. Log it and check the badge next time.','Look at the grille badge and the door.']
+  ];
+  const shape = k => {
+    const hood = k === 'L' ? 34 : 22;
+    return '<g fill="currentColor"><rect x="4" y="12" width="'+(100-hood-14)+'" height="18" rx="2"/>' +
+      '<path d="M'+(90-hood)+' 8h12l'+(hood>30?'18':'10')+' 6v16h-'+(hood+8)+'z" transform="translate(-'+(hood>30?24:12)+' 0)"/></g>' +
+      '<g fill="currentColor"><circle cx="24" cy="32" r="5.5"/><circle cx="40" cy="32" r="5.5"/><circle cx="92" cy="32" r="5.5"/></g>';
+  };
+  let data = store.get('truckdex', {});
+  let cur = null, photo = null;
+  const total = () => T.filter(t => (data[t[0]] || []).length).length;
+  function render() {
+    $('#count').textContent = total() + ' / ' + T.length;
+    $('#grid').innerHTML = T.map(t => {
+      const s = data[t[0]] || [], last = s.filter(x => x.img).pop();
+      return '<button class="tile' + (s.length ? ' seen' : '') + (cur === t[0] ? ' on' : '') + '" data-id="' + t[0] + '">' +
+        (last ? '<img alt="" src="' + last.img + '">' : '<svg viewBox="0 0 120 40" aria-hidden="true">' + shape(t[4]) + '</svg>') +
+        '<b>' + t[1] + ' ' + t[2] + '</b><span>' + (s.length ? 'seen x' + s.length : 'not seen') + '</span></button>';
+    }).join('');
+  }
+  function detail() {
+    const t = T.find(x => x[0] === cur); if (!t) return;
+    $('#detail').hidden = false;
+    $('#hero').innerHTML = shape(t[4]);
+    $('#dname').textContent = t[1] + ' ' + t[2];
+    $('#dmeta').textContent = t[3];
+    $('#ddesc').textContent = t[5];
+    $('#dtell').textContent = 'Tell: ' + t[6];
+    const s = data[cur] || [];
+    $('#log').innerHTML = s.length ? s.slice().reverse().map(x =>
+      '<li class="sight"><span>' + x.d + (x.p ? ' · ' + x.p.replace(/[<&]/g, '') : '') + '</span>' + (x.img ? '<img alt="" src="' + x.img + '">' : '') + '</li>').join('')
+      : '<li class="empty">No sightings yet.</li>';
+  }
+  $('#grid').addEventListener('click', e => {
+    const b = e.target.closest('.tile'); if (!b) return;
+    cur = b.dataset.id; photo = null; $('#pname').textContent = ''; $('#msg').textContent = '';
+    render(); detail();
+  });
+  $('#photo').addEventListener('change', e => {
+    const f = e.target.files[0]; if (!f) return;
+    const img = new Image(), u = URL.createObjectURL(f);
+    img.onload = () => {
+      const w = 200, h = Math.round(img.height * w / img.width), c = document.createElement('canvas');
+      c.width = w; c.height = h; c.getContext('2d').drawImage(img, 0, 0, w, h);
+      photo = c.toDataURL('image/jpeg', 0.6); URL.revokeObjectURL(u); $('#pname').textContent = 'photo ready';
+    };
+    img.onerror = () => { $('#msg').textContent = 'Could not read that photo.'; };
+    img.src = u;
+  });
+  $('#seen').addEventListener('click', () => {
+    if (!cur) return;
+    (data[cur] = data[cur] || []).push({ d: new Date().toISOString().slice(0, 10), p: $('#place').value.trim(), img: photo });
+    $('#msg').textContent = store.set('truckdex', data) ? '' : 'Storage is full or blocked. This sighting will not be kept.';
+    photo = null; $('#pname').textContent = ''; $('#place').value = '';
+    render(); detail();
+  });
+  render();
+})();
+</script>
+</body>
+</html>

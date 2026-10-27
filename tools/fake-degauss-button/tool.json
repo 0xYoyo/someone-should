@@ -1,0 +1,51 @@
+{
+  "slug": "fake-degauss-button",
+  "wish": "someone should make a program that degausses an LCD screen with the warp and the noise",
+  "year": 2010,
+  "agreed": 95,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/SomebodyMakeThis/comments/ctoml/",
+      "date": "2010-07-26",
+      "points": 85,
+      "comments": 10
+    }
+  ],
+  "spec": "Press Degauss and the screen warps, shakes and saturates while a thunk and decaying hum play, then it settles.\nOne tap; sound starts only on tap; effect lasts two seconds.\nIt only simulates the effect on this page; it does not touch the real display.",
+  "tests": [
+    {
+      "tap": "#degauss"
+    },
+    {
+      "expect": {
+        "sel": "#status",
+        "contains": "degaussing"
+      }
+    },
+    {
+      "wait": 1500
+    },
+    {
+      "wait": 1000
+    },
+    {
+      "expect": {
+        "sel": "#status",
+        "contains": "clean"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#count",
+        "contains": "1 time"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:44:54Z",
+  "model": "sonnet-5.5",
+  "minutes": 3,
+  "approved": false,
+  "notes": "Effect is simulated inside the page; the real screen is not affected."
+}

@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T08:43:02.399Z",
+ "updated": "2026-10-27T08:45:41.850Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -1473,6 +1473,193 @@
    "tests": "6/6",
    "built": "2026-10-27T08:42:45Z",
    "minutes": 5,
+   "approved": false
+  },
+  {
+   "slug": "book-a-flight-badly",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 8.8,
+   "tests": "6/6",
+   "built": "2026-10-27T08:43:14Z",
+   "minutes": 4,
+   "approved": false
+  },
+  {
+   "slug": "fighting-words-scrabble",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 20.9,
+   "tests": "5/5",
+   "built": "2026-10-27T08:43:12Z",
+   "minutes": 8,
+   "approved": false
+  },
+  {
+   "slug": "noise-threshold-alarm",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 8.5,
+   "tests": "5/5",
+   "built": "2026-10-27T08:43:56Z",
+   "minutes": 4,
+   "approved": false
+  },
+  {
+   "slug": "hidden-ideas-list",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 6.1,
+   "tests": "6/6",
+   "built": "2026-10-27T08:43:30Z",
+   "minutes": 3,
+   "approved": false
+  },
+  {
+   "slug": "midnight-drop-start-time",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 6.3,
+   "tests": "6/6",
+   "built": "2026-10-27T08:43:50Z",
+   "minutes": 3,
+   "approved": false
+  },
+  {
+   "slug": "swipe-between-calculators",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 9.4,
+   "tests": "6/6",
+   "built": "2026-10-27T08:43:59Z",
+   "minutes": 4,
+   "approved": false
+  },
+  {
+   "slug": "hum-to-chiptune",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 14.2,
+   "tests": "6/6",
+   "built": "2026-10-27T08:44:14Z",
+   "minutes": 6,
+   "approved": false
+  },
+  {
+   "slug": "what-else-is-this-size",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 10,
+   "tests": "6/6",
+   "built": "2026-10-27T08:44:08Z",
+   "minutes": 6,
+   "approved": false
+  },
+  {
+   "slug": "level-up-lose-weapons",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 9.8,
+   "tests": "6/6",
+   "built": "2026-10-27T08:44:06Z",
+   "minutes": 4,
+   "approved": false
+  },
+  {
+   "slug": "nobody-looks-at-you",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 8.7,
+   "tests": "6/6",
+   "built": "2026-10-27T08:50:00Z",
+   "minutes": 6,
+   "approved": false
+  },
+  {
+   "slug": "wire-the-house-puzzle",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 12,
+   "tests": "6/6",
+   "built": "2026-10-27T08:44:35Z",
+   "minutes": 7,
+   "approved": false
+  },
+  {
+   "slug": "play-only-when-running",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 10.6,
+   "tests": "6/6",
+   "built": "2026-10-27T08:44:39Z",
+   "minutes": 5,
+   "approved": false
+  },
+  {
+   "slug": "fake-degauss-button",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 7.4,
+   "tests": "6/6",
+   "built": "2026-10-27T08:44:54Z",
+   "minutes": 3,
+   "approved": false
+  },
+  {
+   "slug": "gift-idea-finder",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 13.1,
+   "tests": "6/6",
+   "built": "2026-10-27T08:45:11Z",
+   "minutes": 6,
+   "approved": false
+  },
+  {
+   "slug": "you-are-the-zombie",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 10.1,
+   "tests": "5/5",
+   "built": "2026-10-27T08:45:00Z",
+   "minutes": 4,
+   "approved": false
+  },
+  {
+   "slug": "semi-truck-spotter-dex",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 11.2,
+   "tests": "6/6",
+   "built": "2026-10-27T08:45:13Z",
+   "minutes": 6,
+   "approved": false
+  },
+  {
+   "slug": "learning-enemies-arena",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 13.2,
+   "tests": "6/6",
+   "built": "2026-10-27T08:45:18Z",
+   "minutes": 6,
    "approved": false
   }
  ]

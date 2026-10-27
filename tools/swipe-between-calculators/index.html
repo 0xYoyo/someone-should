@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a calculator app with multiple blank calculators you can swipe through</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+#track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+#track::-webkit-scrollbar { display: none; }
+.calc { flex: 0 0 100%; scroll-snap-align: center; display: grid; gap: 8px; }
+.screen { border: 1.5px solid var(--line); border-radius: var(--radius); padding: 10px 12px; min-height: 96px; display: flex; flex-direction: column; justify-content: flex-end; text-align: right; overflow-wrap: anywhere; }
+.hist { font: 16px/1.4 var(--mono); color: var(--meta); min-height: 22px; }
+.disp { font-size: 34px; line-height: 1.15; font-weight: 500; font-variant-numeric: tabular-nums; }
+.pad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.pad button { padding: 0; font-size: 22px; min-height: 48px; }
+.pad .wide { grid-column: span 2; }
+.pad .op { border-color: var(--line); }
+#tabs { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+#tabs button { min-width: var(--tap); padding: 0 12px; }
+#tabs button[aria-current="true"] { background: var(--ink); color: var(--paper); }
+#msg { min-height: 24px; }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a calculator app with multiple blank calculators you can swipe through</h1>
+<main id="app">
+<div id="tabs"></div>
+<div id="track"></div>
+<div class="row" style="margin-top:12px"><button id="add">+ new calculator</button><button id="del">remove this one</button></div>
+<div id="msg" class="empty" style="padding:8px 0"></div>
+</main>
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const OPS = '+-\u00d7\u00f7';
+  const KEYS = ['C','\u232b','%','\u00f7','7','8','9','\u00d7','4','5','6','-','1','2','3','+','0','.','='];
+
+  let calcs = store.get('calcs', null);
+  if (!Array.isArray(calcs) || !calcs.length) {
+    calcs = [{ e: '1200\u00d70.15', h: '' }, { e: '', h: '' }, { e: '', h: '' }];
+  }
+  calcs = calcs.map(c => ({ e: String(c.e || ''), h: String(c.h || '') }));
+  const track = $('#track'), tabs = $('#tabs'), msg = $('#msg');
+
+  // recursive descent: expr = term (+|- term)*, term = unary (x|/ unary)*, postfix %
+  function evaluate(s) {
+    let i = 0;
+    const peek = () => s[i];
+    function num() {
+      if (peek() === '(') { i++; const v = expr(); if (peek() !== ')') throw 0; i++; return post(v); }
+      let j = i;
+      while (j < s.length && /[0-9.]/.test(s[j])) j++;
+      if (j === i) throw 0;
+      const v = parseFloat(s.slice(i, j));
+      if (isNaN(v)) throw 0;
+      i = j;
+      return post(v);
+    }
+    function post(v) { while (peek() === '%') { i++; v /= 100; } return v; }
+    function unary() { if (peek() === '-') { i++; return -unary(); } return num(); }
+    function term() {
+      let v = unary();
+      while (peek() === '\u00d7' || peek() === '\u00f7') {
+        const o = s[i++]; const r = unary();
+        v = o === '\u00d7' ? v * r : v / r;
+      }
+      return v;
+    }
+    function expr() {
+      let v = term();
+      while (peek() === '+' || peek() === '-') {
+        const o = s[i++]; const r = term();
+        v = o === '+' ? v + r : v - r;
+      }
+      return v;
+    }
+    const v = expr();
+    if (i < s.length) { // close any open brackets implicitly
+      throw 0;
+    }
+    return v;
+  }
+  const fmt = n => String(+n.toPrecision(12));
+
+  function press(c, k) {
+    msg.textContent = '';
+    if (k === 'C') { c.e = ''; c.h = ''; }
+    else if (k === '\u232b') c.e = c.e.slice(0, -1);
+    else if (k === '=') {
+      if (!c.e) return;
+      try {
+        const r = evaluate(c.e);
+        if (!isFinite(r)) throw 0;
+        c.h = c.e + ' ='; c.e = fmt(r);
+      } catch { msg.textContent = 'cannot calculate that'; }
+    } else {
+      const last = c.e.slice(-1);
+      if (OPS.includes(k)) {
+        if (!c.e && k !== '-') return;
+        if (OPS.includes(last)) c.e = c.e.slice(0, -1);
+      } else if (k === '.') {
+        const part = c.e.split(/[+\-\u00d7\u00f7()%]/).pop();
+        if (part.includes('.')) return;
+      }
+      if (c.h && /[0-9.]/.test(k) && !c.e.includes('\u00d7') && c.h.endsWith('=') && c.e === c.e.trim() && c.justDone) c.e = '';
+      c.e += k;
+    }
+    c.justDone = k === '=';
+    save(); render(c);
+  }
+
+  function save() { store.set('calcs', calcs.map(({ e, h }) => ({ e, h }))); }
+
+  function render(c) {
+    const el = track.children[calcs.indexOf(c)];
+    if (!el) return;
+    $('.hist', el).textContent = c.h;
+    $('.disp', el).textContent = c.e || '0';
+  }
+
+  function build() {
+    track.innerHTML = '';
+    calcs.forEach((c, n) => {
+      const el = document.createElement('section');
+      el.className = 'calc';
+      el.setAttribute('aria-label', 'calculator ' + (n + 1));
+      el.innerHTML = '<div class="screen"><div class="hist"></div><div class="disp"></div></div><div class="pad"></div>';
+      const pad = $('.pad', el);
+      KEYS.forEach(k => {
+        const b = document.createElement('button');
+        b.textContent = k; b.dataset.k = k;
+        if (k === '=') b.className = 'primary wide';
+        else if (OPS.includes(k) || k === '%' || k === 'C' || k === '\u232b') b.className = 'op';
+        pad.appendChild(b);
+      });
+      pad.addEventListener('click', ev => { const b = ev.target.closest('button'); if (b) press(c, b.dataset.k); });
+      track.appendChild(el);
+      render(c);
+    });
+    tabs.innerHTML = '';
+    calcs.forEach((c, n) => {
+      const b = document.createElement('button');
+      b.textContent = n + 1; b.className = 'tab';
+      b.setAttribute('aria-label', 'calculator ' + (n + 1));
+      b.addEventListener('click', () => go(n));
+      tabs.appendChild(b);
+    });
+    mark();
+  }
+
+  function cur() { return Math.max(0, Math.min(calcs.length - 1, Math.round(track.scrollLeft / (track.clientWidth + 12)))); }
+  function mark() { const n = cur(); $$('.tab').forEach((b, i) => b.setAttribute('aria-current', i === n)); }
+  function go(n) { track.scrollTo({ left: n * (track.clientWidth + 12), behavior: 'smooth' }); }
+  track.addEventListener('scroll', mark);
+
+  $('#add').addEventListener('click', () => {
+    calcs.push({ e: '', h: '' }); save(); build();
+    requestAnimationFrame(() => go(calcs.length - 1));
+  });
+  $('#del').addEventListener('click', () => {
+    if (calcs.length < 2) { msg.textContent = 'keep at least one'; return; }
+    calcs.splice(cur(), 1); save(); build();
+  });
+  build();
+})();
+</script>
+</body>
+</html>

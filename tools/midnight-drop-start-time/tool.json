@@ -1,0 +1,60 @@
+{
+  "slug": "midnight-drop-start-time",
+  "wish": "someone should make a website that tells you when to start a song so the bass drops at midnight",
+  "year": 2019,
+  "agreed": 118,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/efl4i0/",
+      "date": "2019-12-25",
+      "points": 106,
+      "comments": 12
+    }
+  ],
+  "spec": "Turns a drop time and its position in the song into the clock time to press play.\nType the target time (default midnight) and the drop timestamp; read the start time and a live countdown.\nIt does not play audio or detect the drop; if too late, it says where to skip to.",
+  "tests": [
+    {
+      "expect": {
+        "sel": "#startat",
+        "contains": "23:58:48"
+      }
+    },
+    {
+      "type": {
+        "sel": "#drop",
+        "text": "2:00"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#startat",
+        "contains": "23:58:00"
+      }
+    },
+    {
+      "type": {
+        "sel": "#target",
+        "text": "12:30"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#startat",
+        "contains": "12:28:00"
+      }
+    },
+    {
+      "type": {
+        "sel": "#drop",
+        "text": "x"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:43:50Z",
+  "model": "sonnet-5.5",
+  "minutes": 3,
+  "approved": false,
+  "notes": ""
+}

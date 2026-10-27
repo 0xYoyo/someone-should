@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a program that degausses an LCD screen with the warp and the noise</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+#screen { display: grid; grid-template-columns: repeat(7, 1fr); height: 220px; border: 1.5px solid var(--ink); border-radius: var(--radius); overflow: hidden; position: relative; background: #000; }
+#screen i { display: block; }
+#screen b { position: absolute; left: 0; right: 0; bottom: 0; padding: 8px 10px; background: rgba(0,0,0,.6); color: #fff; font: 16px/1.3 var(--mono); font-weight: 400; }
+#stage { overflow: hidden; border-radius: var(--radius); }
+#stage.go #screen { filter: url(#warp) saturate(1.8); }
+#stage.go { animation: shake .07s infinite alternate; }
+@keyframes shake { from { transform: translate(-3px, 1px) skewX(-1.5deg); } to { transform: translate(3px, -1px) skewX(1.5deg); } }
+#degauss { width: 100%; font-size: 20px; min-height: 56px; }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a program that degausses an LCD screen with the warp and the noise</h1>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="warp" x="0" y="0" width="100%" height="100%"><feTurbulence id="turb" type="fractalNoise" baseFrequency="0.01 0.04" numOctaves="2" seed="2" result="n"/><feDisplacementMap id="disp" in="SourceGraphic" in2="n" scale="0" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
+<main id="app" class="stack">
+  <div id="stage"><div id="screen">
+    <i style="background:#fff"></i><i style="background:#ee0"></i><i style="background:#0dd"></i><i style="background:#0c0"></i><i style="background:#d0d"></i><i style="background:#d00"></i><i style="background:#00d"></i>
+    <b id="status">idle</b>
+  </div></div>
+  <button id="degauss" class="primary" type="button">Degauss</button>
+  <div class="meta" id="count">degaussed 0 times</div>
+</main>
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const DURATION = 2000;
+  let busy = false, count = store.get('degauss-count', 0);
+  const showCount = () => { $('#count').textContent = 'degaussed ' + count + (count === 1 ? ' time' : ' times'); };
+  showCount();
+
+  // thunk, then a decaying 60 Hz hum with noise
+  function sound() {
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      const ac = new AC(), t = ac.currentTime;
+      const g = ac.createGain();
+      g.connect(ac.destination);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.8, t + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.12, t + 0.25);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 2);
+      const o = ac.createOscillator();
+      o.frequency.setValueAtTime(120, t);
+      o.frequency.exponentialRampToValueAtTime(60, t + 0.15);
+      o.connect(g); o.start(t); o.stop(t + 2);
+      const h = ac.createOscillator();
+      h.type = 'sawtooth'; h.frequency.value = 120;
+      const hg = ac.createGain(); hg.gain.value = 0.15;
+      h.connect(hg); hg.connect(g); h.start(t); h.stop(t + 2);
+      const len = ac.sampleRate * 2, buf = ac.createBuffer(1, len, ac.sampleRate), d = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+      const n = ac.createBufferSource(); n.buffer = buf;
+      const ng = ac.createGain(); ng.gain.value = 0.12;
+      n.connect(ng); ng.connect(g); n.start(t);
+      setTimeout(() => { try { ac.close(); } catch {} }, 2300);
+    } catch {}
+  }
+
+  function degauss() {
+    if (busy) return;
+    busy = true;
+    $('#degauss').disabled = true;
+    $('#status').textContent = 'degaussing';
+    $('#stage').classList.add('go');
+    sound();
+    const turb = $('#turb'), disp = $('#disp'), t0 = performance.now();
+    (function frame(now) {
+      const p = Math.min(1, (now - t0) / DURATION), k = Math.pow(1 - p, 2);
+      disp.setAttribute('scale', String(90 * k * (0.6 + 0.4 * Math.sin(p * 60))));
+      turb.setAttribute('baseFrequency', (0.004 + 0.02 * Math.random() * k).toFixed(4) + ' ' + (0.02 + 0.06 * Math.random() * k).toFixed(4));
+      if (p < 1) return requestAnimationFrame(frame);
+      disp.setAttribute('scale', '0');
+      $('#stage').classList.remove('go');
+      $('#status').textContent = 'clean';
+      $('#degauss').disabled = false;
+      count++; store.set('degauss-count', count); showCount();
+      busy = false;
+    })(t0);
+  }
+  $('#degauss').addEventListener('click', degauss);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+{
+  "slug": "noise-threshold-alarm",
+  "wish": "someone should make an app that flashes the screen or beeps when the noise reaches a set threshold",
+  "year": 2012,
+  "agreed": 124,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/AppIdeas/comments/bfjtpz/",
+      "date": "2019-04-21",
+      "points": 34,
+      "comments": 20
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/1nr4ns/",
+      "date": "2013-10-04",
+      "points": 40,
+      "comments": 6
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/SomebodyMakeThis/comments/y7lub/",
+      "date": "2012-08-14",
+      "points": 14,
+      "comments": 10
+    }
+  ],
+  "spec": "Listens to the microphone and shows the live noise level against a threshold line.\nSet the threshold with the slider, tap start; the screen flashes and a tone sounds when the level reaches it.\nIt does not record or send audio, and the level is relative, not calibrated decibels.",
+  "tests": [
+    {
+      "expect": {
+        "sel": "#status",
+        "contains": "tap to start"
+      }
+    },
+    {
+      "tap": "#flash"
+    },
+    {
+      "tap": "#test"
+    },
+    {
+      "expect": {
+        "sel": "#status",
+        "contains": "too loud"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#level",
+        "matches": "^\\d+$"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:43:56Z",
+  "model": "sonnet-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": "Level is relative, not calibrated dB. Microphone is requested only on tap."
+}

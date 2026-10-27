@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make software that converts your humming into 8-bit music</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+.roll { position: relative; height: 160px; border: 1.5px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.roll i { position: absolute; height: 8px; background: var(--ink); border-radius: 1px; }
+.roll i.on { background: var(--built); }
+.roll .head { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--no); display: none; }
+.note { font: 16px/1.4 var(--mono); color: var(--meta); }
+.level { height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; }
+.level b { display: block; height: 100%; width: 0; background: var(--ink); }
+.wave { display: flex; gap: 8px; flex-wrap: wrap; }
+.wave button { flex: 1; }
+button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+button:disabled { opacity: .4; cursor: default; }
+a.dl { display: inline-flex; align-items: center; min-height: var(--tap); }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make software that converts your humming into 8-bit music</h1>
+
+<main id="app" class="stack">
+  <div class="roll" id="roll" aria-label="melody"><div class="head" id="head"></div></div>
+  <div class="note" id="notes">Example melody</div>
+  <div class="level" id="lvlwrap" hidden><b id="lvl"></b></div>
+  <div class="row">
+    <button class="primary" id="start">Hum (tap to start)</button>
+    <button id="play">Play</button>
+    <button id="save">Save WAV</button>
+  </div>
+  <div class="wave" id="wave" role="group" aria-label="sound">
+    <button data-w="square" aria-pressed="true">Square</button>
+    <button data-w="pulse" aria-pressed="false">Pulse</button>
+    <button data-w="triangle" aria-pressed="false">Triangle</button>
+  </div>
+  <div class="note" id="msg"></div>
+  <a class="dl note" id="dl" hidden download="hum.wav">Download hum.wav</a>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+  const noteName = m => NAMES[m % 12] + (Math.floor(m / 12) - 1);
+  const freq = m => 440 * Math.pow(2, (m - 69) / 12);
+
+  // Example: midi + duration in seconds (opening of a familiar rising/falling phrase)
+  const EXAMPLE = [[64,.25],[67,.25],[69,.25],[72,.5],[71,.25],[69,.25],[67,.5],[64,.25],[62,.25],[64,.75]]
+    .reduce((a, [m, d]) => { const t = a.length ? a[a.length-1].t + a[a.length-1].d : 0; a.push({ m, t, d }); return a; }, []);
+
+  let melody = EXAMPLE.slice();
+  let wave = store.get('wave', 'square');
+  let ctx = null, stream = null, timer = null, playing = null;
+
+  const msg = t => { $('#msg').textContent = t || ''; };
+
+  function render() {
+    const roll = $('#roll');
+    $$('i', roll).forEach(e => e.remove());
+    if (!melody.length) { $('#notes').textContent = 'No notes yet. Hum a short tune.'; return; }
+    const total = melody[melody.length-1].t + melody[melody.length-1].d;
+    const lo = Math.min(...melody.map(n => n.m)) - 1, hi = Math.max(...melody.map(n => n.m)) + 1;
+    const span = Math.max(hi - lo, 6);
+    melody.forEach((n, i) => {
+      const e = document.createElement('i');
+      e.style.left = (n.t / total * 100) + '%';
+      e.style.width = Math.max(n.d / total * 100 - 0.5, 0.8) + '%';
+      e.style.top = ((hi - n.m) / span * 140 + 8) + 'px';
+      e.dataset.i = i;
+      roll.appendChild(e);
+    });
+    $('#notes').textContent = melody.length + ' notes: ' + melody.slice(0, 12).map(n => noteName(n.m)).join(' ') + (melody.length > 12 ? ' ...' : '');
+    $('#play').disabled = $('#save').disabled = false;
+  }
+
+  function setWave(w) {
+    wave = w; store.set('wave', w);
+    $$('#wave button').forEach(b => b.setAttribute('aria-pressed', b.dataset.w === w));
+  }
+
+  // Square-ish oscillators; pulse is a 25% duty cycle via PeriodicWave
+  function pulseWave(c) {
+    const n = 32, re = new Float32Array(n), im = new Float32Array(n), d = 0.25;
+    for (let k = 1; k < n; k++) im[k] = (2 / (k * Math.PI)) * Math.sin(k * Math.PI * d);
+    return c.createPeriodicWave(re, im);
+  }
+
+  function play() {
+    stop();
+    if (!melody.length) return;
+    try {
+      ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+      ctx.resume && ctx.resume();
+    } catch { msg('Audio is not available in this browser.'); return; }
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    if (wave === 'pulse') o.setPeriodicWave(pulseWave(ctx)); else o.type = wave;
+    g.gain.value = 0;
+    o.connect(g); g.connect(ctx.destination);
+    const t0 = ctx.currentTime + 0.05;
+    melody.forEach(n => {
+      o.frequency.setValueAtTime(freq(n.m), t0 + n.t);
+      g.gain.setValueAtTime(0.18, t0 + n.t);
+      g.gain.setValueAtTime(0, t0 + n.t + Math.max(n.d - 0.02, 0.02));
+    });
+    const end = melody[melody.length-1].t + melody[melody.length-1].d;
+    o.start(t0); o.stop(t0 + end + 0.05);
+    playing = { o, t0, end };
+    $('#play').textContent = 'Stop';
+    o.onended = () => { if (playing && playing.o === o) stop(); };
+    requestAnimationFrame(tick);
+  }
+  function tick() {
+    if (!playing) return;
+    const p = (ctx.currentTime - playing.t0) / playing.end;
+    const h = $('#head');
+    h.style.display = p >= 0 && p <= 1 ? 'block' : 'none';
+    h.style.left = (p * 100) + '%';
+    const t = ctx.currentTime - playing.t0;
+    $$('#roll i').forEach((e, i) => e.classList.toggle('on', t >= melody[i].t && t < melody[i].t + melody[i].d));
+    requestAnimationFrame(tick);
+  }
+  function stop() {
+    if (playing) { try { playing.o.stop(); } catch {} playing = null; }
+    $('#play').textContent = 'Play';
+    $('#head').style.display = 'none';
+    $$('#roll i').forEach(e => e.classList.remove('on'));
+  }
+
+  // ---- pitch detection (autocorrelation) ----
+  function detect(buf, sr) {
+    let rms = 0;
+    for (let i = 0; i < buf.length; i++) rms += buf[i] * buf[i];
+    rms = Math.sqrt(rms / buf.length);
+    if (rms < 0.012) return { f: 0, rms };
+    const minLag = Math.floor(sr / 1000), maxLag = Math.floor(sr / 80);
+    let best = -1, bestLag = 0, r0 = 0;
+    for (let i = 0; i < buf.length - maxLag; i++) r0 += buf[i] * buf[i];
+    const c = [];
+    for (let lag = minLag; lag <= maxLag; lag++) {
+      let s = 0;
+      for (let i = 0; i < buf.length - maxLag; i++) s += buf[i] * buf[i + lag];
+      c[lag] = s / (r0 || 1);
+    }
+    // first strong peak, not the global max, to avoid octave-down errors
+    for (let lag = minLag + 1; lag < maxLag; lag++) {
+      if (c[lag] > 0.8 && c[lag] >= c[lag-1] && c[lag] >= c[lag+1]) { bestLag = lag; best = c[lag]; break; }
+    }
+    if (!bestLag) {
+      for (let lag = minLag + 1; lag < maxLag; lag++) if (c[lag] > best && c[lag] >= c[lag-1] && c[lag] >= c[lag+1]) { best = c[lag]; bestLag = lag; }
+      if (best < 0.6) return { f: 0, rms };
+    }
+    return { f: sr / bestLag, rms };
+  }
+
+  // frames: array of midi (rounded) or 0 for silence, at fixed step seconds
+  function segment(frames, step) {
+    const sm = frames.map((m, i) => {
+      const w = frames.slice(Math.max(0, i - 2), i + 3).filter(Boolean).sort((a, b) => a - b);
+      return m && w.length ? w[Math.floor(w.length / 2)] : 0;
+    });
+    const out = [];
+    let i = 0;
+    while (i < sm.length) {
+      let j = i;
+      while (j < sm.length && sm[j] === sm[i]) j++;
+      if (sm[i] && (j - i) * step >= 0.09) out.push({ m: sm[i], t: i * step, d: (j - i) * step });
+      i = j;
+    }
+    // close gaps so the melody is continuous, then rebase to zero
+    if (!out.length) return [];
+    const t0 = out[0].t;
+    out.forEach((n, k) => { n.t -= t0; if (out[k+1]) n.d = Math.max(out[k+1].t - t0 - n.t, n.d); });
+    return out;
+  }
+
+  async function startHum() {
+    if (timer) { finishHum(); return; }
+    stop();
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { msg('No microphone access here. Playing the example.'); return; }
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+    } catch { msg('Microphone blocked. Allow it and tap again.'); return; }
+    ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+    ctx.resume && ctx.resume();
+    const src = ctx.createMediaStreamSource(stream);
+    const an = ctx.createAnalyser(); an.fftSize = 2048;
+    src.connect(an);
+    const buf = new Float32Array(an.fftSize), frames = [], step = 0.03;
+    $('#lvlwrap').hidden = false;
+    $('#start').textContent = 'Done';
+    msg('Listening. Hum, then tap Done.');
+    const began = performance.now();
+    timer = setInterval(() => {
+      an.getFloatTimeDomainData(buf);
+      const { f, rms } = detect(buf, ctx.sampleRate);
+      $('#lvl').style.width = Math.min(rms * 400, 100) + '%';
+      frames.push(f ? Math.round(69 + 12 * Math.log2(f / 440)) : 0);
+      if (performance.now() - began > 30000) finishHum();
+    }, step * 1000);
+    timer.frames = frames; timer.step = step; startHum.cur = { frames, step, src };
+  }
+  function finishHum() {
+    const cur = startHum.cur;
+    clearInterval(timer); timer = null;
+    try { cur.src.disconnect(); } catch {}
+    if (stream) stream.getTracks().forEach(t => t.stop());
+    stream = null;
+    $('#lvlwrap').hidden = true;
+    $('#start').textContent = 'Hum (tap to start)';
+    const m = segment(cur.frames, cur.step);
+    if (!m.length) { msg('Heard no clear notes. Hum louder, closer to the mic.'); return; }
+    melody = m; msg(''); render(); play();
+  }
+
+  // ---- WAV export: 8-bit unsigned mono ----
+  function makeWav() {
+    const sr = 22050, total = melody[melody.length-1].t + melody[melody.length-1].d;
+    const n = Math.ceil(total * sr), data = new Uint8Array(n).fill(128);
+    const duty = wave === 'pulse' ? 0.25 : 0.5;
+    melody.forEach(nt => {
+      const f = freq(nt.m), s = Math.floor(nt.t * sr), e = Math.min(n, Math.floor((nt.t + Math.max(nt.d - 0.02, 0.02)) * sr));
+      for (let i = s; i < e; i++) {
+        const ph = ((i - s) / sr * f) % 1;
+        let v = wave === 'triangle' ? (ph < .5 ? 4 * ph - 1 : 3 - 4 * ph) : (ph < duty ? 1 : -1);
+        data[i] = 128 + Math.round(v * 40);
+      }
+    });
+    const b = new DataView(new ArrayBuffer(44 + n));
+    const w = (o, s) => [...s].forEach((c, i) => b.setUint8(o + i, c.charCodeAt(0)));
+    w(0, 'RIFF'); b.setUint32(4, 36 + n, true); w(8, 'WAVEfmt ');
+    b.setUint32(16, 16, true); b.setUint16(20, 1, true); b.setUint16(22, 1, true);
+    b.setUint32(24, sr, true); b.setUint32(28, sr, true); b.setUint16(32, 1, true); b.setUint16(34, 8, true);
+    w(36, 'data'); b.setUint32(40, n, true);
+    new Uint8Array(b.buffer, 44).set(data);
+    return new Blob([b], { type: 'audio/wav' });
+  }
+  function save() {
+    if (!melody.length) return;
+    try {
+      const a = $('#dl');
+      if (a.href && a.href.startsWith('blob:')) URL.revokeObjectURL(a.href);
+      a.href = URL.createObjectURL(makeWav());
+      a.hidden = false; a.click();
+      msg('Saved as 8-bit WAV.');
+    } catch { msg('Could not save the file here.'); }
+  }
+
+  $('#start').addEventListener('click', startHum);
+  $('#play').addEventListener('click', () => playing ? stop() : play());
+  $('#save').addEventListener('click', save);
+  $$('#wave button').forEach(b => b.addEventListener('click', () => { setWave(b.dataset.w); if (playing) play(); }));
+  setWave(['square','pulse','triangle'].includes(wave) ? wave : 'square');
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+{
+  "slug": "hum-to-chiptune",
+  "wish": "someone should make software that converts your humming into 8-bit music",
+  "year": 2016,
+  "agreed": 106,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/cuneq5/",
+      "date": "2019-08-24",
+      "points": 48,
+      "comments": 6
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/579p7s/",
+      "date": "2016-10-13",
+      "points": 38,
+      "comments": 14
+    }
+  ],
+  "spec": "Turns a hummed tune into a square-wave 8-bit melody drawn as a piano roll.\nTap Hum, hum a short phrase, tap Done; it plays back as Square, Pulse or Triangle and saves as an 8-bit WAV.\nIt does not do chords, rhythm quantising or multiple voices; monophonic pitch only.",
+  "tests": [
+    {
+      "expect": {
+        "sel": "#notes",
+        "contains": "10 notes"
+      }
+    },
+    {
+      "tap": "[data-w=pulse]"
+    },
+    {
+      "expect": {
+        "sel": "[data-w=pulse]",
+        "matches": "Pulse"
+      }
+    },
+    {
+      "tap": "#play"
+    },
+    {
+      "wait": 300
+    },
+    {
+      "expect": {
+        "sel": "#play",
+        "contains": "Stop"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:44:14Z",
+  "model": "sonnet-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Mic pitch detection is untested headless; the example melody is shown first so the wall thumbnail is useful."
+}

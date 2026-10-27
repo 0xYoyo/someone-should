@@ -1,0 +1,54 @@
+{
+  "slug": "play-only-when-running",
+  "wish": "someone should make a running app that plays your playlist only when you move above a set speed",
+  "year": 2016,
+  "agreed": 104,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/4ardle/",
+      "date": "2016-03-17",
+      "points": 78,
+      "comments": 26
+    }
+  ],
+  "spec": "Plays your music (or a built-in beat) only while your GPS speed is above a limit you set.\nTap start, pick your music files, set the km/h limit, then run; it pauses after about a second below the limit and resumes when you speed up.\nIt does not stream playlists from music apps, and the test speed field replaces GPS for trying it indoors.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#sim",
+        "text": "10"
+      }
+    },
+    {
+      "tap": "#start"
+    },
+    {
+      "expect": {
+        "sel": "#state",
+        "contains": "playing"
+      }
+    },
+    {
+      "type": {
+        "sel": "#sim",
+        "text": "2"
+      }
+    },
+    {
+      "wait": 1500
+    },
+    {
+      "expect": {
+        "sel": "#state",
+        "contains": "paused"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:44:39Z",
+  "model": "sonnet-5.5",
+  "minutes": 5,
+  "approved": false,
+  "notes": "Offline: music comes from files you pick on the device, not from streaming apps. Built-in beat plays until files are added. Speed uses GPS; browsers may stop GPS when the screen locks."
+}

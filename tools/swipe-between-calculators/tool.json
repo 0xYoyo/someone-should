@@ -1,0 +1,45 @@
+{
+  "slug": "swipe-between-calculators",
+  "wish": "someone should make a calculator app with multiple blank calculators you can swipe through",
+  "year": 2019,
+  "agreed": 130,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/e7dt7n/",
+      "date": "2019-12-07",
+      "points": 122,
+      "comments": 8
+    }
+  ],
+  "spec": "Several independent calculators side by side in a swipeable strip, each with its own display and last-calculation line.\nSwipe or tap a number to switch; add or remove calculators; everything is saved on the device.\nBasic arithmetic with brackets and percent only; no memory keys or unit conversion.",
+  "tests": [
+    {
+      "tap": "[data-k='C']"
+    },
+    {
+      "tap": "[data-k='7']"
+    },
+    {
+      "tap": "[data-k='×']"
+    },
+    {
+      "tap": "[data-k='6']"
+    },
+    {
+      "tap": "[data-k='=']"
+    },
+    {
+      "expect": {
+        "sel": ".disp",
+        "contains": "42"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:43:59Z",
+  "model": "sonnet-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": ""
+}
