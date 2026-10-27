@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that compares two tables and shows the differences</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+main { max-width: 960px; }
+.pair { display: grid; gap: 12px; grid-template-columns: 1fr; }
+@media (min-width: 720px) { .pair { grid-template-columns: 1fr 1fr; } }
+label.lbl { display: block; margin-bottom: 6px; }
+textarea { min-height: 150px; font: 16px/1.4 var(--mono); resize: vertical; white-space: pre; overflow-x: auto; }
+select { width: auto; min-width: 160px; flex: 1 1 160px; }
+#summary { font-size: 17px; }
+#summary b { font-weight: 600; }
+.err { color: var(--no); }
+.scroll { overflow-x: auto; max-width: 100%; border: 1px solid var(--line); border-radius: var(--radius); }
+table { border-collapse: collapse; font: 16px/1.35 var(--mono); width: max-content; min-width: 100%; }
+th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; white-space: pre; }
+th { color: var(--meta); font-weight: 500; }
+td.st { width: 2em; font-weight: 700; }
+tr.add td { color: var(--built); }
+tr.del td { color: var(--no); }
+td.cell-chg { background: color-mix(in srgb, var(--ink) 8%, transparent); }
+td.cell-chg del { color: var(--no); text-decoration: line-through; }
+td.cell-chg ins { color: var(--built); text-decoration: none; }
+td.cell-chg del + ins::before { content: " \2192  "; color: var(--meta); }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that compares two tables and shows the differences</h1>
+
+<main id="app" class="stack">
+  <div class="pair">
+    <div><label class="lbl meta" for="a">Table A (before) — CSV or TSV, first row is headers</label>
+      <textarea id="a" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="id,name,price&#10;1,apple,3"></textarea></div>
+    <div><label class="lbl meta" for="b">Table B (after)</label>
+      <textarea id="b" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="id,name,price&#10;1,apple,4"></textarea></div>
+  </div>
+  <div class="row">
+    <label class="meta" for="key">Match rows by</label>
+    <select id="key"><option value="">row number</option></select>
+  </div>
+  <div class="row">
+    <button id="compare" class="primary">Compare</button>
+    <button id="swap">Swap A and B</button>
+  </div>
+  <div id="summary" class="empty">Paste two tables to see what changed.</div>
+  <div id="diff"></div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const taA = $('#a'), taB = $('#b'), keySel = $('#key'), summary = $('#summary'), diffEl = $('#diff');
+
+  // Pick the delimiter that appears most on the header line.
+  function detectDelim(text) {
+    const first = text.split(/\r?\n/, 1)[0] || '';
+    let best = ',', n = -1;
+    for (const d of ['\t', ',', ';', '|']) {
+      const c = first.split(d).length - 1;
+      if (c > n) { n = c; best = d; }
+    }
+    return best;
+  }
+
+  // RFC 4180-ish parser: quoted fields, doubled quotes, newlines inside quotes.
+  function parse(text) {
+    const d = detectDelim(text), rows = [];
+    let row = [], f = '', q = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (q) {
+        if (c === '"') { if (text[i + 1] === '"') { f += '"'; i++; } else q = false; }
+        else f += c;
+      } else if (c === '"' && f === '') q = true;
+      else if (c === d) { row.push(f); f = ''; }
+      else if (c === '\n' || c === '\r') {
+        if (c === '\r' && text[i + 1] === '\n') i++;
+        row.push(f); rows.push(row); row = []; f = '';
+      } else f += c;
+    }
+    if (f !== '' || row.length) { row.push(f); rows.push(row); }
+    const clean = rows.map(r => r.map(v => v.trim())).filter(r => r.some(v => v !== ''));
+    if (!clean.length) return null;
+    const head = clean[0].map((h, i) => h || 'col' + (i + 1));
+    return { head, rows: clean.slice(1) };
+  }
+
+  function refreshKeys() {
+    const t = parse(taA.value) || parse(taB.value);
+    const prev = keySel.value, saved = store.get('ctt.key', null);
+    keySel.innerHTML = '<option value="">row number</option>';
+    if (t) for (const h of t.head) { const o = document.createElement('option'); o.value = o.textContent = h; keySel.appendChild(o); }
+    const names = t ? t.head : [];
+    keySel.value = names.includes(prev) ? prev : names.includes(saved) ? saved : (names[0] || '');
+  }
+
+  function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+  function index(t, key) {
+    const ki = key ? t.head.indexOf(key) : -1, map = new Map();
+    let dups = 0;
+    t.rows.forEach((r, i) => {
+      const k = key ? (r[ki] ?? '') : String(i + 1);
+      if (map.has(k)) { dups++; return; }
+      const obj = {};
+      t.head.forEach((h, j) => { obj[h] = r[j] ?? ''; });
+      map.set(k, obj);
+    });
+    return { map, dups };
+  }
+
+  function compare() {
+    store.set('ctt.a', taA.value); store.set('ctt.b', taB.value); store.set('ctt.key', keySel.value);
+    diffEl.innerHTML = '';
+    const A = parse(taA.value), B = parse(taB.value);
+    summary.className = '';
+    if (!A || !B) { summary.className = 'empty'; summary.textContent = !A && !B ? 'Paste two tables to see what changed.' : 'Table ' + (A ? 'B' : 'A') + ' is empty.'; return; }
+    const key = keySel.value;
+    if (key && !B.head.includes(key)) { summary.className = 'err'; summary.textContent = 'Table B has no column "' + key + '".'; return; }
+    if (key && !A.head.includes(key)) { summary.className = 'err'; summary.textContent = 'Table A has no column "' + key + '".'; return; }
+
+    const common = A.head.filter(h => B.head.includes(h) && h !== key);
+    const colsGone = A.head.filter(h => !B.head.includes(h));
+    const colsNew = B.head.filter(h => !A.head.includes(h));
+    const ia = index(A, key), ib = index(B, key);
+    const out = [];
+    let nAdd = 0, nDel = 0, nChg = 0, nSame = 0;
+
+    for (const [k, ra] of ia.map) {
+      const rb = ib.map.get(k);
+      if (!rb) { out.push({ st: 'del', k, a: ra }); nDel++; continue; }
+      const changed = common.filter(h => ra[h] !== rb[h]);
+      if (changed.length) { out.push({ st: 'chg', k, a: ra, b: rb, changed: new Set(changed) }); nChg++; }
+      else nSame++;
+    }
+    for (const [k, rb] of ib.map) if (!ia.map.has(k)) { out.push({ st: 'add', k, b: rb }); nAdd++; }
+
+    const parts = [nChg + ' changed', nAdd + ' added', nDel + ' removed', nSame + ' same'];
+    let html = '<b>' + parts.join(' · ') + '</b>';
+    const notes = [];
+    if (colsNew.length) notes.push('new columns: ' + colsNew.map(esc).join(', '));
+    if (colsGone.length) notes.push('dropped columns: ' + colsGone.map(esc).join(', '));
+    if (ia.dups || ib.dups) notes.push((ia.dups + ib.dups) + ' repeated keys ignored (first one used)');
+    if (notes.length) html += '<div class="meta">' + notes.join(' · ') + '</div>';
+    summary.innerHTML = html;
+    if (!out.length) { diffEl.innerHTML = '<p class="empty">The tables match.</p>'; return; }
+
+    const cols = [...common, ...colsNew.filter(h => h !== key), ...colsGone.filter(h => h !== key)];
+    const mark = { add: '+', del: '−', chg: '~' };
+    let t = '<div class="scroll"><table><thead><tr><th></th><th>' + esc(key || '#') + '</th>' +
+      cols.map(h => '<th>' + esc(h) + '</th>').join('') + '</tr></thead><tbody>';
+    for (const r of out) {
+      t += '<tr class="' + r.st + '"><td class="st">' + mark[r.st] + '</td><td>' + esc(r.k) + '</td>';
+      for (const h of cols) {
+        if (r.st === 'chg' && r.changed.has(h)) {
+          t += '<td class="cell-chg">' + (r.a[h] !== '' ? '<del>' + esc(r.a[h]) + '</del>' : '<del></del>') + '<ins>' + esc(r.b[h]) + '</ins></td>';
+        } else {
+          const src = r.st === 'del' ? r.a : r.b;
+          t += '<td>' + esc(src[h] ?? (r.a && r.a[h]) ?? '') + '</td>';
+        }
+      }
+      t += '</tr>';
+    }
+    diffEl.innerHTML = t + '</tbody></table></div>';
+  }
+
+  taA.value = store.get('ctt.a', '');
+  taB.value = store.get('ctt.b', '');
+  refreshKeys();
+  taA.addEventListener('input', refreshKeys);
+  taB.addEventListener('input', () => { if (!parse(taA.value)) refreshKeys(); });
+  $('#compare').addEventListener('click', compare);
+  keySel.addEventListener('change', () => { if (taA.value && taB.value) compare(); });
+  $('#swap').addEventListener('click', () => {
+    [taA.value, taB.value] = [taB.value, taA.value];
+    refreshKeys();
+    if (taA.value || taB.value) compare();
+  });
+  if (taA.value && taB.value) compare();
+})();
+</script>
+</body>
+</html>
