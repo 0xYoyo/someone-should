@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that builds decision trees</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+.tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+.tabs button { border-radius: 0; }
+.tabs button:first-child { border-radius: var(--radius) 0 0 var(--radius); }
+.tabs button:last-child { border-radius: 0 var(--radius) var(--radius) 0; border-left: 0; }
+.tabs button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+label.lbl { display: block; color: var(--meta); font-size: 16px; margin-bottom: 4px; }
+.answers li { flex-wrap: nowrap; }
+.answers input { flex: 1; min-width: 0; }
+.answers button { padding: 0 12px; flex: none; }
+.add { display: flex; gap: 10px; }
+.add input { flex: 1; min-width: 0; }
+.add button { flex: none; }
+.note { color: var(--meta); font-size: 16px; margin: 0; }
+.err { color: var(--no); }
+#canvas { overflow: auto; border: 1px solid var(--line); border-radius: var(--radius); max-height: 70vh; -webkit-overflow-scrolling: touch; }
+#tree { display: block; }
+#tree .edge { fill: none; stroke: var(--meta); stroke-width: 1.5; }
+#tree .elbl rect { fill: var(--paper); }
+#tree .elbl text { fill: var(--ink); font-size: 16px; font-family: var(--sans); }
+#tree .node { cursor: pointer; }
+#tree .node rect { fill: var(--paper); stroke: var(--ink); stroke-width: 1.5; }
+#tree .node text { fill: var(--ink); font-size: 16px; font-family: var(--sans); }
+#tree .node.out rect { fill: var(--ink); }
+#tree .node.out text { fill: var(--paper); }
+#tree .node.sel rect { stroke-width: 4; }
+#tree .node.out.sel rect { stroke: var(--meta); }
+#tree .node.here rect { stroke-width: 4; stroke-dasharray: 6 4; }
+#walk-node { font-size: 28px; line-height: 1.2; font-weight: 500; margin: 0; overflow-wrap: anywhere; }
+#walk-path { font-size: 16px; color: var(--meta); margin: 0; overflow-wrap: anywhere; }
+.choices { display: grid; gap: 10px; }
+.choices button { text-align: left; padding: 10px 18px; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that builds decision trees</h1>
+
+<!-- the tool. Smallest thing that fully does the wish. -->
+<main id="app" class="stack">
+  <div class="tabs" role="group" aria-label="Mode">
+    <button id="mode-edit" aria-pressed="true">Build</button>
+    <button id="mode-walk" aria-pressed="false">Walk through</button>
+  </div>
+
+  <section id="edit" class="stack">
+    <div>
+      <label class="lbl" for="node-text" id="node-kind">Question</label>
+      <input id="node-text" autocomplete="off" placeholder="Question, or an outcome if it has no answers">
+    </div>
+    <ul id="answers" class="plain answers" aria-label="Answers"></ul>
+    <div class="add">
+      <input id="answer-label" autocomplete="off" placeholder="Add an answer, e.g. Yes" aria-label="New answer">
+      <button id="add-answer">Add</button>
+    </div>
+    <p id="edit-msg" class="note"></p>
+    <div class="row">
+      <button id="up">Up to parent</button>
+      <button id="del-node">Delete branch</button>
+    </div>
+  </section>
+
+  <section id="walk" class="stack" hidden>
+    <p id="walk-path"></p>
+    <p id="walk-kind" class="note"></p>
+    <p id="walk-node"></p>
+    <div id="choices" class="choices"></div>
+    <div class="row">
+      <button id="back">Back</button>
+      <button id="restart">Start over</button>
+    </div>
+  </section>
+
+  <div id="canvas"><svg id="tree" aria-label="Decision tree"></svg></div>
+  <div class="row">
+    <button id="export" class="primary">Export SVG</button>
+    <button id="clear">Clear tree</button>
+  </div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  // storage helper — never throws
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+
+  const KEY = 'decision-tree-builder.v1';
+  const fresh = () => ({ seq: 1, root: 'n1', nodes: { n1: { text: '', answers: [] } } });
+  let tree = store.get(KEY, null);
+  if (!tree || !tree.nodes || !tree.nodes[tree.root]) tree = fresh();
+  let sel = tree.root;
+  let mode = 'edit';
+  let path = [];        // walk: [{id, label}] of nodes already passed
+  let here = tree.root; // walk: current node
+  const save = () => store.set(KEY, tree);
+
+  const node = id => tree.nodes[id];
+  const title = id => node(id).text.trim() || '(untitled)';
+  const parentOf = id => {
+    for (const [pid, n] of Object.entries(tree.nodes)) if (n.answers.some(a => a.to === id)) return pid;
+    return null;
+  };
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  function wrap(text, max, lines) {
+    const out = []; let cur = '';
+    for (let w of text.split(/\s+/).filter(Boolean)) {
+      while (w.length > max) { if (cur) { out.push(cur); cur = ''; } out.push(w.slice(0, max)); w = w.slice(max); }
+      if (!cur) cur = w; else if ((cur + ' ' + w).length <= max) cur += ' ' + w; else { out.push(cur); cur = w; }
+    }
+    if (cur) out.push(cur);
+    if (!out.length) out.push('(untitled)');
+    if (out.length > lines) { out.length = lines; out[lines - 1] = out[lines - 1].slice(0, max - 1) + '…'; }
+    return out;
+  }
+
+  // Tidy layout: leaves get consecutive columns, parents sit centred over their children.
+  const W = 190, COL = 220, ROW = 150, PAD = 16, LH = 20;
+  function layout() {
+    const pos = {}; let leaf = 0, maxDepth = 0;
+    const walk = (id, d) => {
+      maxDepth = Math.max(maxDepth, d);
+      const kids = node(id).answers.map(a => a.to);
+      let x;
+      if (!kids.length) x = leaf++;
+      else { kids.forEach(k => walk(k, d + 1)); x = (pos[kids[0]].x + pos[kids[kids.length - 1]].x) / 2; }
+      const lines = wrap(node(id).text.trim(), 20, 3);
+      pos[id] = { x, d, lines, h: Math.max(48, 16 + lines.length * LH) };
+    };
+    walk(tree.root, 0);
+    return { pos, cols: Math.max(1, leaf), depth: maxDepth };
+  }
+
+  function svgMarkup(standalone) {
+    const { pos, cols, depth } = layout();
+    const width = cols * COL + PAD * 2 - (COL - W), height = (depth + 1) * ROW + PAD;
+    const cx = id => PAD + pos[id].x * COL + W / 2, top = id => PAD + pos[id].d * ROW;
+    let edges = '', labels = '', boxes = '';
+    for (const [id, n] of Object.entries(tree.nodes)) {
+      if (!pos[id]) continue;
+      for (const a of n.answers) {
+        const x1 = cx(id), y1 = top(id) + pos[id].h, x2 = cx(a.to), y2 = top(a.to), my = (y1 + y2) / 2;
+        edges += `<path class="edge" d="M${x1} ${y1} C${x1} ${my} ${x2} ${my} ${x2} ${y2}"/>`;
+        const t = wrap(a.label, 18, 1)[0], lw = t.length * 8.5 + 12, lx = (x1 + x2) / 2, ly = my;
+        labels += `<g class="elbl"><rect x="${lx - lw / 2}" y="${ly - 12}" width="${lw}" height="24" rx="3"/><text x="${lx}" y="${ly + 5}" text-anchor="middle">${esc(t)}</text></g>`;
+      }
+      const p = pos[id], x = PAD + p.x * COL, y = top(id), out = !n.answers.length;
+      const cls = 'node' + (out ? ' out' : '') + (!standalone && mode === 'edit' && id === sel ? ' sel' : '') + (!standalone && mode === 'walk' && id === here ? ' here' : '');
+      const ty = y + p.h / 2 - (p.lines.length - 1) * LH / 2 + 5;
+      boxes += `<g class="${cls}" data-id="${id}"><rect x="${x}" y="${y}" width="${W}" height="${p.h}" rx="${out ? 14 : 3}"/>` +
+        `<text x="${x + W / 2}" text-anchor="middle">${p.lines.map((l, i) => `<tspan x="${x + W / 2}" y="${ty + i * LH}">${esc(l)}</tspan>`).join('')}</text></g>`;
+    }
+    const style = standalone
+      ? '<style>.edge{fill:none;stroke:#6b6b6b;stroke-width:1.5}.elbl rect{fill:#f4f1ea}text{font:16px -apple-system,"Segoe UI",Roboto,sans-serif;fill:#141414}.node rect{fill:#f4f1ea;stroke:#141414;stroke-width:1.5}.out rect{fill:#141414}.out text{fill:#f4f1ea}</style><rect width="100%" height="100%" fill="#f4f1ea"/>'
+      : '';
+    return { width, height, inner: style + edges + labels + boxes };
+  }
+
+  const svg = $('#tree');
+  function drawTree() {
+    const m = svgMarkup(false);
+    svg.setAttribute('viewBox', `0 0 ${m.width} ${m.height}`);
+    svg.setAttribute('width', m.width);
+    svg.setAttribute('height', m.height);
+    svg.innerHTML = m.inner;
+    const g = svg.querySelector(mode === 'edit' ? `[data-id="${sel}"]` : `[data-id="${here}"]`);
+    if (g) { const r = g.getBBox(), c = $('#canvas'); c.scrollLeft = Math.max(0, r.x + r.width / 2 - c.clientWidth / 2); }
+  }
+
+  function drawEdit() {
+    const n = node(sel);
+    const input = $('#node-text');
+    if (document.activeElement !== input) input.value = n.text;
+    $('#node-kind').textContent = sel === tree.root ? (n.answers.length ? 'First question' : 'First question (add answers to branch)') : (n.answers.length ? 'Question' : 'Outcome (add answers to make it a question)');
+    const ul = $('#answers');
+    ul.innerHTML = '';
+    n.answers.forEach((a, i) => {
+      const li = document.createElement('li');
+      li.innerHTML = `<input aria-label="Answer ${i + 1}" value="${esc(a.label)}"><button class="open">Open</button><button class="rm" aria-label="Delete answer">Delete</button>`;
+      $('input', li).addEventListener('input', e => { a.label = e.target.value; save(); drawTree(); });
+      $('.open', li).addEventListener('click', () => select(a.to));
+      $('.rm', li).addEventListener('click', () => { removeBranch(a.to); n.answers.splice(i, 1); save(); render(); });
+      ul.appendChild(li);
+    });
+    $('#up').disabled = sel === tree.root;
+    $('#del-node').disabled = sel === tree.root;
+  }
+
+  function drawWalk() {
+    const n = node(here);
+    $('#walk-path').textContent = path.length ? path.map(p => `${title(p.id)} → ${p.label}`).join('  /  ') : '';
+    $('#walk-kind').textContent = n.answers.length ? (path.length ? 'Next question' : 'Start') : 'Outcome';
+    $('#walk-node').textContent = title(here);
+    const box = $('#choices');
+    box.innerHTML = '';
+    n.answers.forEach(a => {
+      const b = document.createElement('button');
+      b.className = 'choice';
+      b.textContent = a.label.trim() || '(unlabelled answer)';
+      b.addEventListener('click', () => { path.push({ id: here, label: b.textContent }); here = a.to; render(); });
+      box.appendChild(b);
+    });
+    $('#back').disabled = !path.length;
+    $('#restart').disabled = !path.length;
+  }
+
+  function render() {
+    $('#edit').hidden = mode !== 'edit';
+    $('#walk').hidden = mode !== 'walk';
+    $('#mode-edit').setAttribute('aria-pressed', mode === 'edit');
+    $('#mode-walk').setAttribute('aria-pressed', mode === 'walk');
+    if (mode === 'edit') drawEdit(); else drawWalk();
+    drawTree();
+  }
+
+  function select(id) { sel = id; $('#edit-msg').textContent = ''; $('#node-text').blur(); render(); }
+
+  function removeBranch(id) {
+    for (const a of node(id).answers) removeBranch(a.to);
+    delete tree.nodes[id];
+  }
+
+  $('#node-text').addEventListener('input', e => { node(sel).text = e.target.value; save(); drawTree(); });
+
+  function addAnswer() {
+    const inp = $('#answer-label'), label = inp.value.trim();
+    if (!label) { $('#edit-msg').textContent = 'Type an answer first.'; return; }
+    const id = 'n' + (++tree.seq);
+    tree.nodes[id] = { text: '', answers: [] };
+    node(sel).answers.push({ label, to: id });
+    inp.value = '';
+    save();
+    sel = id;
+    $('#edit-msg').textContent = `Now type what follows “${label}”: an outcome, or the next question.`;
+    $('#node-text').blur();
+    render();
+  }
+  $('#add-answer').addEventListener('click', addAnswer);
+  $('#answer-label').addEventListener('keydown', e => { if (e.key === 'Enter') addAnswer(); });
+
+  $('#up').addEventListener('click', () => { const p = parentOf(sel); if (p) select(p); });
+  $('#del-node').addEventListener('click', () => {
+    const p = parentOf(sel); if (!p) return;
+    node(p).answers = node(p).answers.filter(a => a.to !== sel);
+    removeBranch(sel); save(); select(p);
+  });
+
+  svg.addEventListener('click', e => {
+    const g = e.target.closest('.node'); if (!g) return;
+    if (mode === 'edit') select(g.dataset.id);
+  });
+
+  $('#mode-edit').addEventListener('click', () => { mode = 'edit'; if (!tree.nodes[sel]) sel = tree.root; render(); });
+  $('#mode-walk').addEventListener('click', () => { mode = 'walk'; path = []; here = tree.root; render(); });
+  $('#back').addEventListener('click', () => { const p = path.pop(); if (p) { here = p.id; render(); } });
+  $('#restart').addEventListener('click', () => { path = []; here = tree.root; render(); });
+
+  $('#export').addEventListener('click', () => {
+    const m = svgMarkup(true);
+    try {
+      // Built from the page's own SVG namespace; XMLSerializer adds the xmlns attribute.
+      const out = document.createElementNS(svg.namespaceURI, 'svg');
+      out.setAttribute('width', m.width); out.setAttribute('height', m.height);
+      out.setAttribute('viewBox', `0 0 ${m.width} ${m.height}`);
+      out.innerHTML = m.inner;
+      const doc = '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(out) + '\n';
+      const url = URL.createObjectURL(new Blob([doc], { type: 'image/svg+xml' }));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = (wrap(node(tree.root).text.trim() || 'decision tree', 40, 1)[0].replace(/[^\w -]+/g, '').trim().replace(/\s+/g, '-').toLowerCase() || 'decision-tree') + '.svg';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch { $('#edit-msg').textContent = 'This browser would not save the file.'; }
+  });
+
+  let clearArmed = null;
+  $('#clear').addEventListener('click', e => {
+    if (!clearArmed) {
+      e.target.textContent = 'Tap again to clear';
+      clearArmed = setTimeout(() => { clearArmed = null; e.target.textContent = 'Clear tree'; }, 3000);
+      return;
+    }
+    clearTimeout(clearArmed); clearArmed = null; e.target.textContent = 'Clear tree';
+    tree = fresh(); sel = here = tree.root; path = []; mode = 'edit'; save(); render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

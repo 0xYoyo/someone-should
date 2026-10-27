@@ -1,0 +1,51 @@
+{
+  "slug": "decision-tree-builder",
+  "wish": "someone should make a tool that builds decision trees",
+  "year": 2014,
+  "agreed": 21,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/3016/free-decision-tree-software",
+      "date": "2014-04-05",
+      "points": 17,
+      "comments": 4
+    }
+  ],
+  "spec": "Builds a decision tree from questions, answers and outcomes, and draws it as a diagram.\nType a question, add answers (each opens a new node), type the outcome or next question; Walk through clicks the tree step by step; Export SVG saves the drawing.\nIt does not learn trees from data, share online, or import other formats; the tree is kept in this browser only.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#answer-label",
+        "text": "Yes"
+      }
+    },
+    {
+      "tap": "#add-answer"
+    },
+    {
+      "type": {
+        "sel": "#node-text",
+        "text": "Take an umbrella"
+      }
+    },
+    {
+      "tap": "#mode-walk"
+    },
+    {
+      "tap": ".choice"
+    },
+    {
+      "expect": {
+        "sel": "#walk-node",
+        "contains": "Take an umbrella"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:37:18Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": ""
+}
