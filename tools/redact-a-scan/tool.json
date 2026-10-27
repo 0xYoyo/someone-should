@@ -1,0 +1,51 @@
+{
+  "slug": "redact-a-scan",
+  "wish": "someone should make a tool that blacks out information in scanned documents",
+  "year": 2014,
+  "agreed": 9,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/13353/need-program-to-help-remove-information-from-scanned-documents",
+      "date": "2014-10-21",
+      "points": 8,
+      "comments": 1
+    }
+  ],
+  "spec": "Opens a photo or scan of a page and lets you drag solid black boxes over anything you want gone.\nDrag to cover an area, tap a box to remove it, tap empty space to drop a line-sized box, then Save PNG.\nIt does not open PDFs or read text; the saved PNG is new pixels only, so covered content and original metadata are not in it.",
+  "tests": [
+    {
+      "tap": "#sample"
+    },
+    {
+      "tap": "#page"
+    },
+    {
+      "expect": {
+        "sel": "#count",
+        "contains": "1 box"
+      }
+    },
+    {
+      "tap": "#flatten"
+    },
+    {
+      "expect": {
+        "sel": "#status",
+        "matches": "PNG ready: \\d+ × \\d+ px, 1 box burned in"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#dl",
+        "visible": true
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T02:00:22Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Images only (JPG/PNG/whatever the browser decodes); PDFs need to be exported as an image first since a PDF renderer would not fit the size budget. Very large scans are scaled to 16 MP to stay under phone canvas limits."
+}

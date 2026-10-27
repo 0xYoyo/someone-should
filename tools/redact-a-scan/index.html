@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that blacks out information in scanned documents</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+.file { position: relative; display: inline-flex; align-items: center; min-height: var(--tap); padding: 0 18px; border-radius: var(--radius); background: var(--ink); color: var(--paper); cursor: pointer; }
+.file input { position: absolute; inset: 0; opacity: 0; width: 100%; min-height: 0; padding: 0; cursor: pointer; }
+.file:focus-within { outline: 2px solid var(--ink); outline-offset: 2px; }
+#stage { display: none; justify-content: center; border: 1.5px solid var(--line); border-radius: var(--radius); padding: 6px; background: #ffffff10; }
+#stage.on { display: flex; }
+#page { display: block; max-width: 100%; max-height: 72dvh; touch-action: none; cursor: crosshair; background: #fff; }
+#out { display: none; }
+#out.on { display: grid; gap: 12px; }
+#out img { max-width: 100%; max-height: 50dvh; border: 1.5px solid var(--line); justify-self: start; }
+a.btn { display: inline-flex; align-items: center; min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); border-radius: var(--radius); color: var(--ink); text-decoration: none; }
+button:disabled { opacity: .35; cursor: default; }
+#msg { min-height: 1.45em; margin: 0; color: var(--meta); }
+#msg.err { color: var(--no); }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that blacks out information in scanned documents</h1>
+
+<main id="app" class="stack">
+  <div class="row">
+    <label class="file" id="load">Open scan<input type="file" id="file" accept="image/*"></label>
+    <button id="sample">Test page</button>
+  </div>
+  <p id="msg">No page loaded. Open a photo or scan of the page.</p>
+  <div id="stage"><canvas id="page" aria-label="Page. Drag to black out an area; tap a box to remove it."></canvas></div>
+  <div class="row" id="tools">
+    <span id="count">0 boxes</span>
+    <button id="undo" disabled>Undo</button>
+    <button id="clear" disabled>Clear</button>
+    <button id="flatten" class="primary" disabled>Save PNG</button>
+  </div>
+  <section id="out">
+    <span id="status"></span>
+    <img id="result" alt="Flattened page with black boxes burned in">
+    <div class="row"><a id="dl" class="btn" download="redacted.png" href="#">Download</a></div>
+  </section>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const MAX_PIXELS = 16e6;     // iOS canvas limit is ~16.7M px
+  const canvas = $('#page'), ctx = canvas.getContext('2d');
+  const msg = $('#msg'), stage = $('#stage'), out = $('#out');
+  let base = null;             // offscreen canvas holding the page at working size
+  let boxes = [];              // [{x,y,w,h}] in canvas pixels
+  let drag = null;
+  let name = 'page';
+
+  function say(text, err) { msg.textContent = text; msg.classList.toggle('err', !!err); }
+
+  function setPage(src, label) {
+    const scale = Math.min(1, Math.sqrt(MAX_PIXELS / (src.width * src.height)));
+    const w = Math.max(1, Math.round(src.width * scale)), h = Math.max(1, Math.round(src.height * scale));
+    base = document.createElement('canvas');
+    base.width = canvas.width = w; base.height = canvas.height = h;
+    base.getContext('2d').drawImage(src, 0, 0, w, h);
+    boxes = []; name = label;
+    stage.classList.add('on'); out.classList.remove('on');
+    say(`${w} × ${h} px. Drag over anything to black it out. Tap a box to remove it.`);
+    draw();
+  }
+
+  function draw() {
+    if (!base) return;
+    ctx.drawImage(base, 0, 0);
+    ctx.fillStyle = '#000';
+    for (const b of boxes) ctx.fillRect(b.x, b.y, b.w, b.h);
+    if (drag && drag.moved) {
+      const r = rect(drag);
+      ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fillRect(r.x, r.y, r.w, r.h);
+      ctx.strokeStyle = '#c8321e'; ctx.lineWidth = Math.max(2, canvas.width / 400);
+      ctx.strokeRect(r.x, r.y, r.w, r.h);
+    }
+    const n = boxes.length;
+    $('#count').textContent = n === 1 ? '1 box' : `${n} boxes`;
+    $('#undo').disabled = $('#clear').disabled = n === 0;
+    $('#flatten').disabled = false;
+  }
+
+  const rect = d => ({ x: Math.min(d.x0, d.x1), y: Math.min(d.y0, d.y1), w: Math.abs(d.x1 - d.x0), h: Math.abs(d.y1 - d.y0) });
+
+  function pt(e) {
+    const r = canvas.getBoundingClientRect();
+    return {
+      x: Math.max(0, Math.min(canvas.width, (e.clientX - r.left) * canvas.width / r.width)),
+      y: Math.max(0, Math.min(canvas.height, (e.clientY - r.top) * canvas.height / r.height)),
+      k: canvas.width / r.width   // canvas px per css px
+    };
+  }
+
+  canvas.addEventListener('pointerdown', e => {
+    if (!base) return;
+    const p = pt(e);
+    drag = { x0: p.x, y0: p.y, x1: p.x, y1: p.y, k: p.k, moved: false };
+    try { canvas.setPointerCapture(e.pointerId); } catch {}
+  });
+  canvas.addEventListener('pointermove', e => {
+    if (!drag) return;
+    const p = pt(e);
+    drag.x1 = p.x; drag.y1 = p.y;
+    if (Math.hypot(p.x - drag.x0, p.y - drag.y0) > 6 * drag.k) drag.moved = true;
+    draw();
+  });
+  function end() {
+    if (!drag) return;
+    const d = drag; drag = null;
+    if (d.moved) {
+      const r = rect(d);
+      if (r.w > 1 && r.h > 1) boxes.push(r);
+    } else {
+      // a tap removes the box under it, or drops a line-sized box
+      const hit = boxes.map((b, i) => [b, i]).reverse()
+        .find(([b]) => d.x0 >= b.x && d.x0 <= b.x + b.w && d.y0 >= b.y && d.y0 <= b.y + b.h);
+      if (hit) boxes.splice(hit[1], 1);
+      else {
+        const w = 120 * d.k, h = 28 * d.k;
+        boxes.push({ x: Math.max(0, d.x0 - w / 2), y: Math.max(0, d.y0 - h / 2), w, h });
+      }
+    }
+    out.classList.remove('on');
+    draw();
+  }
+  canvas.addEventListener('pointerup', end);
+  canvas.addEventListener('pointercancel', () => { drag = null; draw(); });
+
+  function openFile(f) {
+    if (!f) return;
+    if (/pdf/i.test(f.type) || /\.pdf$/i.test(f.name)) { say('PDFs cannot be opened here. Save the page as an image first.', true); return; }
+    const reader = new FileReader();
+    reader.onerror = () => say('Could not read that file.', true);
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => setPage(img, f.name.replace(/\.[^.]+$/, '') || 'page');
+      img.onerror = () => say('That file is not an image this browser can open.', true);
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(f);
+  }
+  $('#file').addEventListener('change', e => { openFile(e.target.files[0]); e.target.value = ''; });
+  document.addEventListener('dragover', e => e.preventDefault());
+  document.addEventListener('drop', e => { e.preventDefault(); openFile(e.dataTransfer && e.dataTransfer.files[0]); });
+  document.addEventListener('paste', e => {
+    const item = [...(e.clipboardData ? e.clipboardData.items : [])].find(i => i.type.startsWith('image/'));
+    if (item) openFile(item.getAsFile());
+  });
+
+  // a plain letter page to try the tool on
+  $('#sample').addEventListener('click', () => {
+    const c = document.createElement('canvas'); c.width = 850; c.height = 1100;
+    const g = c.getContext('2d');
+    g.fillStyle = '#fbfaf6'; g.fillRect(0, 0, c.width, c.height);
+    g.fillStyle = '#222'; g.font = 'bold 34px system-ui, sans-serif';
+    g.fillText('Statement', 70, 110);
+    g.font = '22px system-ui, sans-serif';
+    const lines = ['Name: A. Sample', 'Account no. 0000 1111 2222 3333', 'Date of birth: 01/01/1970',
+      'Address: 1 Example Street', '', 'Balance brought forward      100.00', 'Payment received              -40.00',
+      'Balance                                60.00'];
+    lines.forEach((t, i) => g.fillText(t, 70, 190 + i * 44));
+    g.fillStyle = '#c9c4b8';
+    for (let i = 0; i < 12; i++) g.fillRect(70, 600 + i * 34, 520 + (i * 37) % 190, 12);
+    setPage(c, 'test-page');
+  });
+
+  $('#undo').addEventListener('click', () => { boxes.pop(); out.classList.remove('on'); draw(); });
+  $('#clear').addEventListener('click', () => { boxes = []; out.classList.remove('on'); draw(); });
+
+  // burn the boxes into a fresh image: new pixels, no layers, no original metadata
+  $('#flatten').addEventListener('click', () => {
+    if (!base) return;
+    const c = document.createElement('canvas'); c.width = base.width; c.height = base.height;
+    const g = c.getContext('2d');
+    g.drawImage(base, 0, 0);
+    g.fillStyle = '#000';
+    for (const b of boxes) g.fillRect(Math.floor(b.x), Math.floor(b.y), Math.ceil(b.w) + 1, Math.ceil(b.h) + 1);
+    let url;
+    try { url = c.toDataURL('image/png'); } catch { $('#status').textContent = 'Could not make the PNG.'; out.classList.add('on'); return; }
+    $('#result').src = url;
+    const dl = $('#dl'); dl.href = url; dl.download = `${name}-redacted.png`;
+    $('#status').textContent = `PNG ready: ${c.width} × ${c.height} px, ${boxes.length} ${boxes.length === 1 ? 'box' : 'boxes'} burned in.`;
+    out.classList.add('on');
+    out.scrollIntoView({ block: 'nearest' });
+  });
+})();
+</script>
+</body>
+</html>
