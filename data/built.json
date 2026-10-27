@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T01:36:25.908Z",
+ "updated": "2026-10-27T01:36:30.881Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -152,9 +152,14 @@
   },
   {
    "slug": "audio-bpm-detector",
-   "status": "pending",
+   "status": "pass",
    "attempts": 1,
-   "model": "opus-5.5"
+   "model": "opus-5.5",
+   "kb": 15.8,
+   "tests": "6/6",
+   "built": "2026-10-27T01:34:29Z",
+   "minutes": 9,
+   "approved": false
   },
   {
    "slug": "remove-passersby-from-photos",

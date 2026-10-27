@@ -1,0 +1,51 @@
+{
+  "slug": "audio-bpm-detector",
+  "wish": "someone should make a tool that detects the BPM of an audio file",
+  "year": 2014,
+  "agreed": 29,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/1727/software-to-detect-bpm-and-tag-mp3-files",
+      "date": "2014-02-26",
+      "points": 23,
+      "comments": 6
+    }
+  ],
+  "spec": "Opens an audio file, decodes it on this device and estimates its tempo in BPM from onset autocorrelation.\nPick a file (or drop one), read the BPM, fix half/double time with x1/2 or x2, play it with a click on the detected grid, or tap along to cross-check.\nIt does not upload anything, edit tags in the file, or handle tempo changes within a track.",
+  "tests": [
+    {
+      "expect": {
+        "sel": "#status",
+        "contains": "Open an audio file"
+      }
+    },
+    {
+      "tap": "#tap"
+    },
+    {
+      "wait": 500
+    },
+    {
+      "tap": "#tap"
+    },
+    {
+      "expect": {
+        "sel": "#tapbpm",
+        "matches": "^\\d+(\\.\\d)?$"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#tapnote",
+        "contains": "Keep tapping"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:34:29Z",
+  "model": "opus-5.5",
+  "minutes": 9,
+  "approved": false,
+  "notes": "File analysis checked locally with synthetic WAVs at 87, 93.5, 100, 120, 128, 140 BPM (all exact); a 174 BPM track reads 87, fixed with x2. Tests cover tap tempo because verify cannot pick a file."
+}
