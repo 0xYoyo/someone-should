@@ -15,6 +15,8 @@ For every row ask, as of late 2026: **does a well-known product already do this 
 - Already in wave1.txt (same need) → `verdict:"skip"`, `dup:"<wave-1 slug>"`.
 - Same need as an earlier row in this chunk → `verdict:"skip"`, `dup:"<that row's topic>"`.
 - Not actually a software wish, a joke, unsafe, gambling, or targets a person → `verdict:"skip"`.
+- Game wishes: `build` only when a small, complete single-file game is a faithful answer (a chess variant, a word game, a snake/pac-man hybrid, a one-screen puzzle). Console-scale ideas (3D open worlds, MMOs, licensed characters, "like GTA/Tony Hawk") → `verdict:"skip"`.
+- A `no` row from the normalize pass may become `build` if an honest offline single file fully does the wish.
 - Otherwise — still unmet, or existing answers are paid / account-walled / ad-stuffed where a free offline single file is a real answer → `verdict:"build"`.
 
 Only these `no` shapes, ≤5 words: `exists: <name>`, `needs: a server`, `needs: other people's data`, `needs: camera hardware`, `needs: your bank password`, `not safe`, `your phone does this`, `too vague`.

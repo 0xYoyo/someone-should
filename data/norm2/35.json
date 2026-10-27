@@ -1,0 +1,1380 @@
+[
+ {
+  "k": "reddit:mczuyy",
+  "drop": null,
+  "wish": "someone should make an app that records your emotions and sends them to your partner",
+  "topic": "share-emotions-with-partner",
+  "category": "social",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "sending to another person needs a server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "reddit:mjp96g",
+  "drop": null,
+  "wish": "someone should make an app that matches people with a hobby or project partner",
+  "topic": "find-project-partner",
+  "category": "social",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "matching needs other people",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "reddit:mkcy18",
+  "drop": null,
+  "wish": "someone should make an app where party guests upload photos and voice memos, then it archives",
+  "topic": "shared-event-media-archive",
+  "category": "social",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "shared uploads need a server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "reddit:n6t2aj",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:nafrw6",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:nrefw1",
+  "drop": null,
+  "wish": "someone should make an app that connects venues with artists who want to perform",
+  "topic": "match-venues-with-artists",
+  "category": "social",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs listings from other people",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "reddit:ofezl3",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:oo5dcj",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:p8rf16",
+  "drop": null,
+  "wish": "someone should make an app for coders to get together and start working on something",
+  "topic": "find-coding-collaborators",
+  "category": "dev",
+  "kind": "dev",
+  "buildable": false,
+  "why": "needs other people",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "reddit:sp6k2u",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:szqmgi",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:w1ytwa",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:z7gjq8",
+  "drop": null,
+  "wish": "someone should make an app that uses AR to show other people's interests",
+  "topic": "see-nearby-interests-ar",
+  "category": "social",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs other people's data and AR",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "reddit:103ft12",
+  "drop": null,
+  "wish": "someone should make an app that matches you with a travel mate",
+  "topic": "find-travel-mate",
+  "category": "travel",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "matching needs other people",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "reddit:11abhta",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:11bpbkv",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:13pw212",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:15qzizm",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:17kv990",
+  "drop": null,
+  "wish": "someone should make an app where friends set challenges and send a live photo when done",
+  "topic": "friend-challenge-photo-app",
+  "category": "social",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "shared with friends via server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "reddit:17muqkw",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1bsz87y",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1fdid1p",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1fpz9ii",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1hu23xm",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1j36xlg",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1jwal7q",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1kbug26",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1kemkva",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1ky7f6d",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1l2h0y4",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1mdyndn",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1n2rb88",
+  "drop": null,
+  "wish": "someone should make an app to make friends around the world",
+  "topic": "make-global-friends",
+  "category": "social",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs other people",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "reddit:1nvukn0",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1nw34o3",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1p1gxah",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1pajpxm",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1pmetc5",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1pvbnay",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1py4d4o",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1qkj7hz",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1rbckdt",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1rch2by",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1roxpvu",
+  "drop": null,
+  "wish": "someone should make a website with simple tools like file converters and text tools, no sign-up",
+  "topic": "no-signup-tool-site",
+  "category": "files",
+  "kind": "dev",
+  "buildable": false,
+  "why": "a collection, not one tool",
+  "no": "too vague"
+ },
+ {
+  "k": "reddit:1spnotv",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1tqytqt",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1vf6i9l",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:17n36m",
+  "drop": null,
+  "wish": "someone should make an app that turns your shopping list into the shortest route through the supermarket",
+  "topic": "supermarket-shopping-route",
+  "category": "food",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs store layouts",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "reddit:17tvc6",
+  "drop": null,
+  "wish": "someone should make a Slender-style video game with the Weeping Angels in a graveyard",
+  "topic": "weeping-angels-graveyard-game",
+  "category": "games",
+  "kind": "everyday",
+  "buildable": true,
+  "why": "canvas game with collectibles",
+  "no": null
+ },
+ {
+  "k": "reddit:1a2xpz",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1affuk",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:1eystg",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:1fp6vu",
+  "drop": null,
+  "wish": "someone should make an iPhone app that tells you how many songs you have in common with another person",
+  "topic": "songs-in-common",
+  "category": "media",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs both people's music libraries",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "reddit:1hy2q1",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:1jwzro",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:1ki3vu",
+  "drop": null,
+  "wish": "someone should make a short video game where you are on your deathbed",
+  "topic": "deathbed-short-game",
+  "category": "games",
+  "kind": "everyday",
+  "buildable": true,
+  "why": "short narrative game in one page",
+  "no": null
+ },
+ {
+  "k": "reddit:1oq63r",
+  "drop": "nsfw"
+ },
+ {
+  "k": "reddit:1ouf4a",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:1q6m1l",
+  "drop": "nsfw"
+ },
+ {
+  "k": "reddit:1ufkt6",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1ygvho",
+  "drop": null,
+  "wish": "someone should make an app for Wikipedia that shows the link distance to Kevin Bacon",
+  "topic": "wikipedia-link-distance",
+  "category": "data",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs Wikipedia link data",
+  "no": "needs: a server"
+ },
+ {
+  "k": "reddit:1zudb2",
+  "drop": "joke"
+ },
+ {
+  "k": "reddit:1zvloc",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:20izt3",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:27blnm",
+  "drop": "joke"
+ },
+ {
+  "k": "reddit:2cfllu",
+  "drop": "joke"
+ },
+ {
+  "k": "reddit:2deov2",
+  "drop": "joke"
+ },
+ {
+  "k": "reddit:1f7uni",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:1fyp6o",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:1i71ih",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1uudig",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1wawf9",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:2093dq",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:20izge",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:20vphe",
+  "drop": null,
+  "wish": "someone should make a website that lets you subscribe to webcomics and read them in one place",
+  "topic": "webcomic-reader",
+  "category": "media",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs fetching comics online",
+  "no": "needs: a server"
+ },
+ {
+  "k": "reddit:23mno1",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:266h8k",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:27q1m5",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:2d1q2e",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:2ftd17",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:2hwus2",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:2ifrar",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:2k7osg",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:2nc3gx",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:2obxze",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:2pd8lb",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:2qc1iy",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:2sjvme",
+  "drop": null,
+  "wish": "someone should make an app for movie theatres to report people talking during the movie",
+  "topic": "report-noisy-moviegoers",
+  "category": "media",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs theatre staff and a server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "reddit:2t9ks7",
+  "drop": null,
+  "wish": "someone should make an online community for people who stay up late",
+  "topic": "night-owl-community",
+  "category": "social",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "community needs a server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "reddit:2wgscs",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:2xu669",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:3001wj",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:3148do",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:32ap2b",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:368oxb",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:3akr56",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:3ej7q5",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:3jfhbn",
+  "drop": null,
+  "wish": "someone should make a Chrome extension for YouTube that fixes videos with audio in only one ear",
+  "topic": "fix-one-sided-audio",
+  "category": "media",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "browser extension, not a page",
+  "no": "too vague"
+ },
+ {
+  "k": "reddit:3ku0vp",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:3lusyh",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:3nbtab",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:3nn1pz",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:3npwkx",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:3nv4fr",
+  "drop": null,
+  "wish": "someone should make a website with a database of TV shows, episode breakdowns and streaming dates",
+  "topic": "tv-episode-release-database",
+  "category": "media",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs a shared database",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "reddit:3opytn",
+  "drop": null,
+  "wish": "someone should make a reddit-style upvote and downvote system for internet search results",
+  "topic": "voted-search-results",
+  "category": "data",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs many users and a server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "reddit:3y75xt",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:3z4p5k",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:44l8d0",
+  "drop": null,
+  "wish": "someone should make a better movie database where you input two movies and see the links between them",
+  "topic": "movie-connections-finder",
+  "category": "media",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs film database",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "reddit:44nraw",
+  "drop": "joke"
+ },
+ {
+  "k": "reddit:457itl",
+  "drop": null,
+  "wish": "someone should make a browser extension that redirects links through a blind middleman so companies can't track you",
+  "topic": "untracked-link-redirect",
+  "category": "privacy",
+  "kind": "dev",
+  "buildable": false,
+  "why": "needs a middleman server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "reddit:45ehrz",
+  "drop": null,
+  "wish": "someone should make an app for touchscreens to create custom hotkeys from tap patterns",
+  "topic": "tap-pattern-hotkeys",
+  "category": "accessibility",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs OS-level integration",
+  "no": "your phone does this"
+ },
+ {
+  "k": "reddit:478vp2",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:4b2e9n",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:4cmt2k",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:4fwayx",
+  "drop": null,
+  "wish": "someone should make a Twitch for musicians to perform live concerts",
+  "topic": "live-concert-streaming",
+  "category": "music",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "live streaming needs a server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "reddit:4ou4vm",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:4x1sio",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:4yzora",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:527ldg",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:57mtil",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:5bp9ck",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:5cjhhv",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:5eotc4",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:5iqh98",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:5jpf1a",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:5nk5q9",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:5nthc7",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:5wq1v6",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:5y50ej",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:63yadf",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:681a40",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:6ayx4b",
+  "drop": null,
+  "wish": "someone should make a Sonic game with Just Cause's grappling hook that doubles as a slingshot",
+  "topic": "sonic-grapple-hook-game",
+  "category": "games",
+  "kind": "everyday",
+  "buildable": true,
+  "why": "2D canvas platformer",
+  "no": null
+ },
+ {
+  "k": "reddit:6sbtq9",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:6vdtxe",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:6wpzjc",
+  "drop": null,
+  "wish": "someone should make a game where an unstoppable \"It\" slowly follows you, like It Follows",
+  "topic": "relentless-follower-game",
+  "category": "games",
+  "kind": "everyday",
+  "buildable": true,
+  "why": "simple chase game on canvas",
+  "no": null
+ },
+ {
+  "k": "reddit:73x2e1",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:78k20q",
+  "drop": null,
+  "wish": "someone should make a choose-your-own-adventure video game mocking reality TV",
+  "topic": "reality-tv-adventure-game",
+  "category": "games",
+  "kind": "everyday",
+  "buildable": true,
+  "why": "branching text game",
+  "no": null
+ },
+ {
+  "k": "reddit:7cwuuf",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:7ldagc",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:7u047l",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:7zo6ph",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:83abge",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:8ljzdx",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:8vwi82",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:8xq2r7",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:9bdu9b",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:9hugcs",
+  "drop": null,
+  "wish": "someone should make a program that uses a webcam to help you learn ASL",
+  "topic": "learn-asl-webcam",
+  "category": "learning",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs gesture recognition",
+  "no": "needs: camera hardware"
+ },
+ {
+  "k": "reddit:9rhtva",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:9sylam",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:au358n",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:basrpp",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:bbzfvm",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:bu8doe",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:dhyitg",
+  "drop": null,
+  "wish": "someone should make a fashion app where you photograph clothing and get styling advice from a stylist",
+  "topic": "clothing-style-advice",
+  "category": "other",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs a stylist and server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "reddit:egalj7",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:ej3pf9",
+  "drop": "nsfw"
+ },
+ {
+  "k": "reddit:ejdzly",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:epr5fj",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:ev8xk2",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:eyxljb",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:f5cha7",
+  "drop": "nsfw"
+ },
+ {
+  "k": "reddit:farfyf",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:g92rly",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:gwh4fy",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:hg36cu",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:hopwpb",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:i29lbo",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:i31gmc",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:iscz2r",
+  "drop": "unsafe"
+ },
+ {
+  "k": "reddit:jkvpe8",
+  "drop": "joke"
+ },
+ {
+  "k": "reddit:kyth5u",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:llg0u9",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:lummu9",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:mf3m6j",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:moskco",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:mruhbh",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:mz7ope",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:obm8dk",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:okwqwa",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:pbikg0",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:qj2bk2",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:qyps72",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:r1o8lx",
+  "drop": "unsafe"
+ },
+ {
+  "k": "reddit:rgdgnk",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:rogek9",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:s2v925",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:s6icp0",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:sav6xb",
+  "drop": "joke"
+ },
+ {
+  "k": "reddit:tnkaoo",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:tug3qw",
+  "drop": "joke"
+ },
+ {
+  "k": "reddit:u14w5h",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:u67h1f",
+  "drop": null,
+  "wish": "someone should make a tool that uses a picture of the empty background to remove the background from video",
+  "topic": "background-removal-from-reference",
+  "category": "photo",
+  "kind": "everyday",
+  "buildable": true,
+  "why": "canvas pixel differencing",
+  "no": null
+ },
+ {
+  "k": "reddit:uoe5d0",
+  "drop": null,
+  "wish": "someone should make a GPS and trail app with a huge square START button",
+  "topic": "big-start-trail-app",
+  "category": "outdoors",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs maps and trail data",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "reddit:uzl3nt",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:w4sowo",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:14o3bqf",
+  "drop": null,
+  "wish": "someone should make a browser plug-in with personal \"vibe check\" settings that masks social media content",
+  "topic": "social-feed-vibe-filter",
+  "category": "privacy",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs content recognition in feeds",
+  "no": "too vague"
+ },
+ {
+  "k": "reddit:156owyw",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:172akws",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1m5ly9p",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1srzr5g",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:1t0taf8",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1t3rrzy",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:1vlzyk9",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1wr3f9r",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1wycizb",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1x80gp7",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:bntcy",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:bo75r",
+  "drop": null,
+  "wish": "someone should make a simple 2D solar system simulator where I can toss planets and comets around",
+  "topic": "solar-system-simulator",
+  "category": "learning",
+  "kind": "everyday",
+  "buildable": true,
+  "why": "canvas gravity simulation",
+  "no": null
+ },
+ {
+  "k": "reddit:bx03i",
+  "drop": null,
+  "wish": "someone should make a background app that saves the text after you type \"Note to self\"",
+  "topic": "note-to-self-capture",
+  "category": "writing",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs OS-level keyboard access",
+  "no": "too vague"
+ },
+ {
+  "k": "reddit:d0c63",
+  "drop": null,
+  "wish": "someone should make a website that shows global disasters in real time, visually",
+  "topic": "live-disaster-map",
+  "category": "data",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs live data",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "reddit:djyw5",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:e59vl",
+  "drop": null,
+  "wish": "someone should make a productivity-based tower defense game",
+  "topic": "productivity-tower-defense",
+  "category": "games",
+  "kind": "everyday",
+  "buildable": true,
+  "why": "canvas game with a task list",
+  "no": null
+ },
+ {
+  "k": "reddit:e97v8",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:euye4",
+  "drop": null,
+  "wish": "someone should make a phone app that receives Morse code",
+  "topic": "receive-morse-code",
+  "category": "learning",
+  "kind": "everyday",
+  "buildable": true,
+  "why": "decode tones from the microphone",
+  "no": null
+ },
+ {
+  "k": "reddit:ltt5t",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:ngjgo",
+  "drop": null,
+  "wish": "someone should make a Wikipedia bot that archives cited sources",
+  "topic": "archive-wikipedia-sources",
+  "category": "data",
+  "kind": "dev",
+  "buildable": false,
+  "why": "needs a server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "reddit:10lpu9",
+  "drop": "nsfw"
+ },
+ {
+  "k": "reddit:1g1luj",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:1j77vz",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1ja9l0",
+  "drop": "unsafe"
+ },
+ {
+  "k": "reddit:1jhmz5",
+  "drop": null,
+  "wish": "someone should make a \"one year ago today\" journal that emails you old entries",
+  "topic": "one-year-ago-journal",
+  "category": "writing",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "emailing needs a server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "reddit:1knthv",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:1ti7zr",
+  "drop": null,
+  "wish": "someone should make a YouTube lecture autocondenser that cuts out pauses",
+  "topic": "condense-lecture-video",
+  "category": "media",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs video fetching and processing",
+  "no": "needs: a server"
+ },
+ {
+  "k": "reddit:2iv75j",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:2mpp6a",
+  "drop": null,
+  "wish": "someone should make a website that suggests new hobbies based on your current interests, with starter links",
+  "topic": "suggest-new-hobbies",
+  "category": "learning",
+  "kind": "everyday",
+  "buildable": true,
+  "why": "fixed suggestion list in the page",
+  "no": null
+ },
+ {
+  "k": "reddit:2vby07",
+  "drop": "unsafe"
+ },
+ {
+  "k": "reddit:35w77n",
+  "drop": null,
+  "wish": "someone should make a cell phone app that shares a grocery list among family members",
+  "topic": "shared-grocery-list",
+  "category": "food",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "sharing needs a server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "reddit:36spvk",
+  "drop": null,
+  "wish": "someone should make an app that tracks the last time I hung out with each friend",
+  "topic": "last-hangout-tracker",
+  "category": "social",
+  "kind": "everyday",
+  "buildable": true,
+  "why": "dates stored in localStorage",
+  "no": null
+ },
+ {
+  "k": "reddit:3mp4kd",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:41gbmt",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:4hjcib",
+  "drop": null,
+  "wish": "someone should make a site where you enter your favorite TV shows and see where to watch them and the total cost",
+  "topic": "cord-cutting-cost-finder",
+  "category": "media",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs streaming availability data",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "reddit:54fevt",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:54kejo",
+  "drop": null,
+  "wish": "someone should make a role-playing app that picks a person in each city to be treated like a celebrity for a week",
+  "topic": "celebrity-of-the-week-app",
+  "category": "social",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs many users",
+  "no": "needs: a server"
+ },
+ {
+  "k": "reddit:5cmc16",
+  "drop": null,
+  "wish": "someone should make a couples' article reading app to share a reading list",
+  "topic": "couples-reading-list",
+  "category": "media",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "sharing needs a server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "reddit:5ddqid",
+  "drop": null,
+  "wish": "someone should make an app to send a job to a list of subcontractors who accept or reject it",
+  "topic": "dispatch-job-to-subcontractors",
+  "category": "work",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs messaging between people",
+  "no": "needs: a server"
+ },
+ {
+  "k": "reddit:5shj5b",
+  "drop": "unsafe"
+ },
+ {
+  "k": "reddit:6feeqw",
+  "drop": null,
+  "wish": "someone should make an Uber for car wash",
+  "topic": "on-demand-car-wash",
+  "category": "other",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs local businesses",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "reddit:6t35jh",
+  "drop": null,
+  "wish": "someone should make a version of Instagram without likes or followers",
+  "topic": "instagram-without-likes",
+  "category": "social",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "social network needs a server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "reddit:8bcftv",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:8hnmld",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:8wq5z6",
+  "drop": "unsafe"
+ },
+ {
+  "k": "reddit:da9ugp",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:efw0t1",
+  "drop": null,
+  "wish": "someone should make software that renders models of knitted items, like digital swatching",
+  "topic": "knit-swatch-preview",
+  "category": "design",
+  "kind": "everyday",
+  "buildable": true,
+  "why": "canvas rendering from typed yarn details",
+  "no": null
+ },
+ {
+  "k": "reddit:fhh95i",
+  "drop": null,
+  "wish": "someone should make a Crazy Wall for the Windows desktop",
+  "topic": "crazy-wall-board",
+  "category": "design",
+  "kind": "everyday",
+  "buildable": true,
+  "why": "pin board with strings on a canvas",
+  "no": null
+ },
+ {
+  "k": "reddit:gjoul2",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:gq7p10",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:hd95gs",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:i1syya",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:ic3tiu",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:k2ueg6",
+  "drop": null,
+  "wish": "someone should make an app that lets users at a party like one song and add one song",
+  "topic": "party-song-voting",
+  "category": "music",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "shared room needs a server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "reddit:khmmef",
+  "drop": null,
+  "wish": "someone should make a site for current news headlines by bias spectrum",
+  "topic": "headlines-by-bias",
+  "category": "media",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs live news data",
+  "no": "needs: other people's data"
+ }
+]

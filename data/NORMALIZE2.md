@@ -8,6 +8,7 @@ Output: `data/norm2/NN.json`, a JSON array with **one object per input line, sam
 ```
 
 - `drop`: `null`, or one of `not-a-wish` (not asking for something to be made: news, a launch/"I built", self-promotion, a question, an opinion, rhetorical), `joke`, `hardware` (a physical product, gadget, vehicle, food, building, law, business), `unsafe` (scraping, impersonation, surveillance/tracking another person, passwords/payments, medical dosing or diagnosis, targeting a person, gambling), `too-specific` (one person's niche setup or a specific vendor integration), `nsfw`. Dropped rows still need `k` and `drop`; other fields may be null.
+- An app-idea pitch IS a wish: "Website idea: …", "App idea: …", "An app that …", "Phone app to …", "[Request] …" are all wishes for something to be made. Judge each row on its own; never drop rows in bulk.
 - Only software wishes survive: an app, site, tool, game, extension, bot. A physical invention ("a fork that…") is `hardware`. A policy/business idea is `not-a-wish`.
 - `wish`: one plain sentence beginning `someone should make` (usually `someone should make an app that …`). ≤120 chars. Lowercase except proper nouns. No editorializing, no "simple", no "free". Keep the stranger's actual ask; don't upgrade it.
 - `topic`: 2–5 word lowercase kebab key naming the core need, so the same wish from different people gets the **same** key (every bill-splitting wish → `split-restaurant-bill`; every "what should we eat tonight" wish → `decide-what-to-eat`). Prefer the most generic natural key.

@@ -9,6 +9,9 @@ const nums = process.argv.slice(2).filter(a => /^\d+$/.test(a));
 const size = +nums[0] || 250, LIMIT = +nums[1] || 10000;
 const raw = readFileSync(join(ROOT, 'data', 'raw2.jsonl'), 'utf8').split('\n').filter(Boolean).map(l => JSON.parse(l));
 
+// --subs=A,B: only rows from these subreddits / sites (a second, software-focused pool).
+const subsArg = process.argv.find(a => a.startsWith('--subs='));
+const onlySubs = subsArg ? new Set(subsArg.slice(7).split(',')) : null;
 const seen = new Set();
 const SOFT = /\b(app|apps|tool|website|site|web ?app|extension|plugin|program|software|service|bot|script|utility|tracker|calculator|game|generator|editor|viewer|player|dashboard|map|timer|planner|browser)\b/i;
 const kept = [];
@@ -19,6 +22,7 @@ for (const r of raw) {
   // Comments carry no votes; keep only the ones whose sentence names a piece of software.
   if (r.site === 'hn' && !r.points && !r.comments && !SOFT.test(r.text)) continue;
   if (r.text.length < 12) continue;
+  if (onlySubs && !onlySubs.has(r.sub ?? r.site)) continue;
   // r/CrazyIdeas is mostly not about software; keep only titles that name one.
   if (r.sub === 'CrazyIdeas' && !SOFT.test(r.text)) continue;
   kept.push({ k, text: r.text, ...(r.body ? { body: r.body.slice(0, 160) } : {}), date: r.date, points: r.points, comments: r.comments, ...(r.tags ? { tags: r.tags.slice(0, 4) } : {}) });

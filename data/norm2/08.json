@@ -1,0 +1,1233 @@
+[
+ {
+  "k": "reddit:3v1iw0",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:3yxhxe",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:53dcwz",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:59k670",
+  "drop": null,
+  "wish": "someone should make a map of Europe showing pre-World War borders",
+  "topic": "historical-europe-borders-map",
+  "category": "learning",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs map data and tiles",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "reddit:5j8b8y",
+  "drop": null,
+  "wish": "someone should make a browser extension that shows how reliable or biased a news site is",
+  "topic": "rate-news-site-bias",
+  "category": "media",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs other people's ratings data",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "reddit:5st4mt",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:96xkvt",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:a03ish",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:c6j2ab",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:cp86kh",
+  "drop": null,
+  "wish": "someone should make a website that answers any yes or no question from credible sources",
+  "topic": "answer-yes-no-question",
+  "category": "other",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs live sources",
+  "no": "needs: a server"
+ },
+ {
+  "k": "reddit:dl6a34",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:e7qi8q",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:ee21v4",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:fp91hm",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:kdz8k1",
+  "drop": "joke"
+ },
+ {
+  "k": "reddit:len5q3",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:pin23h",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "bsky:did:plc:hopmtyvc3dhv62ofiuzii5t7/3m4cyhymtv223",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1hr9h6",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:2dsg23",
+  "drop": "nsfw"
+ },
+ {
+  "k": "reddit:2rytbs",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:2x01mb",
+  "drop": null,
+  "wish": "someone should make a Duolingo-style app for learning programming languages",
+  "topic": "learn-programming-duolingo",
+  "category": "learning",
+  "kind": "dev",
+  "buildable": false,
+  "why": "needs lesson content and accounts",
+  "no": "exists: Codecademy"
+ },
+ {
+  "k": "reddit:45tt08",
+  "drop": null,
+  "wish": "someone should make a Wikipedia for restaurants with menus, hours and directions",
+  "topic": "restaurant-menu-wiki",
+  "category": "food",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs shared database of restaurants",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "reddit:471oob",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:4b8cao",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:4pc4n4",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:5cva8b",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:5mtewh",
+  "drop": null,
+  "wish": "someone should make a panic button that shows your location and an alarm to nearby phones",
+  "topic": "panic-button-nearby-phones",
+  "category": "other",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs other phones and network",
+  "no": "needs: a server"
+ },
+ {
+  "k": "reddit:9tpb3d",
+  "drop": null,
+  "wish": "someone should make a database of people who lost political races and where they are now",
+  "topic": "where-are-they-now-losers",
+  "category": "other",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs people data",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "reddit:a2v6ir",
+  "drop": "joke"
+ },
+ {
+  "k": "reddit:bqyial",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:d7l1de",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:ksssp9",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:m5oxq5",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:odu9sl",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:vp16eo",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:vuh8kj",
+  "drop": "hardware"
+ },
+ {
+  "k": "hn:37408794",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1c7lzb",
+  "drop": "joke"
+ },
+ {
+  "k": "reddit:2y34g9",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:3tuj6c",
+  "drop": null,
+  "wish": "someone should make a Google Maps of historical times",
+  "topic": "historical-maps",
+  "category": "learning",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs map data",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "reddit:3ynosf",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:40nod3",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:4hrj87",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:4j2188",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:4m2x9a",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:586m4z",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:7kc2cb",
+  "drop": null,
+  "wish": "someone should make an MMORPG where people practice a foreign language",
+  "topic": "language-practice-mmorpg",
+  "category": "learning",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs multiplayer server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "reddit:86ypem",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:8cnn1y",
+  "drop": null,
+  "wish": "someone should make a game combining No Man's Sky and Spore",
+  "topic": "nms-spore-game",
+  "category": "games",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "huge game, not one file",
+  "no": "too vague"
+ },
+ {
+  "k": "reddit:92o1af",
+  "drop": null,
+  "wish": "someone should make a music shuffle that learns your mood from what you skip",
+  "topic": "mood-aware-shuffle",
+  "category": "music",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs your music library",
+  "no": "too vague"
+ },
+ {
+  "k": "reddit:9b86m9",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:cme73v",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:ev9x0c",
+  "drop": null,
+  "wish": "someone should make a game that adapts to how you play",
+  "topic": "adaptive-game",
+  "category": "games",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "unspecified game",
+  "no": "too vague"
+ },
+ {
+  "k": "reddit:in6lzz",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:j5gcrv",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:q7qfyk",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:uf27fy",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:v9cbzu",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:t9oogg",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1z3h21",
+  "drop": "unsafe"
+ },
+ {
+  "k": "reddit:1z07er",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1zk0sh",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:26pee7",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:2dfx04",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:31f89f",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:3pqn5l",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:3y1bmk",
+  "drop": null,
+  "wish": "someone should make an open world game about an immortal character in an ageing world",
+  "topic": "immortal-open-world-game",
+  "category": "games",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "large open world game",
+  "no": "too vague"
+ },
+ {
+  "k": "reddit:414vyp",
+  "drop": "unsafe"
+ },
+ {
+  "k": "reddit:57cjly",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:67aeat",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:6zvfvt",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:7401rf",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:76c3fk",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:7fnbet",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:7gfge7",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:8kvpqe",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:91ojcz",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:aqx7wz",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:bwo93u",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:dls7fo",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:emf26o",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:froa8z",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:k1l26r",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:kvtswr",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:mwq6y3",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:nompy6",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:s82hoo",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:z7j2gm",
+  "drop": null,
+  "wish": "someone should make an app showing foods banned around the world",
+  "topic": "banned-foods-app",
+  "category": "food",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs sourced data per country",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "hn:48707536",
+  "drop": null,
+  "wish": "someone should make a list of employers with records of not paying",
+  "topic": "unpaid-employers-list",
+  "category": "work",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs other people's reports",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "reddit:2nj9w0",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:2qiws0",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:3d7shr",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:3p055b",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:4d410n",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:4jb4s0",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:4rata1",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:5jrdn1",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:5ybd0b",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:6br5n0",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:7w83ps",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:8a1v95",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:aifxc6",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:anazy5",
+  "drop": "joke"
+ },
+ {
+  "k": "reddit:d8jo4c",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:lg5bil",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:tyflgv",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1la0oo",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1sbsmg",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:27dzi5",
+  "drop": null,
+  "wish": "someone should make a Shazam for bird calls",
+  "topic": "identify-bird-call",
+  "category": "outdoors",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs audio recognition model",
+  "no": "exists: Merlin Bird ID"
+ },
+ {
+  "k": "reddit:2p6z5m",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:4az9an",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:5awu8c",
+  "drop": null,
+  "wish": "someone should make an audio player that pauses your podcast when you fall asleep",
+  "topic": "pause-audio-when-asleep",
+  "category": "media",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs sleep sensing",
+  "no": "too vague"
+ },
+ {
+  "k": "reddit:5eu3ba",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:6psj15",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:7r3wy7",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:8vwxfv",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:99xykq",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:9g9w4z",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:9kxdjs",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:ac3lzy",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:b41c0s",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:c1pb9y",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:ebdzrr",
+  "drop": null,
+  "wish": "someone should make a website telling when you can leave a movie to use the bathroom",
+  "topic": "movie-bathroom-break-times",
+  "category": "media",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs per-movie data",
+  "no": "exists: RunPee"
+ },
+ {
+  "k": "reddit:ejrkgl",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:hc4qx7",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:hcdea4",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:i03yhs",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:mv1ge9",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:nqbvcn",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:ocpnmb",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:oloj52",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:qe8dv1",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:ri9mpp",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:12yr7iu",
+  "drop": null,
+  "wish": "someone should make a browser plugin showing which search results require a login",
+  "topic": "flag-login-walled-results",
+  "category": "privacy",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs page checks over network",
+  "no": "needs: a server"
+ },
+ {
+  "k": "reddit:283s0d",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:2kp2c5",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:2vb2py",
+  "drop": "joke"
+ },
+ {
+  "k": "reddit:2vdsmd",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:36a5vh",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:4vi26i",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:5w0wd5",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:606lir",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:6qxven",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:86orhl",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:8cuk86",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:8gmjwb",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:8q4209",
+  "drop": "unsafe"
+ },
+ {
+  "k": "reddit:a8zlz0",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:efl4i0",
+  "drop": null,
+  "wish": "someone should make a website that tells you when to start a song so the bass drops at midnight",
+  "topic": "time-song-drop-to-moment",
+  "category": "music",
+  "kind": "everyday",
+  "buildable": true,
+  "why": "subtract drop timestamp from target time",
+  "no": null
+ },
+ {
+  "k": "reddit:ha2v2y",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:j4xq45",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:jd3xnk",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:k0z3gb",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:kyea97",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:bnu61",
+  "drop": "nsfw"
+ },
+ {
+  "k": "reddit:bqntf",
+  "drop": "unsafe"
+ },
+ {
+  "k": "reddit:btucw",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:1x8dmwr",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:1irqwo",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:1supo3",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:28c32s",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:31io7z",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:32djcs",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:3ggb4p",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:3iyh3j",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:4xq0zy",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:7i9bjb",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:9c6imo",
+  "drop": null,
+  "wish": "someone should make a Shazam for movies",
+  "topic": "identify-movie",
+  "category": "media",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs recognition and movie data",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "reddit:9ngjmm",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:b6b86o",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:ccqrbw",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:dfk3gu",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:irb7df",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:jdh0t0",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:jqfx0l",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:mznbpu",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:oiss89",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1d2spy0",
+  "drop": "joke"
+ },
+ {
+  "k": "reddit:k8oidu",
+  "drop": null,
+  "wish": "someone should make an electrician simulator game that teaches wiring household circuits",
+  "topic": "electrician-simulator-game",
+  "category": "games",
+  "kind": "everyday",
+  "buildable": true,
+  "why": "interactive circuit puzzles in canvas",
+  "no": null
+ },
+ {
+  "k": "reddit:1voj9y",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:28e2nl",
+  "drop": "unsafe"
+ },
+ {
+  "k": "reddit:38j7yr",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:4acwto",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:4qxtyk",
+  "drop": null,
+  "wish": "someone should make a digital clock that shows what happened in the year matching the time",
+  "topic": "clock-shows-year-events",
+  "category": "time",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs facts for every year",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "reddit:5s8hhp",
+  "drop": null,
+  "wish": "someone should make a way to see where your iPhone was at what time",
+  "topic": "retrace-my-steps",
+  "category": "other",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs location history",
+  "no": "your phone does this"
+ },
+ {
+  "k": "reddit:6gnlia",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:6s6imb",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:6s8aip",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:73no46",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:7ivapc",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:7vlfvn",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:85qzkf",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:988f9y",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:9hztim",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:a6sjtn",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:c9nzep",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:dkjgk4",
+  "drop": null,
+  "wish": "someone should make a website that builds a mix-and-match weekly outfit list from your style and budget",
+  "topic": "weekly-outfit-planner",
+  "category": "other",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs clothing store data",
+  "no": "needs: other people's data"
+ },
+ {
+  "k": "reddit:dx9jym",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:j9ze3p",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:locbwb",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:n5exq9",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:pkqyr5",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:qc6hs1",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:hgfkug",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1qdkdb",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1xwcy4",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:21w4lh",
+  "drop": null,
+  "wish": "someone should make a website exactly like Netflix but for books",
+  "topic": "netflix-for-books",
+  "category": "media",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs book catalog and streaming",
+  "no": "exists: Kindle Unlimited"
+ },
+ {
+  "k": "reddit:2kidby",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:3ia4ho",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:3vh1ya",
+  "drop": "joke"
+ },
+ {
+  "k": "reddit:3y3ayl",
+  "drop": null,
+  "wish": "someone should make a webpage that makes a printable card summarizing an Amazon item",
+  "topic": "printable-gift-card",
+  "category": "other",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs Amazon item data",
+  "no": "needs: a server"
+ },
+ {
+  "k": "reddit:5aahgg",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:5loql2",
+  "drop": "nsfw"
+ },
+ {
+  "k": "reddit:5q3smp",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:66fw1s",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:86vqms",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:8g0u2x",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:9uruwh",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:abdiyo",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:d6o8od",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:dxycjk",
+  "drop": null,
+  "wish": "someone should make a multiplayer game about hacking and security",
+  "topic": "hacking-multiplayer-game",
+  "category": "games",
+  "kind": "dev",
+  "buildable": false,
+  "why": "needs multiplayer server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "reddit:eewxjl",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:hcydum",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:iafg7y",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:ihctrr",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:m02ja2",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:qpk3bg",
+  "drop": "hardware"
+ },
+ {
+  "k": "reddit:tcro5n",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:10kucj8",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:bo70m",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:e5ntv",
+  "drop": "nsfw"
+ },
+ {
+  "k": "reddit:1mez470",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:1rbpz8h",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:28yoif",
+  "drop": "unsafe"
+ },
+ {
+  "k": "reddit:2rq5l2",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:2synih",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:2tkpip",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:3k3mu5",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:48m5qn",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:4taaif",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:5ih1op",
+  "drop": null,
+  "wish": "someone should make a D&D dice reader that adds up the face down numbers",
+  "topic": "dice-reader-opposite-face",
+  "category": "games",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs camera recognition",
+  "no": "needs: camera hardware"
+ },
+ {
+  "k": "reddit:5zcz9x",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:64c4f0",
+  "drop": "not-a-wish"
+ },
+ {
+  "k": "reddit:666pdh",
+  "drop": null,
+  "wish": "someone should make a chat app that matches strangers with opposite opinions",
+  "topic": "opposing-views-chat",
+  "category": "social",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs matching server",
+  "no": "needs: a server"
+ },
+ {
+  "k": "reddit:a9e5vj",
+  "drop": "joke"
+ },
+ {
+  "k": "reddit:cfy5ph",
+  "drop": "too-specific"
+ },
+ {
+  "k": "reddit:d205b8",
+  "drop": null,
+  "wish": "someone should make a website that breaks complex tasks into a simple to-do list",
+  "topic": "break-task-into-steps",
+  "category": "work",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs task knowledge",
+  "no": "too vague"
+ },
+ {
+  "k": "reddit:di58bm",
+  "drop": null,
+  "wish": "someone should make a language app that uses AI to hold basic conversations",
+  "topic": "ai-language-conversation",
+  "category": "learning",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs AI model",
+  "no": "needs: a server"
+ },
+ {
+  "k": "reddit:gglz4y",
+  "drop": null,
+  "wish": "someone should make an audiobook app that changes the narrator voice",
+  "topic": "change-audiobook-voice",
+  "category": "media",
+  "kind": "everyday",
+  "buildable": false,
+  "why": "needs speech synthesis service",
+  "no": "needs: a server"
+ }
+]
