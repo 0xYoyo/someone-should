@@ -1,0 +1,78 @@
+{
+  "slug": "spending-and-budget-tracker",
+  "wish": "someone should make an app that tracks my spending and budget",
+  "year": 2014,
+  "agreed": 50,
+  "sources": [
+    {
+      "site": "hn",
+      "url": "https://news.ycombinator.com/item?id=18969737",
+      "date": "2019-01-22",
+      "points": 7,
+      "comments": 12
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/28543/money-management",
+      "date": "2016-02-05",
+      "points": 10,
+      "comments": 1
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/938/lightweight-home-bookkeeping-spending-accounting-service",
+      "date": "2014-02-11",
+      "points": 8,
+      "comments": 2
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/19419/exceedingly-simple-expense-app",
+      "date": "2015-05-09",
+      "points": 7,
+      "comments": 3
+    }
+  ],
+  "spec": "Logs expenses by category and month against a monthly budget per category, showing what is left overall, per category, and per remaining day.\nType an amount, pick a category, tap Add; type a budget next to each category; step back through past months with the arrows.\nDoes not connect to a bank, sync between devices, or handle multiple currencies; data stays in this browser.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#chart input[data-cat=\"Food\"]",
+        "text": "300"
+      }
+    },
+    {
+      "type": {
+        "sel": "#amt",
+        "text": "42.50"
+      }
+    },
+    {
+      "type": {
+        "sel": "#note",
+        "text": "groceries"
+      }
+    },
+    {
+      "tap": "#add"
+    },
+    {
+      "expect": {
+        "sel": "#left",
+        "contains": "257.50 left"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#list li",
+        "contains": "groceries"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T02:04:27Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Amounts are shown without a currency symbol so it works in any currency. Data is stored in localStorage only."
+}

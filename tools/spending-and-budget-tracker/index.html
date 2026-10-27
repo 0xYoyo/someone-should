@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app that tracks my spending and budget</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+.month { justify-content: space-between; flex-wrap: nowrap; }
+.month button { width: 48px; padding: 0; font-size: 20px; }
+.month b { font-weight: 500; text-align: center; flex: 1; }
+.sub { font-size: 16px; color: var(--meta); }
+#left.over { color: var(--no); }
+.add { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.add #note { grid-column: 1 / -1; }
+.add #add { grid-column: 1 / -1; }
+h2 { font: 500 16px/1.3 var(--mono); color: var(--meta); margin: 12px 0 0; }
+.cats { display: grid; gap: 14px; }
+.cat { display: grid; grid-template-columns: 1fr 108px; gap: 4px 10px; align-items: center; }
+.cat .name { font-weight: 500; }
+.cat .nums { font-size: 16px; color: var(--meta); grid-column: 1; font-variant-numeric: tabular-nums; }
+.cat input { grid-column: 2; grid-row: 1 / span 2; text-align: right; padding: 10px 8px; }
+.bar { grid-column: 1 / -1; height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--ink); }
+.cat.over .bar i { background: var(--no); }
+.cat.over .nums { color: var(--no); }
+#list li > div { min-width: 0; }
+#list .what { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#list .when { font-size: 16px; color: var(--meta); }
+#list .amt { font-variant-numeric: tabular-nums; white-space: nowrap; margin-left: auto; }
+#list button { width: 44px; padding: 0; border-color: var(--line); color: var(--meta); flex: none; }
+.newcat { flex-wrap: nowrap; }
+.newcat input { flex: 1; min-width: 0; }
+#msg { min-height: 0; color: var(--no); font-size: 16px; margin: 0; }
+#msg:empty { display: none; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make an app that tracks my spending and budget</h1>
+
+<main id="app" class="stack">
+  <div class="row month">
+    <button id="prev" aria-label="Previous month">&lsaquo;</button>
+    <b id="mlabel"></b>
+    <button id="next" aria-label="Next month">&rsaquo;</button>
+  </div>
+
+  <div>
+    <div class="big" id="left">0.00</div>
+    <div class="sub" id="leftsub"></div>
+  </div>
+
+  <form class="add" id="form" autocomplete="off">
+    <input id="amt" inputmode="decimal" placeholder="Amount" aria-label="Amount">
+    <select id="cat" aria-label="Category"></select>
+    <input id="note" placeholder="What for (optional)" aria-label="Note" maxlength="60">
+    <button class="primary" id="add" type="submit">Add expense</button>
+  </form>
+  <p id="msg" role="status"></p>
+
+  <h2>By category &middot; monthly budget</h2>
+  <div class="cats" id="chart"></div>
+  <form class="row newcat" id="catform" autocomplete="off">
+    <input id="newcat" placeholder="New category" aria-label="New category" maxlength="20">
+    <button type="submit" id="addcat">Add</button>
+  </form>
+
+  <h2>Spent this month</h2>
+  <ul class="plain" id="list"></ul>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const KEY = 'someone-should:spending-and-budget-tracker';
+  const data = store.get(KEY, null) || {
+    cats: ['Food', 'Rent', 'Bills', 'Transport', 'Fun', 'Other'],
+    budgets: {},           // category -> monthly amount
+    spent: []              // {id, d: 'YYYY-MM-DD', a: number, c: category, n: note}
+  };
+  const save = () => store.set(KEY, data);
+
+  const now = new Date();
+  let view = { y: now.getFullYear(), m: now.getMonth() };
+  const ym = v => `${v.y}-${String(v.m + 1).padStart(2, '0')}`;
+  const isCurrent = () => view.y === now.getFullYear() && view.m === now.getMonth();
+  const money = n => n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const parse = s => { const n = parseFloat(String(s).replace(/[^\d.,-]/g, '').replace(',', '.')); return isFinite(n) ? Math.round(n * 100) / 100 : NaN; };
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+
+  function monthItems() {
+    const p = ym(view);
+    return data.spent.filter(s => s.d.startsWith(p));
+  }
+
+  function renderSummary(items) {
+    const total = items.reduce((t, s) => t + s.a, 0);
+    const budget = data.cats.reduce((t, c) => t + (data.budgets[c] || 0), 0);
+    const left = $('#left'), sub = $('#leftsub');
+    if (budget > 0) {
+      const rest = Math.round((budget - total) * 100) / 100;
+      left.textContent = rest < 0 ? `${money(-rest)} over` : `${money(rest)} left`;
+      left.classList.toggle('over', rest < 0);
+      let line = `spent ${money(total)} of ${money(budget)}`;
+      if (isCurrent() && rest > 0) {
+        const last = new Date(view.y, view.m + 1, 0).getDate();
+        const days = last - now.getDate() + 1;
+        line += ` · ${money(rest / days)} a day for ${days} day${days > 1 ? 's' : ''}`;
+      }
+      sub.textContent = line;
+    } else {
+      left.textContent = `${money(total)} spent`;
+      left.classList.remove('over');
+      sub.textContent = 'Set a budget per category below.';
+    }
+  }
+
+  function renderChart(items) {
+    const chart = $('#chart');
+    const byCat = {};
+    items.forEach(s => { byCat[s.c] = (byCat[s.c] || 0) + s.a; });
+    const max = Math.max(1, ...data.cats.map(c => Math.max(byCat[c] || 0, data.budgets[c] || 0)));
+    chart.textContent = '';
+    data.cats.forEach(c => {
+      const spent = byCat[c] || 0, b = data.budgets[c] || 0;
+      const row = el('div', 'cat' + (b > 0 && spent > b ? ' over' : ''));
+      row.append(el('span', 'name', c));
+      const inp = el('input');
+      inp.inputMode = 'decimal';
+      inp.dataset.cat = c;
+      inp.placeholder = 'budget';
+      inp.setAttribute('aria-label', `${c} monthly budget`);
+      inp.value = b ? String(b) : '';
+      row.append(inp);
+      row.append(el('span', 'nums', b > 0 ? `${money(spent)} / ${money(b)}${spent > b ? ' · over ' + money(spent - b) : ' · ' + money(b - spent) + ' left'}` : money(spent)));
+      const bar = el('div', 'bar'), fill = el('i');
+      const denom = b > 0 ? b : max;
+      fill.style.width = Math.min(100, (spent / denom) * 100) + '%';
+      bar.append(fill);
+      row.append(bar);
+      chart.append(row);
+    });
+  }
+
+  function renderList(items) {
+    const list = $('#list');
+    list.textContent = '';
+    if (!items.length) { list.append(el('li', 'empty', 'Nothing spent yet this month.')); return; }
+    items.slice().sort((a, b) => b.d.localeCompare(a.d) || b.id - a.id).forEach(s => {
+      const li = el('li');
+      const left = el('div');
+      left.append(el('span', 'what', s.n || s.c));
+      const day = new Date(s.d + 'T12:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+      left.append(el('span', 'when', s.n ? `${s.c} · ${day}` : day));
+      const del = el('button', null, '×');
+      del.setAttribute('aria-label', 'Delete');
+      del.dataset.id = s.id;
+      li.append(left, el('span', 'amt', money(s.a)), del);
+      list.append(li);
+    });
+  }
+
+  function renderCats() {
+    const sel = $('#cat'), cur = sel.value;
+    sel.textContent = '';
+    data.cats.forEach(c => sel.append(new Option(c, c)));
+    if (data.cats.includes(cur)) sel.value = cur;
+  }
+
+  function render() {
+    const d = new Date(view.y, view.m, 1);
+    $('#mlabel').textContent = d.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+    $('#next').disabled = isCurrent();
+    const items = monthItems();
+    renderSummary(items);
+    renderChart(items);
+    renderList(items);
+  }
+
+  const msg = t => { $('#msg').textContent = t; };
+
+  $('#form').addEventListener('submit', e => {
+    e.preventDefault();
+    const a = parse($('#amt').value);
+    if (!(a > 0)) { msg('Enter an amount above zero.'); $('#amt').focus(); return; }
+    let d;
+    // past months: book it on that month's last day
+    if (isCurrent()) d = `${ym(view)}-${String(new Date().getDate()).padStart(2, '0')}`;
+    else d = `${ym(view)}-${String(new Date(view.y, view.m + 1, 0).getDate()).padStart(2, '0')}`;
+    data.spent.push({ id: Date.now(), d, a, c: $('#cat').value, n: $('#note').value.trim() });
+    save();
+    msg('');
+    $('#amt').value = ''; $('#note').value = '';
+    render();
+  });
+
+  $('#chart').addEventListener('input', e => {
+    const c = e.target.dataset.cat;
+    if (!c) return;
+    const v = parse(e.target.value);
+    if (v > 0) data.budgets[c] = v; else delete data.budgets[c];
+    save();
+    const items = monthItems();
+    renderSummary(items);
+    // update just this row's numbers and bar without rebuilding inputs
+    const row = e.target.parentElement, spent = items.filter(s => s.c === c).reduce((t, s) => t + s.a, 0), b = data.budgets[c] || 0;
+    row.classList.toggle('over', b > 0 && spent > b);
+    row.querySelector('.nums').textContent = b > 0 ? `${money(spent)} / ${money(b)}${spent > b ? ' · over ' + money(spent - b) : ' · ' + money(b - spent) + ' left'}` : money(spent);
+    row.querySelector('.bar i').style.width = Math.min(100, (spent / (b > 0 ? b : Math.max(1, spent))) * 100) + '%';
+  });
+
+  $('#catform').addEventListener('submit', e => {
+    e.preventDefault();
+    const name = $('#newcat').value.trim();
+    if (!name) return;
+    if (data.cats.some(c => c.toLowerCase() === name.toLowerCase())) { msg('That category already exists.'); return; }
+    data.cats.push(name);
+    save(); msg('');
+    $('#newcat').value = '';
+    renderCats(); render();
+  });
+
+  $('#list').addEventListener('click', e => {
+    const id = e.target.dataset && e.target.dataset.id;
+    if (!id) return;
+    data.spent = data.spent.filter(s => String(s.id) !== id);
+    save(); render();
+  });
+
+  $('#prev').addEventListener('click', () => { view = view.m ? { y: view.y, m: view.m - 1 } : { y: view.y - 1, m: 11 }; msg(''); render(); });
+  $('#next').addEventListener('click', () => { if (isCurrent()) return; view = view.m === 11 ? { y: view.y + 1, m: 0 } : { y: view.y, m: view.m + 1 }; msg(''); render(); });
+
+  renderCats();
+  render();
+})();
+</script>
+</body>
+</html>
