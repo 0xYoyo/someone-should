@@ -1,0 +1,53 @@
+{
+ "updated": "2026-10-27T01:29:45.918Z",
+ "tools": [
+  {
+   "slug": "arrows-on-a-screenshot",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "freelance-money-ledger",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "pocket-kanban-board",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "markdown-writing-room",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "blood-test-results-log",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "markdown-file-viewer",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "compare-two-tables",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "logo-turtle-playground",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  }
+ ]
+}
