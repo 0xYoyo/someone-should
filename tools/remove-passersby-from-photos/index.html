@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app that removes passers-by by combining several photos of the same scene</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+.pick { display: inline-flex; align-items: center; justify-content: center; min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); border-radius: var(--radius); background: var(--ink); color: var(--paper); cursor: pointer; }
+.pick input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+#thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 8px; }
+#thumbs canvas { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: var(--radius); border: 1px solid var(--line); display: block; }
+#out { width: 100%; height: auto; display: block; border-radius: var(--radius); border: 1px solid var(--line); }
+#save { display: inline-flex; align-items: center; justify-content: center; min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); border-radius: var(--radius); color: var(--ink); text-decoration: none; }
+label.opt { display: flex; align-items: center; gap: 10px; min-height: var(--tap); }
+label.opt input { width: 44px; height: 44px; min-height: 0; margin: 0; accent-color: var(--ink); }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make an app that removes passers-by by combining several photos of the same scene</h1>
+
+<main id="app" class="stack">
+  <div class="row">
+    <label class="pick" role="button" tabindex="0">Add photos<input id="files" type="file" accept="image/*" multiple></label>
+    <button id="sample">Try a sample</button>
+    <button id="clear" hidden>Clear</button>
+  </div>
+  <p class="meta" id="count">Take 3 or more shots from the same spot, a few seconds apart.</p>
+  <div id="thumbs"></div>
+  <label class="opt"><input id="align" type="checkbox" checked> Line up hand-held shots</label>
+  <button id="go" class="primary" disabled>Remove passers-by</button>
+  <p id="status" class="meta" aria-live="polite"></p>
+  <div id="result" class="stack" hidden>
+    <canvas id="out"></canvas>
+    <div class="row"><a id="save" href="#" download="clean.png">Save PNG</a></div>
+  </div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  // storage helper — never throws
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+
+  const MAX_SIDE = 1600;     // working resolution; keeps memory sane on phones
+  const frames = [];         // { w, h, data: Uint8ClampedArray } all same size
+  let target = null;         // { w, h } of the first photo
+  let sampleBg = null;       // known empty scene, only for the sample
+  let saveUrl = null;
+
+  const filesIn = $('#files'), goBtn = $('#go'), statusEl = $('#status'), countEl = $('#count');
+  const say = t => { statusEl.textContent = t; };
+  const tick = () => new Promise(r => setTimeout(r, 0));
+
+  function refresh() {
+    const n = frames.length;
+    countEl.textContent = n === 0 ? 'Take 3 or more shots from the same spot, a few seconds apart.'
+      : n + (n === 1 ? ' photo' : ' photos') + (n < 3 ? ' (need at least 3)' : '') + ', ' + target.w + '×' + target.h;
+    goBtn.disabled = n < 3;
+    $('#clear').hidden = n === 0;
+  }
+
+  function addFrame(source, sw, sh) {
+    if (!target) {
+      const k = Math.min(1, MAX_SIDE / Math.max(sw, sh));
+      target = { w: Math.round(sw * k), h: Math.round(sh * k) };
+    }
+    const c = document.createElement('canvas');
+    c.width = target.w; c.height = target.h;
+    const x = c.getContext('2d', { willReadFrequently: true });
+    // cover-fit so photos of a slightly different size still overlap
+    const k = Math.max(target.w / sw, target.h / sh);
+    const dw = sw * k, dh = sh * k;
+    x.drawImage(source, (target.w - dw) / 2, (target.h - dh) / 2, dw, dh);
+    frames.push({ w: target.w, h: target.h, data: x.getImageData(0, 0, target.w, target.h).data });
+    const t = document.createElement('canvas');
+    t.width = 96; t.height = 96;
+    const s = Math.max(96 / target.w, 96 / target.h);
+    t.getContext('2d').drawImage(c, (96 - target.w * s) / 2, (96 - target.h * s) / 2, target.w * s, target.h * s);
+    $('#thumbs').appendChild(t);
+  }
+
+  function decode(file) {
+    if (window.createImageBitmap) return createImageBitmap(file).catch(() => viaImg(file));
+    return viaImg(file);
+  }
+  function viaImg(file) {
+    return new Promise((res, rej) => {
+      const fr = new FileReader();
+      fr.onerror = rej;
+      fr.onload = () => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = fr.result; };
+      fr.readAsDataURL(file);
+    });
+  }
+
+  filesIn.addEventListener('change', async () => {
+    const list = [...filesIn.files];
+    filesIn.value = '';
+    sampleBg = null;
+    let bad = 0;
+    for (let i = 0; i < list.length; i++) {
+      say('Reading photo ' + (i + 1) + ' of ' + list.length + '…');
+      await tick();
+      try {
+        const im = await decode(list[i]);
+        addFrame(im, im.width || im.naturalWidth, im.height || im.naturalHeight);
+        if (im.close) im.close();
+      } catch { bad++; }
+    }
+    say(bad ? bad + ' file(s) could not be read as images.' : '');
+    refresh();
+  });
+
+  function clearAll() {
+    frames.length = 0; target = null; sampleBg = null;
+    $('#thumbs').textContent = '';
+    $('#result').hidden = true;
+    say(''); refresh();
+  }
+  $('#clear').addEventListener('click', clearAll);
+
+  // Small grayscale copy for estimating shifts between shots.
+  function gray(f, scale) {
+    const w = Math.max(1, Math.floor(f.w * scale)), h = Math.max(1, Math.floor(f.h * scale));
+    const g = new Float32Array(w * h), step = 1 / scale;
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const i = (Math.floor(y * step) * f.w + Math.floor(x * step)) * 4;
+      g[y * w + x] = f.data[i] * 0.3 + f.data[i + 1] * 0.59 + f.data[i + 2] * 0.11;
+    }
+    return { g, w, h };
+  }
+
+  // Brute-force best translation of b onto a; robust error so passers-by don't dominate.
+  function bestShift(a, b, r) {
+    let best = [0, 0], bestE = Infinity;
+    for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) {
+      let e = 0, n = 0;
+      for (let y = r; y < a.h - r; y += 2) for (let x = r; x < a.w - r; x += 2) {
+        const d = Math.abs(a.g[y * a.w + x] - b.g[(y + dy) * b.w + x + dx]);
+        e += d < 40 ? d : 40; n++;
+      }
+      e /= n || 1;
+      if (e < bestE) { bestE = e; best = [dx, dy]; }
+    }
+    return best;
+  }
+
+  async function shifts() {
+    const scale = Math.min(1, 200 / Math.max(target.w, target.h));
+    const ref = gray(frames[0], scale), r = 8;
+    const out = [[0, 0]];
+    for (let i = 1; i < frames.length; i++) {
+      say('Lining up photo ' + (i + 1) + '…');
+      await tick();
+      const [dx, dy] = bestShift(ref, gray(frames[i], scale), r);
+      out.push([Math.round(dx / scale), Math.round(dy / scale)]);
+    }
+    return out;
+  }
+
+  async function combine() {
+    const n = frames.length, { w, h } = target;
+    goBtn.disabled = true;
+    const off = $('#align').checked ? await shifts() : frames.map(() => [0, 0]);
+    const res = new Uint8ClampedArray(w * h * 4);
+    const r = new Uint8Array(n), g = new Uint8Array(n), b = new Uint8Array(n);
+    const sortN = (arr, k) => { // insertion sort, k is tiny
+      for (let i = 1; i < k; i++) { const v = arr[i]; let j = i - 1; while (j >= 0 && arr[j] > v) { arr[j + 1] = arr[j]; j--; } arr[j + 1] = v; }
+    };
+    const rows = Math.max(1, Math.floor(300000 / w));
+    for (let y0 = 0; y0 < h; y0 += rows) {
+      say('Combining… ' + Math.round(100 * y0 / h) + '%');
+      await tick();
+      const y1 = Math.min(h, y0 + rows);
+      for (let y = y0; y < y1; y++) for (let x = 0; x < w; x++) {
+        let k = 0;
+        for (let f = 0; f < n; f++) {
+          const sx = x + off[f][0], sy = y + off[f][1];
+          if (sx < 0 || sy < 0 || sx >= w || sy >= h) continue;
+          const i = (sy * w + sx) * 4, d = frames[f].data;
+          r[k] = d[i]; g[k] = d[i + 1]; b[k] = d[i + 2]; k++;
+        }
+        const o = (y * w + x) * 4;
+        if (!k) { res[o + 3] = 255; continue; }
+        sortN(r, k); sortN(g, k); sortN(b, k);
+        const m = k >> 1, even = !(k & 1);
+        res[o] = even ? (r[m - 1] + r[m] + 1) >> 1 : r[m];
+        res[o + 1] = even ? (g[m - 1] + g[m] + 1) >> 1 : g[m];
+        res[o + 2] = even ? (b[m - 1] + b[m] + 1) >> 1 : b[m];
+        res[o + 3] = 255;
+      }
+    }
+    const out = $('#out');
+    out.width = w; out.height = h;
+    out.getContext('2d').putImageData(new ImageData(res, w, h), 0, 0);
+    $('#result').hidden = false;
+    let msg = 'Done. Combined ' + n + ' photos.';
+    if (sampleBg) {
+      let same = 0;
+      for (let i = 0; i < res.length; i += 4)
+        if (Math.abs(res[i] - sampleBg[i]) + Math.abs(res[i + 1] - sampleBg[i + 1]) + Math.abs(res[i + 2] - sampleBg[i + 2]) < 12) same++;
+      msg += ' ' + (100 * same / (w * h)).toFixed(1) + '% of pixels match the empty scene.';
+    }
+    say(msg);
+    if (saveUrl) { URL.revokeObjectURL(saveUrl); saveUrl = null; }
+    if (out.toBlob) out.toBlob(bl => { if (bl) { saveUrl = URL.createObjectURL(bl); $('#save').href = saveUrl; } }, 'image/png');
+    goBtn.disabled = false;
+  }
+
+  goBtn.addEventListener('click', () => {
+    combine().catch(() => { say('Something went wrong. Try fewer or smaller photos.'); goBtn.disabled = false; });
+  });
+
+  $('#save').addEventListener('click', e => { if (!saveUrl) { e.preventDefault(); say('Still preparing the file.'); } });
+
+  // Sample: a fixed street scene with a different "person" in each of 5 shots.
+  function drawScene(x, w, h) {
+    x.fillStyle = '#9cc3e0'; x.fillRect(0, 0, w, h * 0.6);
+    x.fillStyle = '#b9b2a3'; x.fillRect(0, h * 0.6, w, h * 0.4);
+    const cols = ['#a0522d', '#d2b48c', '#6b8e23', '#8b4513'];
+    for (let i = 0; i < 4; i++) {
+      x.fillStyle = cols[i]; x.fillRect(i * w / 4 + 6, h * (0.2 + 0.08 * (i % 2)), w / 4 - 12, h * (0.4 - 0.08 * (i % 2)));
+      x.fillStyle = '#2b3a4a';
+      for (let j = 0; j < 2; j++) x.fillRect(i * w / 4 + 16 + j * (w / 8 - 6), h * 0.36, w / 16, h * 0.08);
+    }
+  }
+  $('#sample').addEventListener('click', () => {
+    clearAll();
+    const w = 320, h = 200;
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    const x = c.getContext('2d', { willReadFrequently: true });
+    drawScene(x, w, h);
+    sampleBg = x.getImageData(0, 0, w, h).data.slice();
+    for (let f = 0; f < 5; f++) {
+      drawScene(x, w, h);
+      const px = 20 + f * 60;
+      x.fillStyle = ['#c8321e', '#1e5ac8', '#e0a800', '#2e7d4f', '#7b2ec8'][f];
+      x.fillRect(px, h * 0.45, 26, h * 0.45);
+      x.beginPath(); x.arc(px + 13, h * 0.4, 11, 0, 7); x.fill();
+      addFrame(c, w, h);
+    }
+    $('#align').checked = false;
+    say('Sample loaded: 5 shots of a street, someone walking through each.');
+    refresh();
+  });
+
+  refresh();
+})();
+</script>
+</body>
+</html>

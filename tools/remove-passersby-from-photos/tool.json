@@ -1,0 +1,51 @@
+{
+  "slug": "remove-passersby-from-photos",
+  "wish": "someone should make an app that removes passers-by by combining several photos of the same scene",
+  "year": 2018,
+  "agreed": 10,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/48650/remove-passers-by-from-picture-by-taking-the-same-picture-several-times",
+      "date": "2018-02-14",
+      "points": 8,
+      "comments": 2
+    }
+  ],
+  "spec": "Combines 3 or more photos of the same scene with a per-pixel median, so anyone who moved between shots disappears.\nAdd shots taken from the same spot (hand-held shots are lined up automatically), tap Remove passers-by, save the clean PNG.\nIt does not remove people who stay put in most shots, and nothing leaves the device.",
+  "tests": [
+    {
+      "tap": "#sample"
+    },
+    {
+      "expect": {
+        "sel": "#count",
+        "contains": "5 photos"
+      }
+    },
+    {
+      "tap": "#go"
+    },
+    {
+      "wait": 1200
+    },
+    {
+      "expect": {
+        "sel": "#status",
+        "matches": "Done\\. Combined 5 photos\\. (99\\.\\d|100\\.0)% of pixels match the empty scene"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#out",
+        "visible": true
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:34:30Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Works fully offline. Photos are downscaled to 1600px on the long side for memory."
+}
