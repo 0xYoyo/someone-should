@@ -1,0 +1,48 @@
+{
+  "slug": "colorblind-image-filter",
+  "wish": "someone should make a tool that filters images so colorblind people can tell colors apart",
+  "year": 2015,
+  "agreed": 10,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/19781/screen-filter-for-colorblind",
+      "date": "2015-05-24",
+      "points": 7,
+      "comments": 3
+    }
+  ],
+  "spec": "Recolors a photo so colors a red-, green- or blue-weak eye confuses become distinguishable (daltonize), and can show how the original looks to that eye.\nChoose or drop an image (or tap Test plate), pick your vision type, adjust strength, save the filtered PNG.\nIt does not filter your whole screen or live camera, and nothing leaves the device.",
+  "tests": [
+    {
+      "tap": "#sample"
+    },
+    {
+      "wait": 400
+    },
+    {
+      "expect": {
+        "sel": "#status",
+        "matches": "filtered for green-weak · [1-9]\\d*% of pixels shifted"
+      }
+    },
+    {
+      "tap": "#t-tritan"
+    },
+    {
+      "tap": "#v-sim"
+    },
+    {
+      "expect": {
+        "sel": "#status",
+        "contains": "simulated blue-weak vision"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:43:13Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Images processed locally on a canvas, longest side capped at 2400px."
+}

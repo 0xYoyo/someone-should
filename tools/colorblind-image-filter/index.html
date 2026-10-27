@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that filters images so colorblind people can tell colors apart</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+.seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.seg button { padding: 0 6px; font-size: 16px; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.pick { display: inline-flex; align-items: center; min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); border-radius: var(--radius); cursor: pointer; }
+.pick input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+#out { display: block; max-width: 100%; height: auto; border: 1px solid var(--line); border-radius: var(--radius); }
+#drop.over { outline: 2px dashed var(--ink); outline-offset: 4px; }
+label.lbl { font-size: 16px; color: var(--meta); }
+input[type=range] { padding: 0; border: 0; accent-color: var(--ink); }
+#status { font: 16px/1.4 var(--mono); color: var(--meta); min-height: 1.4em; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that filters images so colorblind people can tell colors apart</h1>
+
+<main id="app" class="stack">
+  <div class="row" id="drop">
+    <label class="pick">Choose image<input type="file" id="file" accept="image/*"></label>
+    <button id="sample">Test plate</button>
+  </div>
+  <div class="stack" style="gap:6px">
+    <span class="lbl">My vision</span>
+    <div class="seg" id="types">
+      <button id="t-protan" data-t="protan">Red-weak</button>
+      <button id="t-deutan" data-t="deutan">Green-weak</button>
+      <button id="t-tritan" data-t="tritan">Blue-weak</button>
+    </div>
+  </div>
+  <div class="stack" style="gap:6px">
+    <span class="lbl">Show</span>
+    <div class="seg" id="views">
+      <button id="v-fix" data-v="fix">Filtered</button>
+      <button id="v-orig" data-v="orig">Original</button>
+      <button id="v-sim" data-v="sim">As I see it</button>
+    </div>
+  </div>
+  <label class="stack" style="gap:6px"><span class="lbl">Filter strength <span id="strv"></span></span>
+    <input type="range" id="str" min="0" max="200" step="10" value="100"></label>
+  <p id="status">Choose an image, or drop one here.</p>
+  <canvas id="out" width="1" height="1" hidden></canvas>
+  <div class="row"><button id="save" class="primary" disabled>Save PNG</button></div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  // Machado, Oliveira & Fernandes 2009, severity 1.0, applied in linear RGB
+  const SIM = {
+    protan: [0.152286, 1.052583, -0.204868, 0.114503, 0.786281, 0.099216, -0.003882, -0.048116, 1.051998],
+    deutan: [0.367322, 0.860646, -0.227968, 0.280085, 0.672501, 0.047413, -0.011820, 0.042940, 0.968881],
+    tritan: [1.255528, -0.076749, -0.178779, -0.078411, 0.930809, 0.147602, 0.004733, 0.691367, 0.303900]
+  };
+  // Daltonize: push the lost colour difference into channels this eye still reads
+  const SHIFT = {
+    protan: [0, 0, 0, 0.7, 1, 0, 0.7, 0, 1],
+    deutan: [0, 0, 0, 0.7, 1, 0, 0.7, 0, 1],
+    tritan: [1, 0, 0.7, 0, 1, 0.7, 0, 0, 0]
+  };
+  const NAMES = { protan: 'red-weak', deutan: 'green-weak', tritan: 'blue-weak' };
+  const MAX_SIDE = 2400;
+
+  const toLin = new Float32Array(256);
+  for (let i = 0; i < 256; i++) { const c = i / 255; toLin[i] = c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); }
+  const toSrgb = new Uint8ClampedArray(4096);
+  for (let i = 0; i < 4096; i++) { const c = i / 4095; toSrgb[i] = Math.round(255 * (c <= 0.0031308 ? c * 12.92 : 1.055 * Math.pow(c, 1 / 2.4) - 0.055)); }
+  const enc = v => toSrgb[v <= 0 ? 0 : v >= 1 ? 4095 : (v * 4095 + 0.5) | 0];
+
+  const out = $('#out'), ctx = out.getContext('2d', { willReadFrequently: true });
+  const status = $('#status');
+  let src = null;   // ImageData of the original
+  let type = store.get('cbf-type', 'deutan');
+  if (!SIM[type]) type = 'deutan';
+  let view = 'fix';
+  let strength = store.get('cbf-str', 100);
+  let label = '';
+
+  function process() {
+    if (!src) return;
+    const s = src.data, n = s.length;
+    const img = new ImageData(src.width, src.height);
+    const d = img.data;
+    const m = SIM[type], sh = SHIFT[type], k = strength / 100;
+    let changed = 0;
+    for (let i = 0; i < n; i += 4) {
+      const r = s[i], g = s[i + 1], b = s[i + 2];
+      d[i + 3] = s[i + 3];
+      if (view === 'orig') { d[i] = r; d[i + 1] = g; d[i + 2] = b; continue; }
+      const lr = toLin[r], lg = toLin[g], lb = toLin[b];
+      const sr = enc(m[0] * lr + m[1] * lg + m[2] * lb);
+      const sg = enc(m[3] * lr + m[4] * lg + m[5] * lb);
+      const sb = enc(m[6] * lr + m[7] * lg + m[8] * lb);
+      if (view === 'sim') { d[i] = sr; d[i + 1] = sg; d[i + 2] = sb; continue; }
+      const er = (r - sr) * k, eg = (g - sg) * k, eb = (b - sb) * k;
+      const nr = r + sh[0] * er + sh[1] * eg + sh[2] * eb;
+      const ng = g + sh[3] * er + sh[4] * eg + sh[5] * eb;
+      const nb = b + sh[6] * er + sh[7] * eg + sh[8] * eb;
+      d[i] = nr; d[i + 1] = ng; d[i + 2] = nb;
+      if (Math.abs(d[i] - r) + Math.abs(d[i + 1] - g) + Math.abs(d[i + 2] - b) > 12) changed++;
+    }
+    ctx.putImageData(img, 0, 0);
+    const what = NAMES[type];
+    if (view === 'orig') status.textContent = `${label} · original`;
+    else if (view === 'sim') status.textContent = `${label} · simulated ${what} vision`;
+    else status.textContent = `${label} · filtered for ${what} · ${Math.round(100 * changed / (n / 4))}% of pixels shifted`;
+  }
+
+  function setSource(drawFn, w, h, name) {
+    const sc = Math.min(1, MAX_SIDE / Math.max(w, h));
+    out.width = Math.max(1, Math.round(w * sc));
+    out.height = Math.max(1, Math.round(h * sc));
+    drawFn(ctx, out.width, out.height);
+    src = ctx.getImageData(0, 0, out.width, out.height);
+    label = name;
+    out.hidden = false;
+    $('#save').disabled = false;
+    process();
+  }
+
+  function loadFile(f) {
+    if (!f || !/^image\//.test(f.type)) { status.textContent = 'That file is not an image.'; return; }
+    status.textContent = 'Reading…';
+    const fr = new FileReader();
+    fr.onerror = () => { status.textContent = 'Could not read that file.'; };
+    fr.onload = () => {
+      const im = new Image();
+      im.onload = () => setSource((c, w, h) => { c.clearRect(0, 0, w, h); c.drawImage(im, 0, 0, w, h); }, im.naturalWidth, im.naturalHeight, f.name.slice(0, 40));
+      im.onerror = () => { status.textContent = 'This browser cannot open that image.'; };
+      im.src = fr.result;
+    };
+    fr.readAsDataURL(f);
+  }
+
+  // Ishihara-style plate: a number in red/orange dots on a green/olive field
+  function drawPlate(c, w, h) {
+    let seed = 7;
+    const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    c.fillStyle = '#f4f1ea'; c.fillRect(0, 0, w, h);
+    const mask = document.createElement('canvas');
+    mask.width = w; mask.height = h;
+    const mc = mask.getContext('2d');
+    mc.fillStyle = '#000'; mc.font = `bold ${Math.round(h * 0.55)}px sans-serif`;
+    mc.textAlign = 'center'; mc.textBaseline = 'middle';
+    mc.fillText('74', w / 2, h / 2);
+    const md = mc.getImageData(0, 0, w, h).data;
+    const fg = ['#d0603a', '#e07b4a', '#c9553f', '#e8925a', '#d46e3c'];
+    const bg = ['#8fa257', '#a3ad5c', '#7f9a50', '#b0b366', '#96a85e'];
+    const R = w / 2 - 4;
+    for (let t = 0; t < 2600; t++) {
+      const x = rnd() * w, y = rnd() * h;
+      if ((x - w / 2) ** 2 + (y - h / 2) ** 2 > R * R) continue;
+      const r = 3 + rnd() * 7;
+      const inside = md[((y | 0) * w + (x | 0)) * 4 + 3] > 128;
+      const pal = inside ? fg : bg;
+      c.fillStyle = pal[(rnd() * pal.length) | 0];
+      c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill();
+    }
+  }
+
+  function syncButtons() {
+    $$('#types button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.t === type)));
+    $$('#views button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === view)));
+    $('#str').value = strength;
+    $('#strv').textContent = strength + '%';
+  }
+
+  $('#types').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    type = b.dataset.t; store.set('cbf-type', type); syncButtons(); process();
+  });
+  $('#views').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    view = b.dataset.v; syncButtons(); process();
+  });
+  $('#str').addEventListener('change', () => {
+    strength = +$('#str').value; store.set('cbf-str', strength);
+    if (view !== 'fix') view = 'fix';
+    syncButtons(); process();
+  });
+  $('#str').addEventListener('input', () => { $('#strv').textContent = $('#str').value + '%'; });
+  $('#file').addEventListener('change', e => loadFile(e.target.files[0]));
+  $('#sample').addEventListener('click', () => setSource(drawPlate, 480, 480, 'test plate'));
+
+  const drop = document.body;
+  drop.addEventListener('dragover', e => { e.preventDefault(); $('#drop').classList.add('over'); });
+  drop.addEventListener('dragleave', () => $('#drop').classList.remove('over'));
+  drop.addEventListener('drop', e => { e.preventDefault(); $('#drop').classList.remove('over'); loadFile(e.dataTransfer.files[0]); });
+  document.addEventListener('paste', e => {
+    const it = [...(e.clipboardData?.items || [])].find(i => i.type.startsWith('image/'));
+    if (it) loadFile(it.getAsFile());
+  });
+
+  $('#save').addEventListener('click', () => {
+    if (!src) return;
+    const prev = view;
+    if (view !== 'fix') { view = 'fix'; process(); }
+    out.toBlob(blob => {
+      if (!blob) { status.textContent = 'Could not export the image.'; return; }
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = label.replace(/\.[^.]+$/, '').replace(/[^\w-]+/g, '-') + `-${type}-filtered.png`;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      if (prev !== view) { view = prev; process(); }
+    }, 'image/png');
+  });
+
+  syncButtons();
+})();
+</script>
+</body>
+</html>
