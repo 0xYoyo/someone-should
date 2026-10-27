@@ -1,0 +1,54 @@
+{
+  "slug": "vegetarian-day-calendar",
+  "wish": "someone should make an app that tracks my vegetarian days",
+  "year": 2018,
+  "agreed": 8,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/51675/is-there-any-app-to-track-my-vegetarian-days",
+      "date": "2018-08-08",
+      "points": 7,
+      "comments": 1
+    }
+  ],
+  "spec": "A month calendar where each day can be marked vegetarian, with current and longest streak, this month's count and this year's share.\nTap 'Today was vegetarian' or tap any past day to toggle it; arrows move between months. Marks are kept on this device.\nIt does not log meals, count calories, sync between devices or send reminders.",
+  "tests": [
+    {
+      "tap": "#today"
+    },
+    {
+      "expect": {
+        "sel": ".day.on",
+        "count": 1
+      }
+    },
+    {
+      "expect": {
+        "sel": "#streak",
+        "contains": "1 day"
+      }
+    },
+    {
+      "tap": ".day.on"
+    },
+    {
+      "expect": {
+        "sel": "#streak",
+        "contains": "0 days"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#today",
+        "contains": "Today was vegetarian"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T02:04:27Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": ""
+}
