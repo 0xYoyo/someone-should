@@ -1,0 +1,64 @@
+{
+  "slug": "compare-two-lists",
+  "wish": "someone should make a tool that compares two lists of words, one per line",
+  "year": 2014,
+  "agreed": 16,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/10137/software-that-will-compare-two-txt-files-containing-two-lists-of-line-separated",
+      "date": "2014-07-25",
+      "points": 5,
+      "comments": 3
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/18930/comparing-two-text-files-to-see-they-contain-all-the-same-lines-though-not-nece",
+      "date": "2015-04-22",
+      "points": 5,
+      "comments": 3
+    }
+  ],
+  "spec": "Compares two pasted lists, one item per line, in any order, and shows what is only in A, only in B and in both, with counts.\nPaste into the two boxes; results update as you type; toggle case, swap sides, copy any result column.\nIt does not diff line order or partial matches; blank lines and surrounding spaces are ignored and duplicates are counted once.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#a",
+        "text": "apple\nbanana\ncherry\nbanana"
+      }
+    },
+    {
+      "type": {
+        "sel": "#b",
+        "text": "Cherry\ndate\nbanana"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#onlyB",
+        "contains": "date"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#nBoth",
+        "matches": "^2$"
+      }
+    },
+    {
+      "tap": "#case"
+    },
+    {
+      "expect": {
+        "sel": "#onlyB",
+        "contains": "Cherry"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T02:08:16Z",
+  "model": "opus-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": "Clipboard copy may be unavailable in some embedded contexts; button shows 'copy failed' then."
+}

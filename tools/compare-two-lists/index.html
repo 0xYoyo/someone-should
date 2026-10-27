@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that compares two lists of words, one per line</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+.inputs { display: grid; gap: 12px; grid-template-columns: 1fr; }
+@media (min-width: 620px) { .inputs { grid-template-columns: 1fr 1fr; } }
+.inputs label { display: grid; gap: 6px; }
+.lbl { font: 16px/1.4 var(--mono); color: var(--meta); }
+textarea { min-height: 160px; resize: vertical; font: 16px/1.5 var(--mono); }
+button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.results { display: grid; gap: 20px; grid-template-columns: 1fr; }
+@media (min-width: 620px) { .results { grid-template-columns: 1fr 1fr 1fr; } }
+.results section { min-width: 0; }
+.head { display: flex; justify-content: space-between; align-items: center; gap: 10px; border-bottom: 1.5px solid var(--ink); padding-bottom: 6px; }
+.head h2 { font: 500 17px/1.3 var(--sans); margin: 0; }
+.head .n { font-variant-numeric: tabular-nums; }
+.results ul.plain li { padding: 8px 0; font-family: var(--mono); font-size: 16px; overflow-wrap: anywhere; display: block; }
+.results .empty { padding: 10px 0; font-size: 16px; }
+#summary { font-size: 16px; color: var(--meta); margin: 0; }
+
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that compares two lists of words, one per line</h1>
+
+<main id="app" class="stack">
+  <div class="inputs">
+    <label><span class="lbl">list A</span><textarea id="a" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="one item per line"></textarea></label>
+    <label><span class="lbl">list B</span><textarea id="b" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="one item per line"></textarea></label>
+  </div>
+  <div class="row">
+    <button id="case" type="button" aria-pressed="true">ignore case</button>
+    <button id="swap" type="button">swap</button>
+    <button id="clear" type="button">clear</button>
+  </div>
+  <p id="summary" aria-live="polite">Paste a list on each side.</p>
+  <div class="results">
+    <section><div class="head"><h2>only in A <span class="n" id="nA">0</span></h2><button type="button" data-copy="onlyA">copy</button></div><ul class="plain" id="onlyA"></ul></section>
+    <section><div class="head"><h2>only in B <span class="n" id="nB">0</span></h2><button type="button" data-copy="onlyB">copy</button></div><ul class="plain" id="onlyB"></ul></section>
+    <section><div class="head"><h2>in both <span class="n" id="nBoth">0</span></h2><button type="button" data-copy="both">copy</button></div><ul class="plain" id="both"></ul></section>
+  </div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  // storage helper — never throws
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+
+  const taA = $('#a'), taB = $('#b'), caseBtn = $('#case');
+  const saved = store.get('compare-two-lists', {});
+  taA.value = saved.a || '';
+  taB.value = saved.b || '';
+  if (saved.ignoreCase === false) caseBtn.setAttribute('aria-pressed', 'false');
+  const ignoreCase = () => caseBtn.getAttribute('aria-pressed') === 'true';
+
+  // Trimmed, non-empty lines; first spelling wins for each key.
+  function parse(text) {
+    const map = new Map();
+    let lines = 0;
+    for (const raw of text.split(/\r?\n/)) {
+      const item = raw.trim();
+      if (!item) continue;
+      lines++;
+      const key = ignoreCase() ? item.toLowerCase() : item;
+      if (!map.has(key)) map.set(key, item);
+    }
+    return { map, lines };
+  }
+
+  const out = { onlyA: [], onlyB: [], both: [] };
+  const render = (id, items) => {
+    out[id] = items;
+    const ul = $('#' + id);
+    ul.textContent = '';
+    if (!items.length) {
+      const li = document.createElement('li');
+      li.className = 'empty';
+      li.textContent = 'nothing';
+      ul.append(li);
+      return;
+    }
+    const frag = document.createDocumentFragment();
+    for (const s of items.slice(0, 2000)) {
+      const li = document.createElement('li');
+      li.textContent = s;
+      frag.append(li);
+    }
+    if (items.length > 2000) {
+      const li = document.createElement('li');
+      li.className = 'empty';
+      li.textContent = (items.length - 2000) + ' more — use copy';
+      frag.append(li);
+    }
+    ul.append(frag);
+  };
+
+  function compare() {
+    const A = parse(taA.value), B = parse(taB.value);
+    const onlyA = [], onlyB = [], both = [];
+    for (const [k, v] of A.map) (B.map.has(k) ? both : onlyA).push(v);
+    for (const [k, v] of B.map) if (!A.map.has(k)) onlyB.push(v);
+    render('onlyA', onlyA);
+    render('onlyB', onlyB);
+    render('both', both);
+    $('#nA').textContent = onlyA.length;
+    $('#nB').textContent = onlyB.length;
+    $('#nBoth').textContent = both.length;
+    const dupA = A.lines - A.map.size, dupB = B.lines - B.map.size;
+    let msg;
+    if (!A.lines && !B.lines) msg = 'Paste a list on each side.';
+    else if (A.lines && B.lines && !onlyA.length && !onlyB.length) msg = 'Same items in both lists.';
+    else msg = `A: ${A.map.size} unique · B: ${B.map.size} unique`;
+    if (dupA || dupB) msg += ` · duplicates ignored: ${dupA} in A, ${dupB} in B`;
+    $('#summary').textContent = msg;
+    store.set('compare-two-lists', { a: taA.value, b: taB.value, ignoreCase: ignoreCase() });
+  }
+
+  taA.addEventListener('input', compare);
+  taB.addEventListener('input', compare);
+  caseBtn.addEventListener('click', () => {
+    caseBtn.setAttribute('aria-pressed', ignoreCase() ? 'false' : 'true');
+    compare();
+  });
+  $('#swap').addEventListener('click', () => {
+    [taA.value, taB.value] = [taB.value, taA.value];
+    compare();
+  });
+  $('#clear').addEventListener('click', () => {
+    taA.value = taB.value = '';
+    compare();
+    taA.focus();
+  });
+  for (const btn of $$('[data-copy]')) {
+    btn.addEventListener('click', async () => {
+      const text = out[btn.dataset.copy].join('\n');
+      let ok = false;
+      try { await navigator.clipboard.writeText(text); ok = true; } catch {}
+      btn.textContent = ok ? 'copied' : 'copy failed';
+      setTimeout(() => { btn.textContent = 'copy'; }, 1200);
+    });
+  }
+  compare();
+})();
+</script>
+</body>
+</html>
