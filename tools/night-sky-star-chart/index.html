@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app that draws star charts</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+main { max-width: 560px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+label { display: grid; gap: 4px; min-width: 0; }
+label input { min-width: 0; max-width: 100%; }
+label span { font: 13px/1.4 var(--mono); color: var(--meta); }
+select { appearance: none; }
+select option { background: var(--paper); color: var(--ink); }
+.row button { flex: 1 1 auto; }
+#chart { width: 100%; height: auto; display: block; color: var(--ink); }
+#chart .sky { fill: none; stroke: var(--ink); stroke-width: 1.2; }
+#chart .grid { fill: none; stroke: var(--line); stroke-width: 0.8; }
+#chart .cl { stroke: var(--meta); stroke-width: 0.9; opacity: .7; fill: none; }
+#chart .st { fill: var(--ink); }
+#chart text { font: 13px var(--sans); fill: var(--ink); }
+#chart text.cn { fill: var(--meta); font-style: italic; }
+#chart text.card { font: 600 14px var(--mono); }
+#msg:empty { display: none; }
+#msg { color: var(--no); margin: 0; }
+#summary { margin: 0; }
+#up { margin: 0; color: var(--meta); font-size: 16px; }
+a.btn { display: inline-flex; align-items: center; justify-content: center; min-height: var(--tap); min-width: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); border-radius: var(--radius); color: var(--ink); text-decoration: none; flex: 1 1 auto; }
+@media print {
+  h1, .controls, .actions, #msg { display: none; }
+  body { padding: 0; }
+}
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make an app that draws star charts</h1>
+
+<main id="app" class="stack">
+  <div class="controls stack">
+    <label><span>place</span>
+      <select id="city">
+        <option value="">custom</option>
+      </select>
+    </label>
+    <div class="grid2">
+      <label><span>latitude</span><input id="lat" type="number" inputmode="decimal" step="any" min="-90" max="90"></label>
+      <label><span>longitude (east +)</span><input id="lon" type="number" inputmode="decimal" step="any" min="-180" max="180"></label>
+      <label><span>date</span><input id="date" type="date"></label>
+      <label><span>time (local)</span><input id="time" type="time"></label>
+    </div>
+    <div class="row">
+      <button id="draw" class="primary" type="button">Draw</button>
+      <button id="now" type="button">Now</button>
+      <button id="here" type="button">My location</button>
+    </div>
+  </div>
+  <p id="msg" role="status"></p>
+  <svg id="chart" viewBox="0 0 400 400" role="img" aria-label="Star chart"></svg>
+  <p id="summary"></p>
+  <p id="up"></p>
+  <div class="row actions">
+    <a id="save" class="btn" href="#" download="star-chart.svg">Save SVG</a>
+    <button id="print" type="button">Print</button>
+  </div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  // Bright-star catalog, J2000: name, RA (hours), Dec (deg), visual magnitude.
+  const CATALOG = `Betelgeuse 5.919 7.407 0.5
+Rigel 5.242 -8.202 0.13
+Bellatrix 5.419 6.350 1.64
+Mintaka 5.533 -0.299 2.23
+Alnilam 5.603 -1.202 1.69
+Alnitak 5.679 -1.943 1.77
+Saiph 5.796 -9.670 2.09
+Meissa 5.585 9.934 3.39
+Aldebaran 4.599 16.509 0.86
+Elnath 5.438 28.608 1.65
+zetTau 5.627 21.143 3.0
+Ain 4.477 19.180 3.53
+gamTau 4.330 15.628 3.65
+Alcyone 3.791 24.105 2.87
+Castor 7.577 31.888 1.58
+Pollux 7.755 28.026 1.14
+Alhena 6.629 16.399 1.92
+Mebsuta 6.732 25.131 2.98
+Tejat 6.383 22.514 2.87
+Wasat 7.335 21.982 3.53
+Sirius 6.752 -16.716 -1.46
+Mirzam 6.378 -17.956 1.98
+Wezen 7.140 -26.393 1.83
+Adhara 6.977 -28.972 1.5
+Aludra 7.402 -29.303 2.45
+Furud 6.338 -30.063 3.02
+Procyon 7.655 5.225 0.34
+Gomeisa 7.453 8.289 2.89
+Capella 5.278 45.998 0.08
+Menkalinan 5.992 44.948 1.9
+Mahasim 5.995 37.213 2.62
+Hassaleh 4.950 33.166 2.69
+Regulus 10.140 11.967 1.35
+Denebola 11.818 14.572 2.14
+Algieba 10.333 19.842 2.08
+Zosma 11.235 20.524 2.56
+Chertan 11.237 15.430 3.33
+etaLeo 10.122 16.763 3.48
+Adhafera 10.278 23.417 3.43
+Rasalas 9.879 26.007 3.88
+epsLeo 9.764 23.774 2.98
+Dubhe 11.062 61.751 1.79
+Merak 11.031 56.382 2.37
+Phecda 11.897 53.695 2.44
+Megrez 12.257 57.033 3.31
+Alioth 12.900 55.960 1.77
+Mizar 13.399 54.925 2.27
+Alkaid 13.792 49.313 1.86
+Polaris 2.530 89.264 1.98
+Yildun 17.537 86.586 4.36
+epsUMi 16.766 82.037 4.21
+zetUMi 15.734 77.794 4.29
+Kochab 14.845 74.156 2.08
+Pherkad 15.345 71.834 3.05
+etaUMi 16.292 75.755 4.95
+Schedar 0.675 56.537 2.24
+Caph 0.153 59.150 2.28
+gamCas 0.945 60.717 2.47
+Ruchbah 1.430 60.235 2.68
+Segin 1.907 63.670 3.37
+Deneb 20.690 45.280 1.25
+Sadr 20.370 40.257 2.23
+epsCyg 20.770 33.970 2.48
+delCyg 19.750 45.131 2.87
+Albireo 19.512 27.960 3.08
+Vega 18.616 38.784 0.03
+Sheliak 18.835 33.363 3.52
+Sulafat 18.982 32.690 3.25
+zetLyr 18.746 37.605 4.36
+delLyr 18.908 36.899 4.3
+Altair 19.846 8.868 0.77
+Tarazed 19.771 10.613 2.72
+Alshain 19.922 6.407 3.71
+delAql 19.425 3.115 3.36
+zetAql 19.090 13.863 2.99
+lamAql 19.104 -4.882 3.43
+thAql 20.188 -0.821 3.23
+Arcturus 14.261 19.182 -0.05
+Izar 14.750 27.074 2.37
+Muphrid 13.911 18.398 2.68
+Seginus 14.535 38.308 3.03
+Nekkar 15.032 40.391 3.5
+delBoo 15.258 33.315 3.47
+Spica 13.420 -11.161 0.97
+Porrima 12.694 -1.449 2.74
+Vindemiatrix 13.036 10.959 2.85
+delVir 12.927 3.397 3.38
+zetVir 13.578 -0.596 3.37
+betVir 11.845 1.765 3.6
+Antares 16.490 -26.432 1.06
+Shaula 17.560 -37.104 1.62
+Sargas 17.622 -42.998 1.86
+Dschubba 16.006 -22.622 2.29
+Acrab 16.091 -19.806 2.56
+piSco 15.981 -26.114 2.89
+sigSco 16.353 -25.593 2.9
+tauSco 16.598 -28.216 2.82
+epsSco 16.836 -34.293 2.29
+muSco 16.864 -38.047 3.0
+zetSco 16.910 -42.362 3.6
+etaSco 17.203 -43.239 3.33
+iotSco 17.793 -40.127 3.0
+kapSco 17.708 -39.030 2.39
+Lesath 17.513 -37.296 2.7
+Kaus_Australis 18.403 -34.385 1.85
+Nunki 18.921 -26.297 2.05
+Kaus_Media 18.350 -29.828 2.7
+Kaus_Borealis 18.466 -25.422 2.81
+Ascella 19.044 -29.880 2.6
+Alnasl 18.097 -30.424 2.99
+phiSgr 18.761 -26.991 3.17
+tauSgr 19.116 -27.671 3.32
+Markab 23.079 15.205 2.49
+Scheat 23.063 28.083 2.42
+Algenib 0.220 15.184 2.83
+Alpheratz 0.140 29.091 2.06
+Enif 21.736 9.875 2.38
+Homam 22.691 10.831 3.4
+thPeg 22.170 6.198 3.53
+Matar 22.717 30.221 2.94
+Mirach 1.162 35.621 2.05
+Almach 2.065 42.330 2.1
+delAnd 0.656 30.861 3.27
+Mirfak 3.405 49.861 1.79
+Algol 3.136 40.956 2.12
+zetPer 3.902 31.884 2.85
+epsPer 3.964 40.010 2.89
+delPer 3.715 47.788 3.01
+gamPer 3.080 53.506 2.93
+Hamal 2.120 23.462 2.0
+Sheratan 1.911 20.808 2.64
+Mesarthim 1.892 19.294 3.88
+Alphecca 15.578 26.715 2.23
+betCrB 15.464 29.106 3.68
+thCrB 15.549 31.359 4.14
+gamCrB 15.713 26.296 3.84
+delCrB 15.827 26.068 4.63
+epsCrB 15.960 26.878 4.15
+zetHer 16.688 31.603 2.81
+etaHer 16.715 38.922 3.48
+piHer 17.251 36.809 3.16
+epsHer 17.005 30.926 3.92
+Kornephoros 16.504 21.490 2.77
+Rasalgethi 17.244 14.390 3.1
+delHer 17.250 24.839 3.14
+Rasalhague 17.582 12.560 2.08
+Sabik 17.173 -15.725 2.43
+zetOph 16.619 -10.567 2.54
+delOph 16.239 -3.694 2.74
+Cebalrai 17.725 4.567 2.76
+kapOph 16.961 9.375 3.2
+Eltanin 17.943 51.489 2.23
+Rastaban 17.507 52.301 2.79
+Grumium 17.892 56.873 3.75
+Altais 19.209 67.661 3.07
+epsDra 19.803 70.268 3.83
+zetDra 17.146 65.715 3.17
+etaDra 16.400 61.514 2.73
+Edasich 15.415 58.966 3.29
+Thuban 14.073 64.376 3.65
+kapDra 12.558 69.788 3.87
+lamDra 11.523 69.331 3.84
+Alderamin 21.310 62.585 2.45
+Alfirk 21.478 70.561 3.23
+Errai 23.656 77.632 3.21
+iotCep 22.828 66.200 3.52
+zetCep 22.181 58.201 3.35
+Canopus 6.399 -52.696 -0.74
+Rigil_Kent 14.660 -60.834 -0.27
+Hadar 14.064 -60.373 0.61
+Acrux 12.443 -63.099 0.77
+Mimosa 12.795 -59.689 1.25
+Gacrux 12.519 -57.113 1.64
+delCru 12.252 -58.749 2.79
+Achernar 1.629 -57.237 0.46
+Fomalhaut 22.961 -29.622 1.16
+Peacock 20.427 -56.735 1.94
+Alnair 22.137 -46.961 1.74
+Miaplacidus 9.220 -69.717 1.68
+Avior 8.375 -59.510 1.86
+Regor 8.159 -47.337 1.83
+delVel 8.745 -54.709 1.96
+Suhail 9.133 -43.433 2.21
+kapVel 9.368 -55.011 2.47
+Naos 8.060 -40.003 2.25
+Atria 16.811 -69.028 1.91
+betTrA 15.919 -63.430 2.85
+gamTrA 15.315 -68.679 2.89
+Alphard 9.460 -8.659 1.98
+Diphda 0.727 -17.987 2.04
+Menkar 3.038 4.090 2.54
+Gienah 12.263 -17.542 2.59
+Kraz 12.573 -23.397 2.65
+Algorab 12.498 -16.515 2.95
+epsCrv 12.169 -22.620 3.0
+Sadalsuud 21.526 -5.571 2.87
+Sadalmelik 22.096 -0.320 2.95
+Deneb_Algedi 21.784 -16.127 2.85
+Zubenelgenubi 14.848 -16.042 2.75
+Zubeneschamali 15.283 -9.383 2.61`;
+
+  // Constellation figures: chains of star names joined by ">", separated by ",".
+  const FIGURES = [
+    ['Orion', 'Meissa>Betelgeuse>Alnitak>Alnilam>Mintaka>Bellatrix>Meissa, Betelgeuse>Bellatrix, Alnitak>Saiph, Mintaka>Rigel'],
+    ['Taurus', 'Elnath>Ain>gamTau>Aldebaran>zetTau, Alcyone'],
+    ['Gemini', 'Castor>Mebsuta>Tejat, Pollux>Wasat>Alhena, Castor>Pollux'],
+    ['Canis Major', 'Mirzam>Sirius>Wezen>Adhara>Furud, Wezen>Aludra'],
+    ['Canis Minor', 'Gomeisa>Procyon'],
+    ['Auriga', 'Capella>Menkalinan>Mahasim>Elnath>Hassaleh>Capella'],
+    ['Leo', 'Regulus>etaLeo>Algieba>Adhafera>Rasalas>epsLeo, Algieba>Zosma>Denebola>Chertan>Regulus, Zosma>Chertan'],
+    ['Ursa Major', 'Dubhe>Merak>Phecda>Megrez>Dubhe, Megrez>Alioth>Mizar>Alkaid'],
+    ['Ursa Minor', 'Polaris>Yildun>epsUMi>zetUMi>Kochab>Pherkad>etaUMi>zetUMi'],
+    ['Cassiopeia', 'Caph>Schedar>gamCas>Ruchbah>Segin'],
+    ['Cygnus', 'Deneb>Sadr>Albireo, delCyg>Sadr>epsCyg'],
+    ['Lyra', 'Vega>zetLyr>Sheliak>Sulafat>delLyr>zetLyr'],
+    ['Aquila', 'Tarazed>Altair>Alshain>thAql, Altair>delAql>lamAql, delAql>zetAql'],
+    ['Bootes', 'Arcturus>Izar>delBoo>Nekkar>Seginus>Arcturus, Arcturus>Muphrid'],
+    ['Virgo', 'Spica>Porrima>betVir, Porrima>delVir>Vindemiatrix, Spica>zetVir'],
+    ['Scorpius', 'Acrab>Dschubba>piSco, Dschubba>sigSco>Antares>tauSco>epsSco>muSco>zetSco>etaSco>Sargas>iotSco>kapSco>Shaula>Lesath'],
+    ['Sagittarius', 'Alnasl>Kaus_Media>Kaus_Australis>Alnasl, Kaus_Media>Kaus_Borealis>phiSgr>Kaus_Media, phiSgr>Nunki>tauSgr>Ascella>phiSgr, Ascella>Kaus_Australis'],
+    ['Pegasus', 'Markab>Scheat>Alpheratz>Algenib>Markab, Markab>Homam>thPeg>Enif, Scheat>Matar'],
+    ['Andromeda', 'Alpheratz>delAnd>Mirach>Almach'],
+    ['Perseus', 'gamPer>Mirfak>delPer>epsPer>zetPer, Mirfak>Algol'],
+    ['Aries', 'Hamal>Sheratan>Mesarthim'],
+    ['Corona Borealis', 'thCrB>betCrB>Alphecca>gamCrB>delCrB>epsCrB'],
+    ['Hercules', 'zetHer>etaHer>piHer>epsHer>zetHer, zetHer>Kornephoros, epsHer>delHer>Rasalgethi'],
+    ['Ophiuchus', 'Rasalhague>kapOph>delOph>zetOph>Sabik>Cebalrai>Rasalhague'],
+    ['Draco', 'lamDra>kapDra>Thuban>Edasich>etaDra>zetDra>Altais>Grumium>Rastaban>Eltanin>Grumium, Altais>epsDra'],
+    ['Cepheus', 'Alderamin>Alfirk>Errai>iotCep>zetCep>Alderamin, Alfirk>iotCep'],
+    ['Crux', 'Acrux>Gacrux, Mimosa>delCru'],
+    ['Centaurus', 'Rigil_Kent>Hadar'],
+    ['Triangulum Australe', 'Atria>betTrA>gamTrA>Atria'],
+    ['Carina', 'Canopus, Avior>Miaplacidus'],
+    ['Vela', 'Regor>delVel>kapVel>Suhail>Regor'],
+    ['Corvus', 'Gienah>Algorab>Kraz>epsCrv>Gienah'],
+    ['Libra', 'Zubenelgenubi>Zubeneschamali'],
+    ['Aquarius', 'Sadalsuud>Sadalmelik'],
+    ['Capricornus', 'Deneb_Algedi'],
+    ['Piscis Austrinus', 'Fomalhaut'],
+    ['Eridanus', 'Achernar'],
+    ['Hydra', 'Alphard'],
+    ['Cetus', 'Menkar, Diphda'],
+    ['Puppis', 'Naos'],
+    ['Pavo', 'Peacock'],
+    ['Grus', 'Alnair']
+  ];
+
+  const CITIES = [
+    ['London', 51.51, -0.13], ['New York', 40.71, -74.01], ['Los Angeles', 34.05, -118.24],
+    ['Chicago', 41.88, -87.63], ['Toronto', 43.65, -79.38], ['Mexico City', 19.43, -99.13],
+    ['Sao Paulo', -23.55, -46.63], ['Buenos Aires', -34.60, -58.38], ['Reykjavik', 64.15, -21.94],
+    ['Paris', 48.86, 2.35], ['Berlin', 52.52, 13.40], ['Madrid', 40.42, -3.70],
+    ['Cairo', 30.04, 31.24], ['Nairobi', -1.29, 36.82], ['Cape Town', -33.92, 18.42],
+    ['Tel Aviv', 32.09, 34.78], ['Dubai', 25.20, 55.27], ['Mumbai', 19.08, 72.88],
+    ['Singapore', 1.35, 103.82], ['Beijing', 39.90, 116.40], ['Tokyo', 35.68, 139.69],
+    ['Sydney', -33.87, 151.21], ['Auckland', -36.85, 174.76]
+  ];
+
+  const stars = new Map();
+  for (const line of CATALOG.split('\n')) {
+    const [name, ra, dec, mag] = line.trim().split(/\s+/);
+    stars.set(name, { name, ra: +ra * 15, dec: +dec, mag: +mag });
+  }
+  const figures = FIGURES.map(([name, def]) => {
+    const chains = def.split(',').map(c => c.trim().split('>'));
+    const members = [...new Set(chains.flat())];
+    return { name, chains, members };
+  });
+
+  const RAD = Math.PI / 180;
+  const C = 200, R = 178;
+  const svgNS = document.getElementById('chart').namespaceURI;
+
+  function julianDay(ms) { return ms / 86400000 + 2440587.5; }
+
+  // Local sidereal time in degrees for a UTC timestamp and east longitude.
+  function lst(ms, lon) {
+    const d = julianDay(ms) - 2451545.0;
+    const t = d / 36525;
+    const g = 280.46061837 + 360.98564736629 * d + 0.000387933 * t * t;
+    return ((g + lon) % 360 + 360) % 360;
+  }
+
+  function altAz(raDeg, decDeg, latDeg, lstDeg) {
+    const H = (lstDeg - raDeg) * RAD, d = decDeg * RAD, p = latDeg * RAD;
+    const sinAlt = Math.sin(p) * Math.sin(d) + Math.cos(p) * Math.cos(d) * Math.cos(H);
+    const alt = Math.asin(Math.max(-1, Math.min(1, sinAlt)));
+    const az = Math.atan2(-Math.sin(H) * Math.cos(d), Math.cos(p) * Math.sin(d) - Math.sin(p) * Math.cos(d) * Math.cos(H));
+    return { alt: alt / RAD, az: ((az / RAD) + 360) % 360 };
+  }
+
+  // Looking up: north at top, east on the left. Stereographic keeps shapes true.
+  function project(alt, az) {
+    const r = R * Math.tan((90 - alt) * RAD / 2);
+    return [C - r * Math.sin(az * RAD), C - r * Math.cos(az * RAD)];
+  }
+
+  function el(tag, attrs, text) {
+    const e = document.createElementNS(svgNS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  const f = n => n.toFixed(1);
+
+  function draw(lat, lon, ms) {
+    const svg = $('#chart');
+    svg.textContent = '';
+    const L = lst(ms, lon);
+    const pos = new Map();
+    let count = 0;
+    for (const s of stars.values()) {
+      const h = altAz(s.ra, s.dec, lat, L);
+      pos.set(s.name, h);
+      if (h.alt > 0) count++;
+    }
+
+    svg.appendChild(el('circle', { class: 'grid', cx: C, cy: C, r: f(R * Math.tan(30 * RAD / 2)) }));
+    svg.appendChild(el('circle', { class: 'grid', cx: C, cy: C, r: f(R * Math.tan(60 * RAD / 2)) }));
+    svg.appendChild(el('circle', { class: 'sky', cx: C, cy: C, r: R }));
+
+    const clip = el('clipPath', { id: 'skyclip' });
+    clip.appendChild(el('circle', { cx: C, cy: C, r: R }));
+    svg.appendChild(clip);
+    const g = el('g', { 'clip-path': 'url(#skyclip)' });
+    svg.appendChild(g);
+
+    const upNames = [];
+    for (const fig of figures) {
+      for (const chain of fig.chains) {
+        if (chain.length < 2) continue;
+        const pts = chain.map(n => pos.get(n));
+        // break the line where it dips well below the horizon
+        let seg = [];
+        const flush = () => { if (seg.length > 1) g.appendChild(el('polyline', { class: 'cl', points: seg.join(' ') })); seg = []; };
+        for (const p of pts) {
+          if (p.alt > -10) { const [x, y] = project(p.alt, p.az); seg.push(f(x) + ',' + f(y)); } else flush();
+        }
+        flush();
+      }
+      const vis = fig.members.filter(n => pos.get(n).alt > 0);
+      if (vis.length && vis.length * 2 >= fig.members.length) {
+        upNames.push(fig.name);
+        let sx = 0, sy = 0;
+        for (const n of vis) { const p = pos.get(n); const [x, y] = project(p.alt, p.az); sx += x; sy += y; }
+        const x = sx / vis.length, y = sy / vis.length + 14;
+        g.appendChild(el('text', { class: 'cn', x: f(x), y: f(y), 'text-anchor': 'middle' }, fig.name));
+      }
+    }
+
+    for (const s of stars.values()) {
+      const p = pos.get(s.name);
+      if (p.alt <= 0) continue;
+      const [x, y] = project(p.alt, p.az);
+      const r = Math.max(0.9, 3.4 - 0.6 * s.mag);
+      g.appendChild(el('circle', { class: 'st', cx: f(x), cy: f(y), r: f(r) }));
+      if (s.mag <= 1.2) {
+        const left = x > C + 60;
+        g.appendChild(el('text', { x: f(x + (left ? -6 : 6)), y: f(y - 4), 'text-anchor': left ? 'end' : 'start' }, s.name.replace('_', ' ')));
+      }
+    }
+
+    const card = [['N', 0], ['E', 90], ['S', 180], ['W', 270]];
+    for (const [t, az] of card) {
+      const x = C - (R + 11) * Math.sin(az * RAD), y = C - (R + 11) * Math.cos(az * RAD) + 5;
+      svg.appendChild(el('text', { class: 'card', x: f(x), y: f(y), 'text-anchor': 'middle' }, t));
+    }
+
+    const when = new Date(ms);
+    const label = `${lat.toFixed(2)}, ${lon.toFixed(2)} · ${when.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}`;
+    svg.appendChild(el('title', {}, label));
+    $('#summary').textContent = `${count} stars above the horizon · ${label}`;
+    $('#up').textContent = upNames.length ? 'Up: ' + upNames.join(', ') : 'No catalog constellations above the horizon.';
+    updateSave(label);
+  }
+
+  function updateSave(label) {
+    const clone = $('#chart').cloneNode(true);
+    clone.setAttribute('width', '800');
+    clone.setAttribute('height', '800');
+    const style = el('style', {}, `text{font:13px sans-serif;fill:#141414}.cn{fill:#6b6b6b;font-style:italic}.card{font:600 14px monospace}.sky{fill:none;stroke:#141414;stroke-width:1.2}.grid{fill:none;stroke:#d9d4c7;stroke-width:.8}.cl{stroke:#6b6b6b;stroke-width:.9;fill:none}.st{fill:#141414}`);
+    clone.insertBefore(style, clone.firstChild);
+    clone.insertBefore(el('rect', { width: 400, height: 400, fill: '#ffffff' }), style.nextSibling);
+    const caption = el('text', { x: 4, y: 396, style: 'font:9px monospace;fill:#6b6b6b' }, label);
+    clone.appendChild(caption);
+    $('#save').href = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(new XMLSerializer().serializeToString(clone));
+  }
+
+  const pad = n => String(n).padStart(2, '0');
+  function setNow() {
+    const d = new Date();
+    $('#date').value = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    $('#time').value = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  function say(t) { $('#msg').textContent = t; }
+
+  function run() {
+    const lat = parseFloat($('#lat').value), lon = parseFloat($('#lon').value);
+    if (!isFinite(lat) || lat < -90 || lat > 90) return say('Latitude must be between -90 and 90.');
+    if (!isFinite(lon) || lon < -180 || lon > 180) return say('Longitude must be between -180 and 180.');
+    const [y, mo, d] = ($('#date').value || '').split('-').map(Number);
+    const [h, mi] = ($('#time').value || '').split(':').map(Number);
+    if (!y || !mo || !d || !isFinite(h) || !isFinite(mi)) return say('Pick a date and a time.');
+    const ms = new Date(y, mo - 1, d, h, mi).getTime();
+    if (!isFinite(ms)) return say('That date does not work.');
+    say('');
+    store.set('nssc.place', { lat, lon, city: $('#city').value });
+    draw(lat, lon, ms);
+  }
+
+  const citySel = $('#city');
+  for (const [name] of CITIES) citySel.appendChild(new Option(name, name));
+  citySel.addEventListener('change', () => {
+    const c = CITIES.find(x => x[0] === citySel.value);
+    if (!c) return;
+    $('#lat').value = c[1];
+    $('#lon').value = c[2];
+    run();
+  });
+  for (const id of ['#lat', '#lon']) $(id).addEventListener('input', () => { citySel.value = ''; });
+  for (const id of ['#date', '#time']) $(id).addEventListener('change', run);
+  for (const id of ['#lat', '#lon']) $(id).addEventListener('keydown', e => { if (e.key === 'Enter') run(); });
+
+  $('#draw').addEventListener('click', run);
+  $('#now').addEventListener('click', () => { setNow(); run(); });
+  $('#print').addEventListener('click', () => window.print());
+  $('#here').addEventListener('click', () => {
+    if (!navigator.geolocation) return say('Location is not available here. Type latitude and longitude.');
+    say('Finding location…');
+    navigator.geolocation.getCurrentPosition(p => {
+      $('#lat').value = p.coords.latitude.toFixed(2);
+      $('#lon').value = p.coords.longitude.toFixed(2);
+      citySel.value = '';
+      run();
+    }, () => say('Location was denied. Type latitude and longitude, or pick a place.'), { timeout: 10000 });
+  });
+
+  const saved = store.get('nssc.place', null);
+  if (saved && isFinite(saved.lat) && isFinite(saved.lon)) {
+    $('#lat').value = saved.lat; $('#lon').value = saved.lon;
+    citySel.value = CITIES.some(c => c[0] === saved.city) ? saved.city : '';
+  } else {
+    citySel.value = 'London'; $('#lat').value = 51.51; $('#lon').value = -0.13;
+  }
+  setNow();
+  run();
+})();
+</script>
+</body>
+</html>

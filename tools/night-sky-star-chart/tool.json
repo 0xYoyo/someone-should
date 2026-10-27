@@ -1,0 +1,57 @@
+{
+  "slug": "night-sky-star-chart",
+  "wish": "someone should make an app that draws star charts",
+  "year": 2015,
+  "agreed": 10,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/21089/linux-software-for-drawing-star-charts",
+      "date": "2015-07-13",
+      "points": 8,
+      "comments": 2
+    }
+  ],
+  "spec": "Draws an all-sky chart of the bright stars and constellation figures above the horizon for any place, date and time.\nPick a city or type latitude and longitude (or tap My location), set date and time, tap Draw; save the chart as SVG or print it.\nIt does not show the Moon, planets or faint stars, and times are in this device's time zone.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#lat",
+        "text": "51.5"
+      }
+    },
+    {
+      "type": {
+        "sel": "#date",
+        "text": "2026-01-15"
+      }
+    },
+    {
+      "type": {
+        "sel": "#time",
+        "text": "22:00"
+      }
+    },
+    {
+      "tap": "#draw"
+    },
+    {
+      "expect": {
+        "sel": "#up",
+        "contains": "Orion"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#summary",
+        "matches": "^\\d+ stars above the horizon"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:37:18Z",
+  "model": "opus-5.5",
+  "minutes": 12,
+  "approved": false,
+  "notes": "Embedded catalog of about 200 bright stars (J2000, no precession) and 42 constellation figures; stereographic projection, north up, east left."
+}
