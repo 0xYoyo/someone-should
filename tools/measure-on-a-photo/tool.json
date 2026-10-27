@@ -1,0 +1,48 @@
+{
+  "slug": "measure-on-a-photo",
+  "wish": "someone should make a tool that measures real distances on images",
+  "year": 2015,
+  "agreed": 10,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/21471/software-to-measure-true-distances-on-images-on-linux",
+      "date": "2015-07-25",
+      "points": 6,
+      "comments": 4
+    }
+  ],
+  "spec": "Open a photo, drag a reference line over something of known length and type that length; then add lines and areas and read their real size.\nDrag dots with a magnifier for precision; lines show length, areas show real area in the reference unit (mm, cm, m, in, ft).\nIt does not correct perspective: measurements are true only on the same flat surface as the reference, and the photo never leaves the device.",
+  "tests": [
+    {
+      "tap": "#sample"
+    },
+    {
+      "wait": 400
+    },
+    {
+      "tap": "#add-ref"
+    },
+    {
+      "type": {
+        "sel": "#ref-len",
+        "text": "29.7"
+      }
+    },
+    {
+      "tap": "#add-line"
+    },
+    {
+      "expect": {
+        "sel": "#list li[data-kind=line] .val",
+        "contains": "8.56 cm"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:54:46Z",
+  "model": "opus-5.5",
+  "minutes": 10,
+  "approved": false,
+  "notes": "Sample is an A4 sheet with a bank card; the test sets the sheet width as reference and checks the card width (85.6 mm). Photo is read locally via FileReader; nothing is stored except the last reference length and unit."
+}

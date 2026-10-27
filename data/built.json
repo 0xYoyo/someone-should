@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T01:57:46.910Z",
+ "updated": "2026-10-27T01:57:52.249Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -603,9 +603,14 @@
   },
   {
    "slug": "measure-on-a-photo",
-   "status": "pending",
+   "status": "pass",
    "attempts": 1,
-   "model": "opus-5.5"
+   "model": "opus-5.5",
+   "kb": 18.4,
+   "tests": "6/6",
+   "built": "2026-10-27T01:54:46Z",
+   "minutes": 10,
+   "approved": false
   },
   {
    "slug": "gif-animation-maker",
