@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that steps through a video and extracts single frames</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+#app { max-width: 720px; margin: 0 auto; }
+.stage { position: relative; background: #000; border-radius: var(--radius); overflow: hidden; aspect-ratio: 16 / 9; display: grid; place-items: center; }
+.stage video { width: 100%; height: 100%; object-fit: contain; display: block; }
+.stage .drop { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: 12px; padding: 16px; text-align: center; color: #ededed; background: #1a1a1a; }
+.stage.loaded .drop { display: none; }
+.stage.over { outline: 2px dashed var(--ink); outline-offset: 2px; }
+.drop button { border-color: #ededed; color: #ededed; }
+.drop button.primary { background: #ededed; color: #141414; }
+input[type=range] { padding: 0; border: 0; accent-color: var(--ink); min-height: var(--tap); }
+input[type=file] { display: none; }
+.ctrl { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.ctrl button { padding: 0 8px; }
+#time { font: 500 17px/1.3 var(--mono); font-variant-numeric: tabular-nums; }
+.field { display: grid; gap: 4px; font-size: 16px; color: var(--meta); }
+.fields { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.fields input, .fields select { color: var(--ink); }
+.grabs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+#status { min-height: 1.45em; color: var(--meta); }
+#status.err { color: var(--no); }
+#frames { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+#frames li { display: grid; gap: 6px; min-width: 0; }
+#frames img { width: 100%; display: block; border-radius: var(--radius); background: #000; cursor: pointer; }
+#frames .t { font: 16px/1.3 var(--mono); }
+#frames .acts { display: grid; grid-template-columns: 1fr 44px; gap: 6px; }
+#frames a, #frames button { min-height: var(--tap); display: grid; place-items: center; padding: 0 6px; border: 1.5px solid var(--ink); border-radius: var(--radius); color: var(--ink); text-decoration: none; background: transparent; }
+.head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that steps through a video and extracts single frames</h1>
+
+<main id="app" class="stack">
+  <div class="stage" id="stage">
+    <video id="video" playsinline muted preload="auto"></video>
+    <div class="drop">
+      <div>Open a video. It stays on this device.</div>
+      <div class="row" style="justify-content:center">
+        <button class="primary" id="open" type="button">open video</button>
+        <button id="sample" type="button">sample clip</button>
+      </div>
+    </div>
+  </div>
+  <input type="file" id="file" accept="video/*">
+
+  <div id="player" class="stack" hidden>
+    <input type="range" id="scrub" min="0" max="1" step="any" value="0" aria-label="position">
+    <div class="head"><span id="time">0:00.000</span><span class="meta" id="fno">frame 0</span></div>
+    <div class="ctrl">
+      <button id="prev" type="button" aria-label="previous frame">&lsaquo; frame</button>
+      <button id="play" type="button">play</button>
+      <button id="next" type="button" aria-label="next frame">frame &rsaquo;</button>
+    </div>
+    <div class="fields">
+      <label class="field">fps<input id="fps" type="number" min="1" max="240" step="any" value="30" inputmode="decimal"></label>
+      <label class="field">every (s)<input id="every" type="number" min="0.01" step="any" value="1" inputmode="decimal"></label>
+      <label class="field">format<select id="fmt"><option value="png">PNG</option><option value="jpeg">JPG</option></select></label>
+    </div>
+    <div class="grabs">
+      <button class="primary" id="grab" type="button">grab this frame</button>
+      <button id="grab-every" type="button">grab every N s</button>
+    </div>
+    <button id="another" type="button">open another video</button>
+  </div>
+
+  <div id="status" role="status"></div>
+
+  <section class="stack" id="out" hidden>
+    <div class="head">
+      <span id="count">0 frames</span>
+      <div class="row">
+        <button id="zip" type="button">save all .zip</button>
+        <button id="clear" type="button">clear</button>
+      </div>
+    </div>
+    <ul id="frames"></ul>
+  </section>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const SAMPLE = 'data:video/webm;base64,GkXfo59ChoEBQveBAULygQRC84EIQoKEd2VibUKHgQJChYECGFOAZwEAAAAAAAR6EU2bdLpNu4tTq4QVSalmU6yBoU27i1OrhBZUrmtTrIHYTbuMU6uEElTDZ1OsggEeTbuMU6uEHFO7a1OsggRR7AEAAAAAAABZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVSalmsirXsYMPQkBNgI1MYXZmNjAuMTYuMTAwV0GNTGF2ZjYwLjE2LjEwMESJiECfQAAAAAAAFlSua8GuAQAAAAAAADjXgQFzxYj1oN260rCzl5yBACK1nIN1bmSIgQCGhVZfVlA4g4EBI+ODhAvrwgDgibCBYLqBNpqBAhJUw2f8c3OgY8CAZ8iaRaOHRU5DT0RFUkSHjUxhdmY2MC4xNi4xMDBzc9ZjwItjxYj1oN260rCzl2fIoUWjh0VOQ09ERVJEh5RMYXZjNjAuMzEuMTAyIGxpYnZweGfIoUWjiERVUkFUSU9ORIeTMDA6MDA6MDIuMDAwMDAwMDAwAB9DtnVCrOeBAKNA9oEAAIAQCACdASpgADYAAEcIhYWIhYSIAgICddULQPfj9A+QFsgO9NeaBvOf7AfA95IxSALilIiTHwkVKNNBL02GtE0Be+OMhew2nubTgP78/yW//+rPmP3dzAatZHcVcTIof7vNw1H//lz1edJf/ORgnusp/8pKcuTz4f//vL4P/tRVmxuFUS70Rd1956HJ32//GGC9XIVNaYf/95e3ftRIAB4/GnHhaZENObcQAH/8Yv/way7Ww/hakrWHVon/QesnPdn+Wj/z8f+eQ/T9P+1b/Xv27+xX2AAAV7/gzbwAADY/+ouhh+f/9b7Qi5ckAAAAAKhMgKOZgQDIADECAAcQ7AAYABhYL/QAWBj8QYgAAKOdgQGQALECAAcQ7AAYABhYK/foS+FvcY215aSJAACjm4ECWABxAgAHEOwAGAAYWC736BLwaqiOuF4AAKOdgQMgALECAAcQ7AAYABhYK/foD5rS9Fvvi+Oh0ACjQMaBA+iAcAcAnQEqYAA2AABHCIWFiIWEiAICAxF1C/oH4q9JoQPyAoue6UApAH8AX6gk/5fIAkmzF+FPmqVUJJEICksqK7+zMxAA/vmS8uDjv5fvj4a+57+/RX//wdX/3peH/2hP4M7dS+H4Lw7zn+F98Tt//zjy6slSSkXncu0P3uT/5Zqt80RQKhg1k///umf+4q3Lv/jRg4P8P2SIYohXZ80kJyGB/0A9I/5hx+Z39LVGrfadKIA9oBwgrW9hf8D/rJ1OgACjm4EEsABxAgAHEOwAGAAYWv/0AF7CkAjWRdoAAKOZgQV4ADECAAcQ7AAYABhYL/QAC3FQ4ySwAKOcgQZAAJECAAcQ7AAYABha/afoXvEk5UUwqtIAAKOZgQcIADECAAcQ7AAYABhYL/QACgXy3o1AABxTu2uku4+zgQC3iveBAfGCAZ/wgQO7kbOCA+i3i/eBAfGCAZ/wggFy';
+  const MAX_BATCH = 600;
+  const video = $('#video'), stage = $('#stage'), scrub = $('#scrub');
+  const fpsIn = $('#fps'), everyIn = $('#every'), fmtIn = $('#fmt');
+  const statusEl = $('#status'), list = $('#frames');
+
+  let name = 'video', frames = [], busy = false, cancel = false, fpsTouched = false;
+
+  const prefs = store.get('v2f', {});
+  if (prefs.every) everyIn.value = prefs.every;
+  if (prefs.fmt) fmtIn.value = prefs.fmt;
+  const savePrefs = () => store.set('v2f', { every: everyIn.value, fmt: fmtIn.value });
+  everyIn.addEventListener('change', savePrefs);
+  fmtIn.addEventListener('change', savePrefs);
+  fpsIn.addEventListener('input', () => { fpsTouched = true; show(); });
+
+  const say = (msg, err) => { statusEl.textContent = msg || ''; statusEl.classList.toggle('err', !!err); };
+  const fps = () => { const f = parseFloat(fpsIn.value); return f > 0 ? f : 30; };
+  const fmtTime = t => {
+    const m = Math.floor(t / 60), s = t - m * 60;
+    return m + ':' + (s < 10 ? '0' : '') + s.toFixed(3);
+  };
+  const stamp = t => fmtTime(t).replace(':', 'm').replace('.', 's');
+
+  function show() {
+    const t = video.currentTime || 0;
+    $('#time').textContent = fmtTime(t);
+    $('#fno').textContent = 'frame ' + Math.round(t * fps());
+    if (!scrub.matches(':active')) scrub.value = t;
+  }
+
+  // ---- loading ----
+  function load(src, label) {
+    frames.forEach(f => f.url && URL.revokeObjectURL(f.url));
+    name = label.replace(/\.[^.]+$/, '').replace(/[^\w.-]+/g, '_') || 'video';
+    fpsTouched = false;
+    stage.classList.remove('loaded');
+    say('Loading ' + label + '…');
+    video.src = src;
+    video.load();
+  }
+
+  $('#open').addEventListener('click', () => $('#file').click());
+  $('#another').addEventListener('click', () => $('#file').click());
+  $('#sample').addEventListener('click', () => load(SAMPLE, 'sample.webm'));
+  $('#file').addEventListener('change', e => { const f = e.target.files[0]; if (f) readFile(f); e.target.value = ''; });
+
+  // The page's CSP allows media only from data: URLs, so files are read in as one.
+  function readFile(f) {
+    if (f.type && !/^video\//.test(f.type)) return say('That is not a video file.', true);
+    say('Reading ' + f.name + '…');
+    const r = new FileReader();
+    r.onload = () => load(r.result, f.name);
+    r.onerror = () => say('Could not read that file.', true);
+    r.readAsDataURL(f);
+  }
+
+  ['dragenter', 'dragover'].forEach(ev => document.addEventListener(ev, e => { e.preventDefault(); stage.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach(ev => document.addEventListener(ev, e => { e.preventDefault(); stage.classList.remove('over'); }));
+  document.addEventListener('drop', e => { const f = e.dataTransfer && e.dataTransfer.files[0]; if (f) readFile(f); });
+
+  video.addEventListener('loadedmetadata', () => {
+    const d = video.duration;
+    scrub.max = isFinite(d) ? d : 0;
+    stage.classList.add('loaded');
+    $('#player').hidden = false;
+    say(video.videoWidth + '×' + video.videoHeight + ', ' + (isFinite(d) ? fmtTime(d) : 'unknown length'));
+    show();
+    estimateFps();
+  });
+  video.addEventListener('error', () => {
+    if (!video.getAttribute('src')) return;
+    say('This browser cannot play that video. Try an MP4 or WebM.', true);
+  });
+  video.addEventListener('timeupdate', show);
+  video.addEventListener('seeked', show);
+  video.addEventListener('play', () => { $('#play').textContent = 'pause'; });
+  video.addEventListener('pause', () => { $('#play').textContent = 'play'; show(); });
+
+  // Guess the frame rate by playing a few frames, then rewind.
+  function estimateFps() {
+    if (!('requestVideoFrameCallback' in HTMLVideoElement.prototype)) return;
+    const times = [];
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      if (busy) return;
+      video.pause();
+      video.currentTime = 0;
+      const d = times.slice(1).map((t, i) => t - times[i]).filter(x => x > 0).sort((a, b) => a - b);
+      if (d.length >= 3 && !fpsTouched) {
+        const f = 1 / d[Math.floor(d.length / 2)];
+        if (f > 1 && f < 241) fpsIn.value = Math.abs(f - Math.round(f)) < 0.01 ? Math.round(f) : f.toFixed(3);
+        show();
+      }
+    };
+    const tick = (now, meta) => {
+      if (done) return;
+      times.push(meta.mediaTime);
+      if (times.length < 8) video.requestVideoFrameCallback(tick); else finish();
+    };
+    video.requestVideoFrameCallback(tick);
+    video.addEventListener('ended', finish, { once: true });
+    setTimeout(finish, 1200);
+    video.play().catch(finish);
+  }
+
+  // ---- stepping ----
+  function seek(t) {
+    return new Promise(res => {
+      const d = isFinite(video.duration) ? video.duration : t;
+      t = Math.max(0, Math.min(d, t));
+      if (Math.abs(video.currentTime - t) < 1e-6 && video.readyState >= 2) return res();
+      let done = false;
+      const finish = () => { if (done) return; done = true; res(); };
+      video.addEventListener('seeked', () => {
+        if ('requestVideoFrameCallback' in video) { video.requestVideoFrameCallback(finish); setTimeout(finish, 250); }
+        else finish();
+      }, { once: true });
+      video.currentTime = t;
+    });
+  }
+  const step = n => { if (busy || !video.duration) return; video.pause(); seek(video.currentTime + n / fps()); };
+
+  $('#prev').addEventListener('click', () => step(-1));
+  $('#next').addEventListener('click', () => step(1));
+  $('#play').addEventListener('click', () => { if (busy) return; video.paused ? video.play().catch(() => {}) : video.pause(); });
+  scrub.addEventListener('input', () => { video.pause(); video.currentTime = parseFloat(scrub.value); });
+  document.addEventListener('keydown', e => {
+    if (!stage.classList.contains('loaded') || /INPUT|SELECT|TEXTAREA/.test(e.target.tagName) && e.target.type !== 'range') return;
+    if (e.key === 'ArrowLeft' || e.key === ',') { e.preventDefault(); step(-1); }
+    else if (e.key === 'ArrowRight' || e.key === '.') { e.preventDefault(); step(1); }
+    else if (e.key === 'Enter' || e.key === 'g') { e.preventDefault(); grab(); }
+  });
+
+  // ---- grabbing ----
+  const canvas = document.createElement('canvas');
+  const thumb = document.createElement('canvas');
+
+  async function capture() {
+    const w = video.videoWidth, h = video.videoHeight;
+    if (!w || !h) throw new Error('no picture');
+    canvas.width = w; canvas.height = h;
+    canvas.getContext('2d').drawImage(video, 0, 0, w, h);
+    const type = 'image/' + fmtIn.value;
+    const blob = await new Promise((res, rej) => canvas.toBlob(b => b ? res(b) : rej(new Error('encode')), type, 0.92));
+    const tw = Math.min(320, w), th = Math.round(h * tw / w);
+    thumb.width = tw; thumb.height = th;
+    thumb.getContext('2d').drawImage(canvas, 0, 0, tw, th);
+    const t = video.currentTime;
+    return { t, blob, thumb: thumb.toDataURL('image/jpeg', 0.7),
+      file: name + '_' + stamp(t) + '.' + (fmtIn.value === 'jpeg' ? 'jpg' : 'png') };
+  }
+
+  function add(f) {
+    if (frames.some(x => x.file === f.file)) return;
+    frames.push(f);
+    frames.sort((a, b) => a.t - b.t);
+    render();
+  }
+
+  async function grab() {
+    if (busy || !stage.classList.contains('loaded')) return;
+    video.pause();
+    try { add(await capture()); say('Grabbed ' + fmtTime(video.currentTime) + '.'); }
+    catch { say('Could not grab this frame.', true); }
+  }
+  $('#grab').addEventListener('click', grab);
+
+  $('#grab-every').addEventListener('click', async () => {
+    if (busy) { cancel = true; return; }
+    const n = parseFloat(everyIn.value), d = video.duration;
+    if (!(n > 0)) return say('Set "every" to a number of seconds above 0.', true);
+    if (!isFinite(d) || !d) return say('This video does not report its length.', true);
+    const total = Math.max(1, Math.ceil(d / n - 1e-9));
+    if (total > MAX_BATCH) return say('That is ' + total + ' frames. Use a bigger interval (limit ' + MAX_BATCH + ').', true);
+    busy = true; cancel = false; video.pause();
+    const btn = $('#grab-every'); btn.textContent = 'stop';
+    let got = 0;
+    try {
+      for (let i = 0; i < total && !cancel; i++) {
+        // Stay a hair inside the end so the last frame decodes.
+        await seek(Math.min(i * n, Math.max(0, d - 0.001)));
+        add(await capture());
+        got++;
+        say('Grabbing ' + got + ' of ' + total + '…');
+      }
+      say((cancel ? 'Stopped after ' : 'Grabbed ') + got + ' frame' + (got === 1 ? '' : 's') + '.');
+    } catch { say('Stopped: could not grab a frame at ' + fmtTime(video.currentTime) + '.', true); }
+    busy = false; btn.textContent = 'grab every N s';
+  });
+
+  // ---- results ----
+  function render() {
+    $('#out').hidden = !frames.length;
+    $('#count').textContent = frames.length + ' frame' + (frames.length === 1 ? '' : 's');
+    list.textContent = '';
+    frames.forEach((f, i) => {
+      if (!f.url) f.url = URL.createObjectURL(f.blob);
+      const li = document.createElement('li');
+      const img = document.createElement('img');
+      img.src = f.thumb; img.alt = 'frame at ' + fmtTime(f.t);
+      img.addEventListener('click', () => { if (!busy) { video.pause(); seek(f.t); } });
+      const t = document.createElement('span'); t.className = 't'; t.textContent = fmtTime(f.t);
+      const acts = document.createElement('div'); acts.className = 'acts';
+      const a = document.createElement('a'); a.href = f.url; a.download = f.file; a.textContent = 'save';
+      const x = document.createElement('button'); x.type = 'button'; x.textContent = '×'; x.setAttribute('aria-label', 'remove');
+      x.addEventListener('click', () => { URL.revokeObjectURL(f.url); frames.splice(i, 1); render(); });
+      acts.append(a, x); li.append(img, t, acts); list.append(li);
+    });
+  }
+
+  $('#clear').addEventListener('click', () => { frames.forEach(f => URL.revokeObjectURL(f.url)); frames = []; render(); say(''); });
+
+  // Minimal uncompressed ZIP (images are already compressed).
+  const CRC = new Uint32Array(256).map((_, n) => { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; return c >>> 0; });
+  const crc32 = b => { let c = ~0; for (let i = 0; i < b.length; i++) c = CRC[(c ^ b[i]) & 255] ^ (c >>> 8); return ~c >>> 0; };
+
+  async function zip(files) {
+    const parts = [], central = [];
+    let off = 0;
+    for (const f of files) {
+      const data = new Uint8Array(await f.blob.arrayBuffer());
+      const nm = new TextEncoder().encode(f.file), crc = crc32(data);
+      const h = new DataView(new ArrayBuffer(30));
+      h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(12, 33, true);
+      h.setUint32(14, crc, true); h.setUint32(18, data.length, true); h.setUint32(22, data.length, true);
+      h.setUint16(26, nm.length, true);
+      const c = new DataView(new ArrayBuffer(46));
+      c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint16(14, 33, true);
+      c.setUint32(16, crc, true); c.setUint32(20, data.length, true); c.setUint32(24, data.length, true);
+      c.setUint16(28, nm.length, true); c.setUint32(42, off, true);
+      parts.push(h, nm, data); central.push(c, nm);
+      off += 30 + nm.length + data.length;
+    }
+    const size = central.reduce((s, p) => s + p.byteLength, 0);
+    const e = new DataView(new ArrayBuffer(22));
+    e.setUint32(0, 0x06054b50, true); e.setUint16(8, files.length, true); e.setUint16(10, files.length, true);
+    e.setUint32(12, size, true); e.setUint32(16, off, true);
+    return new Blob([...parts, ...central, e], { type: 'application/zip' });
+  }
+
+  $('#zip').addEventListener('click', async () => {
+    if (!frames.length) return;
+    say('Packing ' + frames.length + ' frames…');
+    try {
+      const url = URL.createObjectURL(await zip(frames));
+      const a = document.createElement('a'); a.href = url; a.download = name + '_frames.zip';
+      document.body.append(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 30000);
+      say('Saved ' + name + '_frames.zip.');
+    } catch { say('Could not build the zip.', true); }
+  });
+})();
+</script>
+</body>
+</html>
