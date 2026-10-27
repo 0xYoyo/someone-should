@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool for making mind maps</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+#app { max-width: 960px; }
+#outline { min-height: 132px; resize: vertical; font: 16px/1.5 var(--mono); tab-size: 2; white-space: pre; overflow-x: auto; }
+.mapbox { user-select: none; -webkit-user-select: none; border: 1.5px solid var(--line); border-radius: var(--radius); overflow: hidden; touch-action: none; position: relative; }
+#map { display: block; width: 100%; height: auto; min-height: 220px; user-select: none; -webkit-user-select: none; }
+#map .edge { fill: none; stroke: var(--meta); stroke-width: 1.5; }
+#map g.node { cursor: grab; }
+#map g.node rect { fill: var(--paper); stroke: var(--ink); stroke-width: 1.5; }
+#map g.node.root rect { fill: var(--ink); }
+#map g.node.root text { fill: var(--paper); font-weight: 600; }
+#map g.node.sel rect { stroke-width: 3.5; }
+#map text { fill: var(--ink); font: 16px var(--sans); dominant-baseline: central; text-anchor: middle; pointer-events: none; }
+#empty[hidden] { display: none; }
+#empty { pointer-events: none; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; margin: 0; padding: 16px; text-align: center; }
+.row > input { flex: 1 1 160px; width: auto; }
+.row button { flex: 0 0 auto; }
+#file { display: none; }
+#count, #msg { font-size: 15px; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool for making mind maps</h1>
+
+<main id="app" class="stack">
+  <textarea id="outline" aria-label="Outline" spellcheck="false" placeholder="Central idea
+  Branch
+    Detail
+  Another branch"></textarea>
+  <div class="mapbox">
+    <svg id="map" viewBox="0 0 360 220" role="img" aria-label="Mind map"></svg>
+    <p id="empty" class="empty">Type an outline above, or add a central idea below.</p>
+  </div>
+  <div class="row">
+    <input id="child" type="text" aria-label="New node" autocomplete="off" placeholder="Central idea">
+    <button id="add" class="primary">Add</button>
+    <button id="del">Delete</button>
+  </div>
+  <div class="row">
+    <button id="svg">SVG</button>
+    <button id="png">PNG</button>
+    <button id="json">JSON</button>
+    <button id="open">Open</button>
+    <button id="reset">Tidy</button>
+    <input id="file" type="file" accept=".json,application/json">
+  </div>
+  <p class="meta"><span id="count">0 nodes</span> <span id="msg">Tap a node to add under it. Drag to move.</span></p>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  // storage helper — never throws
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  const NS = document.getElementById("map").namespaceURI;
+  const H = 38, GAP_Y = 12, GAP_X = 44, MAX_CHARS = 32;
+  const outline = $('#outline'), svg = $('#map'), child = $('#child'), msg = $('#msg');
+
+  let root = null;          // { text, key, children: [] }
+  let offsets = store.get('mm.offsets', {});   // key -> [dx, dy], applied to a node and its branch
+  let selected = null;      // key
+  let nodes = [];           // flat list after layout
+  let viewBox = null;       // frozen while dragging
+
+  const say = t => { msg.textContent = t; };
+
+  // ---- outline <-> tree ----
+  function parse(src) {
+    let top = null; const stack = [];
+    for (const raw of src.split('\n')) {
+      if (!raw.trim()) continue;
+      const lead = raw.match(/^[ \t]*/)[0].replace(/\t/g, '  ').length;
+      const text = raw.trim().replace(/^[-*+•]\s+/, '') || raw.trim();
+      const node = { text, children: [] };
+      if (!top) { top = node; stack.push({ indent: -Infinity, node }); continue; }
+      while (stack.length > 1 && stack[stack.length - 1].indent >= lead) stack.pop();
+      stack[stack.length - 1].node.children.push(node);
+      stack.push({ indent: lead, node });
+    }
+    if (top) assignKeys(top, '');
+    return top;
+  }
+  function assignKeys(n, prefix) {
+    n.key = prefix + '/' + n.text;
+    const seen = {};
+    for (const c of n.children) {
+      const base = n.key; seen[c.text] = (seen[c.text] || 0) + 1;
+      assignKeys(c, seen[c.text] > 1 ? base + '#' + seen[c.text] : base);
+    }
+  }
+  function serialize(n, depth = 0) {
+    return '  '.repeat(depth) + n.text + '\n' + n.children.map(c => serialize(c, depth + 1)).join('');
+  }
+  const walk = (n, f, parent = null) => { f(n, parent); n.children.forEach(c => walk(c, f, n)); };
+  const find = key => { let hit = null; if (root) walk(root, n => { if (n.key === key) hit = n; }); return hit; };
+
+  // ---- layout ----
+  const ctx = document.createElement('canvas').getContext('2d');
+  function label(t) { return t.length > MAX_CHARS ? t.slice(0, MAX_CHARS - 1) + '…' : t; }
+  function measure(n, isRoot) {
+    ctx.font = (isRoot ? '600 ' : '') + '16px ' + getComputedStyle(document.body).fontFamily;
+    n.label = label(n.text);
+    n.w = Math.ceil(ctx.measureText(n.label).width) + 28;
+    n.h = H;
+  }
+  function span(n) {
+    if (!n.children.length) return (n.span = n.h);
+    const s = n.children.reduce((a, c) => a + span(c), 0) + GAP_Y * (n.children.length - 1);
+    return (n.span = Math.max(n.h, s));
+  }
+  function placeKids(list, parent, dir, top) {
+    let y = top;
+    for (const c of list) {
+      c.x = parent.x + dir * (parent.w / 2 + GAP_X + c.w / 2);
+      c.y = y + c.span / 2;
+      placeKids(c.children, c, dir, c.y - (c.children.reduce((a, k) => a + k.span, 0) + GAP_Y * (c.children.length - 1)) / 2);
+      y += c.span + GAP_Y;
+    }
+  }
+  function layout() {
+    nodes = [];
+    if (!root) return;
+    walk(root, (n, p) => { measure(n, !p); n.parent = p; nodes.push(n); });
+    walk(root, n => span(n));
+    root.x = 0; root.y = 0;
+    const k = root.children, cut = Math.ceil(k.length / 2);
+    const sides = [[k.slice(0, cut), 1], [k.slice(cut), -1]];
+    for (const [list, dir] of sides) {
+      const total = list.reduce((a, c) => a + c.span, 0) + GAP_Y * Math.max(0, list.length - 1);
+      placeKids(list, root, dir, -total / 2);
+    }
+    // apply drag offsets down each branch
+    walk(root, (n, p) => {
+      const o = offsets[n.key] || [0, 0];
+      n.dx = (p ? p.dx : 0) + o[0]; n.dy = (p ? p.dy : 0) + o[1];
+      n.cx = n.x + n.dx; n.cy = n.y + n.dy;
+    });
+  }
+
+  // ---- render ----
+  function el(tag, attrs) { const e = document.createElementNS(NS, tag); for (const a in attrs) e.setAttribute(a, attrs[a]); return e; }
+  function edgePath(p, c) {
+    const dir = c.cx >= p.cx ? 1 : -1;
+    const x1 = p.cx + dir * p.w / 2, x2 = c.cx - dir * c.w / 2, mx = (x1 + x2) / 2;
+    return `M${x1},${p.cy} C${mx},${p.cy} ${mx},${c.cy} ${x2},${c.cy}`;
+  }
+  function render() {
+    layout();
+    svg.textContent = '';
+    $('#empty').hidden = !!root;
+    const n = nodes.length;
+    $('#count').textContent = n + (n === 1 ? ' node' : ' nodes');
+    const sel = selected && find(selected);
+    child.placeholder = !root ? 'Central idea' : 'Add under ' + (sel || root).label;
+    if (!root) { svg.setAttribute('viewBox', '0 0 360 220'); return; }
+    const edges = el('g', {});
+    for (const c of nodes) if (c.parent) edges.appendChild(el('path', { class: 'edge', d: edgePath(c.parent, c) }));
+    svg.appendChild(edges);
+    for (const c of nodes) {
+      const g = el('g', { class: 'node' + (c.parent ? '' : ' root') + (c.key === selected ? ' sel' : ''), transform: `translate(${c.cx},${c.cy})` });
+      g.dataset.key = c.key;
+      g.appendChild(el('rect', { x: -c.w / 2, y: -c.h / 2, width: c.w, height: c.h, rx: c.parent ? 6 : 19 }));
+      const t = el('text', { x: 0, y: 1 }); t.textContent = c.label; g.appendChild(t);
+      if (c.label !== c.text) { const tt = el('title', {}); tt.textContent = c.text; g.appendChild(tt); }
+      svg.appendChild(g);
+    }
+    if (!viewBox) {
+      let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      for (const c of nodes) {
+        x0 = Math.min(x0, c.cx - c.w / 2); x1 = Math.max(x1, c.cx + c.w / 2);
+        y0 = Math.min(y0, c.cy - c.h / 2); y1 = Math.max(y1, c.cy + c.h / 2);
+      }
+      const pad = 16; let w = x1 - x0 + pad * 2, h = y1 - y0 + pad * 2;
+      const minW = 360, minH = 220;
+      if (w < minW) { x0 -= (minW - w) / 2; w = minW; }
+      if (h < minH) { y0 -= (minH - h) / 2; h = minH; }
+      svg.setAttribute('viewBox', `${x0 - pad} ${y0 - pad} ${w} ${h}`);
+    }
+  }
+
+  function save() {
+    store.set('mm.outline', outline.value);
+    store.set('mm.offsets', offsets);
+  }
+  function fromOutline() {
+    root = parse(outline.value);
+    if (selected && !find(selected)) selected = null;
+    render(); save();
+  }
+  function commitTree() {
+    outline.value = root ? serialize(root) : '';
+    root = parse(outline.value);
+    render(); save();
+  }
+
+  // ---- editing ----
+  outline.addEventListener('input', fromOutline);
+  outline.addEventListener('keydown', e => {
+    if (e.key !== 'Tab') return;
+    e.preventDefault();
+    const s = outline.selectionStart, end = outline.selectionEnd, v = outline.value;
+    const ls = v.lastIndexOf('\n', s - 1) + 1;
+    if (e.shiftKey) {
+      if (v.slice(ls, ls + 2) === '  ') { outline.value = v.slice(0, ls) + v.slice(ls + 2); outline.selectionStart = outline.selectionEnd = Math.max(ls, s - 2); }
+    } else {
+      outline.value = v.slice(0, ls) + '  ' + v.slice(ls); outline.selectionStart = s + 2; outline.selectionEnd = end + 2;
+    }
+    fromOutline();
+  });
+
+  function addNode() {
+    const text = child.value.trim().replace(/\s+/g, ' ');
+    if (!text) { say('Type a word first.'); child.focus(); return; }
+    if (!root) { outline.value = text + '\n'; root = parse(outline.value); selected = root.key; }
+    else {
+      const parent = (selected && find(selected)) || root;
+      parent.children.push({ text, children: [] });
+      selected = parent.key;
+      outline.value = serialize(root);
+      root = parse(outline.value);
+    }
+    child.value = '';
+    say('Added ' + label(text) + '.');
+    render(); save();
+  }
+  $('#add').addEventListener('click', addNode);
+  child.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addNode(); } });
+
+  $('#del').addEventListener('click', () => {
+    const n = selected && find(selected);
+    if (!n) { say('Tap a node to select it first.'); return; }
+    if (!n.parent) { root = null; offsets = {}; }
+    else n.parent.children.splice(n.parent.children.indexOf(n), 1);
+    delete offsets[n.key];
+    selected = n.parent ? n.parent.key : null;
+    say('Deleted ' + n.label + '.');
+    commitTree();
+  });
+  $('#reset').addEventListener('click', () => { offsets = {}; render(); save(); say('Layout tidied.'); });
+
+  // ---- drag & select ----
+  function toSvg(e) {
+    const m = svg.getScreenCTM();
+    if (!m) return { x: 0, y: 0 };
+    const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(m.inverse());
+    return { x: p.x, y: p.y };
+  }
+  let drag = null;
+  svg.addEventListener('pointerdown', e => {
+    const g = e.target.closest && e.target.closest('g.node');
+    if (!g) return;
+    e.preventDefault();
+    const key = g.dataset.key;
+    drag = { key, start: toSvg(e), base: (offsets[key] || [0, 0]).slice(), moved: false, id: e.pointerId };
+    try { svg.setPointerCapture(e.pointerId); } catch {}
+  });
+  svg.addEventListener('pointermove', e => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const p = toSvg(e), dx = p.x - drag.start.x, dy = p.y - drag.start.y;
+    if (!drag.moved && Math.hypot(dx, dy) < 6) return;
+    if (!drag.moved) { drag.moved = true; viewBox = svg.getAttribute('viewBox'); }
+    offsets[drag.key] = [drag.base[0] + dx, drag.base[1] + dy];
+    render();
+  });
+  function endDrag(e) {
+    if (!drag || e.pointerId !== drag.id) return;
+    const d = drag; drag = null; viewBox = null;
+    if (!d.moved) {
+      selected = selected === d.key ? null : d.key;
+      const n = find(selected);
+      say(n ? 'Selected ' + n.label + '.' : 'Tap a node to add under it. Drag to move.');
+    }
+    render(); save();
+  }
+  svg.addEventListener('pointerup', endDrag);
+  svg.addEventListener('pointercancel', endDrag);
+  svg.addEventListener('click', e => { if (!e.target.closest('g.node') && selected) { selected = null; render(); } });
+
+  // ---- export / import ----
+  const fileName = ext => (((root && root.text) || '').replace(/[^\w\- ]+/g, '').trim().slice(0, 40).replace(/\s+/g, '-').toLowerCase() || 'mind-map') + '.' + ext;
+  function download(blob, name) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  }
+  function standaloneSvg() {
+    const prev = selected; selected = null; render();
+    const vb = svg.getAttribute('viewBox').split(' ').map(Number);
+    const out = svg.cloneNode(true);
+    selected = prev; render();
+    out.setAttribute('width', vb[2]); out.setAttribute('height', vb[3]);
+    out.removeAttribute('id');
+    const font = getComputedStyle(document.body).fontFamily.replace(/"/g, "'");
+    const style = el('style', {});
+    style.textContent = `.edge{fill:none;stroke:#6b6b6b;stroke-width:1.5}.node rect{fill:#f4f1ea;stroke:#141414;stroke-width:1.5}.root rect{fill:#141414}text{fill:#141414;font:16px ${font};dominant-baseline:central;text-anchor:middle}.root text{fill:#f4f1ea;font-weight:600}`;
+    const bg = el('rect', { x: vb[0], y: vb[1], width: vb[2], height: vb[3], fill: '#f4f1ea' });
+    out.insertBefore(bg, out.firstChild); out.insertBefore(style, out.firstChild);
+    return { text: new XMLSerializer().serializeToString(out), w: vb[2], h: vb[3] };
+  }
+  const needMap = () => { if (!root) { say('Nothing to export yet.'); return true; } return false; };
+  $('#svg').addEventListener('click', () => {
+    if (needMap()) return;
+    download(new Blob([standaloneSvg().text], { type: 'image/svg+xml' }), fileName('svg'));
+    say('Saved SVG.');
+  });
+  $('#png').addEventListener('click', () => {
+    if (needMap()) return;
+    const s = standaloneSvg(), img = new Image(), scale = 2;
+    img.onload = () => {
+      try {
+        const c = document.createElement('canvas');
+        c.width = Math.ceil(s.w * scale); c.height = Math.ceil(s.h * scale);
+        const g = c.getContext('2d'); g.scale(scale, scale); g.drawImage(img, 0, 0);
+        c.toBlob(b => { if (b) { download(b, fileName('png')); say('Saved PNG.'); } else say('This browser could not make a PNG. Try SVG.'); }, 'image/png');
+      } catch { say('This browser could not make a PNG. Try SVG.'); }
+    };
+    img.onerror = () => say('This browser could not make a PNG. Try SVG.');
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(s.text);
+  });
+  $('#json').addEventListener('click', () => {
+    if (needMap()) return;
+    const strip = n => ({ text: n.text, children: n.children.map(strip) });
+    const data = { mindmap: 1, outline: serialize(root), tree: strip(root), offsets };
+    download(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }), fileName('json'));
+    say('Saved JSON.');
+  });
+  $('#open').addEventListener('click', () => $('#file').click());
+  $('#file').addEventListener('change', e => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try {
+        const d = JSON.parse(r.result);
+        const fromTree = n => n.text + '\n' + (n.children || []).map(c => fromTree(c).replace(/^/gm, '  ').replace(/ +$/, '')).join('');
+        const text = typeof d.outline === 'string' ? d.outline : d.tree ? fromTree(d.tree) : null;
+        if (!text) throw 0;
+        outline.value = text; offsets = d.offsets && typeof d.offsets === 'object' ? d.offsets : {};
+        selected = null; fromOutline(); say('Opened ' + f.name + '.');
+      } catch { say('That file is not a mind map JSON.'); }
+      e.target.value = '';
+    };
+    r.onerror = () => say('Could not read that file.');
+    r.readAsText(f);
+  });
+
+  outline.value = store.get('mm.outline', '');
+  fromOutline();
+})();
+</script>
+</body>
+</html>

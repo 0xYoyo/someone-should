@@ -1,0 +1,78 @@
+{
+  "slug": "mind-map-maker",
+  "wish": "someone should make a tool for making mind maps",
+  "year": 2014,
+  "agreed": 34,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/234/what-are-alternatives-for-mindjets-mind-mapping-software",
+      "date": "2014-02-05",
+      "points": 9,
+      "comments": 4
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/47540/non-hierarchical-mind-map-software",
+      "date": "2017-12-11",
+      "points": 6,
+      "comments": 2
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/16758/free-mind-mapping-software-for-windows-and-android",
+      "date": "2015-01-30",
+      "points": 6,
+      "comments": 1
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/24937/cross-platform-offline-mindmapping",
+      "date": "2015-09-19",
+      "points": 5,
+      "comments": 1
+    }
+  ],
+  "spec": "Turns an indented outline, or nodes added one at a time, into a two-sided mind map you can drag around.\nType or paste an outline (two spaces per level), or tap a node and add under it; drag nodes to rearrange, then save as SVG, PNG or JSON and reopen the JSON later.\nIt does not sync, share, or draw links between unrelated branches.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#outline",
+        "text": "Trip\n  Budget\n  Dates"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#map g.node",
+        "count": 3
+      }
+    },
+    {
+      "type": {
+        "sel": "#child",
+        "text": "Packing"
+      }
+    },
+    {
+      "tap": "#add"
+    },
+    {
+      "expect": {
+        "sel": "#map",
+        "contains": "Packing"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#count",
+        "matches": "^4 nodes"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:56:46Z",
+  "model": "opus-5.5",
+  "minutes": 7,
+  "approved": false,
+  "notes": "Works offline; map and layout persist in localStorage."
+}
