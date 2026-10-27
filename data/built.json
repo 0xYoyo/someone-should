@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T01:54:09.538Z",
+ "updated": "2026-10-27T01:54:21.317Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -572,6 +572,78 @@
    "built": "2026-10-27T01:50:11Z",
    "minutes": 6,
    "approved": false
+  },
+  {
+   "slug": "big-json-viewer",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "offline-qr-code-maker",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "memorable-password-maker",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "measure-on-a-photo",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "gif-animation-maker",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "seamless-pixel-tile-maker",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "geometric-avatar-maker",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "image-color-extractor",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "simple-sketch-pad",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "mind-map-maker",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "flowchart-maker",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
+  },
+  {
+   "slug": "visual-equation-editor",
+   "status": "pending",
+   "attempts": 1,
+   "model": "opus-5.5"
   }
  ]
 }
