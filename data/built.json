@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T01:44:48.687Z",
+ "updated": "2026-10-27T01:45:38.651Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -368,9 +368,14 @@
   },
   {
    "slug": "hide-text-in-image",
-   "status": "pending",
+   "status": "pass",
    "attempts": 1,
-   "model": "opus-5.5"
+   "model": "opus-5.5",
+   "kb": 16.3,
+   "tests": "6/6",
+   "built": "2026-10-27T01:43:13Z",
+   "minutes": 9,
+   "approved": false
   },
   {
    "slug": "run-a-checklist",

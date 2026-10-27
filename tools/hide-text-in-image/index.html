@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that hides data inside images</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+
+/* ---- tool styles below ---- */
+.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+.seg button { border-radius: 0; }
+.seg button:first-child { border-radius: var(--radius) 0 0 var(--radius); }
+.seg button:last-child { border-radius: 0 var(--radius) var(--radius) 0; border-left: 0; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.pane[hidden] { display: none; }
+.pick { display: inline-flex; align-items: center; justify-content: center; min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); border-radius: var(--radius); cursor: pointer; }
+.pick input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.pick:focus-within { outline: 2px solid var(--ink); outline-offset: 2px; }
+canvas, img.out { display: block; max-width: 100%; height: auto; max-height: 260px; object-fit: contain; border: 1px solid var(--line); border-radius: var(--radius); }
+textarea { min-height: 120px; resize: vertical; }
+a.btn { display: inline-flex; align-items: center; justify-content: center; min-height: var(--tap); padding: 0 18px; border-radius: var(--radius); background: var(--ink); color: var(--paper); text-decoration: none; }
+.line { min-height: 1.45em; }
+.err { color: var(--no); }
+#found { white-space: pre-wrap; word-break: break-word; border-left: 3px solid var(--ink); padding: 4px 0 4px 12px; }
+#found:empty { display: none; }
+.file { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.file[hidden], #result[hidden] { display: none; }
+.file span { overflow-wrap: anywhere; }
+
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that hides data inside images</h1>
+
+<main id="app" class="stack">
+  <div class="seg" role="group">
+    <button id="tab-hide" type="button" aria-pressed="true">Hide</button>
+    <button id="tab-reveal" type="button" aria-pressed="false">Reveal</button>
+  </div>
+
+  <section id="pane-hide" class="pane stack">
+    <canvas id="src" width="480" height="360" aria-label="image to hide data in"></canvas>
+    <div class="row">
+      <label class="pick">Choose image<input id="img" type="file" accept="image/*"></label>
+      <span id="srcinfo" class="meta">sample image</span>
+    </div>
+    <textarea id="msg" placeholder="Message to hide" aria-label="message to hide"></textarea>
+    <div class="row">
+      <label class="pick">Add a file<input id="att" type="file"></label>
+      <button id="att-clear" type="button" hidden>Remove file</button>
+    </div>
+    <div id="attinfo" class="meta line"></div>
+    <input id="pw" type="password" autocomplete="new-password" placeholder="Password (optional)" aria-label="password, optional">
+    <div id="cap" class="meta line"></div>
+    <button id="hide" class="primary" type="button">Hide it in the image</button>
+    <div id="hideerr" class="err line" role="status"></div>
+    <div id="result" class="stack" hidden>
+      <img id="outimg" class="out" alt="image with hidden data">
+      <div class="row">
+        <a id="dl" class="btn" download="image.png" href="#">Save image</a>
+        <button id="check" type="button">Check it</button>
+      </div>
+      <div class="meta">Send it as a file. Apps that recompress photos erase what is hidden.</div>
+    </div>
+  </section>
+
+  <section id="pane-reveal" class="pane stack" hidden>
+    <div class="row">
+      <label class="pick">Open image<input id="rimg" type="file" accept="image/png,image/*"></label>
+      <span id="rinfo" class="meta"></span>
+    </div>
+    <input id="rpw" type="password" autocomplete="current-password" placeholder="Password, if one was set" aria-label="password">
+    <button id="reveal" class="primary" type="button">Reveal</button>
+    <div id="rerr" class="line" role="status"></div>
+    <div id="found"></div>
+    <div id="foundfile" class="file" hidden><span id="ffname"></span><a id="ffdl" class="btn" href="#" download>Save file</a></div>
+  </section>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  // storage helper — never throws
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  const MAGIC = [0x53, 0x53, 0x01];
+  const HEAD = 8; // magic(3) + flags(1) + length(4)
+  const F_CRYPT = 1, F_FILE = 2;
+  const enc = new TextEncoder(), dec = new TextDecoder();
+
+  const src = $('#src');
+  const sctx = src.getContext('2d', { willReadFrequently: true });
+  let attachment = null; // { name, bytes }
+  let lastOut = null;    // ImageData of the last image we produced
+  let urls = [];
+
+  // ---- tabs
+  const tab = which => {
+    const hide = which === 'hide';
+    $('#tab-hide').setAttribute('aria-pressed', hide);
+    $('#tab-reveal').setAttribute('aria-pressed', !hide);
+    $('#pane-hide').hidden = !hide;
+    $('#pane-reveal').hidden = hide;
+  };
+  $('#tab-hide').onclick = () => tab('hide');
+  $('#tab-reveal').onclick = () => tab('reveal');
+
+  // ---- images
+  function sample() {
+    const w = src.width, h = src.height, img = sctx.createImageData(w, h), d = img.data;
+    let seed = 7;
+    const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const i = (y * w + x) * 4, n = rnd() * 18;
+      const sky = y < h * 0.62;
+      d[i] = sky ? 200 + (y / h) * 60 + n : 70 + n + (x / w) * 30;
+      d[i + 1] = sky ? 190 + (y / h) * 40 + n : 92 + n;
+      d[i + 2] = sky ? 170 - (y / h) * 30 + n : 64 + n;
+      d[i + 3] = 255;
+    }
+    sctx.putImageData(img, 0, 0);
+    showCap();
+  }
+
+  async function loadImage(file) {
+    if (window.createImageBitmap) {
+      try { return await createImageBitmap(file, { premultiplyAlpha: 'none', colorSpaceConversion: 'none' }); } catch {}
+    }
+    const url = await new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(r.result); r.onerror = no; r.readAsDataURL(file); });
+    return new Promise((ok, no) => { const im = new Image(); im.onload = () => ok(im); im.onerror = no; im.src = url; });
+  }
+
+  function toImageData(bmp) {
+    const c = document.createElement('canvas');
+    c.width = bmp.width; c.height = bmp.height;
+    const x = c.getContext('2d', { willReadFrequently: true });
+    x.drawImage(bmp, 0, 0);
+    return x.getImageData(0, 0, c.width, c.height);
+  }
+
+  const MAX_PX = 16e6;
+
+  $('#img').onchange = async e => {
+    const f = e.target.files[0]; if (!f) return;
+    $('#hideerr').textContent = '';
+    try {
+      const bmp = await loadImage(f);
+      if (bmp.width * bmp.height > MAX_PX) throw new Error('too big');
+      src.width = bmp.width; src.height = bmp.height;
+      sctx.drawImage(bmp, 0, 0);
+      $('#srcinfo').textContent = `${bmp.width} × ${bmp.height}`;
+      $('#result').hidden = true;
+      showCap();
+    } catch (err) {
+      $('#hideerr').textContent = err.message === 'too big' ? 'That image is too large. Try one under 16 megapixels.' : 'Could not open that image.';
+    }
+    e.target.value = '';
+  };
+
+  // ---- payload
+  const capacity = (w, h) => Math.floor(w * h * 3 / 8) - HEAD;
+  const kb = n => n < 1024 ? `${n} bytes` : `${(n / 1024).toFixed(n < 10240 ? 1 : 0)} kB`;
+
+  function plain() {
+    const text = enc.encode($('#msg').value);
+    if (!attachment) return { flags: 0, bytes: text };
+    const name = enc.encode(attachment.name).slice(0, 255);
+    const b = new Uint8Array(1 + name.length + attachment.bytes.length);
+    b[0] = name.length; b.set(name, 1); b.set(attachment.bytes, 1 + name.length);
+    return { flags: F_FILE, bytes: b };
+  }
+
+  function showCap() {
+    const cap = capacity(src.width, src.height);
+    const used = plain().bytes.length + ($('#pw').value ? 44 : 0);
+    const el = $('#cap');
+    el.textContent = `${kb(used)} of ${kb(cap)}`;
+    el.classList.toggle('err', used > cap);
+  }
+  $('#msg').oninput = showCap;
+  $('#pw').oninput = showCap;
+
+  $('#att').onchange = async e => {
+    const f = e.target.files[0]; if (!f) return;
+    attachment = { name: f.name, bytes: new Uint8Array(await f.arrayBuffer()) };
+    $('#attinfo').textContent = `${f.name}, ${kb(f.size)}`;
+    $('#att-clear').hidden = false;
+    e.target.value = '';
+    showCap();
+  };
+  $('#att-clear').onclick = () => {
+    attachment = null; $('#attinfo').textContent = ''; $('#att-clear').hidden = true; showCap();
+  };
+
+  // ---- crypto (AES-GCM, key from password via PBKDF2)
+  async function key(pw, salt) {
+    const base = await crypto.subtle.importKey('raw', enc.encode(pw), 'PBKDF2', false, ['deriveKey']);
+    return crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: 150000, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+  }
+  async function seal(bytes, pw) {
+    const salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
+    const ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, await key(pw, salt), bytes));
+    const out = new Uint8Array(28 + ct.length);
+    out.set(salt); out.set(iv, 16); out.set(ct, 28);
+    return out;
+  }
+  async function open(bytes, pw) {
+    const k = await key(pw, bytes.slice(0, 16));
+    return new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: bytes.slice(16, 28) }, k, bytes.slice(28)));
+  }
+
+  // ---- bits: one bit in the lowest bit of each R, G, B value, most significant bit first
+  function writeBits(d, bytes) {
+    for (let b = 0; b < bytes.length; b++) for (let k = 0; k < 8; k++) {
+      const c = b * 8 + k, i = (c / 3 | 0) * 4 + c % 3;
+      d[i] = (d[i] & 0xfe) | ((bytes[b] >> (7 - k)) & 1);
+    }
+  }
+  function readBits(d, start, n) {
+    const out = new Uint8Array(n);
+    for (let b = 0; b < n; b++) {
+      let v = 0;
+      for (let k = 0; k < 8; k++) {
+        const c = (start + b) * 8 + k, i = (c / 3 | 0) * 4 + c % 3;
+        v = (v << 1) | (d[i] & 1);
+      }
+      out[b] = v;
+    }
+    return out;
+  }
+
+  // ---- hide
+  $('#hide').onclick = async () => {
+    const err = $('#hideerr'); err.textContent = '';
+    let { flags, bytes } = plain();
+    if (!bytes.length) { err.textContent = 'Write a message or add a file first.'; return; }
+    const pw = $('#pw').value;
+    if (pw) {
+      if (!window.crypto || !crypto.subtle) { err.textContent = 'This browser cannot use a password here.'; return; }
+      bytes = await seal(bytes, pw); flags |= F_CRYPT;
+    }
+    const cap = capacity(src.width, src.height);
+    if (bytes.length > cap) { err.textContent = `Too much for this image: ${kb(bytes.length)} of ${kb(cap)}. Use a bigger image.`; return; }
+    const img = sctx.getImageData(0, 0, src.width, src.height), d = img.data;
+    for (let i = 3; i < d.length; i += 4) d[i] = 255; // transparent pixels would lose their colour bits
+    const all = new Uint8Array(HEAD + bytes.length);
+    all.set(MAGIC); all[3] = flags;
+    new DataView(all.buffer).setUint32(4, bytes.length);
+    all.set(bytes, HEAD);
+    writeBits(d, all);
+    lastOut = img;
+    const c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
+    c.getContext('2d').putImageData(img, 0, 0);
+    $('#outimg').src = c.toDataURL('image/png');
+    c.toBlob(blob => {
+      urls.forEach(URL.revokeObjectURL); urls = [];
+      if (!blob) return;
+      const u = URL.createObjectURL(blob); urls.push(u);
+      $('#dl').href = u;
+    }, 'image/png');
+    $('#result').hidden = false;
+  };
+
+  $('#check').onclick = () => {
+    if (!lastOut) return;
+    pending = lastOut;
+    $('#rinfo').textContent = 'the image you just made';
+    $('#rpw').value = $('#pw').value;
+    tab('reveal');
+    reveal();
+  };
+
+  // ---- reveal
+  let pending = null;
+  $('#rimg').onchange = async e => {
+    const f = e.target.files[0]; if (!f) return;
+    clearFound();
+    try {
+      const bmp = await loadImage(f);
+      if (bmp.width * bmp.height > MAX_PX) throw 0;
+      pending = toImageData(bmp);
+      $('#rinfo').textContent = f.name;
+      reveal();
+    } catch { say('Could not open that image.', true); }
+    e.target.value = '';
+  };
+  $('#reveal').onclick = () => pending ? reveal() : say('Open an image first.', true);
+
+  function say(t, bad) { const el = $('#rerr'); el.textContent = t; el.className = 'line' + (bad ? ' err' : ' meta'); }
+  function clearFound() { $('#found').textContent = ''; $('#foundfile').hidden = true; say(''); }
+
+  async function reveal() {
+    clearFound();
+    const d = pending.data, cap = capacity(pending.width, pending.height);
+    if (cap < 1) { say('Nothing hidden in this image.'); return; }
+    const h = readBits(d, 0, HEAD);
+    const len = new DataView(h.buffer).getUint32(4);
+    if (h[0] !== MAGIC[0] || h[1] !== MAGIC[1] || h[2] !== MAGIC[2] || len > cap) {
+      say('Nothing hidden in this image, or it was recompressed.'); return;
+    }
+    let bytes = readBits(d, HEAD, len);
+    const flags = h[3];
+    if (flags & F_CRYPT) {
+      const pw = $('#rpw').value;
+      if (!pw) { say('This one is locked. Enter the password.', true); $('#rpw').focus(); return; }
+      if (!window.crypto || !crypto.subtle) { say('This browser cannot unlock it.', true); return; }
+      try { bytes = await open(bytes, pw); } catch { say('Wrong password.', true); return; }
+    }
+    if (flags & F_FILE) {
+      const n = bytes[0], name = dec.decode(bytes.slice(1, 1 + n)) || 'file';
+      const body = bytes.slice(1 + n);
+      const u = URL.createObjectURL(new Blob([body])); urls.push(u);
+      $('#ffname').textContent = `${name}, ${kb(body.length)}`;
+      $('#ffdl').href = u; $('#ffdl').download = name;
+      $('#foundfile').hidden = false;
+      say('A file was hidden in this image.');
+    } else {
+      $('#found').textContent = dec.decode(bytes);
+      say(`${kb(len)} hidden in this image.`);
+    }
+  }
+
+  requestAnimationFrame(sample);
+})();
+</script>
+</body>
+</html>

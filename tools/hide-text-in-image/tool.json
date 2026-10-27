@@ -1,0 +1,51 @@
+{
+  "slug": "hide-text-in-image",
+  "wish": "someone should make a tool that hides data inside images",
+  "year": 2014,
+  "agreed": 9,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/11834/steganography-library-or-command-line-program",
+      "date": "2014-09-29",
+      "points": 7,
+      "comments": 2
+    }
+  ],
+  "spec": "Hides a message or a small file in the lowest bits of an image's pixels, optionally locked with a password (AES-GCM), and saves it as a PNG that looks unchanged.\nPick an image (or use the sample), type the message, tap Hide, save; on the other side open the PNG under Reveal.\nIt does not survive recompression: JPEG re-saves, screenshots and chat apps that shrink photos erase the hidden data.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#msg",
+        "text": "meet at the pier at six"
+      }
+    },
+    {
+      "tap": "#hide"
+    },
+    {
+      "expect": {
+        "sel": "#dl",
+        "visible": true
+      }
+    },
+    {
+      "tap": "#check"
+    },
+    {
+      "wait": 300
+    },
+    {
+      "expect": {
+        "sel": "#found",
+        "contains": "meet at the pier at six"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:43:13Z",
+  "model": "opus-5.5",
+  "minutes": 9,
+  "approved": false,
+  "notes": "Output is always PNG. Password mode uses PBKDF2 + AES-GCM via Web Crypto, offline."
+}
