@@ -1,0 +1,57 @@
+{
+  "slug": "fountain-screenplay-formatter",
+  "wish": "someone should make a tool that converts fountain screenplays to PDF",
+  "year": 2015,
+  "agreed": 13,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/17402/convert-fountain-files-to-pdf-files",
+      "date": "2015-02-23",
+      "points": 10,
+      "comments": 3
+    }
+  ],
+  "spec": "Type, paste or open a .fountain file and see it laid out as a standard screenplay: scene headings, action, character, parentheticals, dialogue, dual dialogue, transitions, title page.\nSave as PDF prints on US Letter in 12pt Courier with industry margins, page breaks and page numbers; the draft is kept on this device.\nIt does not number scenes, add MORE/CONT'D across page breaks, or upload anything.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#src",
+        "text": "INT. KITCHEN - NIGHT\n\nMary pours coffee.\n\nMARY\n(quietly)\nIt is late.\n\nCUT TO:"
+      }
+    },
+    {
+      "wait": 400
+    },
+    {
+      "expect": {
+        "sel": ".scene",
+        "contains": "INT. KITCHEN - NIGHT"
+      }
+    },
+    {
+      "expect": {
+        "sel": ".character",
+        "contains": "MARY"
+      }
+    },
+    {
+      "expect": {
+        "sel": ".paren",
+        "contains": "(quietly)"
+      }
+    },
+    {
+      "expect": {
+        "sel": ".transition",
+        "contains": "CUT TO:"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T02:04:27Z",
+  "model": "opus-5.5",
+  "minutes": 8,
+  "approved": false,
+  "notes": "PDF via the browser's print dialog (Save as PDF); no network needed."
+}

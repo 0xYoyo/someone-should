@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that converts fountain screenplays to PDF</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+#app { min-width: 0; }
+.open { display: inline-flex; align-items: center; min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); border-radius: var(--radius); cursor: pointer; }
+.open:focus-within { outline: 2px solid var(--ink); outline-offset: 2px; }
+#file { display: none; }
+#src { font: 16px/1.4 var(--mono); min-height: 40vh; resize: vertical; }
+#status { color: var(--meta); font-size: 16px; margin: 0; }
+#out { font: 16px/1.25 var(--mono); border: 1.5px solid var(--line); border-radius: var(--radius); padding: 20px 14px; min-width: 0; overflow-wrap: break-word; }
+#out p, #out div { margin: 0; }
+#out > * + * { margin-top: 1.25em; }
+#out .dlg > * + * { margin-top: 0; }
+.scene { text-transform: uppercase; font-weight: 700; }
+.action, .dialogue, .centered, .lyric { white-space: pre-wrap; }
+.character { margin-left: 37%; text-transform: uppercase; }
+.paren { margin-left: 27%; margin-right: 15%; }
+.dialogue { margin-left: 17%; margin-right: 17%; }
+.lyric { font-style: italic; }
+.transition { text-align: right; text-transform: uppercase; }
+.centered { text-align: center; }
+.pb { border-top: 1.5px dashed var(--line); }
+.dual { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.dual .character { margin-left: 20%; }
+.dual .paren { margin-left: 10%; margin-right: 0; }
+.dual .dialogue { margin: 0; }
+.tp { text-align: center; padding-bottom: 1.25em; border-bottom: 1.5px dashed var(--line); }
+.tp .t-title { font-weight: 700; text-transform: uppercase; }
+.tp .t-left { text-align: left; margin-top: 1.25em; white-space: pre-wrap; }
+.tp div { white-space: pre-wrap; }
+@media (min-width: 900px) {
+  #app { grid-template-columns: 1fr 1fr; align-items: start; }
+  #app > .row, #status { grid-column: 1 / -1; }
+  #src { min-height: 75vh; }
+}
+
+@page { size: letter; margin: 1in 1in 0.75in 1.5in; @top-right { content: counter(page) "."; font: 12pt "Courier Prime", Courier, "Courier New", monospace; } }
+@page :first { @top-right { content: none; } }
+@media print {
+  html, body { background: #fff; color: #000; padding: 0; min-height: 0; }
+  h1, #app > .row, #src, #status { display: none !important; }
+  #app { display: block; }
+  #out { border: 0; padding: 0; font: 12pt/12pt "Courier Prime", Courier, "Courier New", monospace; color: #000; }
+  #out > * + * { margin-top: 12pt; }
+  .scene, .character, .paren { break-after: avoid; }
+  .dialogue, .paren { orphans: 2; widows: 2; }
+  .character { margin-left: 2.2in; }
+  .paren { margin-left: 1.6in; margin-right: 0; width: 2in; }
+  .dialogue { margin-left: 1in; margin-right: 0; width: 3.5in; }
+  .dlg { break-inside: avoid-page; }
+  .dual { gap: 0.3in; }
+  .dual .character { margin-left: 0.9in; }
+  .dual .paren { margin-left: 0.3in; width: auto; }
+  .dual .dialogue { width: auto; }
+  .pb { border: 0; break-after: page; height: 0; }
+  .tp { border: 0; break-after: page; height: 9in; position: relative; padding-top: 3in; }
+  .tp .t-left { position: absolute; bottom: 0; left: 0; }
+  .empty { display: none; }
+}
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that converts fountain screenplays to PDF</h1>
+
+<main id="app" class="stack">
+  <div class="row">
+    <label class="open" for="file">Open .fountain</label>
+    <input id="file" type="file" accept=".fountain,.txt,.spmd,text/plain">
+    <button id="print" class="primary" type="button">Save as PDF</button>
+  </div>
+  <textarea id="src" spellcheck="false" autocapitalize="off" aria-label="Fountain text" placeholder="INT. KITCHEN - NIGHT&#10;&#10;Mary pours coffee.&#10;&#10;MARY&#10;(quietly)&#10;It is late."></textarea>
+  <p id="status" aria-live="polite"></p>
+  <article id="out" aria-label="Formatted screenplay"></article>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  // storage helper — never throws
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const src = $('#src'), out = $('#out'), status = $('#status');
+  const KEY = 'fountain-screenplay-formatter:draft';
+  const baseTitle = document.title;
+  let printTitle = '';
+
+  const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  // Fountain emphasis: ***bold italic***, **bold**, *italic*, _underline_, with \* and \_ escapes
+  function inline(s) {
+    let h = esc(s).replace(/\\\*/g, '\u0001').replace(/\\_/g, '\u0002');
+    h = h.replace(/\*\*\*(.+?)\*\*\*/g, '<b><i>$1</i></b>')
+         .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
+         .replace(/\*(.+?)\*/g, '<i>$1</i>')
+         .replace(/_(.+?)_/g, '<u>$1</u>');
+    return h.replace(/\u0001/g, '*').replace(/\u0002/g, '_');
+  }
+
+  const SCENE = /^(INT|EXT|EST|INT\.?\/EXT|I\/E)[.\s]/i;
+  const isUpper = s => /[A-Z]/.test(s) && s === s.toUpperCase();
+
+  function parseTitlePage(lines) {
+    if (!/^[A-Za-z][A-Za-z ]*:/.test(lines[0] || '')) return { tp: null, rest: lines };
+    const tp = {};
+    let key = null, i = 0;
+    for (; i < lines.length; i++) {
+      const l = lines[i];
+      if (!l.trim()) break;
+      const m = l.match(/^([A-Za-z][A-Za-z ]*):\s*(.*)$/);
+      if (m && !/^\s/.test(l)) {
+        key = m[1].toLowerCase();
+        tp[key] = m[2] ? [m[2].trim()] : [];
+      } else if (key) {
+        tp[key].push(l.trim());
+      }
+    }
+    return { tp, rest: lines.slice(i) };
+  }
+
+  function parse(text) {
+    text = text.replace(/\r\n?/g, '\n')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/\[\[[\s\S]*?\]\]/g, '');
+    const { tp, rest: lines } = parseTitlePage(text.split('\n'));
+    const blocks = [];
+    const blank = i => i < 0 || i >= lines.length || !lines[i].trim();
+
+    for (let i = 0; i < lines.length; i++) {
+      const raw = lines[i], t = raw.trim();
+      if (!t) continue;
+
+      if (/^={3,}$/.test(t)) { blocks.push({ type: 'pb' }); continue; }
+      if (/^#/.test(t) || /^=(?!=)/.test(t)) continue; // sections and synopses don't print
+
+      let m;
+      if ((m = t.match(/^>\s*(.+?)\s*<$/))) { blocks.push({ type: 'centered', text: m[1] }); continue; }
+      if ((m = t.match(/^>\s*(.+)$/))) { blocks.push({ type: 'transition', text: m[1] }); continue; }
+      if (blank(i - 1) && blank(i + 1) && isUpper(t) && /TO:$/.test(t)) { blocks.push({ type: 'transition', text: t }); continue; }
+
+      if ((m = t.match(/^\.(?!\.)(.+)$/)) || (blank(i - 1) && SCENE.test(t))) {
+        const head = (m ? m[1] : t).replace(/\s*#[^#]*#\s*$/, '');
+        blocks.push({ type: 'scene', text: head });
+        continue;
+      }
+
+      if (/^~/.test(t)) { blocks.push({ type: 'lyric', text: t.replace(/^~\s*/, '') }); continue; }
+
+      const forcedChar = /^@/.test(t);
+      const nameBase = t.replace(/^@/, '').replace(/\s*\^$/, '').replace(/\(.*?\)/g, '').trim();
+      if (!blank(i + 1) && (forcedChar || (blank(i - 1) && isUpper(nameBase) && !/[!?:]$/.test(nameBase)))) {
+        const dual = /\^$/.test(t);
+        const dlg = { type: 'dlg', name: t.replace(/^@/, '').replace(/\s*\^$/, ''), parts: [] };
+        while (!blank(i + 1) || (lines[i + 1] === '  ')) {
+          i++;
+          const d = lines[i].trim();
+          if (/^\(.*\)?$/.test(d)) dlg.parts.push({ type: 'paren', text: d });
+          else if (/^~/.test(d)) dlg.parts.push({ type: 'lyric', text: d.replace(/^~\s*/, '') });
+          else {
+            const last = dlg.parts[dlg.parts.length - 1];
+            if (last && last.type === 'dialogue') last.text += '\n' + d;
+            else dlg.parts.push({ type: 'dialogue', text: d });
+          }
+        }
+        const prev = blocks[blocks.length - 1];
+        if (dual && prev && prev.type === 'dlg') blocks[blocks.length - 1] = { type: 'dual', a: prev, b: dlg };
+        else blocks.push(dlg);
+        continue;
+      }
+
+      // action: this line and every following non-blank line
+      const para = [raw.replace(/^!/, '')];
+      while (!blank(i + 1)) para.push(lines[++i]);
+      blocks.push({ type: 'action', text: para.join('\n').replace(/\t/g, '    ') });
+    }
+    return { tp, blocks };
+  }
+
+  function dlgHTML(d) {
+    return '<div class="dlg"><p class="character">' + inline(d.name) + '</p>' +
+      d.parts.map(p => '<p class="' + p.type + '">' + inline(p.text) + '</p>').join('') + '</div>';
+  }
+
+  function titleHTML(tp) {
+    const get = k => (tp[k] || []).map(inline).join('\n');
+    const center = [
+      tp.title && '<div class="t-title">' + get('title') + '</div>',
+      tp.credit && '<div>' + get('credit') + '</div>',
+      (tp.author || tp.authors) && '<div>' + (get('author') || get('authors')) + '</div>',
+      tp.source && '<div>' + get('source') + '</div>'
+    ].filter(Boolean).join('<br>');
+    const left = ['draft date', 'date', 'contact', 'copyright', 'notes'].map(get).filter(Boolean).join('\n\n');
+    return '<section class="tp">' + center + (left ? '<div class="t-left">' + left + '</div>' : '') + '</section>';
+  }
+
+  function render() {
+    const text = src.value;
+    if (!text.trim()) {
+      out.innerHTML = '<p class="empty">Paste or open a .fountain file to see it as a screenplay.</p>';
+      status.textContent = '';
+      printTitle = '';
+      return;
+    }
+    const { tp, blocks } = parse(text);
+    let html = tp ? titleHTML(tp) : '';
+    for (const b of blocks) {
+      if (b.type === 'pb') html += '<div class="pb"></div>';
+      else if (b.type === 'dlg') html += dlgHTML(b);
+      else if (b.type === 'dual') html += '<div class="dual">' + dlgHTML(b.a) + dlgHTML(b.b) + '</div>';
+      else html += '<p class="' + b.type + '">' + inline(b.text) + '</p>';
+    }
+    out.innerHTML = html;
+    const scenes = blocks.filter(b => b.type === 'scene').length;
+    status.textContent = scenes + (scenes === 1 ? ' scene' : ' scenes');
+    printTitle = tp && tp.title ? tp.title.join(' ').replace(/[*_]/g, '').trim() : '';
+  }
+
+  let timer;
+  src.addEventListener('input', () => {
+    clearTimeout(timer);
+    timer = setTimeout(() => { render(); store.set(KEY, src.value); }, 120);
+  });
+
+  $('#file').addEventListener('change', e => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = () => { src.value = String(r.result); render(); store.set(KEY, src.value); };
+    r.onerror = () => { status.textContent = 'Could not read that file.'; };
+    r.readAsText(f);
+    e.target.value = '';
+  });
+
+  $('#print').addEventListener('click', () => {
+    render();
+    if (!src.value.trim()) { status.textContent = 'Nothing to save yet.'; return; }
+    window.print();
+  });
+
+  // the browser uses the document title as the PDF file name
+  window.addEventListener('beforeprint', () => { if (printTitle) document.title = printTitle; });
+  window.addEventListener('afterprint', () => { document.title = baseTitle; });
+
+  src.value = store.get(KEY, '');
+  render();
+})();
+</script>
+</body>
+</html>
