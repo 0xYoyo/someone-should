@@ -1,0 +1,54 @@
+{
+  "slug": "real-file-type-checker",
+  "wish": "someone should make a tool that tells a file's real type from its content, not its extension",
+  "year": 2016,
+  "agreed": 11,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/36519/determine-file-type-from-its-content-not-trusting-the-extension",
+      "date": "2016-09-28",
+      "points": 7,
+      "comments": 4
+    }
+  ],
+  "spec": "Reads the first bytes of any file you drop and names its real format from magic numbers (about 100 formats, incl. docx/xlsx/apk inside ZIPs and old Office files) and text sniffing.\nDrop or pick one or more files, or paste the first bytes as hex; each result says the real type, MIME, and whether the extension matches.\nIt does not upload anything, repair or rename files, or identify encrypted or headerless raw data.",
+  "tests": [
+    {
+      "tap": "#hexbox summary"
+    },
+    {
+      "type": {
+        "sel": "#hex",
+        "text": "89 50 4E 47 0D 0A 1A 0A 00 00 00 0D 49 48 44 52"
+      }
+    },
+    {
+      "type": {
+        "sel": "#hexname",
+        "text": "holiday.jpg"
+      }
+    },
+    {
+      "tap": "#check"
+    },
+    {
+      "expect": {
+        "sel": "#results li .kind",
+        "contains": "PNG image"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#results li .verdict",
+        "contains": "Mismatch: named .jpg, really .png"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:50:11Z",
+  "model": "opus-5.5",
+  "minutes": 9,
+  "approved": false,
+  "notes": "Reads only the first 64 kB of each file, locally. File-picker path cannot be exercised by verify steps, so tests use the hex paste input, which runs the same detector."
+}

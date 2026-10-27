@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T01:52:45.033Z",
+ "updated": "2026-10-27T01:52:49.572Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -510,9 +510,14 @@
   },
   {
    "slug": "real-file-type-checker",
-   "status": "pending",
+   "status": "pass",
    "attempts": 1,
-   "model": "opus-5.5"
+   "model": "opus-5.5",
+   "kb": 25.8,
+   "tests": "6/6",
+   "built": "2026-10-27T01:50:11Z",
+   "minutes": 9,
+   "approved": false
   },
   {
    "slug": "file-checksum-checker",

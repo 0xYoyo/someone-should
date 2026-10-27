@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that tells a file's real type from its content, not its extension</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+main { max-width: 640px; }
+#drop { display: flex; align-items: center; justify-content: center; text-align: center; min-height: 140px; padding: 20px; border: 1.5px dashed var(--meta); border-radius: var(--radius); cursor: pointer; }
+#drop.over { border-color: var(--ink); border-style: solid; }
+#file { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+#results li { display: block; }
+.name { font-weight: 500; overflow-wrap: anywhere; }
+.kind { font-size: 22px; line-height: 1.25; font-weight: 500; margin: 2px 0; }
+.small { font-size: 16px; color: var(--meta); }
+.hex { font: 16px/1.4 var(--mono); color: var(--meta); overflow-wrap: anywhere; }
+details summary { min-height: var(--tap); display: flex; align-items: center; cursor: pointer; color: var(--meta); }
+textarea { min-height: 88px; font-family: var(--mono); resize: vertical; }
+#err { min-height: 0; }
+#err:empty { display: none; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that tells a file's real type from its content, not its extension</h1>
+
+<main id="app" class="stack">
+  <label id="drop" for="file">Drop files here or tap to choose. Nothing leaves this page.</label>
+  <input id="file" type="file" multiple>
+
+  <details id="hexbox">
+    <summary>or paste the first bytes as hex</summary>
+    <div class="stack">
+      <textarea id="hex" spellcheck="false" placeholder="89 50 4E 47 0D 0A 1A 0A"></textarea>
+      <input id="hexname" type="text" placeholder="file name, e.g. photo.jpg">
+      <div class="row"><button id="check" class="primary" type="button">Check</button><button id="clear" type="button">Clear</button></div>
+    </div>
+  </details>
+
+  <p id="err" class="no"></p>
+  <ul id="results" class="plain"></ul>
+  <p id="empty" class="empty">No files checked yet.</p>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const HEAD = 65536;
+  const TEXT_EXTS = 'txt text md markdown csv tsv log ini cfg conf env json jsonl geojson xml html htm xhtml svg css js mjs cjs ts tsx jsx py rb pl php sh bash zsh bat cmd ps1 c h cpp hpp cc java kt go rs swift sql yml yaml toml srt vtt rtf tex lua r m cs vb ics vcf eml nfo properties gitignore'.split(' ');
+
+  const at = (b, off, sig) => {
+    if (b.length < off + sig.length) return false;
+    for (let i = 0; i < sig.length; i++) if (sig[i] !== null && b[off + i] !== sig[i]) return false;
+    return true;
+  };
+  const ascii = (b, off, len) => String.fromCharCode(...b.subarray(off, off + len));
+  const hasStr = (b, s, limit = b.length) => {
+    const max = Math.min(limit, b.length) - s.length;
+    outer: for (let i = 0; i <= max; i++) {
+      for (let j = 0; j < s.length; j++) if (b[i + j] !== s.charCodeAt(j)) continue outer;
+      return true;
+    }
+    return false;
+  };
+  const T = (name, exts, mime) => ({ name, exts, mime });
+
+  // Signature table, checked in order. Each test returns a result or null.
+  const SIGS = [
+    b => at(b, 0, [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]) && T('PNG image', ['png', 'apng'], 'image/png'),
+    b => at(b, 0, [0xFF, 0xD8, 0xFF]) && T('JPEG image', ['jpg', 'jpeg', 'jpe', 'jfif'], 'image/jpeg'),
+    b => (ascii(b, 0, 6) === 'GIF87a' || ascii(b, 0, 6) === 'GIF89a') && T('GIF image', ['gif'], 'image/gif'),
+    b => ascii(b, 0, 2) === 'BM' && b.length >= 14 && T('BMP image', ['bmp', 'dib'], 'image/bmp'),
+    b => (at(b, 0, [0x49, 0x49, 0x2A, 0x00]) || at(b, 0, [0x4D, 0x4D, 0x00, 0x2A])) &&
+      (hasStr(b, 'Canon', 512) && ascii(b, 8, 2) === 'CR' ? T('Canon RAW photo', ['cr2'], 'image/x-canon-cr2')
+        : T('TIFF image (or camera RAW)', ['tif', 'tiff', 'dng', 'nef', 'arw', 'cr2', 'orf', 'rw2', 'pef', 'srw'], 'image/tiff')),
+    b => at(b, 0, [0x00, 0x00, 0x01, 0x00]) && b.length > 6 && b[4] > 0 && T('Windows icon', ['ico'], 'image/x-icon'),
+    b => ascii(b, 0, 4) === '8BPS' && T('Photoshop document', ['psd', 'psb'], 'image/vnd.adobe.photoshop'),
+    b => at(b, 0, [0x00, 0x00, 0x00, 0x0C, 0x6A, 0x50, 0x20, 0x20]) && T('JPEG 2000 image', ['jp2', 'j2k', 'jpf', 'jpx'], 'image/jp2'),
+    b => at(b, 0, [0xFF, 0x0A]) && T('JPEG XL image', ['jxl'], 'image/jxl'),
+    b => ascii(b, 4, 8) === 'JXL \r\n\x87\n' && T('JPEG XL image', ['jxl'], 'image/jxl'),
+    b => ascii(b, 0, 4) === 'RIFF' && riff(ascii(b, 8, 4)),
+    b => ascii(b, 4, 4) === 'ftyp' && ftyp(ascii(b, 8, 4).trim(), b),
+    b => ascii(b, 0, 5) === '%PDF-' && T('PDF document', ['pdf', 'ai'], 'application/pdf'),
+    b => hasStr(b, '%PDF-', 1024) && T('PDF document (with junk before the header)', ['pdf'], 'application/pdf'),
+    b => ascii(b, 0, 4) === '%!PS' && T('PostScript', ['ps', 'eps'], 'application/postscript'),
+    b => at(b, 0, [0x50, 0x4B, 0x03, 0x04]) || at(b, 0, [0x50, 0x4B, 0x05, 0x06]) || at(b, 0, [0x50, 0x4B, 0x07, 0x08]) ? zip(b) : null,
+    b => at(b, 0, [0x52, 0x61, 0x72, 0x21, 0x1A, 0x07]) && T('RAR archive', ['rar'], 'application/vnd.rar'),
+    b => at(b, 0, [0x37, 0x7A, 0xBC, 0xAF, 0x27, 0x1C]) && T('7-Zip archive', ['7z'], 'application/x-7z-compressed'),
+    b => at(b, 0, [0x1F, 0x8B]) && T('gzip compressed', ['gz', 'tgz', 'gzip', 'svgz'], 'application/gzip'),
+    b => ascii(b, 0, 3) === 'BZh' && T('bzip2 compressed', ['bz2', 'tbz', 'tbz2'], 'application/x-bzip2'),
+    b => at(b, 0, [0xFD, 0x37, 0x7A, 0x58, 0x5A, 0x00]) && T('xz compressed', ['xz', 'txz'], 'application/x-xz'),
+    b => at(b, 0, [0x28, 0xB5, 0x2F, 0xFD]) && T('Zstandard compressed', ['zst', 'zstd'], 'application/zstd'),
+    b => ascii(b, 257, 5) === 'ustar' && T('tar archive', ['tar'], 'application/x-tar'),
+    b => at(b, 0, [0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1]) && ole(b),
+    b => ascii(b, 0, 2) === 'MZ' && (b.length < 64 || pe(b)),
+    b => at(b, 0, [0x7F, 0x45, 0x4C, 0x46]) && T('Linux/Unix executable (ELF)', ['', 'so', 'o', 'elf', 'bin', 'axf', 'ko'], 'application/x-elf'),
+    b => (at(b, 0, [0xCF, 0xFA, 0xED, 0xFE]) || at(b, 0, [0xCE, 0xFA, 0xED, 0xFE]) || at(b, 0, [0xCA, 0xFE, 0xBA, 0xBE]) && b[7] < 0x20) &&
+      T('macOS executable (Mach-O)', ['', 'dylib', 'bundle', 'o'], 'application/x-mach-binary'),
+    b => at(b, 0, [0xCA, 0xFE, 0xBA, 0xBE]) && T('Java class file', ['class'], 'application/java-vm'),
+    b => at(b, 0, [0x00, 0x61, 0x73, 0x6D]) && T('WebAssembly module', ['wasm'], 'application/wasm'),
+    b => ascii(b, 0, 16) === 'SQLite format 3\0' && T('SQLite database', ['sqlite', 'sqlite3', 'db', 'db3', 'sdb'], 'application/vnd.sqlite3'),
+    b => ascii(b, 0, 4) === 'fLaC' && T('FLAC audio', ['flac'], 'audio/flac'),
+    b => ascii(b, 0, 4) === 'OggS' && (hasStr(b, 'OpusHead', 128) ? T('Opus audio (Ogg)', ['opus', 'ogg', 'oga'], 'audio/ogg')
+      : hasStr(b, 'theora', 128) ? T('Ogg video', ['ogv', 'ogg'], 'video/ogg') : T('Ogg Vorbis audio', ['ogg', 'oga'], 'audio/ogg')),
+    b => ascii(b, 0, 3) === 'ID3' && T('MP3 audio', ['mp3'], 'audio/mpeg'),
+    b => ascii(b, 0, 4) === 'MThd' && T('MIDI', ['mid', 'midi'], 'audio/midi'),
+    b => ascii(b, 0, 4) === 'FORM' && ascii(b, 8, 3) === 'AIF' && T('AIFF audio', ['aif', 'aiff', 'aifc'], 'audio/aiff'),
+    b => ascii(b, 0, 4) === '#!AM' && T('AMR audio', ['amr'], 'audio/amr'),
+    b => at(b, 0, [0x1A, 0x45, 0xDF, 0xA3]) && (hasStr(b, 'webm', 64) ? T('WebM video', ['webm', 'weba'], 'video/webm') : T('Matroska video', ['mkv', 'mka', 'mks', 'mk3d'], 'video/x-matroska')),
+    b => ascii(b, 0, 3) === 'FLV' && T('Flash video', ['flv'], 'video/x-flv'),
+    b => at(b, 0, [0x00, 0x00, 0x01, 0xBA]) && T('MPEG video', ['mpg', 'mpeg', 'vob', 'm2p'], 'video/mpeg'),
+    b => b[0] === 0x47 && b[188] === 0x47 && b.length > 376 && b[376] === 0x47 && T('MPEG transport stream', ['ts', 'm2ts', 'mts'], 'video/mp2t'),
+    b => at(b, 0, [0x30, 0x26, 0xB2, 0x75, 0x8E, 0x66, 0xCF, 0x11]) && T('Windows Media (ASF)', ['wmv', 'wma', 'asf'], 'video/x-ms-asf'),
+    b => (ascii(b, 0, 4) === 'wOFF' && T('WOFF font', ['woff'], 'font/woff')) || (ascii(b, 0, 4) === 'wOF2' && T('WOFF2 font', ['woff2'], 'font/woff2')),
+    b => (at(b, 0, [0x00, 0x01, 0x00, 0x00, 0x00]) && T('TrueType font', ['ttf', 'tte'], 'font/ttf')) || (ascii(b, 0, 4) === 'OTTO' && T('OpenType font', ['otf'], 'font/otf')),
+    b => ascii(b, 0, 5) === '{\\rtf' && T('Rich Text document', ['rtf', 'doc'], 'application/rtf'),
+    b => ascii(b, 0, 8) === '!<arch>\n' && (hasStr(b, 'debian-binary', 80) ? T('Debian package', ['deb'], 'application/vnd.debian.binary-package') : T('ar archive', ['a', 'ar', 'lib'], 'application/x-archive')),
+    b => at(b, 0, [0xED, 0xAB, 0xEE, 0xDB]) && T('RPM package', ['rpm'], 'application/x-rpm'),
+    b => ascii(b, 0, 4) === 'xar!' && T('macOS installer (xar)', ['pkg', 'xar', 'xip'], 'application/x-xar'),
+    b => ascii(b, 0, 7) === 'BEGIN:V' && (ascii(b, 6, 9) === 'VCALENDAR' ? T('Calendar (iCalendar)', ['ics', 'ical'], 'text/calendar') : T('Contact card (vCard)', ['vcf', 'vcard'], 'text/vcard')),
+    b => b.length > 32768 + 6 && ascii(b, 32769, 5) === 'CD001' && T('Disc image (ISO 9660)', ['iso'], 'application/x-iso9660-image'),
+    b => ascii(b, 0, 4) === 'koly' && T('macOS disk image', ['dmg'], 'application/x-apple-diskimage'),
+    b => (ascii(b, 0, 8) === 'bplist00') && T('Apple binary property list', ['plist', 'bplist'], 'application/x-plist'),
+    b => ascii(b, 0, 4) === 'ITSF' && T('Windows help (CHM)', ['chm'], 'application/vnd.ms-htmlhelp'),
+    b => ascii(b, 0, 3) === 'CWS' || ascii(b, 0, 3) === 'FWS' || ascii(b, 0, 3) === 'ZWS' ? T('Flash (SWF)', ['swf'], 'application/x-shockwave-flash') : null,
+    b => ascii(b, 0, 4) === 'Cr24' && T('Chrome extension', ['crx'], 'application/x-chrome-extension'),
+    b => at(b, 0, [0x00, 0x00, 0x00]) && ascii(b, 4, 4) === 'jP  ' && T('JPEG 2000 image', ['jp2'], 'image/jp2'),
+    b => b.length > 1 && b[0] === 0xFF && (b[1] & 0xF6) === 0xF0 && T('AAC audio (ADTS)', ['aac'], 'audio/aac'),
+    b => b.length > 1 && b[0] === 0xFF && (b[1] & 0xE0) === 0xE0 && (b[1] & 0x06) !== 0 && (b[1] & 0x18) !== 0x08 &&
+      T('MP3 audio', ['mp3', 'mp2', 'mpga'], 'audio/mpeg'),
+  ];
+
+  function riff(f) {
+    if (f === 'WAVE') return T('WAV audio', ['wav', 'wave'], 'audio/wav');
+    if (f === 'AVI ') return T('AVI video', ['avi'], 'video/x-msvideo');
+    if (f === 'WEBP') return T('WebP image', ['webp'], 'image/webp');
+    if (f === 'ACON') return T('Animated cursor', ['ani'], 'application/x-navi-animation');
+    if (f === 'CDDA') return T('CD audio track', ['cda'], 'application/x-cdf');
+    return T('RIFF container (' + f.trim() + ')', ['riff'], 'application/octet-stream');
+  }
+
+  function ftyp(brand, b) {
+    const all = brand + ' ' + ascii(b, 16, Math.max(0, Math.min(b.length, 64) - 16));
+    if (/^(heic|heix|heim|heis|hevc|hevx)/.test(brand)) return T('HEIC image', ['heic', 'heif'], 'image/heic');
+    if (/^(mif1|msf1)/.test(brand)) return /avif/.test(all) ? T('AVIF image', ['avif'], 'image/avif') : T('HEIF image', ['heif', 'heic'], 'image/heif');
+    if (/^avi[fs]/.test(brand)) return T('AVIF image', ['avif'], 'image/avif');
+    if (/^crx/.test(brand)) return T('Canon RAW photo (CR3)', ['cr3'], 'image/x-canon-cr3');
+    if (brand === 'qt') return T('QuickTime video', ['mov', 'qt'], 'video/quicktime');
+    if (/^M4A/.test(brand)) return T('MPEG-4 audio', ['m4a', 'mp4', 'aac'], 'audio/mp4');
+    if (/^M4B/.test(brand)) return T('Audiobook (MPEG-4)', ['m4b', 'm4a'], 'audio/mp4');
+    if (/^M4V/.test(brand)) return T('MPEG-4 video', ['m4v', 'mp4'], 'video/x-m4v');
+    if (/^3g/.test(brand)) return T('3GP video', ['3gp', '3g2', '3gpp'], 'video/3gpp');
+    if (/^jp2/.test(brand)) return T('JPEG 2000 image', ['jp2'], 'image/jp2');
+    return T('MP4 video', ['mp4', 'm4v', 'mov', 'm4a', 'f4v'], 'video/mp4');
+  }
+
+  function zip(b) {
+    if (ascii(b, 30, 8) === 'mimetype') {
+      const m = ascii(b, 38, 60);
+      if (m.startsWith('application/epub+zip')) return T('EPUB e-book', ['epub'], 'application/epub+zip');
+      if (m.includes('opendocument.text')) return T('OpenDocument text', ['odt', 'ott'], 'application/vnd.oasis.opendocument.text');
+      if (m.includes('opendocument.spreadsheet')) return T('OpenDocument spreadsheet', ['ods', 'ots'], 'application/vnd.oasis.opendocument.spreadsheet');
+      if (m.includes('opendocument.presentation')) return T('OpenDocument presentation', ['odp', 'otp'], 'application/vnd.oasis.opendocument.presentation');
+      if (m.includes('opendocument.graphics')) return T('OpenDocument drawing', ['odg'], 'application/vnd.oasis.opendocument.graphics');
+    }
+    if (hasStr(b, 'word/')) return T('Word document (docx)', ['docx', 'docm', 'dotx', 'dotm'], 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+    if (hasStr(b, 'xl/')) return T('Excel workbook (xlsx)', ['xlsx', 'xlsm', 'xltx', 'xltm'], 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    if (hasStr(b, 'ppt/')) return T('PowerPoint deck (pptx)', ['pptx', 'pptm', 'potx', 'ppsx'], 'application/vnd.openxmlformats-officedocument.presentationml.presentation');
+    if (hasStr(b, 'AndroidManifest.xml')) return T('Android app (APK)', ['apk', 'aab'], 'application/vnd.android.package-archive');
+    if (hasStr(b, 'Payload/') && hasStr(b, '.app/')) return T('iOS app (IPA)', ['ipa'], 'application/octet-stream');
+    if (hasStr(b, 'META-INF/MANIFEST.MF') || hasStr(b, '.class')) return T('Java archive (JAR)', ['jar', 'war', 'ear'], 'application/java-archive');
+    if (hasStr(b, 'manifest.json') && hasStr(b, 'background')) return T('ZIP archive (browser extension?)', ['zip', 'xpi', 'crx'], 'application/zip');
+    if (hasStr(b, '3D/3dmodel.model')) return T('3D printing model (3MF)', ['3mf'], 'model/3mf');
+    if (hasStr(b, '[Content_Types].xml')) return T('Office Open XML package', ['docx', 'xlsx', 'pptx', 'vsdx', 'xps', 'nupkg'], 'application/zip');
+    return T('ZIP archive', ['zip', 'zipx', 'cbz', 'xpi', 'kmz', 'sketch', 'whl', 'nupkg'], 'application/zip');
+  }
+
+  function ole(b) {
+    // Legacy Office: stream names are stored as UTF-16LE in the directory sector.
+    const u16 = s => s.split('').map(c => c + '\0').join('');
+    if (hasStr(b, u16('WordDocument'))) return T('Word 97-2003 document', ['doc', 'dot'], 'application/msword');
+    if (hasStr(b, u16('Workbook')) || hasStr(b, u16('Book'))) return T('Excel 97-2003 workbook', ['xls', 'xlt'], 'application/vnd.ms-excel');
+    if (hasStr(b, u16('PowerPoint Document'))) return T('PowerPoint 97-2003 deck', ['ppt', 'pps', 'pot'], 'application/vnd.ms-powerpoint');
+    if (hasStr(b, u16('__substg1.0_'))) return T('Outlook message', ['msg'], 'application/vnd.ms-outlook');
+    if (hasStr(b, u16('VisioDocument'))) return T('Visio drawing', ['vsd'], 'application/vnd.visio');
+    return T('Microsoft compound file (doc, xls, ppt, msi, msg)', ['doc', 'xls', 'ppt', 'msi', 'msg', 'msp', 'vsd', 'pub', 'db'], 'application/x-ole-storage');
+  }
+
+  function pe(b) {
+    const off = b[0x3C] | (b[0x3D] << 8) | (b[0x3E] << 16);
+    if (off + 24 > b.length || ascii(b, off, 4) !== 'PE\0\0') return T('DOS executable', ['exe', 'com'], 'application/x-msdownload');
+    const chars = b[off + 22] | (b[off + 23] << 8);
+    if (chars & 0x2000) return T('Windows DLL', ['dll', 'ocx', 'sys', 'drv', 'cpl', 'ax'], 'application/x-msdownload');
+    return T('Windows executable', ['exe', 'scr', 'com', 'sys', 'efi', 'msi'], 'application/x-msdownload');
+  }
+
+  // Text heuristics for files no magic number claims.
+  function text(b) {
+    if (!b.length) return T('Empty file', [], '');
+    let start = 0, enc = 'UTF-8';
+    if (at(b, 0, [0xEF, 0xBB, 0xBF])) start = 3;
+    else if (at(b, 0, [0xFF, 0xFE]) || at(b, 0, [0xFE, 0xFF])) return T('Text (UTF-16)', TEXT_EXTS, 'text/plain');
+    const slice = b.subarray(start, Math.min(b.length, 8192));
+    let s;
+    try { s = new TextDecoder('utf-8', { fatal: true }).decode(slice.length === 8192 ? trimUtf8(slice) : slice); }
+    catch { enc = 'other'; s = null; }
+    if (s == null) {
+      let bad = 0;
+      for (const c of slice) if (c < 9 || (c > 13 && c < 32)) bad++;
+      if (bad > slice.length * 0.02) return null;
+      s = String.fromCharCode(...slice.subarray(0, 4096));
+    }
+    if (/[\0-\x08\x0E-\x1F]/.test(s.replace(/\x1B/g, ''))) return null;
+    const t = s.trimStart(), low = t.slice(0, 512).toLowerCase();
+    const label = n => n + (enc === 'other' ? ' (non-UTF-8 text)' : '');
+    if (t.startsWith('#!')) {
+      const l = t.split('\n')[0];
+      if (/python/.test(l)) return T(label('Python script'), ['py', ''], 'text/x-python');
+      if (/node|deno|bun/.test(l)) return T(label('JavaScript script'), ['js', 'mjs', 'cjs', ''], 'text/javascript');
+      if (/perl/.test(l)) return T(label('Perl script'), ['pl', 'pm', ''], 'text/x-perl');
+      if (/ruby/.test(l)) return T(label('Ruby script'), ['rb', ''], 'text/x-ruby');
+      return T(label('Shell script'), ['sh', 'bash', 'zsh', 'command', ''], 'text/x-shellscript');
+    }
+    if (/^<\?xml[^>]*>\s*(<!--[\s\S]*?-->\s*)*(<!doctype svg[^>]*>\s*)?<svg/.test(low) || low.startsWith('<svg')) return T(label('SVG image'), ['svg'], 'image/svg+xml');
+    if (low.startsWith('<!doctype html') || /^<(html|head|body)[\s>]/.test(low)) return T(label('HTML page'), ['html', 'htm', 'xhtml', 'shtml'], 'text/html');
+    if (low.startsWith('<?xml')) {
+      if (low.includes('<plist')) return T(label('Apple property list (XML)'), ['plist'], 'application/x-plist');
+      if (low.includes('<rss') || low.includes('<feed')) return T(label('RSS/Atom feed'), ['xml', 'rss', 'atom'], 'application/rss+xml');
+      if (low.includes('<gpx')) return T(label('GPS track (GPX)'), ['gpx'], 'application/gpx+xml');
+      if (low.includes('<kml')) return T(label('Google Earth (KML)'), ['kml'], 'application/vnd.google-earth.kml+xml');
+      return T(label('XML document'), ['xml', 'xsd', 'xsl', 'xslt', 'config', 'csproj', 'resx', 'xaml', 'svg', 'plist'], 'application/xml');
+    }
+    if (/^<\?php/.test(low)) return T(label('PHP script'), ['php', 'phtml'], 'application/x-php');
+    if (/^[\[{]/.test(t)) {
+      try { JSON.parse(s); return T(label('JSON data'), ['json', 'geojson', 'webmanifest', 'map', 'har', 'ipynb'], 'application/json'); } catch {}
+      if (/^\{\s*"/.test(t) && slice.length === 8192) return T(label('JSON data (start of a large file)'), ['json', 'geojson', 'jsonl', 'ipynb'], 'application/json');
+      if (/^\{"/.test(t) && /\}\s*\n\s*\{"/.test(t)) return T(label('JSON lines'), ['jsonl', 'ndjson', 'json', 'log'], 'application/x-ndjson');
+    }
+    if (low.startsWith('-----begin')) return T(label('PEM key or certificate'), ['pem', 'crt', 'cer', 'key', 'pub', 'csr'], 'application/x-pem-file');
+    if (/^(from|received|return-path|mime-version|delivered-to): /m.test(t.slice(0, 400)) && /^subject: /mi.test(t)) return T(label('Email message'), ['eml', 'mbox', 'txt'], 'message/rfc822');
+    if (/^webvtt/.test(low)) return T(label('Subtitles (WebVTT)'), ['vtt'], 'text/vtt');
+    if (/^\d+\r?\n\d\d:\d\d:\d\d,\d{3} --> /.test(t)) return T(label('Subtitles (SRT)'), ['srt'], 'application/x-subrip');
+    const lines = t.split(/\r?\n/).slice(0, 6).filter(Boolean);
+    if (lines.length >= 2) {
+      for (const d of [',', '\t', ';']) {
+        const n = lines.map(l => l.split(d).length);
+        if (n[0] > 1 && n.every(x => x === n[0])) return T(label(d === '\t' ? 'Tab-separated table (TSV)' : 'CSV table'), ['csv', 'tsv', 'tab', 'txt', 'dat'], 'text/csv');
+      }
+    }
+    return T(label('Plain text'), TEXT_EXTS.concat(['', 'dat']), 'text/plain');
+  }
+
+  function trimUtf8(u) {
+    // Drop a multi-byte character cut off at the end of the sample.
+    let end = u.length;
+    for (let i = 1; i <= 3 && end - i >= 0; i++) {
+      const c = u[end - i];
+      if ((c & 0xC0) === 0x80) continue;
+      if (c >= 0xC0) end -= i;
+      break;
+    }
+    return u.subarray(0, end);
+  }
+
+  function detect(b) {
+    for (const f of SIGS) {
+      const r = f(b);
+      if (r) return r;
+    }
+    return text(b);
+  }
+
+  const extOf = name => {
+    const base = name.split(/[\\/]/).pop();
+    const i = base.lastIndexOf('.');
+    return i > 0 ? base.slice(i + 1).toLowerCase() : '';
+  };
+  const hexOf = b => [...b.subarray(0, 16)].map(x => x.toString(16).padStart(2, '0').toUpperCase()).join(' ');
+  const sizeOf = n => n < 1024 ? n + ' B' : n < 1048576 ? (n / 1024).toFixed(1) + ' kB' : (n / 1048576).toFixed(1) + ' MB';
+
+  function report(name, bytes, size) {
+    const r = detect(bytes);
+    const ext = extOf(name);
+    const li = document.createElement('li');
+    let verdict, cls;
+    if (!r) {
+      verdict = 'Unknown format. Not text, no known signature.';
+      cls = '';
+    } else if (!r.exts.length) {
+      verdict = 'Nothing to check.';
+      cls = '';
+    } else if (ext === 'zip' && bytes[0] === 0x50 && bytes[1] === 0x4B) {
+      verdict = 'Valid .zip. Inside it is really .' + r.exts[0] + '.';
+      cls = 'built';
+    } else if (r.exts.includes(ext)) {
+      verdict = ext ? 'Matches its extension (.' + ext + ').' : 'No extension, and none expected.';
+      cls = 'built';
+    } else if (!ext) {
+      verdict = 'No extension. Should be .' + r.exts[0] + '.';
+      cls = 'no';
+    } else {
+      verdict = 'Mismatch: named .' + ext + ', really ' + (r.exts[0] ? '.' + r.exts[0] : 'an extensionless ' + r.name) + '.';
+      cls = 'no';
+    }
+    li.innerHTML = '<div class="name"></div><div class="kind"></div><div class="verdict"></div><div class="hex"></div>';
+    li.querySelector('.name').textContent = name || '(no name)';
+    li.querySelector('.kind').textContent = r ? r.name : 'Unknown binary data';
+    const v = li.querySelector('.verdict');
+    v.textContent = verdict;
+    if (cls) v.className = 'verdict ' + cls;
+    li.querySelector('.hex').textContent = [sizeOf(size), r && r.mime, bytes.length ? hexOf(bytes) : ''].filter(Boolean).join('  ·  ');
+    $('#results').prepend(li);
+    $('#empty').hidden = true;
+  }
+
+  async function handle(files) {
+    $('#err').textContent = '';
+    for (const f of files) {
+      try {
+        const head = new Uint8Array(await f.slice(0, Math.max(HEAD, 32774)).arrayBuffer());
+        report(f.name, head, f.size);
+      } catch {
+        $('#err').textContent = 'Could not read ' + f.name + '.';
+      }
+    }
+  }
+
+  $('#file').addEventListener('change', e => { handle([...e.target.files]); e.target.value = ''; });
+  const drop = $('#drop');
+  ['dragenter', 'dragover'].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.remove('over'); }));
+  drop.addEventListener('drop', e => handle([...(e.dataTransfer && e.dataTransfer.files || [])]));
+  // Dropping anywhere on the page should not navigate away to the file.
+  window.addEventListener('dragover', e => e.preventDefault());
+  window.addEventListener('drop', e => { e.preventDefault(); if (e.target !== drop) handle([...(e.dataTransfer && e.dataTransfer.files || [])]); });
+
+  $('#check').addEventListener('click', () => {
+    const raw = $('#hex').value.replace(/0x/gi, '').replace(/[^0-9a-f]/gi, '');
+    $('#err').textContent = '';
+    if (!raw) { $('#err').textContent = 'Paste some hex bytes first.'; return; }
+    if (raw.length % 2) { $('#err').textContent = 'Odd number of hex digits.'; return; }
+    const b = new Uint8Array(raw.length / 2);
+    for (let i = 0; i < b.length; i++) b[i] = parseInt(raw.substr(i * 2, 2), 16);
+    report($('#hexname').value.trim() || 'pasted bytes', b, b.length);
+  });
+  $('#clear').addEventListener('click', () => { $('#results').textContent = ''; $('#empty').hidden = false; $('#err').textContent = ''; });
+})();
+</script>
+</body>
+</html>
