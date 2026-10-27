@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that makes and prints game cards</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+
+/* ---- tool styles below ---- */
+form, fieldset { margin: 0; padding: 0; border: 0; }
+label { display: grid; gap: 4px; }
+label > span { font: 15px/1.3 var(--mono); color: var(--meta); }
+textarea { min-height: 88px; resize: vertical; }
+.grow { flex: 1 1 140px; }
+.file { display: inline-flex; align-items: center; min-height: var(--tap); padding: 0 18px; border: 1.5px dashed var(--line); border-radius: var(--radius); cursor: pointer; color: var(--meta); }
+.file input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+details summary { min-height: var(--tap); display: flex; align-items: center; cursor: pointer; color: var(--meta); font-family: var(--mono); font-size: 15px; }
+#msg:empty { display: none; }
+#cards { display: flex; flex-wrap: wrap; gap: 12px; }
+.card { position: relative; width: var(--cw); height: var(--ch); max-width: 100%; border: 1.5px solid var(--ink); border-radius: 3mm; padding: 3mm; display: flex; flex-direction: column; gap: 2mm; overflow: hidden; background: #fff; color: #141414; }
+.card-title { font-weight: 600; line-height: 1.15; overflow-wrap: anywhere; }
+.card img { width: 100%; flex: 1 1 0; min-height: 0; object-fit: cover; border-radius: 1.5mm; }
+.card-text { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.3; overflow: hidden; }
+.card.noimg .card-text { flex: 1; }
+.card-copies { position: absolute; right: 52px; top: 8px; font: 13px var(--mono); color: #6b6b6b; }
+.card .del { position: absolute; right: 4px; top: 4px; padding: 0; width: 44px; border-color: #d9d4c7; background: #fff; color: #141414; }
+.back { justify-content: center; align-items: center; text-align: center; font-weight: 600; }
+#print { display: none; }
+@media print {
+  body { padding: 0; background: #fff; }
+  body > *:not(#print) { display: none !important; }
+  #print { display: block; }
+  .page { position: relative; overflow: hidden; break-after: page; display: grid; align-content: center; justify-content: center; }
+  .page:last-child { break-after: auto; }
+  .page .card { border: 0.3mm dashed #999; border-radius: 0; font-size: 9pt; }
+  .page .card-title { font-size: 11pt; }
+  .page .back { font-size: 14pt; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that makes and prints game cards</h1>
+
+<main id="app" class="stack">
+  <form id="form" class="stack" autocomplete="off">
+    <label><span>title</span><input id="title" maxlength="80"></label>
+    <label><span>text</span><textarea id="text" maxlength="600"></textarea></label>
+    <div class="row">
+      <label class="file" id="imglabel"><input id="image" type="file" accept="image/*"><span id="imgname">add image</span></label>
+      <label style="width:110px"><span>copies</span><input id="copies" type="number" min="1" max="99" value="1" inputmode="numeric"></label>
+    </div>
+    <button id="add" class="primary" type="submit">Add card</button>
+  </form>
+  <details>
+    <summary>paste a list: title, text, copies</summary>
+    <div class="stack">
+      <textarea id="csv" placeholder="Fireball, Deal 3 damage, 2"></textarea>
+      <button id="import" type="button">Add all</button>
+    </div>
+  </details>
+  <div class="row">
+    <label class="grow"><span>card size</span><select id="size">
+      <option value="63x88">poker 63 x 88 mm</option>
+      <option value="57x89">bridge 57 x 89 mm</option>
+      <option value="44x68">mini 44 x 68 mm</option>
+      <option value="70x120">tarot 70 x 120 mm</option>
+      <option value="89x89">square 89 x 89 mm</option>
+    </select></label>
+    <label class="grow"><span>paper</span><select id="paper">
+      <option value="210x297">A4</option>
+      <option value="215.9x279.4">Letter</option>
+    </select></label>
+  </div>
+  <label><span>card back (optional, prints mirrored for double-sided)</span><input id="back" maxlength="40"></label>
+  <div class="row"><button id="print-btn" type="button" class="primary">Print</button><span id="sum" class="meta"></span></div>
+  <p id="msg" class="meta"></p>
+  <div id="cards"></div>
+</main>
+<div id="print"></div>
+
+<script>
+(() => {
+  'use strict';
+  // storage helper — never throws
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+
+  const KEY = 'printable-game-cards';
+  const MARGIN = 8;
+  const state = Object.assign({ cards: [], size: '63x88', paper: '210x297', back: '' }, store.get(KEY, {}));
+  let pendingImg = '';
+  const save = () => {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); }
+    catch { msg('Too big to remember after reload. Printing still works.'); }
+  };
+  const msg = t => { $('#msg').textContent = t; };
+  const dims = v => v.split('x').map(Number);
+
+  function cardEl(c, i) {
+    const el = document.createElement('div');
+    el.className = 'card' + (c.img ? '' : ' noimg');
+    const t = document.createElement('div'); t.className = 'card-title'; t.textContent = c.title;
+    el.append(t);
+    if (c.img) { const im = document.createElement('img'); im.src = c.img; im.alt = ''; el.append(im); }
+    if (c.text) { const x = document.createElement('div'); x.className = 'card-text'; x.textContent = c.text; el.append(x); }
+    if (i != null) {
+      if (c.copies > 1) { const n = document.createElement('span'); n.className = 'card-copies'; n.textContent = 'x' + c.copies; el.append(n); }
+      const d = document.createElement('button'); d.className = 'del'; d.type = 'button'; d.textContent = '×';
+      d.setAttribute('aria-label', 'remove ' + c.title); d.dataset.i = i; el.append(d);
+    }
+    return el;
+  }
+
+  function layout() {
+    const [cw, ch] = dims(state.size), [pw, ph] = dims(state.paper);
+    const cols = Math.max(1, Math.floor((pw - 2 * MARGIN) / cw));
+    const rows = Math.max(1, Math.floor((ph - 2 * MARGIN) / ch));
+    return { cw, ch, pw, ph, cols, rows, per: cols * rows };
+  }
+
+  function render() {
+    const L = layout();
+    document.documentElement.style.setProperty('--cw', L.cw + 'mm');
+    document.documentElement.style.setProperty('--ch', L.ch + 'mm');
+    const box = $('#cards'); box.textContent = '';
+    state.cards.forEach((c, i) => box.append(cardEl(c, i)));
+    const total = state.cards.reduce((s, c) => s + c.copies, 0);
+    const sheets = Math.ceil(total / L.per);
+    $('#sum').textContent = total ? `${total} card${total > 1 ? 's' : ''}, ${L.per} per sheet, ${sheets} sheet${sheets > 1 ? 's' : ''}${state.back ? ' + backs' : ''}` : '';
+    if (!total) box.innerHTML = '<p class="empty">No cards yet. Add one above or paste a list.</p>';
+    $('#size').value = state.size; $('#paper').value = state.paper; $('#back').value = state.back;
+  }
+
+  function buildPrint() {
+    const L = layout();
+    const all = state.cards.flatMap(c => Array(c.copies).fill(c));
+    const out = $('#print'); out.textContent = '';
+    let st = $('#pagestyle');
+    if (!st) { st = document.createElement('style'); st.id = 'pagestyle'; document.head.append(st); }
+    st.textContent = `@page { size: ${L.pw}mm ${L.ph}mm; margin: 0; }`;
+    const page = () => {
+      const p = document.createElement('div'); p.className = 'page';
+      p.style.cssText = `width:${L.pw}mm;height:${L.ph}mm;grid-template-columns:repeat(${L.cols},${L.cw}mm);grid-auto-rows:${L.ch}mm`;
+      out.append(p); return p;
+    };
+    for (let s = 0; s < all.length; s += L.per) {
+      const chunk = all.slice(s, s + L.per);
+      const front = page();
+      chunk.forEach(c => front.append(cardEl(c)));
+      if (state.back) {
+        const back = page();
+        const n = Math.ceil(chunk.length / L.cols);
+        for (let r = 0; r < n; r++) {
+          for (let col = L.cols - 1; col >= 0; col--) {
+            const b = document.createElement('div');
+            const filled = r * L.cols + col < chunk.length;
+            b.className = 'card back';
+            if (filled) b.textContent = state.back; else b.style.visibility = 'hidden';
+            back.append(b);
+          }
+        }
+      }
+    }
+  }
+
+  function addCard(title, text, copies, img) {
+    title = (title || '').trim(); text = (text || '').trim();
+    if (!title && !text && !img) return false;
+    const n = Math.min(99, Math.max(1, parseInt(copies, 10) || 1));
+    state.cards.push({ title, text, copies: n, img: img || '' });
+    return true;
+  }
+
+  function parseCSV(src) {
+    const delim = src.includes('\t') ? '\t' : ',';
+    const rows = []; let row = [], f = '', q = false;
+    for (let i = 0; i < src.length; i++) {
+      const ch = src[i];
+      if (q) {
+        if (ch === '"' && src[i + 1] === '"') { f += '"'; i++; }
+        else if (ch === '"') q = false;
+        else f += ch;
+      } else if (ch === '"' && !f.trim()) { q = true; f = ''; }
+      else if (ch === delim) { row.push(f); f = ''; }
+      else if (ch === '\n' || ch === '\r') { if (ch === '\r' && src[i + 1] === '\n') i++; row.push(f); rows.push(row); row = []; f = ''; }
+      else f += ch;
+    }
+    row.push(f); rows.push(row);
+    return rows.map(r => r.map(s => s.trim())).filter(r => r.some(Boolean));
+  }
+
+  $('#form').addEventListener('submit', e => {
+    e.preventDefault();
+    if (!addCard($('#title').value, $('#text').value, $('#copies').value, pendingImg)) { msg('Give the card a title, text or image.'); return; }
+    $('#title').value = ''; $('#text').value = ''; $('#copies').value = 1; $('#image').value = '';
+    pendingImg = ''; $('#imgname').textContent = 'add image';
+    msg(''); save(); render(); $('#title').focus();
+  });
+
+  $('#image').addEventListener('change', e => {
+    const f = e.target.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        // shrink so dozens of cards still fit in storage
+        const k = Math.min(1, 600 / Math.max(img.width, img.height));
+        const c = document.createElement('canvas');
+        c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        pendingImg = c.toDataURL('image/jpeg', 0.8);
+        $('#imgname').textContent = f.name.slice(0, 24);
+      };
+      img.onerror = () => msg('That image could not be read.');
+      img.src = r.result;
+    };
+    r.readAsDataURL(f);
+  });
+
+  $('#import').addEventListener('click', () => {
+    const rows = parseCSV($('#csv').value);
+    if (rows.length && /^title$/i.test(rows[0][0])) rows.shift();
+    let n = 0;
+    rows.forEach(r => { if (addCard(r[0], r[1], r[2])) n++; });
+    if (!n) { msg('Nothing to add. One card per line: title, text, copies.'); return; }
+    $('#csv').value = ''; msg(`Added ${n} card${n > 1 ? 's' : ''}.`); save(); render();
+  });
+
+  $('#cards').addEventListener('click', e => {
+    const d = e.target.closest('.del'); if (!d) return;
+    state.cards.splice(+d.dataset.i, 1); save(); render();
+  });
+
+  $('#size').addEventListener('change', e => { state.size = e.target.value; save(); render(); });
+  $('#paper').addEventListener('change', e => { state.paper = e.target.value; save(); render(); });
+  $('#back').addEventListener('input', e => { state.back = e.target.value.trim(); save(); render(); });
+
+  $('#print-btn').addEventListener('click', () => {
+    if (!state.cards.length) { msg('Add a card first.'); return; }
+    buildPrint(); window.print();
+  });
+  window.addEventListener('beforeprint', buildPrint);
+
+  render();
+})();
+</script>
+</body>
+</html>
