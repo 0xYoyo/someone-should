@@ -1,0 +1,54 @@
+{
+  "slug": "editor-color-scheme-maker",
+  "wish": "someone should make a tool that generates text editor color schemes",
+  "year": 2014,
+  "agreed": 14,
+  "sources": [
+    {
+      "site": "hn",
+      "url": "https://news.ycombinator.com/item?id=7153750",
+      "date": "2014-01-30",
+      "points": 11,
+      "comments": 3
+    }
+  ],
+  "spec": "Generates a full editor color scheme from a hue, a vividness and a dark or light mode, keeping every token readable against the background.\nDrag the sliders or tap shuffle, override any single color, watch the sample code update, then copy or download it as a VS Code theme or a Vim colorscheme.\nIt does not install the theme for you or export to other editors.",
+  "tests": [
+    {
+      "tap": "#fmt-vim"
+    },
+    {
+      "expect": {
+        "sel": "#out",
+        "contains": "hi Comment"
+      }
+    },
+    {
+      "type": {
+        "sel": "#name",
+        "text": "nightowl"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#out",
+        "matches": "colors_name = \"(dusk)?nightowl\""
+      }
+    },
+    {
+      "tap": "#fmt-vscode"
+    },
+    {
+      "expect": {
+        "sel": "#out",
+        "contains": "\"tokenColors\""
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T02:00:22Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Export is copy or a local blob download; no network."
+}

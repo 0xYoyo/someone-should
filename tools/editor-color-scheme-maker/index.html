@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that generates text editor color schemes</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+main { max-width: 640px; min-width: 0; }
+main > * { min-width: 0; }
+#preview { margin: 0; padding: 14px 12px; border-radius: var(--radius); font: 16px/1.5 var(--mono); overflow-x: auto; max-width: 100%; background: var(--bg); color: var(--fg); white-space: pre; }
+#preview .ln { color: var(--lnr); user-select: none; display: inline-block; width: 2ch; margin-right: 1.2ch; text-align: right; }
+#preview .cur { background: var(--cur); display: inline-block; min-width: 100%; }
+#preview .sel { background: var(--sel); }
+.kw { color: var(--kw); } .st { color: var(--st); } .nu { color: var(--nu); }
+.fn { color: var(--fn); } .ty { color: var(--ty); } .cm { color: var(--cm); font-style: italic; }
+.op { color: var(--op); }
+label.f { display: grid; gap: 4px; font-size: 16px; }
+.seg { display: flex; gap: 0; }
+.seg button { flex: 1; border-radius: 0; font-size: 16px; padding: 0 10px; }
+.seg button:first-child { border-radius: var(--radius) 0 0 var(--radius); }
+.seg button:last-child { border-radius: 0 var(--radius) var(--radius) 0; margin-left: -1.5px; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+input[type="range"] { padding: 0; border: 0; accent-color: var(--ink); }
+input[type="color"] { width: 44px; height: 44px; padding: 2px; flex: none; cursor: pointer; }
+#swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+#swatches label { display: flex; gap: 8px; align-items: center; font-size: 16px; }
+#out { font: 16px/1.4 var(--mono); margin: 0; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); max-height: 320px; white-space: pre; overflow: auto; max-width: 100%; }
+#msg { min-height: 1.4em; }
+.row > button { flex: 1 1 auto; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that generates text editor color schemes</h1>
+
+<main id="app" class="stack">
+  <pre id="preview" aria-label="preview"></pre>
+
+  <div class="row">
+    <div class="seg" style="flex:1 1 160px">
+      <button id="mode-dark" aria-pressed="true">dark</button>
+      <button id="mode-light" aria-pressed="false">light</button>
+    </div>
+    <button id="shuffle" class="primary" style="flex:1 1 120px">shuffle</button>
+  </div>
+
+  <label class="f">hue <input id="hue" type="range" min="0" max="359" value="210"></label>
+  <label class="f">vividness <input id="vivid" type="range" min="10" max="100" value="60"></label>
+
+  <div id="swatches"></div>
+
+  <label class="f">name <input id="name" type="text" value="dusk" autocomplete="off" spellcheck="false"></label>
+
+  <div class="seg">
+    <button id="fmt-vscode" aria-pressed="true">VS Code</button>
+    <button id="fmt-vim" aria-pressed="false">Vim</button>
+  </div>
+  <pre id="out" tabindex="0" aria-label="theme file"></pre>
+  <div class="row">
+    <button id="copy">copy</button>
+    <button id="download" class="primary">download</button>
+  </div>
+  <p id="msg" class="meta"></p>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const TOKENS = [
+    ['bg', 'background'], ['fg', 'text'], ['kw', 'keyword'], ['st', 'string'],
+    ['nu', 'number'], ['fn', 'function'], ['ty', 'type'], ['cm', 'comment']
+  ];
+
+  // ---- color math ----
+  const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+  function hsl(h, s, l) {
+    h = ((h % 360) + 360) % 360; s /= 100; l /= 100;
+    const k = n => (n + h / 30) % 12, a = s * Math.min(l, 1 - l);
+    const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1));
+    return '#' + [f(0), f(8), f(4)].map(x => Math.round(x * 255).toString(16).padStart(2, '0')).join('');
+  }
+  const rgb = hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
+  const toHex = c => '#' + c.map(x => clamp(Math.round(x), 0, 255).toString(16).padStart(2, '0')).join('');
+  function lum(hex) {
+    const [r, g, b] = rgb(hex).map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  }
+  function contrast(a, b) { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); }
+  function mix(a, b, t) { const x = rgb(a), y = rgb(b); return toHex(x.map((v, i) => v + (y[i] - v) * t)); }
+
+  // walk lightness away from the background until the color reads
+  function readable(h, s, l, bg, dark, min) {
+    let c = hsl(h, s, l);
+    for (let i = 0; i < 60 && contrast(c, bg) < min; i++) { l += dark ? 1 : -1; l = clamp(l, 0, 100); c = hsl(h, s, l); }
+    return c;
+  }
+
+  function generate(st) {
+    const { dark, hue: h, vivid: v } = st;
+    const bgS = Math.round(v * 0.3);
+    const bg = dark ? hsl(h, bgS, 11) : hsl(h, bgS, 96);
+    const fg = readable(h, Math.round(v * 0.15), dark ? 82 : 22, bg, dark, 9);
+    const L = dark ? 68 : 38;
+    const s = clamp(v, 10, 100);
+    return {
+      bg, fg,
+      kw: readable(h, s, L, bg, dark, 4.5),
+      st: readable(h + 130, s * 0.85, L, bg, dark, 4.5),
+      nu: readable(h + 40, s, L, bg, dark, 4.5),
+      fn: readable(h + 200, s, L, bg, dark, 4.5),
+      ty: readable(h + 290, s * 0.9, L, bg, dark, 4.5),
+      cm: readable(h, Math.round(v * 0.15), dark ? 45 : 58, bg, dark, 3.2)
+    };
+  }
+
+  // ---- state ----
+  const defaults = { dark: true, hue: 210, vivid: 60, name: 'dusk', fmt: 'vscode', over: {} };
+  const state = Object.assign({}, defaults, store.get('ecsm', {}));
+  if (typeof state.over !== 'object' || !state.over) state.over = {};
+  let pal;
+
+  function palette() {
+    const p = generate(state);
+    for (const k in state.over) if (/^#[0-9a-f]{6}$/i.test(state.over[k]) && k in p) p[k] = state.over[k];
+    p.op = mix(p.fg, p.kw, 0.35);
+    p.sel = mix(p.bg, p.kw, state.dark ? 0.28 : 0.2);
+    p.cur = mix(p.bg, p.fg, 0.06);
+    p.lnr = mix(p.bg, p.fg, 0.38);
+    p.ui = mix(p.bg, state.dark ? '#000000' : '#ffffff', 0.25);
+    return p;
+  }
+  const slug = () => (state.name || '').trim().toLowerCase().replace(/[^a-z0-9_-]+/g, '-').replace(/^-+|-+$/g, '') || 'untitled';
+
+  // ---- preview ----
+  const SAMPLE = [
+    '<span class="cm">// count words in a line</span>',
+    '<span class="kw">function</span> <span class="fn">countWords</span>(text<span class="op">:</span> <span class="ty">string</span>) {',
+    '  <span class="kw">const</span> parts <span class="op">=</span> text.<span class="fn">split</span>(<span class="st">" "</span>);',
+    '  <span class="kw">if</span> (parts.length <span class="op">===</span> <span class="nu">0</span>) <span class="kw">return</span> <span class="nu">0</span>;',
+    '  <span class="kw">return</span> <span class="sel">parts.length</span>;',
+    '}',
+    '<span class="kw">class</span> <span class="ty">Counter</span> { total <span class="op">=</span> <span class="nu">42</span>; }'
+  ];
+  $('#preview').innerHTML = SAMPLE.map((l, i) => {
+    const line = `<span class="ln">${i + 1}</span>${l}`;
+    return i === 4 ? `<span class="cur">${line}</span>` : line;
+  }).join('\n');
+
+  const sw = $('#swatches');
+  sw.innerHTML = TOKENS.map(([k, n]) => `<label><input type="color" id="c-${k}" data-k="${k}" aria-label="${n}">${n}</label>`).join('');
+
+  // ---- exporters ----
+  function vscode(p) {
+    const tc = (scope, fg, fontStyle) => ({ scope, settings: Object.assign({ foreground: fg }, fontStyle ? { fontStyle } : {}) });
+    return JSON.stringify({
+      name: state.name || slug(),
+      type: state.dark ? 'dark' : 'light',
+      semanticHighlighting: false,
+      colors: {
+        'editor.background': p.bg, 'editor.foreground': p.fg,
+        'editor.selectionBackground': p.sel, 'editor.lineHighlightBackground': p.cur,
+        'editorLineNumber.foreground': p.lnr, 'editorLineNumber.activeForeground': p.fg,
+        'editorCursor.foreground': p.kw, 'editorWhitespace.foreground': p.lnr,
+        'sideBar.background': p.ui, 'sideBar.foreground': p.fg,
+        'activityBar.background': p.ui, 'activityBar.foreground': p.fg,
+        'titleBar.activeBackground': p.ui, 'titleBar.activeForeground': p.fg,
+        'statusBar.background': p.ui, 'statusBar.foreground': p.fg,
+        'tab.activeBackground': p.bg, 'tab.inactiveBackground': p.ui,
+        'editorGroupHeader.tabsBackground': p.ui, 'panel.background': p.ui,
+        'terminal.background': p.bg, 'terminal.foreground': p.fg,
+        'focusBorder': p.kw
+      },
+      tokenColors: [
+        tc(['comment', 'punctuation.definition.comment'], p.cm, 'italic'),
+        tc(['keyword', 'storage', 'storage.type', 'keyword.control'], p.kw),
+        tc(['keyword.operator', 'punctuation'], p.op),
+        tc(['string', 'string.quoted', 'string.template'], p.st),
+        tc(['constant.numeric', 'constant.language', 'constant.character'], p.nu),
+        tc(['entity.name.function', 'support.function', 'meta.function-call'], p.fn),
+        tc(['entity.name.type', 'entity.name.class', 'support.type', 'support.class'], p.ty),
+        tc(['variable', 'meta.definition.variable'], p.fg)
+      ]
+    }, null, 2);
+  }
+
+  function vim(p) {
+    const n = slug();
+    const hi = (g, fg, bg, attr) => `hi ${g.padEnd(13)} guifg=${fg || 'NONE'} guibg=${bg || 'NONE'} gui=${attr || 'NONE'} cterm=${attr || 'NONE'}`;
+    return [
+      `" ${n}.vim  (put in ~/.vim/colors/, needs :set termguicolors in a terminal)`,
+      `set background=${state.dark ? 'dark' : 'light'}`,
+      'hi clear',
+      'if exists("syntax_on") | syntax reset | endif',
+      `let g:colors_name = "${n}"`,
+      '',
+      hi('Normal', p.fg, p.bg),
+      hi('Comment', p.cm, null, 'italic'),
+      hi('Statement', p.kw), hi('Keyword', p.kw), hi('Conditional', p.kw), hi('Repeat', p.kw), hi('PreProc', p.kw),
+      hi('Operator', p.op), hi('Delimiter', p.op),
+      hi('String', p.st), hi('Character', p.st),
+      hi('Number', p.nu), hi('Float', p.nu), hi('Boolean', p.nu), hi('Constant', p.nu),
+      hi('Function', p.fn), hi('Identifier', p.fg),
+      hi('Type', p.ty), hi('StorageClass', p.kw), hi('Structure', p.ty),
+      hi('Special', p.ty), hi('Title', p.fn, null, 'bold'), hi('Todo', p.bg, p.nu, 'bold'),
+      hi('LineNr', p.lnr, p.bg), hi('CursorLineNr', p.fg, p.cur, 'bold'),
+      hi('CursorLine', null, p.cur), hi('ColorColumn', null, p.cur),
+      hi('Visual', null, p.sel), hi('Search', p.bg, p.nu), hi('IncSearch', p.bg, p.kw),
+      hi('MatchParen', p.kw, p.sel, 'bold'),
+      hi('StatusLine', p.fg, p.ui), hi('StatusLineNC', p.lnr, p.ui), hi('VertSplit', p.ui, p.ui),
+      hi('Pmenu', p.fg, p.ui), hi('PmenuSel', p.bg, p.kw),
+      hi('NonText', p.lnr), hi('SpecialKey', p.lnr), hi('Folded', p.cm, p.cur),
+      hi('SignColumn', null, p.bg), hi('EndOfBuffer', p.lnr),
+      hi('Error', p.bg, p.nu), hi('ErrorMsg', p.nu), hi('WarningMsg', p.nu),
+      ''
+    ].join('\n');
+  }
+
+  // ---- render ----
+  function render() {
+    pal = palette();
+    const pre = $('#preview');
+    for (const k of ['bg', 'fg', 'kw', 'st', 'nu', 'fn', 'ty', 'cm', 'op', 'sel', 'cur', 'lnr']) pre.style.setProperty('--' + k, pal[k]);
+    for (const [k] of TOKENS) $('#c-' + k).value = pal[k];
+    $('#hue').value = state.hue; $('#vivid').value = state.vivid;
+    if (document.activeElement !== $('#name')) $('#name').value = state.name;
+    $('#mode-dark').setAttribute('aria-pressed', state.dark);
+    $('#mode-light').setAttribute('aria-pressed', !state.dark);
+    $('#fmt-vscode').setAttribute('aria-pressed', state.fmt === 'vscode');
+    $('#fmt-vim').setAttribute('aria-pressed', state.fmt === 'vim');
+    $('#out').textContent = state.fmt === 'vim' ? vim(pal) : vscode(pal);
+    const weak = ['kw', 'st', 'nu', 'fn', 'ty'].filter(k => contrast(pal[k], pal.bg) < 4.5).length;
+    $('#msg').textContent = weak ? `${weak} token color${weak > 1 ? 's' : ''} below 4.5:1 contrast` : '';
+    store.set('ecsm', state);
+  }
+
+  const regen = () => { state.over = {}; render(); };
+  $('#mode-dark').addEventListener('click', () => { state.dark = true; regen(); });
+  $('#mode-light').addEventListener('click', () => { state.dark = false; regen(); });
+  $('#shuffle').addEventListener('click', () => {
+    state.hue = Math.floor(Math.random() * 360);
+    state.vivid = 25 + Math.floor(Math.random() * 70);
+    regen();
+  });
+  $('#hue').addEventListener('input', e => { state.hue = +e.target.value; regen(); });
+  $('#vivid').addEventListener('input', e => { state.vivid = +e.target.value; regen(); });
+  sw.addEventListener('input', e => {
+    const k = e.target.dataset.k; if (!k) return;
+    if (k === 'bg') { // a new background re-derives everything else from it
+      const [r, g, b] = rgb(e.target.value);
+      const mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+      if (mx !== mn) {
+        const d = mx - mn;
+        let h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4;
+        state.hue = Math.round(h * 60 + 360) % 360;
+      }
+      state.dark = lum(e.target.value) < 0.18;
+      state.over = { bg: e.target.value };
+    } else state.over[k] = e.target.value;
+    render();
+  });
+  const onName = e => { state.name = e.target.value.slice(0, 40); render(); };
+  $('#name').addEventListener('input', onName);
+  $('#name').addEventListener('change', onName);
+  $('#fmt-vscode').addEventListener('click', () => { state.fmt = 'vscode'; render(); });
+  $('#fmt-vim').addEventListener('click', () => { state.fmt = 'vim'; render(); });
+
+  $('#copy').addEventListener('click', async () => {
+    const txt = $('#out').textContent;
+    try { await navigator.clipboard.writeText(txt); $('#msg').textContent = 'copied'; }
+    catch {
+      const r = document.createRange(); r.selectNodeContents($('#out')); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      try { document.execCommand('copy'); $('#msg').textContent = 'copied'; }
+      catch { $('#msg').textContent = 'select the text and copy it by hand'; }
+    }
+  });
+  $('#download').addEventListener('click', () => {
+    const vimFmt = state.fmt === 'vim';
+    const file = vimFmt ? slug() + '.vim' : slug() + '-color-theme.json';
+    try {
+      const url = URL.createObjectURL(new Blob([$('#out').textContent], { type: vimFmt ? 'text/plain' : 'application/json' }));
+      const a = document.createElement('a'); a.href = url; a.download = file;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      $('#msg').textContent = 'saved ' + file;
+    } catch { $('#msg').textContent = 'download blocked here, use copy'; }
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
