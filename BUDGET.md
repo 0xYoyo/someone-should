@@ -1,23 +1,32 @@
-# BUDGET — $250 of cloud credit, total, for everything. No top-ups exist.
+# BUDGET — $250 of cloud credit, total. No top-ups exist. Meter yourself.
 
-Sessions can't see their own spend, so the caps are structural. Count, don't guess.
+## How you measure spend (this is not optional)
+Every time a subagent finishes, the harness tells you its token usage (`subagent_tokens`). Record it. Convert with a conservative blended rate:
+- `opus` ≈ **$8 per 1M tokens**
+- `sonnet` ≈ **$3.5 per 1M tokens**
+- `haiku` ≈ **$1 per 1M tokens**
+Keep a running total in `LEDGER.md` after **every batch**: tokens by model, estimated $, tools PASS so far, average tokens per PASS tool. The reviewer reads these numbers hourly.
 
-## FACTORY (session A) — target ≤ $180
-- Orchestrator: `opus`. Keep its context small: never read tool HTML; read only verify output and subagent 5-line reports.
-- Harvest + normalize + rank: ≤ 25 `opus` subagent calls total (chunks of 200 wishes each for normalize; 1–3 for rank).
-- Build: exactly one `opus` subagent per tool. Each subagent: one build + at most one fix. **Hard cap: 140 build subagents** (100 target + reserve). Stop building at 100 PASS or at 140 spawned, whichever first.
-- Verify loops run as `node scripts/verify.mjs` from the subagent itself (no extra model calls). If a subagent needs a second model to fix, it's `haiku`.
-- Estimated: ~$1–1.5 per tool including thinking → $100–150 for 100 PASS with drops; harvest/rank ~$15; orchestrator ~$15.
-- Push at most every 10 minutes (GitHub Pages soft-limits 10 deploys/hour, shared with the shell).
+## FACTORY — total target ≤ $200 (≈ 25M opus-equivalent tokens). Reserve $50 for the morning.
+- Orchestrator: `opus`. Keep its context small: never read tool HTML; read only verify output and the 5-line subagent reports. Spawn builders in the background, 8 at a time, and wait for the batch.
+- Harvest + normalize + rank: ≤ 25 subagent calls total (`opus` for rank; `sonnet` is fine for normalize chunks).
+- Build: one subagent per tool, one build + one fix inside it. **Hard cap: 140 build subagents.** Stop at 100 PASS or 140 spawned.
 
-## SHELL (session B) — target ≤ $45
-- One `opus` session, no subagents except ≤ 2 `haiku` for mechanical tasks (OG renders, screenshots).
-- Push at most every 10 minutes.
+### Adaptive rules — check after every batch, write the decision in LEDGER
+1. Compute `avg = tokens per PASS tool so far` and `projected = avg × (100 − PASS so far)`.
+2. If `projected + spent > $200` equivalent → **switch builders to `sonnet`** for the next batch. Note it. Sonnet tools are fine; the gate is the same.
+3. If after a sonnet batch the PASS rate drops below 60% → go back to `opus` for the hardest wishes only (the ones that failed) and keep `sonnet` for the rest.
+4. If cumulative spend ≥ $180 equivalent and PASS < 100 → one final `sonnet` batch from the reserve list, then stop.
+5. If the first batch of 8 averages > 400k tokens per tool → something is wrong with the subagent brief (it's reading too much). Fix the brief (shorter, point at files, don't paste them) before batch 2. Do not just continue.
+6. A tool that FAILs its one in-subagent retry gets **one more attempt in a fresh `sonnet` subagent** with the verify errors pasted into its brief. Only after that is it `dropped`. Dropped slugs are replaced from the reserve list so the target stays 100.
 
-## RESERVE — $25
-- For the morning: re-verify, a repair wave on the 5 weakest tools, approve script. Not for tonight.
+## Stop conditions
+- 100 PASS and `data/built.json` committed → final LEDGER line, stop.
+- 140 build subagents spawned → finish batch, commit, stop.
+- Running total ≥ $200 equivalent → finish batch, commit, stop.
+- The reviewer writes `STOP` as the first line of REVIEW.md → finish batch, commit, stop.
+- 09:30 Asia/Jerusalem → wrap up regardless: commit what passes, write LEDGER, stop.
+- If the platform cuts the session (credit exhausted, timeout): everything is already committed per batch; the next session resumes from `data/built.json`.
 
-## Stop conditions (either session)
-- You hit your cap → finish the current batch, commit, write the final LEDGER line, stop.
-- The reviewer writes `STOP` at the top of REVIEW.md → same.
-- 06:30 Asia/Jerusalem → wrap up regardless: commit what passes, write LEDGER, stop.
+## Push cadence
+At most one push every 10 minutes (GitHub Pages deploys from main; it soft-limits ~10 builds/hour).

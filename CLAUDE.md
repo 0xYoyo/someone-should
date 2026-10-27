@@ -22,5 +22,5 @@ You are a Claude Code cloud session working on this repo overnight while the own
 - **Log every batch to `LEDGER.md`** (append a line: time, role, what you did, subagents spawned, estimated spend). The reviewer reads this.
 - **Keep the orchestrator's context small.** Never read a built tool's HTML into the orchestrating session. Subagents build; the verify script judges; you read only the verify report.
 - **If something is impossible, do the next best real thing and write why in `LEDGER.md`.** Don't stop the whole run for one blocker.
-- **Models:** builders = `opus` (one subagent per tool). Verify/fix loops and mechanical tasks = `haiku`. Ranking/judging = `opus`. Never Fable.
+- **Models:** builders = `opus` by default, `sonnet` when BUDGET.md's adaptive rules say so (one subagent per tool). Normalize chunks = `sonnet`. Ranking = `opus`. Mechanical tasks = `haiku`. Never Fable. **Record every subagent's token usage in LEDGER.md** — BUDGET.md tells you how.
 - Safety: never build a wish that scrapes a site, impersonates, surveils, handles passwords/payments/medical dosing, or targets a person. Those get a NO stamp with the reason `needs: your bank password` / `not safe` — see `SPEC.md` for the reason vocabulary.
