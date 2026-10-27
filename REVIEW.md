@@ -17,3 +17,21 @@ Quality check on arrows-on-a-screenshot, freelance-money-ledger, sing-the-note-t
 5. **Push cadence:** you are pushing per tool (one commit per PASS). That's fine for git but GitHub Pages rebuilds on every push and will start queueing. Batch your pushes: commit per tool locally if you like, push once per batch.
 
 ### Nothing else to change. Continue.
+
+## 2026-10-27 04:30 — FINAL (morning summary)
+
+**Result:** 100 built · 100 PASS · 0 failed · 0 dropped · 0 retries needed. 40 NO stamps. Independent `verify.mjs --all` from the reviewer: 100/100. Spend: ~$63 of $250 (opus 7.26M + sonnet 1.47M tokens; avg $0.57 per tool). Harvest: 6,025 raw posts (HN 3,525 · Software Recommendations SE 2,500; Reddit is behind a login wall and was skipped) → 1,265 wish clusters → 482 buildable → top 100 + 40 reserve + 40 NO.
+
+**Reviewer changes after the factory finished:**
+- Every tool got an `?embed=1` mode that hides its own title; the wall thumbnails use it so the wish isn't printed twice. Three tools that generate HTML in template strings were checked by hand so the snippet didn't leak into their output. Re-verified 100/100.
+- `assets/og.png` created (social share card). `assets/og-source.html` is its source.
+- Player iframe grants microphone/camera/geolocation (review 1).
+
+**For Yoav, in order:**
+1. Open https://0xyoyo.github.io/someone-should/ on your phone. If it 404s, Pages isn't enabled yet: repo → Settings → Pages → Deploy from a branch → `main` / `/ (root)`. (The reviewer's sandbox can't reach github.io, so this is the one thing not verified tonight.)
+2. `review.html` on the site → approve/drop with your thumb → download built.json → replace `data/built.json` → commit. The counter then shows "approved" and the byline flips to "he approved every one".
+3. Drop candidates (the factory's and mine): `brainfuck-debugger` (the wish line names the language — your call), `text-scratchpad` (does the wish, little more), `compare-two-lists` (thin), `vegetarian-day-calendar` (narrow). Dropping is `rm -r tools/<slug>` + remove its entry from `data/built.json`.
+4. `about.html` links `assets/cv.pdf` — add the file or remove the link. `data/stats.json` isn't written; the "N candidates" line in about.html falls back to "—". Write `{"harvested":6025}` to `data/stats.json` if you want the number.
+5. Factory's best three: `sql-on-csv-files` (real SQL with JOIN/GROUP BY, offline), `simple-circuit-simulator` (live nodal analysis), `logo-turtle-playground` (full LOGO with procedures and recursion). Mine from what I opened: `arrows-on-a-screenshot`, `hide-text-in-image`, `table-to-heatmap`.
+
+**Reserve left ($187 of credit, 40 reserve wishes):** a second factory run with the same prompt builds the reserve if you want 140. Not tonight; approve the 100 first.

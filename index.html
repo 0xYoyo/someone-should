@@ -102,7 +102,7 @@ function tile(t) {
 const io = new IntersectionObserver(es => {
   for (const e of es) {
     const f = e.target;
-    if (e.isIntersecting && !f.firstChild) { const i = document.createElement('iframe'); i.sandbox = 'allow-scripts'; i.loading = 'lazy'; i.tabIndex = -1; i.setAttribute('aria-hidden','true'); i.src = f.dataset.src; f.appendChild(i); }
+    if (e.isIntersecting && !f.firstChild) { const i = document.createElement('iframe'); i.sandbox = 'allow-scripts'; i.loading = 'lazy'; i.tabIndex = -1; i.setAttribute('aria-hidden','true'); i.src = f.dataset.src + '?embed=1'; f.appendChild(i); }
     else if (!e.isIntersecting && f.firstChild && Math.abs(e.boundingClientRect.top) > innerHeight * 4) f.replaceChildren();
   }
 }, { rootMargin: '150% 0px' });
