@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T01:53:04.286Z",
+ "updated": "2026-10-27T01:54:09.538Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -509,9 +509,14 @@
   },
   {
    "slug": "mbox-email-reader",
-   "status": "pending",
+   "status": "pass",
    "attempts": 1,
-   "model": "opus-5.5"
+   "model": "opus-5.5",
+   "kb": 25.2,
+   "tests": "6/6",
+   "built": "2026-10-27T01:50:11Z",
+   "minutes": 9,
+   "approved": false
   },
   {
    "slug": "real-file-type-checker",

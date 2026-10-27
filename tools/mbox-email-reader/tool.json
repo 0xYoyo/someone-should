@@ -1,0 +1,51 @@
+{
+  "slug": "mbox-email-reader",
+  "wish": "someone should make a tool that opens large mbox email files and lets me read them",
+  "year": 2014,
+  "agreed": 11,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/2102/mbox-viewer-for-large-files",
+      "date": "2014-03-07",
+      "points": 9,
+      "comments": 2
+    }
+  ],
+  "spec": "Opens an .mbox file of any size on the device, indexing it in 8 MB slices so multi-gigabyte archives never load whole into memory.\nLists every message by sender, date and subject (newest or oldest first), filters as you type, can search inside message text, and opens a message with MIME, encoded headers, HTML-only mail and attachments decoded.\nIt does not send, reply, edit or upload anything; nothing leaves the page and the file is only read.",
+  "tests": [
+    {
+      "tap": "summary"
+    },
+    {
+      "type": {
+        "sel": "#paste",
+        "text": "From alice@example.com Mon Mar  3 10:00:00 2014\nFrom: Alice <alice@example.com>\nSubject: Quarterly numbers\nDate: Mon, 3 Mar 2014 10:00:00 +0000\n\nThe totals are attached below.\n\nFrom bob@example.org Tue Mar  4 09:30:00 2014\nFrom: Bob <bob@example.org>\nSubject: =?UTF-8?Q?Caf=C3=A9_plans?=\nDate: Tue, 4 Mar 2014 09:30:00 +0000\n\nLunch on Friday?\n"
+      }
+    },
+    {
+      "tap": "#read-paste"
+    },
+    {
+      "type": {
+        "sel": "#q",
+        "text": "quarterly"
+      }
+    },
+    {
+      "tap": ".msg"
+    },
+    {
+      "expect": {
+        "sel": "#body",
+        "contains": "The totals are attached below."
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:50:11Z",
+  "model": "opus-5.5",
+  "minutes": 9,
+  "approved": false,
+  "notes": "Pasted text path exists so the tool can be tested without a file picker. Full-text search matches raw and quoted-printable text, not base64-encoded bodies."
+}

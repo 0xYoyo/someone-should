@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that opens large mbox email files and lets me read them</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+main { max-width: 760px; }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+label.btn { display: inline-flex; align-items: center; min-height: var(--tap); padding: 0 18px; border-radius: var(--radius); background: var(--ink); color: var(--paper); cursor: pointer; }
+#file:focus-visible + label.btn { outline: 2px solid var(--ink); outline-offset: 2px; }
+.sub { font-size: 16px; color: var(--meta); }
+details summary { min-height: var(--tap); display: flex; align-items: center; cursor: pointer; color: var(--meta); font-size: 16px; }
+details textarea { min-height: 140px; font: 15px/1.4 var(--mono); }
+details .stack { margin-top: 8px; }
+#status { min-height: 1.45em; font-size: 16px; color: var(--meta); }
+#status.err { color: var(--no); }
+.tools { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
+#list { border-top: 1px solid var(--line); }
+#list li { padding: 0; display: block; }
+.msg { display: grid; gap: 2px; width: 100%; text-align: left; border: 0; border-radius: 0; padding: 12px 2px; min-height: 64px; }
+.msg .top { display: flex; justify-content: space-between; gap: 12px; font-size: 16px; color: var(--meta); min-width: 0; }
+.msg .who { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.msg .when { flex: none; font-variant-numeric: tabular-nums; }
+.msg .subj { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.msg.hit .subj { font-weight: 600; }
+#reader[hidden], #browse[hidden], #opener[hidden] { display: none; }
+#reader-subject { font-size: 22px; line-height: 1.25; font-weight: 600; margin: 0; overflow-wrap: anywhere; }
+.hdrs { font-size: 16px; color: var(--meta); display: grid; gap: 2px; overflow-wrap: anywhere; }
+#body { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 17px; margin: 0; padding: 16px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); min-height: 4em; }
+#atts:empty { display: none; }
+#atts li span { overflow-wrap: anywhere; min-width: 0; }
+.nav { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.nav button { padding: 0 8px; }
+#drop.over { outline: 2px dashed var(--ink); outline-offset: 6px; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that opens large mbox email files and lets me read them</h1>
+
+<main id="app" class="stack">
+  <section id="opener" class="stack">
+    <div id="drop" class="row">
+      <input type="file" id="file" class="vh" accept=".mbox,.mbx,.mbs,.eml,.txt,application/mbox,text/plain">
+      <label for="file" class="btn">Open mbox file</label>
+      <span class="sub">Stays on this device. Any size.</span>
+    </div>
+    <details>
+      <summary>or paste mbox text</summary>
+      <div class="stack">
+        <textarea id="paste" spellcheck="false" placeholder="From someone@example Mon Jan  1 00:00:00 2024"></textarea>
+        <button id="read-paste" type="button">Read pasted text</button>
+      </div>
+    </details>
+  </section>
+
+  <div id="status" role="status" aria-live="polite">No mailbox open.</div>
+
+  <section id="browse" class="stack" hidden>
+    <div class="tools">
+      <input id="q" type="search" placeholder="Search sender or subject" autocomplete="off" aria-label="Search">
+      <button id="sort" type="button">Newest</button>
+    </div>
+    <div class="row">
+      <button id="deep" type="button" hidden>Search inside messages too</button>
+      <button id="another" type="button">Open another</button>
+    </div>
+    <ul id="list" class="plain"></ul>
+    <button id="more" type="button" hidden>Show more</button>
+  </section>
+
+  <article id="reader" class="stack" hidden>
+    <div class="nav">
+      <button id="back" type="button">Back</button>
+      <button id="prev" type="button">Newer</button>
+      <button id="next" type="button">Older</button>
+    </div>
+    <h2 id="reader-subject"></h2>
+    <div class="hdrs" id="hdrs"></div>
+    <pre id="body"></pre>
+    <ul id="atts" class="plain"></ul>
+  </article>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const CHUNK = 8 * 1024 * 1024;
+  const PAGE = 150;
+  const utf8 = new TextDecoder('utf-8');
+  const fmtN = n => n.toLocaleString();
+
+  // ---------- byte / text helpers ----------
+  function binFromBytes(b) {
+    let s = '';
+    for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000));
+    return s;
+  }
+  function bytesFromBin(s) {
+    const b = new Uint8Array(s.length);
+    for (let i = 0; i < s.length; i++) b[i] = s.charCodeAt(i) & 255;
+    return b;
+  }
+  function decodeCharset(bytes, cs) {
+    cs = (cs || 'utf-8').trim().toLowerCase().replace(/^"|"$/g, '');
+    if (cs === 'us-ascii' || cs === 'ascii') cs = 'utf-8';
+    try { return new TextDecoder(cs).decode(bytes); } catch { return utf8.decode(bytes); }
+  }
+  function decodeQP(s) {
+    return s.replace(/=\r?\n/g, '').replace(/=([0-9A-Fa-f]{2})/g, (m, h) => String.fromCharCode(parseInt(h, 16)));
+  }
+  function decodeB64(s) {
+    s = s.replace(/[^A-Za-z0-9+/]/g, '');
+    if (s.length % 4 === 1) s = s.slice(0, -1);
+    while (s.length % 4) s += '=';
+    try { return atob(s); } catch { return ''; }
+  }
+  // RFC 2047 encoded words: =?charset?B|Q?text?=
+  function decodeWords(s) {
+    if (!s || s.indexOf('=?') < 0) return s || '';
+    return s.replace(/(=\?[^?]+\?[BbQq]\?[^?]*\?=)\s+(?==\?)/g, '$1')
+      .replace(/=\?([^?*]+)(?:\*[^?]*)?\?([BbQq])\?([^?]*)\?=/g, (m, cs, enc, txt) => {
+        const bin = /b/i.test(enc) ? decodeB64(txt) : decodeQP(txt.replace(/_/g, ' '));
+        return decodeCharset(bytesFromBin(bin), cs);
+      });
+  }
+  function parseHeaders(text) {
+    const h = {};
+    const lines = text.replace(/\r?\n[ \t]+/g, ' ').split(/\r?\n/);
+    for (const line of lines) {
+      const i = line.indexOf(':');
+      if (i < 1) continue;
+      const k = line.slice(0, i).trim().toLowerCase();
+      if (!(k in h)) h[k] = line.slice(i + 1).trim();
+    }
+    return h;
+  }
+  function param(str, key) {
+    const m = new RegExp(';\\s*' + key + '\\*?(?:0\\*?)?=\\s*(?:"([^"]*)"|([^;\\s]*))', 'i').exec(str || '');
+    if (!m) return '';
+    let v = m[1] != null ? m[1] : m[2];
+    const ext = /^([\w-]+)'[^']*'(.*)$/.exec(v);
+    if (ext) { try { v = decodeCharset(bytesFromBin(unescape(ext[2])), ext[1]); } catch {} }
+    return decodeWords(v);
+  }
+  function displayName(from) {
+    const v = decodeWords(from).trim();
+    const m = /^\s*"?([^"<]*?)"?\s*<([^>]+)>/.exec(v);
+    if (m) return m[1].trim() || m[2].trim();
+    return v.replace(/\s*\(.*\)\s*$/, '') || '(no sender)';
+  }
+
+  // ---------- indexer: finds message boundaries without loading the whole file ----------
+  // A message starts at a line beginning "From " that carries a year (the mbox envelope line).
+  function isFromLine(buf, s) {
+    if (buf[s] !== 70 || buf[s + 1] !== 114 || buf[s + 2] !== 111 || buf[s + 3] !== 109 || buf[s + 4] !== 32) return false;
+    const end = Math.min(buf.length, s + 300);
+    let digits = 0;
+    for (let i = s + 5; i < end; i++) {
+      const c = buf[i];
+      if (c === 10) break;
+      if (c >= 48 && c <= 57) { if (++digits === 4) return true; } else digits = 0;
+    }
+    return false;
+  }
+  function headerInfo(bytes) {
+    const text = utf8.decode(bytes);
+    const nl = text.indexOf('\n');
+    const env = nl > 0 ? text.slice(5, nl) : '';
+    const h = parseHeaders(nl > 0 ? text.slice(nl + 1) : '');
+    const f = displayName(h.from || h.sender || env.split(/\s/)[0] || '');
+    const t = decodeWords(h.subject || '').replace(/\s+/g, ' ').trim();
+    let d = Date.parse((h.date || '').replace(/\s*\([^)]*\)\s*$/, ''));
+    if (isNaN(d)) d = Date.parse(env.replace(/^\S+\s+/, ''));
+    return { f, t, d: isNaN(d) ? 0 : d };
+  }
+  function makeIndexer() {
+    const msgs = [], pend = [];
+    let carry = new Uint8Array(0), base = 0, scanned = 0, started = false;
+    function findBlank(buf, from) {
+      let i = from;
+      for (;;) {
+        const nl = buf.indexOf(10, i);
+        if (nl < 0 || nl + 1 >= buf.length) return -1;
+        if (buf[nl + 1] === 10 || (buf[nl + 1] === 13 && buf[nl + 2] === 10)) return nl;
+        i = nl + 1;
+      }
+    }
+    function feed(chunk, final) {
+      let buf;
+      if (!carry.length) buf = chunk;
+      else { buf = new Uint8Array(carry.length + chunk.length); buf.set(carry); buf.set(chunk, carry.length); }
+      const limit = final ? buf.length - 5 : buf.length - 300;
+      if (!started && (final || buf.length >= 300)) {
+        started = true;
+        if (isFromLine(buf, 0)) { const m = { s: 0 }; msgs.push(m); pend.push(m); }
+      }
+      if (!started) { carry = buf; return msgs; }
+      let i = scanned - base;
+      scanned = base + buf.length;
+      for (;;) {
+        const nl = buf.indexOf(10, i);
+        if (nl < 0) break;
+        if (nl + 1 > limit) { scanned = base + nl; break; }
+        if (isFromLine(buf, nl + 1)) { const m = { s: base + nl + 1 }; msgs.push(m); pend.push(m); }
+        i = nl + 1;
+      }
+      while (pend.length) {
+        const m = pend[0], rel = m.s - base;
+        const blank = findBlank(buf, rel);
+        let end = blank;
+        if (blank < 0) {
+          if (!final && buf.length - rel < 1048576) break;
+          end = Math.min(buf.length, rel + 65536);
+        }
+        Object.assign(m, headerInfo(buf.subarray(rel, end)));
+        pend.shift();
+      }
+      const keep = Math.min(pend.length ? pend[0].s - base : Infinity, scanned - base, buf.length);
+      carry = buf.slice(keep);
+      base += keep;
+      if (final) {
+        const total = base + carry.length;
+        for (let k = 0; k < msgs.length; k++) {
+          const m = msgs[k];
+          m.e = k + 1 < msgs.length ? msgs[k + 1].s : total;
+          m.i = k;
+          m.k = (m.f + ' \u0001 ' + m.t).toLowerCase();
+        }
+      }
+      return msgs;
+    }
+    return { feed, msgs };
+  }
+
+  // ---------- MIME rendering of one message ----------
+  function parseEntity(bin, out, depth) {
+    const sep = /\r?\n\r?\n/.exec(bin);
+    const hBin = sep ? bin.slice(0, sep.index) : bin;
+    const body = sep ? bin.slice(sep.index + sep[0].length) : '';
+    const h = parseHeaders(utf8.decode(bytesFromBin(hBin)));
+    if (!out.headers) out.headers = h;
+    const ct = h['content-type'] || 'text/plain';
+    const type = ct.split(';')[0].trim().toLowerCase();
+    const cte = (h['content-transfer-encoding'] || '').trim().toLowerCase();
+    const disp = h['content-disposition'] || '';
+    const boundary = param(ct, 'boundary');
+    if (type.startsWith('multipart/') && boundary && depth < 20) {
+      const esc = boundary.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const re = new RegExp('(?:^|\\r?\\n)--' + esc + '(--)?[ \\t]*(?=\\r?\\n|$)', 'g');
+      let m, prev = -1;
+      while ((m = re.exec(body))) {
+        if (prev >= 0) parseEntity(body.slice(prev, m.index).replace(/^\r?\n/, ''), out, depth + 1);
+        prev = m.index + m[0].length;
+        if (m[1]) { prev = -1; break; }
+      }
+      if (prev >= 0 && prev < body.length) parseEntity(body.slice(prev).replace(/^\r?\n/, ''), out, depth + 1);
+      return out;
+    }
+    let data = body;
+    if (cte === 'base64') data = decodeB64(body);
+    else if (cte === 'quoted-printable') data = decodeQP(body);
+    if (type === 'message/rfc822' && depth < 20) {
+      out.texts.push('\n---------- Forwarded message ----------');
+      const sub = { texts: out.texts, htmls: out.htmls, atts: out.atts, headers: null };
+      parseEntity(data, sub, depth + 1);
+      const sh = sub.headers || {};
+      ['from', 'date', 'subject'].forEach(k => { if (sh[k]) out.texts.push(k[0].toUpperCase() + k.slice(1) + ': ' + decodeWords(sh[k])); });
+      return out;
+    }
+    const name = param(disp, 'filename') || param(ct, 'name');
+    const isAtt = /^\s*attachment/i.test(disp) || (name && !type.startsWith('text/'));
+    const charset = param(ct, 'charset');
+    if (!isAtt && type === 'text/plain') out.texts.push(decodeCharset(bytesFromBin(data), charset));
+    else if (!isAtt && type === 'text/html') out.htmls.push(decodeCharset(bytesFromBin(data), charset));
+    else if (data.length) out.atts.push({ name: name || type.replace('/', '.'), type, data });
+    return out;
+  }
+  function htmlToText(html) {
+    html = html.replace(/<br\s*\/?>/gi, '\n').replace(/<\/(p|div|tr|li|h\d|blockquote|table)>/gi, '$&\n');
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    doc.querySelectorAll('script,style,head,title').forEach(n => n.remove());
+    return (doc.body ? doc.body.textContent : '').replace(/[ \t ]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+  }
+  function fmtSize(n) {
+    return n < 1024 ? n + ' B' : n < 1048576 ? (n / 1024).toFixed(0) + ' kB' : (n / 1048576).toFixed(1) + ' MB';
+  }
+  function fmtDate(d, long) {
+    if (!d) return '';
+    const o = long ? { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' } : { year: 'numeric', month: 'short', day: 'numeric' };
+    return new Date(d).toLocaleString(undefined, o);
+  }
+
+  // ---------- state ----------
+  let src = null, msgs = [], view = [], shown = 0, cur = -1;
+  let newestFirst = store.get('mbox-reader-newest', true);
+  let bodyHits = null, searchToken = 0, loadToken = 0, scrollY = 0;
+  const statusEl = $('#status'), listEl = $('#list');
+
+  function status(text, err) { statusEl.textContent = text; statusEl.classList.toggle('err', !!err); }
+  function readRange(s, e) {
+    if (src.bytes) return src.bytes.subarray(s, e);
+    return src.file.slice(s, e).arrayBuffer().then(b => new Uint8Array(b));
+  }
+
+  function opened(name) {
+    if (!msgs.length) { status('No messages found in ' + name + '.', true); return; }
+    status(fmtN(msgs.length) + ' messages in ' + name);
+    $('#opener').hidden = true;
+    $('#browse').hidden = false;
+    $('#reader').hidden = true;
+    $('#q').value = '';
+    bodyHits = null;
+    applyFilter();
+  }
+  function indexBytes(bytes, name) {
+    const ix = makeIndexer();
+    msgs = ix.feed(bytes, true);
+    src = { bytes, name };
+    opened(name);
+  }
+  async function indexFile(file) {
+    const token = ++loadToken;
+    const ix = makeIndexer();
+    status('Reading ' + file.name + '…');
+    try {
+      for (let off = 0; off < file.size || off === 0; off += CHUNK) {
+        const end = Math.min(file.size, off + CHUNK);
+        const buf = new Uint8Array(await file.slice(off, end).arrayBuffer());
+        if (token !== loadToken) return;
+        ix.feed(buf, end >= file.size);
+        status('Reading ' + file.name + ' ' + Math.round(end / Math.max(file.size, 1) * 100) + '% · ' + fmtN(ix.msgs.length) + ' messages');
+        if (end >= file.size) break;
+      }
+    } catch {
+      status('Could not read that file.', true);
+      return;
+    }
+    msgs = ix.msgs;
+    src = { file, name: file.name };
+    opened(file.name);
+  }
+
+  // ---------- list ----------
+  function terms() { return $('#q').value.toLowerCase().split(/\s+/).filter(Boolean); }
+  function applyFilter() {
+    const ts = terms();
+    view = ts.length ? msgs.filter(m => ts.every(t => m.k.includes(t)) || (bodyHits && bodyHits.has(m.i))) : msgs.slice();
+    view.sort(newestFirst ? (a, b) => b.d - a.d || b.i - a.i : (a, b) => a.d - b.d || a.i - b.i);
+    $('#sort').textContent = newestFirst ? 'Newest' : 'Oldest';
+    $('#deep').hidden = !ts.length || !!bodyHits;
+    listEl.textContent = '';
+    shown = 0;
+    renderMore();
+    if (ts.length) status(fmtN(view.length) + ' of ' + fmtN(msgs.length) + ' messages match' + (bodyHits ? ' (subjects and text)' : ''));
+    else status(fmtN(msgs.length) + ' messages in ' + src.name);
+  }
+  function renderMore() {
+    const frag = document.createDocumentFragment();
+    const stop = Math.min(view.length, shown + PAGE);
+    for (let k = shown; k < stop; k++) {
+      const m = view[k];
+      const li = document.createElement('li');
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'msg' + (bodyHits && bodyHits.has(m.i) ? ' hit' : '');
+      b.dataset.v = k;
+      const top = document.createElement('span'); top.className = 'top';
+      const who = document.createElement('span'); who.className = 'who'; who.textContent = m.f;
+      const when = document.createElement('span'); when.className = 'when'; when.textContent = fmtDate(m.d);
+      const subj = document.createElement('span'); subj.className = 'subj'; subj.textContent = m.t || '(no subject)';
+      top.append(who, when); b.append(top, subj); li.append(b); frag.append(li);
+    }
+    listEl.append(frag);
+    shown = stop;
+    const more = $('#more');
+    more.hidden = shown >= view.length;
+    more.textContent = 'Show more (' + fmtN(view.length - shown) + ' left)';
+  }
+
+  // search inside message text, reading the file in large slices
+  async function deepSearch() {
+    const ts = terms();
+    if (!ts.length) return;
+    const token = ++searchToken;
+    const hits = new Set();
+    $('#deep').hidden = true;
+    let k = 0;
+    while (k < msgs.length) {
+      let j = k;
+      while (j < msgs.length && msgs[j].e - msgs[k].s < CHUNK) j++;
+      if (j === k) j = k + 1;
+      const s = msgs[k].s;
+      const bytes = await readRange(s, msgs[j - 1].e);
+      if (token !== searchToken) return;
+      for (let x = k; x < j; x++) {
+        const m = msgs[x];
+        const raw = utf8.decode(bytes.subarray(m.s - s, m.e - s)).toLowerCase();
+        const text = raw.indexOf('=\n') >= 0 || raw.indexOf('=3d') >= 0 ? decodeQP(raw) : raw;
+        if (ts.every(t => text.includes(t))) hits.add(m.i);
+      }
+      k = j;
+      status('Searching ' + Math.round(k / msgs.length * 100) + '%');
+      await new Promise(r => setTimeout(r, 0));
+      if (token !== searchToken) return;
+    }
+    bodyHits = hits;
+    applyFilter();
+  }
+
+  // ---------- reader ----------
+  function openAt(v) {
+    if (v < 0 || v >= view.length) return;
+    if (cur < 0) scrollY = window.scrollY;
+    cur = v;
+    const m = view[v];
+    $('#browse').hidden = true;
+    $('#opener').hidden = true;
+    $('#reader').hidden = false;
+    $('#reader-subject').textContent = m.t || '(no subject)';
+    $('#hdrs').textContent = '';
+    $('#body').textContent = 'Loading…';
+    $('#atts').textContent = '';
+    $('#prev').disabled = v === 0;
+    $('#next').disabled = v === view.length - 1;
+    window.scrollTo(0, 0);
+    const got = readRange(m.s, m.e);
+    if (got instanceof Uint8Array) render(m, got);
+    else got.then(b => { if (cur === v) render(m, b); }, () => { $('#body').textContent = 'Could not read this message.'; });
+  }
+  function render(m, bytes) {
+    let bin = binFromBytes(bytes);
+    const nl = bin.indexOf('\n');
+    if (bin.startsWith('From ') && nl >= 0) bin = bin.slice(nl + 1);
+    const out = parseEntity(bin, { texts: [], htmls: [], atts: [], headers: null }, 0);
+    const h = out.headers || {};
+    const lines = [['From', decodeWords(h.from || m.f)], ['To', decodeWords(h.to || '')], ['Cc', decodeWords(h.cc || '')], ['Date', fmtDate(m.d, true) || h.date || '']];
+    const hd = $('#hdrs');
+    for (const [k, v] of lines) {
+      if (!v) continue;
+      const div = document.createElement('div');
+      div.textContent = k + ': ' + v;
+      hd.append(div);
+    }
+    let text = out.texts.join('\n\n').trim();
+    if (!text && out.htmls.length) text = out.htmls.map(htmlToText).join('\n\n');
+    text = text.replace(/\r\n/g, '\n').replace(/^>(>*From )/gm, '$1').trim();
+    $('#body').textContent = text || '(no text in this message)';
+    const ul = $('#atts');
+    out.atts.forEach(a => {
+      const li = document.createElement('li');
+      const span = document.createElement('span');
+      span.textContent = a.name + ' · ' + fmtSize(a.data.length);
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = 'Save';
+      b.addEventListener('click', () => {
+        const url = URL.createObjectURL(new Blob([bytesFromBin(a.data)], { type: a.type || 'application/octet-stream' }));
+        const link = document.createElement('a');
+        link.href = url; link.download = a.name; link.style.display = 'none';
+        document.body.append(link); link.click(); link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
+      });
+      li.append(span, b);
+      ul.append(li);
+    });
+  }
+  function closeReader() {
+    cur = -1;
+    $('#reader').hidden = true;
+    $('#browse').hidden = false;
+    window.scrollTo(0, scrollY);
+  }
+
+  // ---------- wiring ----------
+  $('#file').addEventListener('change', e => { const f = e.target.files[0]; if (f) indexFile(f); e.target.value = ''; });
+  $('#read-paste').addEventListener('click', () => {
+    let text = $('#paste').value;
+    if (!text.trim()) { status('Paste the text of an mbox file first.', true); return; }
+    if (!/^From /.test(text)) text = 'From pasted Thu Jan  1 00:00:00 1970\n' + text;
+    indexBytes(new TextEncoder().encode(text), 'pasted text');
+  });
+  let qTimer = 0;
+  $('#q').addEventListener('input', () => {
+    searchToken++; bodyHits = null;
+    clearTimeout(qTimer);
+    if (msgs.length > 20000) qTimer = setTimeout(applyFilter, 150); else applyFilter();
+  });
+  $('#q').addEventListener('keydown', e => { if (e.key === 'Enter') e.target.blur(); });
+  $('#sort').addEventListener('click', () => { newestFirst = !newestFirst; store.set('mbox-reader-newest', newestFirst); applyFilter(); });
+  $('#deep').addEventListener('click', deepSearch);
+  $('#more').addEventListener('click', renderMore);
+  listEl.addEventListener('click', e => { const b = e.target.closest('.msg'); if (b) openAt(+b.dataset.v); });
+  $('#back').addEventListener('click', closeReader);
+  $('#prev').addEventListener('click', () => openAt(cur - 1));
+  $('#next').addEventListener('click', () => openAt(cur + 1));
+  $('#another').addEventListener('click', () => {
+    loadToken++; searchToken++;
+    msgs = []; view = []; src = null;
+    listEl.textContent = '';
+    $('#browse').hidden = true;
+    $('#opener').hidden = false;
+    status('No mailbox open.');
+  });
+  document.addEventListener('keydown', e => {
+    if (cur < 0 || e.target.matches('input,textarea')) return;
+    if (e.key === 'Escape') closeReader();
+    else if (e.key === 'ArrowLeft' || e.key === 'k') openAt(cur - 1);
+    else if (e.key === 'ArrowRight' || e.key === 'j') openAt(cur + 1);
+  });
+  const drop = document.documentElement;
+  drop.addEventListener('dragover', e => { e.preventDefault(); $('#drop').classList.add('over'); });
+  drop.addEventListener('dragleave', () => $('#drop').classList.remove('over'));
+  drop.addEventListener('drop', e => {
+    e.preventDefault(); $('#drop').classList.remove('over');
+    const f = e.dataTransfer && e.dataTransfer.files[0];
+    if (f) indexFile(f);
+  });
+})();
+</script>
+</body>
+</html>
