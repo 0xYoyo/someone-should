@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a random handwriting generator</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+
+#paper{width:100%;display:block;border:1px solid var(--line);border-radius:var(--radius);background:#fbf9f3}
+label{display:grid;gap:4px;font-size:16px}
+label span{color:var(--meta);font-size:16px}
+input[type=range]{padding:0;min-height:var(--tap);accent-color:var(--ink)}
+textarea{min-height:96px;resize:vertical}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+#info{font-size:16px;color:var(--meta)}
+#err{font-size:16px;color:var(--no);min-height:0}
+
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a random handwriting generator</h1>
+<main id="app" class="stack">
+<canvas id="paper" width="600" height="360" aria-label="handwriting preview"></canvas>
+<div id="info">-</div>
+<textarea id="text" aria-label="text" maxlength="600">Dear Sam, thanks for the lovely evening. See you on Friday!</textarea>
+<div class="grid">
+<label><span>Slant</span><input id="slant" type="range" min="-20" max="40" value="14"></label>
+<label><span>Messiness</span><input id="mess" type="range" min="0" max="10" value="4"></label>
+<label><span>Size</span><input id="size" type="range" min="22" max="56" value="34"></label>
+<label><span>Ink</span><select id="ink"><option value="#1d3a8a">Blue</option><option value="#141414">Black</option><option value="#7a1f2b">Red</option><option value="#2e5d3a">Green</option></select></label>
+</div>
+<div class="row">
+<button id="again" class="primary">New handwriting</button>
+<button id="save">Save PNG</button>
+</div>
+<div id="err" role="status"></div>
+</main>
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const cv = $('#paper'), ctx = cv.getContext('2d');
+  const FONT = '"Bradley Hand","Segoe Script","Snell Roundhand","Comic Sans MS","Apple Chancery",cursive,serif';
+  let seed = store.get('hw.seed', 20240611);
+  const saved = store.get('hw.opts', null);
+  if (saved) {
+    for (const k of ['text', 'slant', 'mess', 'size', 'ink']) if (saved[k] != null) $('#' + k).value = saved[k];
+  }
+
+  function rng(a) {
+    return () => {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      let t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  function draw(w, scale) {
+    const text = $('#text').value;
+    const slant = +$('#slant').value, mess = +$('#mess').value / 10, size = +$('#size').value;
+    const ink = $('#ink').value;
+    const lh = Math.round(size * 1.5), margin = 24, top = lh;
+    const maxW = w - margin * 2;
+    const rnd = rng(seed);
+    ctx.font = size + 'px ' + FONT;
+    // wrap into lines
+    const lines = [];
+    for (const para of text.split('\n')) {
+      let cur = '';
+      for (const word of para.split(/\s+/).filter(Boolean)) {
+        const t = cur ? cur + ' ' + word : word;
+        if (cur && ctx.measureText(t).width * 1.04 > maxW) { lines.push(cur); cur = word; } else cur = t;
+      }
+      lines.push(cur);
+    }
+    const h = Math.max(lh * 3, top + lines.length * lh + 10);
+    cv.width = Math.round(w * scale); cv.height = Math.round(h * scale);
+    cv.style.aspectRatio = w + ' / ' + h;
+    ctx.setTransform(scale, 0, 0, scale, 0, 0);
+    ctx.fillStyle = '#fbf9f3'; ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = '#d6dcea'; ctx.lineWidth = 1;
+    for (let y = top + 6; y < h; y += lh) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+    ctx.textBaseline = 'alphabetic';
+    let n = 0;
+    lines.forEach((line, i) => {
+      let x = margin + (rnd() - 0.5) * 10 * mess;
+      const drift = (rnd() - 0.5) * 8 * mess;
+      const base = top + i * lh;
+      for (const ch of line) {
+        const s = size * (1 + (rnd() - 0.5) * 0.28 * mess);
+        ctx.font = s + 'px ' + FONT;
+        const adv = ctx.measureText(ch).width;
+        if (ch !== ' ') {
+          const y = base + drift * (x / w) + Math.sin(x / 40 + i) * 2 * mess + (rnd() - 0.5) * 6 * mess;
+          const rot = (rnd() - 0.5) * 0.3 * mess;
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.rotate(rot);
+          ctx.transform(1, 0, -Math.tan(slant * Math.PI / 180), 1, 0, 0);
+          ctx.globalAlpha = 0.82 + rnd() * 0.18;
+          ctx.fillStyle = ink;
+          ctx.fillText(ch, 0, 0);
+          ctx.strokeStyle = ink; ctx.lineWidth = 0.5 + rnd() * 0.5;
+          ctx.strokeText(ch, 0, 0);
+          ctx.restore();
+          n++;
+        }
+        x += adv * (0.96 + (rnd() - 0.5) * 0.14 * mess);
+      }
+    });
+    $('#info').textContent = n ? n + ' characters, ' + lines.length + (lines.length === 1 ? ' line' : ' lines') + ', style #' + (seed % 10000) : 'Type something above.';
+    return n;
+  }
+
+  function render() {
+    const w = Math.max(280, Math.round(cv.getBoundingClientRect().width || 340));
+    draw(w, Math.min(window.devicePixelRatio || 1, 2));
+    store.set('hw.opts', { text: $('#text').value, slant: $('#slant').value, mess: $('#mess').value, size: $('#size').value, ink: $('#ink').value });
+  }
+
+  ['text', 'slant', 'mess', 'size', 'ink'].forEach(id => $('#' + id).addEventListener('input', render));
+  $('#again').addEventListener('click', () => {
+    seed = (Math.random() * 1e9) | 0; store.set('hw.seed', seed); render();
+  });
+  $('#save').addEventListener('click', () => {
+    $('#err').textContent = '';
+    if (!$('#text').value.trim()) { $('#err').textContent = 'Nothing to save yet.'; return; }
+    try {
+      draw(900, 2); // fixed width for export
+      cv.toBlob(b => {
+        if (!b) { $('#err').textContent = 'Could not make the image.'; return; }
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(b); a.download = 'handwriting.png';
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+        render();
+      });
+    } catch (e) { $('#err').textContent = 'Could not save the image.'; render(); }
+  });
+  window.addEventListener('resize', render);
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+{
+  "slug": "fake-bad-signal",
+  "wish": "someone should make an app that simulates static on a phone call so you can leave an awkward call",
+  "year": 2013,
+  "agreed": 74,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/CrazyIdeas/comments/1pk1g0/",
+      "date": "2013-10-30",
+      "points": 44,
+      "comments": 5
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/CrazyIdeas/comments/194r5p/",
+      "date": "2013-02-24",
+      "points": 20,
+      "comments": 5
+    }
+  ],
+  "spec": "Plays synthesized phone-line static with crackle and dropouts through the speaker.\\nTap start, pick light, heavy or dead line, hold the phone near the other speaker and say you are breaking up.\\nIt does not touch the call itself or play any recorded audio.",
+  "tests": [
+    {
+      "tap": "#dead"
+    },
+    {
+      "expect": {
+        "sel": "#sev",
+        "contains": "dead line"
+      }
+    },
+    {
+      "tap": "#start"
+    },
+    {
+      "expect": {
+        "sel": "#state",
+        "contains": "static is on"
+      }
+    },
+    {
+      "tap": "#start"
+    },
+    {
+      "expect": {
+        "sel": "#state",
+        "contains": "static is off"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:49:00Z",
+  "model": "sonnet-5.5",
+  "minutes": 3,
+  "approved": false,
+  "notes": "Audio is synthesized with Web Audio; no network."
+}

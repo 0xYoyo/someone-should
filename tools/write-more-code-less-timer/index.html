@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a timer that adds time when you write blog posts and subtracts double when you code the blog</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+.modes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.modes button { min-height: 64px; display: grid; gap: 2px; align-content: center; text-align: left; }
+.modes button small { font: 13px/1.2 var(--mono); opacity: .7; }
+.modes button.on { background: var(--ink); color: var(--paper); }
+.neg { color: var(--no); }
+.pos { color: var(--built); }
+.mins { width: 96px; }
+.err { min-height: 24px; }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a timer that adds time when you write blog posts and subtracts double when you code the blog</h1>
+<main id="app" class="stack">
+  <div>
+    <div class="meta">balance</div>
+    <div class="big" id="balance">+10:00</div>
+    <div class="meta" id="status">stopped</div>
+  </div>
+  <div class="modes">
+    <button id="write" type="button">write<small>+1 min per min</small></button>
+    <button id="code" type="button">code<small>-2 min per min</small></button>
+  </div>
+  <div class="row">
+    <input id="mins" class="mins" type="number" inputmode="numeric" min="1" max="999" value="15" aria-label="minutes">
+    <button id="addw" type="button">add written</button>
+    <button id="addc" type="button">add coded</button>
+  </div>
+  <div class="meta err" id="err"></div>
+  <ul class="plain" id="log"></ul>
+  <div><button id="reset" type="button">reset</button></div>
+</main>
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const MULT = { write: 1, code: -2 };
+  // seconds; example entries so the first frame shows the tool working
+  const seed = { log: [{ m: 'write', s: 1800 }, { m: 'code', s: 600 }], run: null };
+  let st = store.get('wmcl-timer', null);
+  if (!st || !Array.isArray(st.log)) st = seed;
+
+  const save = () => store.set('wmcl-timer', st);
+  const base = () => st.log.reduce((a, e) => a + MULT[e.m] * e.s, 0);
+  const elapsed = () => st.run ? Math.max(0, Math.floor((Date.now() - st.run.t) / 1000)) : 0;
+  const fmt = n => {
+    const a = Math.abs(Math.round(n));
+    const h = Math.floor(a / 3600), m = Math.floor(a % 3600 / 60), s = a % 60;
+    const p = x => String(x).padStart(2, '0');
+    return (n < 0 ? '-' : '+') + (h ? h + ':' + p(m) : p(m)) + ':' + p(s);
+  };
+  const dur = s => { const m = Math.floor(s / 60), r = s % 60; return m + 'm' + (r ? ' ' + r + 's' : ''); };
+
+  function render() {
+    const bal = base() + (st.run ? MULT[st.run.m] * elapsed() : 0);
+    const b = $('#balance');
+    b.textContent = fmt(bal);
+    b.className = 'big ' + (bal < 0 ? 'neg' : bal > 0 ? 'pos' : '');
+    $('#write').className = st.run && st.run.m === 'write' ? 'on' : '';
+    $('#code').className = st.run && st.run.m === 'code' ? 'on' : '';
+    $('#status').textContent = st.run ? (st.run.m === 'write' ? 'writing ' : 'coding ') + dur(elapsed()) : 'stopped';
+    const ul = $('#log');
+    if (!st.log.length) { ul.innerHTML = '<li class="empty">nothing logged yet</li>'; return; }
+    ul.innerHTML = '';
+    st.log.slice().reverse().slice(0, 20).forEach(e => {
+      const li = document.createElement('li');
+      const a = document.createElement('span'), c = document.createElement('span');
+      a.textContent = (e.m === 'write' ? 'write ' : 'code ') + dur(e.s);
+      c.className = 'meta';
+      c.textContent = fmt(MULT[e.m] * e.s);
+      li.append(a, c);
+      ul.appendChild(li);
+    });
+  }
+
+  function stopRun() {
+    if (!st.run) return;
+    const s = elapsed();
+    if (s > 0) st.log.push({ m: st.run.m, s });
+    st.run = null;
+  }
+  function toggle(m) {
+    const same = st.run && st.run.m === m;
+    stopRun();
+    if (!same) st.run = { m, t: Date.now() };
+    save(); render();
+  }
+  function add(m) {
+    const v = Math.floor(Number($('#mins').value));
+    if (!(v >= 1 && v <= 999)) { $('#err').textContent = 'enter 1 to 999 minutes'; return; }
+    $('#err').textContent = '';
+    st.log.push({ m, s: v * 60 });
+    save(); render();
+  }
+
+  $('#write').addEventListener('click', () => toggle('write'));
+  $('#code').addEventListener('click', () => toggle('code'));
+  $('#addw').addEventListener('click', () => add('write'));
+  $('#addc').addEventListener('click', () => add('code'));
+  $('#reset').addEventListener('click', () => { st = { log: [], run: null }; save(); $('#err').textContent = ''; render(); });
+  setInterval(() => { if (st.run) render(); }, 1000);
+  render();
+})();
+</script>
+</body>
+</html>

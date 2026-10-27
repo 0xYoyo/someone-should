@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a simple entertaining guide that teaches Americans the metric system</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+.card { border: 1.5px solid var(--line); border-radius: var(--radius); padding: 16px; display: grid; gap: 14px; }
+.q { font-size: 22px; line-height: 1.25; font-weight: 500; }
+.prog { font: 16px/1.4 var(--mono); color: var(--meta); display: flex; justify-content: space-between; }
+.opts { display: grid; gap: 10px; }
+.opts button { text-align: left; font-size: 20px; min-height: 52px; font-variant-numeric: tabular-nums; }
+.opts button.good { border-color: var(--built); color: var(--built); border-width: 2.5px; }
+.opts button.bad { border-color: var(--no); color: var(--no); }
+.fb { min-height: 48px; }
+.fb b { font-weight: 600; }
+.fb.ok b { color: var(--built); }
+.fb.miss b { color: var(--no); }
+.hint { font-size: 16px; color: var(--meta); }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a simple entertaining guide that teaches Americans the metric system</h1>
+
+<main id="app" class="stack">
+  <div class="prog"><span id="step"></span><span id="score"></span></div>
+  <section class="card" id="card">
+    <div class="q" id="q"></div>
+    <div class="opts" id="opts"></div>
+    <div class="fb" id="fb" aria-live="polite"></div>
+    <div class="row"><button class="primary" id="next" hidden>Next</button></div>
+  </section>
+  <p class="hint" id="hint">Pick the one that fits. Each answer comes with something to remember it by.</p>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  // [question, right answer, two wrong answers, thing to remember]
+  const Q = [
+    ['How tall is a standard door?', '2 m', ['20 cm', '20 m'], 'A door is about 2 m. A tall adult is just under it.'],
+    ['How wide is a credit card?', '8.5 cm', ['85 cm', '8.5 mm'], 'A credit card is 8.5 cm. A finger is about 1 cm wide.'],
+    ['A can of soda holds', '355 mL', ['35 mL', '3.5 L'], 'A can is 355 mL. A teaspoon is 5 mL.'],
+    ['A gallon of milk is about', '3.8 L', ['380 mL', '38 L'], 'A gallon is 3.8 L, so a liter is a bit more than a quart.'],
+    ['A comfortable room is about', '21 \u00b0C', ['5 \u00b0C', '40 \u00b0C'], '0 is freezing, 10 is a cold jacket, 20 is a nice room, 30 is hot.'],
+    ['A hot summer day is about', '35 \u00b0C', ['15 \u00b0C', '60 \u00b0C'], '30 is hot, 35 is very hot. 40 is a heat warning.'],
+    ['A fever starts at about', '38 \u00b0C', ['28 \u00b0C', '48 \u00b0C'], 'Normal body temperature is 37 \u00b0C. 38 and up is a fever.'],
+    ['One mile is about', '1.6 km', ['160 m', '16 km'], 'A mile is 1.6 km. A 5K race is just over 3 miles.'],
+    ['A pound of butter weighs', '450 g', ['45 g', '4.5 kg'], 'A pound is 450 g. A kilogram is a bit over 2 pounds.'],
+    ['An adult weighs about', '70 kg', ['7 kg', '700 kg'], '70 kg is about 154 pounds. Double the kilos and add 10% to get pounds.'],
+    ['A highway speed limit of 65 mph is', '105 km/h', ['65 km/h', '205 km/h'], '100 km/h is about 62 mph. Multiply mph by 1.6.']
+  ];
+
+  let st = store.get('mfa', { i: 0, right: 0, best: 0 });
+  if (!st || typeof st.i !== 'number' || st.i < 0 || st.i > Q.length) st = { i: 0, right: 0, best: 0 };
+  let answered = false;
+
+  const save = () => store.set('mfa', st);
+
+  function show() {
+    const card = $('#card');
+    $('#score').textContent = st.right + ' right';
+    if (st.i >= Q.length) {
+      st.best = Math.max(st.best || 0, st.right);
+      save();
+      $('#step').textContent = 'done';
+      $('#q').textContent = st.right + ' of ' + Q.length + ' right';
+      $('#opts').innerHTML = '';
+      $('#fb').className = 'fb';
+      $('#fb').textContent = 'Best so far: ' + st.best + ' of ' + Q.length + '.';
+      $('#next').textContent = 'Again';
+      $('#next').hidden = false;
+      $('#hint').hidden = true;
+      return;
+    }
+    const [q, right, wrong, tip] = Q[st.i];
+    answered = false;
+    $('#step').textContent = (st.i + 1) + ' of ' + Q.length;
+    $('#q').textContent = q;
+    $('#fb').className = 'fb';
+    $('#fb').textContent = '';
+    $('#next').hidden = true;
+    $('#next').textContent = st.i === Q.length - 1 ? 'Finish' : 'Next';
+    $('#hint').hidden = false;
+    // rotate where the right answer sits, so it is not always the same slot
+    const opts = [right, wrong[0], wrong[1]];
+    const shift = st.i % 3;
+    const order = opts.map((_, k) => opts[(k + shift) % 3]);
+    const box = $('#opts');
+    box.innerHTML = '';
+    order.forEach(text => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = text;
+      b.dataset.ok = text === right ? '1' : '0';
+      b.addEventListener('click', () => pick(b, tip));
+      box.appendChild(b);
+    });
+  }
+
+  function pick(btn, tip) {
+    if (answered) return;
+    answered = true;
+    const ok = btn.dataset.ok === '1';
+    if (ok) st.right++;
+    st.i++;
+    save();
+    document.querySelectorAll('#opts button').forEach(b => {
+      if (b.dataset.ok === '1') b.classList.add('good');
+      else if (b === btn) b.classList.add('bad');
+      b.disabled = true;
+    });
+    const fb = $('#fb');
+    fb.className = 'fb ' + (ok ? 'ok' : 'miss');
+    fb.innerHTML = '<b>' + (ok ? 'Right.' : 'Not quite.') + '</b> ';
+    fb.appendChild(document.createTextNode(tip));
+    $('#score').textContent = st.right + ' right';
+    $('#next').hidden = false;
+    $('#hint').hidden = true;
+  }
+
+  $('#next').addEventListener('click', () => {
+    if (st.i >= Q.length && $('#next').textContent === 'Again') st = { i: 0, right: 0, best: st.best || 0 };
+    show();
+  });
+
+  show();
+})();
+</script>
+</body>
+</html>

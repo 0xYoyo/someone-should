@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a stealth game where Santa breaks into houses to deliver gifts</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+#board { display: grid; width: 100%; max-width: 380px; margin: 0 auto; border: 1.5px solid var(--ink); touch-action: manipulation; }
+.c { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font: 600 17px/1 var(--mono); position: relative; }
+.c.w { background: var(--meta); }
+.c.sight { background: rgba(200, 50, 30, .22); }
+.c.near { background: rgba(200, 50, 30, .10); }
+.c.door { box-shadow: inset 0 -4px 0 var(--line); }
+.c.door.open { box-shadow: inset 0 -4px 0 var(--built); }
+.c.tree { color: var(--built); }
+.u { width: 78%; height: 78%; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+.u.santa { background: var(--no); color: #fff; }
+.u.kid { border: 1.5px dashed var(--ink); }
+.u.dog { border: 1.5px solid var(--ink); border-radius: var(--radius); }
+.u.hit { outline: 3px solid var(--no); outline-offset: 1px; }
+#info { display: flex; justify-content: space-between; gap: 12px; margin: 0 auto 10px; max-width: 380px; }
+#status { min-height: 48px; max-width: 380px; margin: 12px auto 4px; }
+#pad { display: grid; grid-template-columns: repeat(3, 64px); grid-template-rows: repeat(2, 56px); gap: 6px; justify-content: center; margin: 8px 0; }
+#pad button { min-height: 56px; padding: 0; }
+#up { grid-column: 2; grid-row: 1; }
+#left { grid-column: 1; grid-row: 2; }
+#down { grid-column: 2; grid-row: 2; }
+#right { grid-column: 3; grid-row: 2; }
+#wait { grid-column: 1; grid-row: 1; }
+#next { grid-column: 3; grid-row: 1; }
+#pad button[hidden] { display: none; }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a stealth game where Santa breaks into houses to deliver gifts</h1>
+
+<main id="app">
+  <div id="info" class="meta"><span id="house">house 1 of 3</span><span>moves <span id="moves">0</span></span></div>
+  <div id="board" role="img" aria-label="top-down map of a house"></div>
+  <p id="status" aria-live="polite"></p>
+  <div id="pad">
+    <button id="wait" type="button">wait</button>
+    <button id="up" type="button" aria-label="up">&#9650;</button>
+    <button id="left" type="button" aria-label="left">&#9664;</button>
+    <button id="down" type="button" aria-label="down">&#9660;</button>
+    <button id="right" type="button" aria-label="right">&#9654;</button>
+    <button id="next" type="button" class="primary" hidden>next</button>
+  </div>
+  <div class="row" style="justify-content:center"><button id="reset" type="button">restart house</button></div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+// CORE
+const LEVELS = [
+  ['#######','#T....#','#.###.#','#.....#','#.#.#.#','#..D..#','###S###'],
+  ['#######','#T..K.#','#.##..#','#...#.#','#.#...#','#.D...#','###S###'],
+  ['#######','#T..K.#','#.##..#','#...V.#','#.#...#','#.....#','###S###']
+];
+function parse(map) {
+  const g = { w: map[0].length, h: map.length, walls: new Set(), kids: [], mons: [], tree: null, start: null };
+  map.forEach((row, y) => [...row].forEach((c, x) => {
+    const k = x + ',' + y;
+    if (c === '#') g.walls.add(k);
+    else if (c === 'T') g.tree = { x, y };
+    else if (c === 'S') g.start = { x, y };
+    else if (c === 'K') g.kids.push({ x, y });
+    else if (c === 'D') g.mons.push({ x, y, dx: 1, dy: 0 });
+    else if (c === 'V') g.mons.push({ x, y, dx: 0, dy: 1 });
+  }));
+  return g;
+}
+function open(g, x, y) { return x >= 0 && y >= 0 && x < g.w && y < g.h && !g.walls.has(x + ',' + y); }
+// Why Santa is seen, or '' if safe.
+function seen(g, s, mons) {
+  for (const k of g.kids) if (Math.abs(k.x - s.x) <= 1 && Math.abs(k.y - s.y) <= 1) return 'kid';
+  for (const m of mons) {
+    for (let i = 0; i <= 3; i++) {
+      const x = m.x + m.dx * i, y = m.y + m.dy * i;
+      if (!open(g, x, y)) break;
+      if (x === s.x && y === s.y) return 'dog';
+    }
+  }
+  return '';
+}
+function moveMons(g, mons) {
+  return mons.map(m => {
+    const n = { ...m };
+    if (open(g, m.x + m.dx, m.y + m.dy)) { n.x += m.dx; n.y += m.dy; } else { n.dx = -m.dx; n.dy = -m.dy; }
+    return n;
+  });
+}
+// One turn. Returns new state with .result: '', 'caught:kid|dog', 'done'.
+function step(g, st, dx, dy) {
+  const nx = st.x + dx, ny = st.y + dy;
+  const s = open(g, nx, ny) ? { x: nx, y: ny } : { x: st.x, y: st.y };
+  let gift = st.gift;
+  if (gift && g.tree && s.x === g.tree.x && s.y === g.tree.y) gift = false;
+  let r = seen(g, s, st.mons);
+  const mons = moveMons(g, st.mons);
+  if (!r) r = seen(g, s, mons);
+  let result = r ? 'caught:' + r : '';
+  if (!result && !gift && s.x === g.start.x && s.y === g.start.y) result = 'done';
+  return { x: s.x, y: s.y, gift, mons, result, moves: st.moves + 1 };
+}
+function initial(g) { return { x: g.start.x, y: g.start.y, gift: true, mons: g.mons.map(m => ({ ...m })), result: '', moves: 0 }; }
+// /CORE
+
+  let lvl = Math.min(Math.max(0, store.get('santa-level', 0) | 0), LEVELS.length - 1);
+  let g, st;
+
+  function load(i) {
+    lvl = i; store.set('santa-level', i);
+    g = parse(LEVELS[i]); st = initial(g);
+    draw();
+  }
+
+  function draw() {
+    const b = $('#board');
+    b.style.gridTemplateColumns = 'repeat(' + g.w + ', 1fr)';
+    // cells lit by dog sight and by sleeping kids
+    const sight = new Set(), near = new Set();
+    st.mons.forEach(m => {
+      for (let i = 1; i <= 3; i++) {
+        const x = m.x + m.dx * i, y = m.y + m.dy * i;
+        if (!open(g, x, y)) break;
+        sight.add(x + ',' + y);
+      }
+    });
+    g.kids.forEach(k => { for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) if (open(g, k.x + dx, k.y + dy)) near.add((k.x + dx) + ',' + (k.y + dy)); });
+    const hit = st.result.startsWith('caught');
+    let h = '';
+    for (let y = 0; y < g.h; y++) for (let x = 0; x < g.w; x++) {
+      const k = x + ',' + y;
+      let cls = 'c', inner = '';
+      if (g.walls.has(k)) cls += ' w';
+      else {
+        if (near.has(k)) cls += ' near';
+        if (sight.has(k)) cls += ' sight';
+        if (g.start.x === x && g.start.y === y) cls += ' door' + (st.gift ? '' : ' open');
+        if (g.tree.x === x && g.tree.y === y) { cls += ' tree'; inner = st.gift ? 'T' : 'T+'; }
+        if (g.kids.some(q => q.x === x && q.y === y)) inner = '<span class="u kid">K</span>';
+        if (st.mons.some(m => m.x === x && m.y === y)) inner = '<span class="u dog">D</span>';
+        if (st.x === x && st.y === y) inner = '<span class="u santa' + (hit ? ' hit' : '') + '">S</span>';
+      }
+      h += '<div class="' + cls + '">' + inner + '</div>';
+    }
+    b.innerHTML = h;
+    $('#house').textContent = 'house ' + (lvl + 1) + ' of ' + LEVELS.length;
+    $('#moves').textContent = st.moves;
+    const over = st.result !== '';
+    ['up', 'down', 'left', 'right', 'wait'].forEach(id => { $('#' + id).disabled = over; });
+    $('#next').hidden = st.result !== 'done' || lvl === LEVELS.length - 1;
+    let msg;
+    if (st.result === 'caught:dog') msg = 'A dog saw you. Restart the house.';
+    else if (st.result === 'caught:kid') msg = 'A kid woke up. Restart the house.';
+    else if (st.result === 'done') msg = lvl === LEVELS.length - 1 ? 'All three houses done. Nobody woke up.' : 'Gift under the tree, back out unseen.';
+    else if (st.gift) msg = 'Reach the tree with the gift. Stay out of dog sight and one step from kids.';
+    else msg = 'Gift delivered. Back to the door.';
+    $('#status').textContent = msg;
+  }
+
+  function go(dx, dy) {
+    if (st.result) return;
+    st = step(g, st, dx, dy);
+    draw();
+  }
+
+  $('#up').onclick = () => go(0, -1);
+  $('#down').onclick = () => go(0, 1);
+  $('#left').onclick = () => go(-1, 0);
+  $('#right').onclick = () => go(1, 0);
+  $('#wait').onclick = () => go(0, 0);
+  $('#reset').onclick = () => load(lvl);
+  $('#next').onclick = () => load(Math.min(lvl + 1, LEVELS.length - 1));
+  document.addEventListener('keydown', e => {
+    const m = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0], w: [0, -1], s: [0, 1], a: [-1, 0], d: [1, 0], ' ': [0, 0] }[e.key];
+    if (m) { e.preventDefault(); go(m[0], m[1]); }
+  });
+
+  load(lvl);
+})();
+</script>
+</body>
+</html>

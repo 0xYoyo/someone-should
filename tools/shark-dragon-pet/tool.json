@@ -1,0 +1,51 @@
+{
+  "slug": "shark-dragon-pet",
+  "wish": "someone should make a Tamagotchi with cooler animals like sharks and dragons",
+  "year": 2019,
+  "agreed": 69,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/ccbatx/",
+      "date": "2019-07-12",
+      "points": 57,
+      "comments": 12
+    }
+  ],
+  "spec": "A virtual pet you pick from shark, dragon or kraken. Feed, play and clean to keep hunger, fun and clean up; they drain in real time, even while the page is closed, and are saved on the device. No sound, no accounts, no evolution stages.",
+  "tests": [
+    {
+      "tap": "#feed"
+    },
+    {
+      "expect": {
+        "sel": "#msg",
+        "contains": "ate a fish"
+      }
+    },
+    {
+      "tap": "#pick-dragon"
+    },
+    {
+      "expect": {
+        "sel": "#name",
+        "contains": "Dragon"
+      }
+    },
+    {
+      "tap": "#play"
+    },
+    {
+      "expect": {
+        "sel": "#msg",
+        "contains": "breathed fire"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:50:00Z",
+  "model": "sonnet-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": ""
+}

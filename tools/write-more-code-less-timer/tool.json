@@ -1,0 +1,51 @@
+{
+  "slug": "write-more-code-less-timer",
+  "wish": "someone should make a timer that adds time when you write blog posts and subtracts double when you code the blog",
+  "year": 2026,
+  "agreed": 72,
+  "sources": [
+    {
+      "site": "bsky",
+      "url": "https://bsky.app/profile/did:plc:ln6p42mckoylrkcd3ds6b7vv/post/3mxdhu3mqqc2c",
+      "date": "2026-10-08",
+      "points": 72,
+      "comments": 0
+    }
+  ],
+  "spec": "Keeps a time balance: writing adds time at 1x, coding the blog subtracts at 2x.\nTap write or code to run a live timer, or add minutes by hand; the log and balance are saved on the device.\nIt does not sync, set goals or track anything else.",
+  "tests": [
+    {
+      "tap": "#reset"
+    },
+    {
+      "type": {
+        "sel": "#mins",
+        "text": "30"
+      }
+    },
+    {
+      "tap": "#addw"
+    },
+    {
+      "type": {
+        "sel": "#mins",
+        "text": "20"
+      }
+    },
+    {
+      "tap": "#addc"
+    },
+    {
+      "expect": {
+        "sel": "#balance",
+        "contains": "-10:00"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:47:49Z",
+  "model": "sonnet-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": ""
+}

@@ -1,0 +1,51 @@
+{
+  "slug": "find-the-moving-walker",
+  "wish": "someone should make a Where's Waldo smartphone game where the characters move around the map",
+  "year": 2013,
+  "agreed": 69,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/CrazyIdeas/comments/1qpnb3/",
+      "date": "2013-11-15",
+      "points": 66,
+      "comments": 3
+    }
+  ],
+  "spec": "A crowd of small figures wanders around a field; a card names the target by shirt colour and hat shape.\nTap Start, then tap the matching figure as fast as you can; each find starts a bigger, faster level.\nIt keeps no leaderboard and uses no network; wrong taps cost 3 s and the hint costs 5 s.",
+  "tests": [
+    {
+      "tap": "#start"
+    },
+    {
+      "wait": 300
+    },
+    {
+      "expect": {
+        "sel": "#level",
+        "contains": "Level 1"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#timer",
+        "matches": "\\d+\\.\\d s"
+      }
+    },
+    {
+      "tap": "#hint"
+    },
+    {
+      "expect": {
+        "sel": "#msg",
+        "contains": "Ring shown"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:49:17Z",
+  "model": "sonnet-5.5",
+  "minutes": 5,
+  "approved": false,
+  "notes": ""
+}

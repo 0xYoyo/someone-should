@@ -1,0 +1,54 @@
+{
+  "slug": "tiny-steps-improvement",
+  "wish": "someone should make an app that gives you small objectives to gradually improve yourself",
+  "year": 2019,
+  "agreed": 70,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/eh21v8/",
+      "date": "2019-12-29",
+      "points": 64,
+      "comments": 6
+    }
+  ],
+  "spec": "Gives one tiny daily objective in an area you pick (move, sleep, read, focus, water).\nTap done each day; after 3 done days the objective steps up, and a streak counts.\nIt does not sync, remind, or judge; everything stays on this device.",
+  "tests": [
+    {
+      "expect": {
+        "sel": "#goal",
+        "contains": "Stand up"
+      }
+    },
+    {
+      "tap": "#done"
+    },
+    {
+      "expect": {
+        "sel": "#count",
+        "matches": "^1$"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#next",
+        "contains": "2 more days"
+      }
+    },
+    {
+      "tap": "#a-read"
+    },
+    {
+      "expect": {
+        "sel": "#goal",
+        "contains": "Read 1 page"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:48:35Z",
+  "model": "sonnet-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": ""
+}

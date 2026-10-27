@@ -1,0 +1,51 @@
+{
+  "slug": "war-weary-nations",
+  "wish": "someone should make a turn-based strategy game where warring countries degrade from war effort",
+  "year": 2019,
+  "agreed": 70,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/cbttp1/",
+      "date": "2019-07-11",
+      "points": 62,
+      "comments": 8
+    }
+  ],
+  "spec": "Two-nation war game: each turn you attack, defend, rebuild or offer peace against a rival.\nEvery turn drains population, economy and morale on both sides, and the drain grows each turn.\nPeace is accepted once the rival is worn down; a nation collapses when any figure hits zero. No map, no multiplayer.",
+  "tests": [
+    {
+      "tap": "#attack"
+    },
+    {
+      "wait": 300
+    },
+    {
+      "expect": {
+        "sel": "#turn",
+        "contains": "turn 2"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#log li",
+        "contains": "both lose"
+      }
+    },
+    {
+      "tap": "#peace"
+    },
+    {
+      "expect": {
+        "sel": "#status",
+        "contains": "Refused"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:48:46Z",
+  "model": "sonnet-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": ""
+}

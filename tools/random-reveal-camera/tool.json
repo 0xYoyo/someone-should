@@ -1,0 +1,51 @@
+{
+  "slug": "random-reveal-camera",
+  "wish": "someone should make a disposable camera app that locks photos away for a random time",
+  "year": 2016,
+  "agreed": 72,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/5dymi4/",
+      "date": "2016-11-20",
+      "points": 61,
+      "comments": 11
+    }
+  ],
+  "spec": "Takes photos with the camera (or the phone's photo picker) and locks each one on the device.\nPick a wait range, shoot, and each photo stays hidden until its own random reveal time, which is never shown.\nIt does not upload anything, and photos only live in this browser's storage.",
+  "tests": [
+    {
+      "expect": {
+        "sel": "#status",
+        "contains": "Empty roll"
+      }
+    },
+    {
+      "tap": "[data-r='0']"
+    },
+    {
+      "expect": {
+        "sel": "[data-r='0']",
+        "visible": true
+      }
+    },
+    {
+      "tap": "#start"
+    },
+    {
+      "wait": 500
+    },
+    {
+      "expect": {
+        "sel": "#msg",
+        "matches": "\\S"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:48:24Z",
+  "model": "sonnet-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Camera needs permission on tap; headless test only covers the denied/fallback path."
+}

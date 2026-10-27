@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a Monopoly edition where inflation changes prices</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+.board{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.sq{border:1.5px solid var(--line);border-radius:var(--radius);padding:6px 8px;min-height:76px;display:grid;align-content:space-between;line-height:1.2;font-size:16px;position:relative}
+.sq b{font-weight:500}
+.sq.on{border-color:var(--ink)}
+.sq .own{color:var(--built)}
+.sq .tk{position:absolute;top:4px;right:6px;font-family:var(--mono);font-weight:600}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pl{border:1.5px solid var(--line);border-radius:var(--radius);padding:8px 10px}
+.pl.turn{border-color:var(--ink)}
+.pl .cash{font-size:24px;font-variant-numeric:tabular-nums}
+.idx{font-size:16px}
+#log{min-height:48px}
+#go{flex:1}
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a Monopoly edition where inflation changes prices</h1>
+<main id="app" class="stack">
+  <div class="idx" id="round"></div>
+  <div class="stats" id="stats"></div>
+  <div class="board" id="board"></div>
+  <div id="log" class="stack"></div>
+  <div class="row"><button class="primary" id="go">Roll</button><button id="buy" hidden>Buy</button></div>
+  <button id="reset">New game</button>
+</main>
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const MAX_ROUND = 20;
+  // base price at index 1.00; rent is a tenth of price
+  const SQ = [['Start', 0], ['Mill Rd', 60], ['Dock St', 80], ['Elm Ave', 100], ['Canal', 120], ['Hill Lane', 150], ['Park Row', 180], ['Bridge', 220], ['Market', 260], ['Tower', 300], ['Harbor', 340], ['Crown', 400]];
+  const NAMES = ['A', 'B'];
+  const money = n => '$' + n.toLocaleString('en-US');
+  const price = i => Math.round(SQ[i][1] * s.idx);
+  const rent = i => Math.max(1, Math.round(SQ[i][1] * 0.1 * s.idx));
+  const salary = () => Math.round(200 * s.idx);
+
+  function fresh() {
+    return { idx: 1, round: 1, turn: 0, phase: 'roll', cash: [1500, 1500], pos: [0, 0], owner: SQ.map(() => -1), log: ['Roll to start. Prices rise or fall after every round.'], over: false };
+  }
+  let s = store.get('ipg', null);
+  if (!s || !Array.isArray(s.cash) || s.owner.length !== SQ.length) s = fresh();
+
+  const worth = p => s.cash[p] + s.owner.reduce((t, o, i) => t + (o === p ? price(i) : 0), 0);
+
+  function say(t) { s.log = [t]; }
+  function add(t) { s.log.push(t); }
+
+  function roll() {
+    const p = s.turn, d = 1 + Math.floor(Math.random() * 6);
+    const np = (s.pos[p] + d) % SQ.length;
+    s.log = [NAMES[p] + ' rolls ' + d + ' and lands on ' + SQ[np][0] + '.'];
+    if (np < s.pos[p]) { s.cash[p] += salary(); add('Passed Start: +' + money(salary()) + ' salary.'); }
+    s.pos[p] = np;
+    const o = s.owner[np];
+    if (np === 0) add('Nothing to pay.');
+    else if (o === -1) add(SQ[np][0] + ' is for sale at ' + money(price(np)) + '.');
+    else if (o === p) add('You own this.');
+    else {
+      const r = Math.min(rent(np), Math.max(0, s.cash[p]));
+      s.cash[p] -= rent(np); s.cash[o] += r;
+      add(NAMES[p] + ' pays ' + NAMES[o] + ' ' + money(rent(np)) + ' rent.');
+      if (s.cash[p] < 0) { s.over = true; add(NAMES[p] + ' is broke. ' + NAMES[o] + ' wins.'); }
+    }
+    s.phase = 'after';
+  }
+
+  function buy() {
+    const p = s.turn, i = s.pos[p];
+    if (i === 0 || s.owner[i] !== -1 || s.cash[p] < price(i)) return;
+    s.cash[p] -= price(i); s.owner[i] = p;
+    add(NAMES[p] + ' buys ' + SQ[i][0] + ' for ' + money(price(i)) + '.');
+  }
+
+  function next() {
+    if (s.turn === 0) { s.turn = 1; s.phase = 'roll'; s.log = [NAMES[1] + ' to roll.']; return; }
+    // round ends: inflation hits everything
+    const rate = Math.round((Math.random() * 12 - 2) * 10) / 10;
+    s.idx = Math.max(0.5, Math.round(s.idx * (1 + rate / 100) * 1000) / 1000);
+    s.turn = 0; s.phase = 'roll';
+    if (s.round >= MAX_ROUND) {
+      s.over = true;
+      const a = worth(0), b = worth(1);
+      s.log = ['Round ' + MAX_ROUND + ' done. ' + (a === b ? 'Tie' : (a > b ? 'A' : 'B') + ' wins') + ' at ' + money(a) + ' to ' + money(b) + '.'];
+      return;
+    }
+    s.round++;
+    s.log = ['Inflation this round: ' + (rate > 0 ? '+' : '') + rate + '%. All prices, rents and salary moved with it.', 'A to roll.'];
+  }
+
+  function render() {
+    const p = s.turn;
+    $('#round').textContent = 'Round ' + s.round + ' of ' + MAX_ROUND + ' · price index ' + s.idx.toFixed(2) + (s.idx >= 1 ? ' (+' : ' (') + Math.round((s.idx - 1) * 100) + '%)';
+    $('#stats').innerHTML = NAMES.map((n, i) =>
+      '<div class="pl' + (i === p && !s.over ? ' turn' : '') + '"><div>Player ' + n + '</div><div class="cash" id="cash' + n + '">' + money(s.cash[i]) + '</div><div>worth ' + money(worth(i)) + '</div></div>').join('');
+    $('#board').innerHTML = SQ.map((q, i) => {
+      const tk = NAMES.filter((n, k) => s.pos[k] === i).join('');
+      const o = s.owner[i];
+      const sub = i === 0 ? 'salary ' + money(salary()) : (o === -1 ? money(price(i)) : '<span class="own">' + NAMES[o] + ' · rent ' + money(rent(i)) + '</span>');
+      return '<div class="sq' + (s.pos[p] === i ? ' on' : '') + '"><b>' + q[0] + '</b><span class="tk">' + tk + '</span><span>' + sub + '</span></div>';
+    }).join('');
+    $('#log').innerHTML = s.log.map(t => '<div>' + t + '</div>').join('');
+    const go = $('#go'), by = $('#buy'), i = s.pos[p];
+    go.textContent = s.over ? 'Play again' : s.phase === 'roll' ? 'Roll (' + NAMES[p] + ')' : 'Next';
+    const can = !s.over && s.phase === 'after' && i !== 0 && s.owner[i] === -1 && s.cash[p] >= price(i);
+    by.hidden = !can;
+    if (can) by.textContent = 'Buy ' + money(price(i));
+    store.set('ipg', s);
+  }
+
+  $('#go').addEventListener('click', () => {
+    if (s.over) s = fresh();
+    else if (s.phase === 'roll') roll();
+    else next();
+    render();
+  });
+  $('#buy').addEventListener('click', () => { buy(); render(); });
+  $('#reset').addEventListener('click', () => { s = fresh(); render(); });
+  render();
+})();
+</script>
+</body>
+</html>

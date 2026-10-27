@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app that gives you small objectives to gradually improve yourself</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.tabs button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.goal { font-size: 26px; line-height: 1.25; font-weight: 500; margin: 8px 0 4px; }
+.bar { display: flex; gap: 6px; }
+.bar i { flex: 1; height: 8px; border: 1.5px solid var(--ink); border-radius: 2px; }
+.bar i.on { background: var(--ink); }
+button.done { width: 100%; font-size: 19px; min-height: 56px; }
+button.done[disabled] { opacity: .5; cursor: default; }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make an app that gives you small objectives to gradually improve yourself</h1>
+<main id="app" class="stack">
+  <div class="tabs" id="areas" role="group" aria-label="area"></div>
+  <div>
+    <div class="meta" id="level"></div>
+    <div class="goal" id="goal"></div>
+    <div class="meta" id="next"></div>
+  </div>
+  <div class="bar" id="bar" aria-hidden="true"></div>
+  <button class="primary done" id="done">done for today</button>
+  <div class="meta" id="streak"></div>
+</main>
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  // Each ladder starts embarrassingly small. Level rises after 3 done days.
+  const AREAS = {
+    move: ['move', ['Stand up and stretch for 1 minute', 'Walk for 5 minutes', 'Walk for 10 minutes', 'Walk for 15 minutes and do 10 squats', 'Walk for 20 minutes and do 20 squats', 'Walk for 30 minutes', 'Jog for 10 minutes, then walk for 10']],
+    sleep: ['sleep', ['Put your phone down 10 minutes before bed', 'Go to bed 10 minutes earlier', 'No screens for 30 minutes before bed', 'Go to bed 20 minutes earlier', 'Same wake-up time as yesterday, no snooze', 'Same bedtime and wake-up time all week']],
+    read: ['read', ['Read 1 page', 'Read 5 pages', 'Read for 10 minutes', 'Read for 15 minutes', 'Read for 20 minutes and write one sentence about it', 'Read for 30 minutes']],
+    focus: ['focus', ['Work 5 minutes on one thing, nothing else open', 'Work 10 minutes on one thing', 'Work 15 minutes on one thing', 'Work 25 minutes, then a 5 minute break', 'Two 25 minute rounds', 'Three 25 minute rounds']],
+    water: ['water', ['Drink one glass of water after waking', 'Two glasses of water before noon', 'Three glasses by 2 pm', 'Four glasses by 4 pm', 'Six glasses through the day']],
+  };
+  const PER = 3;
+  const today = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+  const dayNum = s => Math.round(Date.parse(s + 'T00:00:00Z') / 864e5);
+
+  let state = store.get('tsi', {});
+  if (!state || typeof state !== 'object') state = {};
+  let area = state.area && AREAS[state.area] ? state.area : 'move';
+  const get = a => state[a] || (state[a] = { done: 0, last: '', streak: 0 });
+
+  function render() {
+    const a = get(area), list = AREAS[area][1];
+    const lvl = Math.min(Math.floor(a.done / PER), list.length - 1);
+    const doneToday = a.last === today();
+    // a streak is alive only if last done was today or yesterday
+    const alive = a.last && dayNum(today()) - dayNum(a.last) <= 1;
+    const streak = alive ? a.streak : 0;
+    $('#areas').innerHTML = '';
+    Object.keys(AREAS).forEach(k => {
+      const b = document.createElement('button');
+      b.textContent = AREAS[k][0]; b.id = 'a-' + k;
+      b.setAttribute('aria-pressed', k === area);
+      b.onclick = () => { area = k; state.area = k; store.set('tsi', state); render(); };
+      $('#areas').appendChild(b);
+    });
+    $('#level').textContent = 'step ' + (lvl + 1) + ' of ' + list.length;
+    $('#goal').textContent = list[lvl];
+    const left = PER - (a.done % PER);
+    $('#next').textContent = lvl >= list.length - 1 ? 'top step. keep it up daily.' : left + ' more day' + (left > 1 ? 's' : '') + ' until the next step';
+    $('#bar').innerHTML = list.map((_, i) => '<i class="' + (i <= lvl ? 'on' : '') + '"></i>').join('');
+    const btn = $('#done');
+    btn.disabled = doneToday;
+    btn.textContent = doneToday ? 'done. come back tomorrow' : 'done for today';
+    $('#streak').innerHTML = 'streak: <span id="count">' + streak + '</span> day' + (streak === 1 ? '' : 's');
+  }
+
+  $('#done').onclick = () => {
+    const a = get(area), t = today();
+    if (a.last === t) return;
+    a.streak = a.last && dayNum(t) - dayNum(a.last) === 1 ? a.streak + 1 : 1;
+    a.last = t; a.done += 1;
+    state.area = area; store.set('tsi', state);
+    render();
+  };
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T08:48:03.572Z",
+ "updated": "2026-10-27T08:50:03.974Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -1858,6 +1858,193 @@
    "tests": "6/6",
    "built": "2026-10-27T08:47:29Z",
    "minutes": 12,
+   "approved": false
+  },
+  {
+   "slug": "notes-about-friends",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 9.8,
+   "tests": "6/6",
+   "built": "2026-10-27T08:47:53Z",
+   "minutes": 5,
+   "approved": false
+  },
+  {
+   "slug": "write-more-code-less-timer",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 7.4,
+   "tests": "6/6",
+   "built": "2026-10-27T08:47:49Z",
+   "minutes": 4,
+   "approved": false
+  },
+  {
+   "slug": "fake-bad-signal",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 8,
+   "tests": "6/6",
+   "built": "2026-10-27T08:49:00Z",
+   "minutes": 3,
+   "approved": false
+  },
+  {
+   "slug": "today-i-learned-recall",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 7.5,
+   "tests": "6/6",
+   "built": "2026-10-27T08:47:51Z",
+   "minutes": 3,
+   "approved": false
+  },
+  {
+   "slug": "run-in-donuts",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 8,
+   "tests": "6/6",
+   "built": "2026-10-27T08:47:59Z",
+   "minutes": 4,
+   "approved": false
+  },
+  {
+   "slug": "metric-for-americans",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 8.5,
+   "tests": "6/6",
+   "built": "2026-10-27T08:48:22Z",
+   "minutes": 4,
+   "approved": false
+  },
+  {
+   "slug": "random-reveal-camera",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 9.3,
+   "tests": "6/6",
+   "built": "2026-10-27T08:48:24Z",
+   "minutes": 6,
+   "approved": false
+  },
+  {
+   "slug": "one-internet-time-clock",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 5.9,
+   "tests": "6/6",
+   "built": "2026-10-27T08:50:00Z",
+   "minutes": 3,
+   "approved": false
+  },
+  {
+   "slug": "tiny-steps-improvement",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 7.5,
+   "tests": "6/6",
+   "built": "2026-10-27T08:48:35Z",
+   "minutes": 4,
+   "approved": false
+  },
+  {
+   "slug": "war-weary-nations",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 8.9,
+   "tests": "6/6",
+   "built": "2026-10-27T08:48:46Z",
+   "minutes": 4,
+   "approved": false
+  },
+  {
+   "slug": "random-handwriting-generator",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 8.9,
+   "tests": "6/6",
+   "built": "2026-10-27T08:49:02Z",
+   "minutes": 4,
+   "approved": false
+  },
+  {
+   "slug": "santa-stealth-delivery",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 11,
+   "tests": "6/6",
+   "built": "2026-10-27T08:49:07Z",
+   "minutes": 12,
+   "approved": false
+  },
+  {
+   "slug": "shark-dragon-pet",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 10.2,
+   "tests": "6/6",
+   "built": "2026-10-27T08:50:00Z",
+   "minutes": 4,
+   "approved": false
+  },
+  {
+   "slug": "find-the-moving-walker",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 10.2,
+   "tests": "6/6",
+   "built": "2026-10-27T08:49:17Z",
+   "minutes": 5,
+   "approved": false
+  },
+  {
+   "slug": "score-your-day-diary",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 10.3,
+   "tests": "6/6",
+   "built": "2026-10-27T08:49:00Z",
+   "minutes": 3,
+   "approved": false
+  },
+  {
+   "slug": "inflation-property-game",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 8.9,
+   "tests": "6/6",
+   "built": "2026-10-27T08:50:00Z",
+   "minutes": 4,
+   "approved": false
+  },
+  {
+   "slug": "fuzzy-date-todo",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 8.6,
+   "tests": "6/6",
+   "built": "2026-10-27T08:49:26Z",
+   "minutes": 6,
    "approved": false
   }
  ]

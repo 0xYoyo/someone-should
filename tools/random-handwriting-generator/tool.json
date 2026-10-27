@@ -1,0 +1,64 @@
+{
+  "slug": "random-handwriting-generator",
+  "wish": "someone should make a random handwriting generator",
+  "year": 2020,
+  "agreed": 67,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/ff6tv9/",
+      "date": "2020-03-08",
+      "points": 36,
+      "comments": 2
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/SomebodyMakeThis/comments/hbaeu5/",
+      "date": "2020-06-18",
+      "points": 25,
+      "comments": 4
+    }
+  ],
+  "spec": "Renders typed text as wobbly, ink-filled handwriting on ruled paper using a script font with random per-letter slant, size, baseline and pressure.\nType a message, adjust slant, messiness, size and ink, tap New handwriting for another random hand, then Save PNG.\nIt does not learn your own handwriting or use any font files; the look depends on the script fonts on your device.",
+  "tests": [
+    {
+      "expect": {
+        "sel": "#info",
+        "matches": "\\d+ characters"
+      }
+    },
+    {
+      "type": {
+        "sel": "#text",
+        "text": "hello there"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#info",
+        "contains": "10 characters"
+      }
+    },
+    {
+      "tap": "#again"
+    },
+    {
+      "expect": {
+        "sel": "#info",
+        "matches": "style #\\d+"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#paper",
+        "visible": true
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:49:02Z",
+  "model": "sonnet-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": ""
+}

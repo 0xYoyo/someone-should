@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a Tamagotchi with cooler animals like sharks and dragons</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* tool styles */
+.pick{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pick button[aria-pressed=true]{background:var(--ink);color:var(--paper)}
+.stage{border:1.5px solid var(--line);border-radius:var(--radius);padding:8px;display:grid;justify-items:center}
+.stage svg{width:100%;max-width:300px;height:auto;color:var(--ink)}
+.stage svg .f{fill:var(--paper);stroke:var(--ink);stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
+.stage svg .s{fill:none;stroke:var(--ink);stroke-width:3;stroke-linecap:round}
+.stage svg .k{fill:var(--ink)}
+#pet.sad{transform:translateY(6px)}
+#pet.happy{animation:bob 1.2s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-6px)}}
+.stat{display:grid;grid-template-columns:84px 1fr 44px;gap:10px;align-items:center;font-size:16px}
+.bar{height:12px;border:1.5px solid var(--ink);border-radius:var(--radius);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ink);width:0}
+.bar.low i{background:var(--no)}
+.stat b{font-weight:500;text-align:right;font-variant-numeric:tabular-nums}
+.acts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.info{font:16px/1.4 var(--mono);color:var(--meta);min-height:24px}
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a Tamagotchi with cooler animals like sharks and dragons</h1>
+<main id="app" class="stack">
+  <div class="pick" role="group" aria-label="Creature">
+    <button id="pick-shark" data-t="shark">shark</button>
+    <button id="pick-dragon" data-t="dragon">dragon</button>
+    <button id="pick-kraken" data-t="kraken">kraken</button>
+  </div>
+  <div class="stage"><svg id="pet" viewBox="0 0 300 200" role="img" aria-label="pet"></svg></div>
+  <div class="row" style="justify-content:space-between"><span id="name">Shark</span><span id="mood" class="info">content</span></div>
+  <div class="stack">
+    <div class="stat"><span>hunger</span><div class="bar" id="bar-hunger"><i></i></div><b id="hunger">0</b></div>
+    <div class="stat"><span>fun</span><div class="bar" id="bar-fun"><i></i></div><b id="fun">0</b></div>
+    <div class="stat"><span>clean</span><div class="bar" id="bar-clean"><i></i></div><b id="clean">0</b></div>
+  </div>
+  <div class="acts">
+    <button id="feed" class="primary">feed</button>
+    <button id="play" class="primary">play</button>
+    <button id="wash" class="primary">clean</button>
+  </div>
+  <div id="msg" class="info">hunger drops while you are away</div>
+  <div class="row" style="justify-content:space-between"><span id="age" class="info"></span><button id="reset">new egg</button></div>
+</main>
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  const NAMES = { shark: 'Shark', dragon: 'Dragon', kraken: 'Kraken' };
+  const FOOD = { shark: 'ate a fish', dragon: 'ate a goat', kraken: 'ate a crab' };
+  const GAME = { shark: 'chased a wave', dragon: 'breathed fire', kraken: 'juggled shells' };
+  // points lost per hour (hunger drops fastest)
+  const RATE = { hunger: 14, fun: 9, clean: 6 };
+  const KEYS = ['hunger', 'fun', 'clean'];
+
+  const ART = {
+    shark: '<path class="f" d="M40 120 Q120 40 220 100 L270 60 L262 120 L270 168 L220 132 Q120 190 40 120Z"/>' +
+      '<path class="f" d="M130 70 L150 22 L178 84Z"/><path class="f" d="M150 150 L128 182 L172 148Z"/>' +
+      '<path class="s" d="M52 124 Q80 140 110 128"/><path class="s" d="M120 100 l0 18 M130 100 l0 18 M140 100 l0 18"/>',
+    dragon: '<path class="f" d="M70 140 Q60 60 140 70 Q200 70 220 110 Q250 110 280 90 Q270 150 210 150 L190 170 L180 150 L100 160 L90 180Z"/>' +
+      '<path class="f" d="M120 76 L110 20 L160 66Z"/><path class="f" d="M80 80 L66 40 L100 66Z"/>' +
+      '<path class="f" d="M150 80 L190 20 L230 60 L212 66 L204 84Z"/><path class="s" d="M60 112 l-24 6 M62 124 l-24 8"/>',
+    kraken: '<path class="f" d="M70 100 Q70 20 150 20 Q230 20 230 100 Q230 120 210 120 L90 120 Q70 120 70 100Z"/>' +
+      '<path class="s" d="M90 120 Q70 160 90 185 M120 120 Q112 160 130 190 M150 120 Q150 165 150 192 M180 120 Q188 160 170 190 M210 120 Q230 160 210 185"/>'
+  };
+  // eye and mouth positions per creature [ex, ey, mx, my]
+  const FACE = { shark: [88, 106, 56, 128], dragon: [112, 100, 82, 130], kraken: [128, 76, 150, 100] };
+
+  const now = () => Date.now();
+  function fresh(type) {
+    return { type: type || 'shark', hunger: 78, fun: 70, clean: 85, t: now(), born: now() };
+  }
+  let st = store.get('sdp1', null);
+  if (!st || !ART[st.type]) st = fresh();
+
+  function decay() {
+    const t = now(), h = Math.max(0, (t - st.t) / 3600000);
+    KEYS.forEach(k => { st[k] = Math.max(0, Math.min(100, st[k] - RATE[k] * h)); });
+    st.t = t;
+  }
+  const mood = () => {
+    const m = Math.min(st.hunger, st.fun, st.clean);
+    if (st.hunger < 1) return 'starving';
+    return m < 25 ? 'miserable' : m < 50 ? 'grumpy' : m < 80 ? 'content' : 'thrilled';
+  };
+
+  function drawPet() {
+    const [ex, ey, mx, my] = FACE[st.type], m = mood();
+    const happy = m === 'thrilled', sad = m === 'miserable' || m === 'starving';
+    const mouth = sad ? `M${mx} ${my + 6} q14 -12 28 0` : `M${mx} ${my} q14 ${happy ? 16 : 8} 28 0`;
+    const eye = sad ? `<path class="s" d="M${ex - 8} ${ey} l16 0"/>` : `<circle class="k" cx="${ex}" cy="${ey}" r="6"/>`;
+    const dirt = st.clean < 40 ? '<path class="s" d="M150 150 l6 -6 M180 60 l6 -6 M110 140 l6 -6" opacity=".6"/>' : '';
+    const el = $('#pet');
+    el.innerHTML = ART[st.type] + eye + `<path class="s" d="${mouth}"/>` + dirt;
+    el.setAttribute('class', happy ? 'happy' : sad ? 'sad' : '');
+    el.setAttribute('aria-label', NAMES[st.type] + ', ' + m);
+  }
+
+  function render() {
+    decay();
+    KEYS.forEach(k => {
+      const v = Math.round(st[k]);
+      $('#' + k).textContent = v;
+      const bar = $('#bar-' + k);
+      bar.firstElementChild.style.width = v + '%';
+      bar.classList.toggle('low', v < 25);
+    });
+    $('#name').textContent = NAMES[st.type];
+    $('#mood').textContent = mood();
+    $$('.pick button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.t === st.type)));
+    const d = Math.floor((now() - st.born) / 86400000), h = Math.floor((now() - st.born) / 3600000) % 24;
+    $('#age').textContent = d + 'd ' + h + 'h old';
+    drawPet();
+    store.set('sdp1', st);
+  }
+  const say = s => { $('#msg').textContent = s; };
+  function act(key, gain, text) {
+    decay();
+    if (st[key] >= 100) { say('not needed right now'); render(); return; }
+    st[key] = Math.min(100, st[key] + gain);
+    // playing makes a mess and an appetite
+    if (key === 'fun') { st.hunger = Math.max(0, st.hunger - 6); st.clean = Math.max(0, st.clean - 8); }
+    if (key === 'hunger') st.clean = Math.max(0, st.clean - 4);
+    say(NAMES[st.type] + ' ' + text);
+    render();
+  }
+
+  $('#feed').onclick = () => act('hunger', 25, FOOD[st.type]);
+  $('#play').onclick = () => act('fun', 25, GAME[st.type]);
+  $('#wash').onclick = () => act('clean', 30, 'is clean');
+  $$('.pick button').forEach(b => b.onclick = () => { st = fresh(b.dataset.t); say('new ' + NAMES[st.type].toLowerCase() + ' hatched'); render(); });
+  $('#reset').onclick = () => { st = fresh(st.type); say('new egg hatched'); render(); };
+
+  render();
+  setInterval(render, 5000);
+})();
+</script>
+</body>
+</html>

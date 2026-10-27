@@ -1,0 +1,48 @@
+{
+  "slug": "santa-stealth-delivery",
+  "wish": "someone should make a stealth game where Santa breaks into houses to deliver gifts",
+  "year": 2013,
+  "agreed": 75,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/CrazyIdeas/comments/1l7wm7/",
+      "date": "2013-08-27",
+      "points": 70,
+      "comments": 5
+    }
+  ],
+  "spec": "A top-down stealth game in three houses: Santa carries a gift to the tree and slips back out the door.\nTap the arrows to step (wait to hold still); every step the dogs move too. Dogs see three cells ahead, kids wake if you stand next to them.\nIt has no sound, no timer and no score beyond your move count; progress is remembered on this device.",
+  "tests": [
+    {
+      "tap": "#up"
+    },
+    {
+      "expect": {
+        "sel": "#status",
+        "contains": "dog saw you"
+      }
+    },
+    {
+      "tap": "#reset"
+    },
+    {
+      "tap": "#wait"
+    },
+    {
+      "tap": "#up"
+    },
+    {
+      "expect": {
+        "sel": "#moves",
+        "contains": "2"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:49:07Z",
+  "model": "sonnet-5.5",
+  "minutes": 12,
+  "approved": false,
+  "notes": ""
+}

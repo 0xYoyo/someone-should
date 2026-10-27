@@ -1,0 +1,54 @@
+{
+  "slug": "fuzzy-date-todo",
+  "wish": "someone should make calendar apps that support approximate dates for to-do items",
+  "year": 2017,
+  "agreed": 65,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/5wj5gb/",
+      "date": "2017-02-27",
+      "points": 57,
+      "comments": 8
+    }
+  ],
+  "spec": "Keeps a to-do list where each item gets an approximate date: early, mid, late or any time in a month, season or year.\nType the to-do, pick roughly when, add; items group under their period in calendar order and show when a period has passed.\nIt does not sync, remind, or use exact dates; the list lives in this browser only.",
+  "tests": [
+    {
+      "expect": {
+        "sel": "h2",
+        "contains": "open"
+      }
+    },
+    {
+      "type": {
+        "sel": "#text",
+        "text": "call the dentist"
+      }
+    },
+    {
+      "tap": "#add"
+    },
+    {
+      "expect": {
+        "sel": "#list",
+        "contains": "call the dentist"
+      }
+    },
+    {
+      "tap": ".done"
+    },
+    {
+      "expect": {
+        "sel": "#list",
+        "contains": "open"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:49:26Z",
+  "model": "sonnet-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": ""
+}

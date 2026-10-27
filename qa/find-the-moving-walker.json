@@ -1,0 +1,29 @@
+{
+  "slug": "find-the-moving-walker",
+  "pass": true,
+  "checks": {
+    "meta": true,
+    "size": true,
+    "no-urls": true,
+    "csp": true,
+    "tests-count": true,
+    "dcl@390": true,
+    "no-hscroll@390": true,
+    "tap-size@390": true,
+    "text-size@390": true,
+    "tests": true,
+    "zero-network@390": true,
+    "console@390": true,
+    "dcl@360": true,
+    "no-hscroll@360": true,
+    "tap-size@360": true,
+    "text-size@360": true,
+    "zero-network@360": true,
+    "console@360": true
+  },
+  "errors": [],
+  "kb": 10.2,
+  "dcl@390": 59,
+  "tests": "6/6",
+  "dcl@360": 41
+}

@@ -1,0 +1,51 @@
+{
+  "slug": "score-your-day-diary",
+  "wish": "someone should make a diary and habit tracker where you score each positive or negative event of the day",
+  "year": 2023,
+  "agreed": 67,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/13wz77x/",
+      "date": "2023-05-31",
+      "points": 60,
+      "comments": 7
+    }
+  ],
+  "spec": "Log events for a day with a note and a score from -3 to +3. Type what happened, pick a score, tap Add; step back through days with the arrows, delete entries with the cross.\nShows the day total and a 14-day bar chart of daily totals, saved in this browser only.\nNo accounts, no sync, no export; the first view shows example entries until you add your own.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#note",
+        "text": "Great lunch"
+      }
+    },
+    {
+      "tap": ".sp[data-p='3']"
+    },
+    {
+      "tap": "#add"
+    },
+    {
+      "expect": {
+        "sel": "#list",
+        "contains": "Great lunch"
+      }
+    },
+    {
+      "tap": "#prev"
+    },
+    {
+      "expect": {
+        "sel": "#list",
+        "contains": "Nothing scored"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:49:00Z",
+  "model": "sonnet-5.5",
+  "minutes": 3,
+  "approved": false,
+  "notes": ""
+}

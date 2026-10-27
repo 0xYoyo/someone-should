@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app that simulates static on a phone call so you can leave an awkward call</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+.seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+#start { width: 100%; min-height: 96px; font-size: 24px; }
+#meter { display: flex; gap: 3px; align-items: flex-end; height: 56px; }
+#meter i { flex: 1; background: var(--line); height: 8%; border-radius: 2px; transition: height .12s; }
+#meter.on i { background: var(--ink); }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make an app that simulates static on a phone call so you can leave an awkward call</h1>
+
+<main id="app" class="stack">
+  <div id="meter" aria-hidden="true"></div>
+  <button id="start" class="primary" type="button">tap to start</button>
+  <div id="state" class="meta">static is off. Hold the phone to your ear, then tap.</div>
+  <div class="seg" role="group" aria-label="severity">
+    <button id="light" type="button" aria-pressed="false">light</button>
+    <button id="heavy" type="button" aria-pressed="true">heavy</button>
+    <button id="dead" type="button" aria-pressed="false">dead line</button>
+  </div>
+  <div id="sev" class="meta">heavy: crackle and long dropouts</div>
+  <div id="err" class="meta no"></div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  // pops: crackle per second; gap: chance of a dropout per 300 ms tick; hiss: base level
+  const LEVELS = {
+    light: { label: 'light: steady hiss, a few clicks', hiss: 0.12, pops: 2, gap: 0.10 },
+    heavy: { label: 'heavy: crackle and long dropouts', hiss: 0.3, pops: 8, gap: 0.35 },
+    dead:  { label: 'dead line: mostly silence, bursts of noise', hiss: 0.45, pops: 14, gap: 0.7 }
+  };
+  let level = store.get('fbs-level', 'heavy');
+  if (!LEVELS[level]) level = 'heavy';
+
+  let ctx = null, gain = null, timer = null, on = false;
+  const meter = $('#meter');
+  for (let i = 0; i < 16; i++) meter.appendChild(document.createElement('i'));
+  const bars = $$('i', meter);
+
+  function setLevel(l) {
+    level = l; store.set('fbs-level', l);
+    ['light', 'heavy', 'dead'].forEach(k => $('#' + k).setAttribute('aria-pressed', String(k === l)));
+    $('#sev').textContent = LEVELS[l].label;
+  }
+
+  function buildNoise() {
+    const len = ctx.sampleRate * 2, buf = ctx.createBuffer(1, len, ctx.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true;
+    // narrow the band to a phone line, 300 to 3400 Hz
+    const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 300;
+    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 3400;
+    gain = ctx.createGain(); gain.gain.value = 0;
+    src.connect(hp); hp.connect(lp); lp.connect(gain); gain.connect(ctx.destination);
+    src.start();
+  }
+
+  function tick() {
+    const L = LEVELS[level], t = ctx.currentTime;
+    const drop = Math.random() < L.gap;
+    let target = drop ? 0.0 : L.hiss * (0.6 + Math.random() * 0.8);
+    gain.gain.cancelScheduledValues(t);
+    gain.gain.setTargetAtTime(target, t, 0.02);
+    // clicks and pops on top of the hiss
+    const n = Math.round(L.pops * 0.3 * Math.random() * 2);
+    for (let i = 0; i < n; i++) {
+      const at = t + Math.random() * 0.28;
+      gain.gain.setValueAtTime(Math.min(1, L.hiss * 3 + 0.3), at);
+      gain.gain.setTargetAtTime(target, at + 0.005, 0.01);
+    }
+    bars.forEach(b => { b.style.height = (drop ? 6 : 15 + Math.random() * 85 * (target / 0.4 + 0.2)) + '%'; });
+  }
+
+  async function start() {
+    $('#err').textContent = '';
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) throw new Error('no audio');
+      if (!ctx) { ctx = new AC(); buildNoise(); }
+      await ctx.resume();
+    } catch (e) {
+      $('#err').textContent = 'This browser cannot play sound.';
+      return;
+    }
+    on = true;
+    tick(); timer = setInterval(tick, 300);
+    meter.classList.add('on');
+    $('#start').textContent = 'stop';
+    $('#state').textContent = 'static is on. Say "sorry, you are breaking up" and hang up.';
+  }
+
+  function stop() {
+    on = false; clearInterval(timer);
+    if (gain) { gain.gain.cancelScheduledValues(ctx.currentTime); gain.gain.setTargetAtTime(0, ctx.currentTime, 0.02); }
+    meter.classList.remove('on');
+    bars.forEach(b => { b.style.height = ''; });
+    $('#start').textContent = 'tap to start';
+    $('#state').textContent = 'static is off. Hold the phone to your ear, then tap.';
+  }
+
+  $('#start').addEventListener('click', () => (on ? stop() : start()));
+  ['light', 'heavy', 'dead'].forEach(k => $('#' + k).addEventListener('click', () => setLevel(k)));
+  document.addEventListener('visibilitychange', () => { if (document.hidden && on) { /* keep playing: the call is the point */ } });
+  setLevel(level);
+})();
+</script>
+</body>
+</html>

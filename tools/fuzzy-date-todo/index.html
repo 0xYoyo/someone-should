@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make calendar apps that support approximate dates for to-do items</title>
+<style>
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+h2 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 22px 0 0; padding-bottom: 6px; border-bottom: 1.5px solid var(--ink); display: flex; justify-content: space-between; gap: 12px; }
+h2.past { color: var(--no); }
+label.item { display: flex; align-items: center; gap: 12px; min-height: var(--tap); flex: 1; cursor: pointer; }
+label.item input { width: 44px; min-height: 44px; height: 44px; margin: 0 -8px 0 -12px; flex: none; accent-color: var(--ink); }
+label.item input:checked + span { text-decoration: line-through; color: var(--meta); }
+.when { font: 14px/1.3 var(--mono); color: var(--meta); white-space: nowrap; }
+.del { min-width: var(--tap); padding: 0; border-color: var(--line); color: var(--meta); }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make calendar apps that support approximate dates for to-do items</h1>
+
+<main id="app" class="stack">
+  <form id="form" class="stack">
+    <input id="text" type="text" placeholder="to-do" aria-label="to-do" autocomplete="off">
+    <div class="grid">
+      <select id="part" aria-label="part of the period">
+        <option value="">any time in</option>
+        <option value="early">early</option>
+        <option value="mid">mid</option>
+        <option value="late">late</option>
+      </select>
+      <select id="when" aria-label="period"></select>
+    </div>
+    <button id="add" class="primary" type="submit">add</button>
+  </form>
+  <div id="list"></div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const SEASONS = [['spring', 2], ['summer', 5], ['fall', 8], ['winter', 11]]; // start month index
+  const now = new Date();
+  const Y = now.getFullYear(), M = now.getMonth();
+
+  // A period is {key, label, start, end} with start/end as Date.
+  function periodFor(key) {
+    const [t, a, b] = key.split(':');
+    if (t === 'm') { const y = +a, m = +b; return { key, label: MONTHS[m] + ' ' + y, start: new Date(y, m, 1), end: new Date(y, m + 1, 0) }; }
+    if (t === 's') { const y = +a, s = SEASONS.find(x => x[0] === b); return { key, label: b + ' ' + y, start: new Date(y, s[1], 1), end: new Date(y, s[1] + 3, 0) }; }
+    const y = +a; return { key, label: 'sometime ' + y, start: new Date(y, 0, 1), end: new Date(y, 11, 31) };
+  }
+
+  function options() {
+    const keys = [];
+    for (let i = 0; i < 12; i++) { const d = new Date(Y, M + i, 1); keys.push('m:' + d.getFullYear() + ':' + d.getMonth()); }
+    for (const y of [Y, Y + 1]) for (const s of SEASONS) {
+      const p = periodFor('s:' + y + ':' + s[0]);
+      if (p.end >= now) keys.push(p.key);
+    }
+    keys.push('y:' + Y, 'y:' + (Y + 1), 'y:' + (Y + 2));
+    return keys.filter((k, i) => keys.indexOf(k) === i);
+  }
+
+  const sel = $('#when');
+  options().forEach(k => { const o = document.createElement('option'); o.value = k; o.textContent = periodFor(k).label; sel.appendChild(o); });
+
+  const PARTS = { early: 0, mid: 1, late: 2, '': 3 };
+  let items = store.get('fuzzy-todos', null);
+  if (!items) {
+    const nm = new Date(Y, M + 1, 1);
+    items = [
+      { id: 1, text: 'renew passport', key: 'm:' + nm.getFullYear() + ':' + nm.getMonth(), part: 'early', done: false },
+      { id: 2, text: 'clear out the garage', key: 'y:' + Y, part: '', done: false },
+      { id: 3, text: 'book flights', key: 's:' + (Y + (M > 8 ? 1 : 0)) + ':summer', part: 'mid', done: false }
+    ];
+  }
+  const save = () => store.set('fuzzy-todos', items);
+
+  function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+  function render() {
+    const box = $('#list');
+    if (!items.length) { box.innerHTML = '<p class="empty">Nothing yet. Add a to-do and pick roughly when.</p>'; return; }
+    const groups = {};
+    items.forEach(it => { (groups[it.key] = groups[it.key] || []).push(it); });
+    const keys = Object.keys(groups).sort((a, b) => {
+      const pa = periodFor(a), pb = periodFor(b);
+      return (pa.end - pb.end) || (pa.start - pb.start);
+    });
+    box.innerHTML = keys.map(k => {
+      const p = periodFor(k);
+      const open = groups[k].filter(i => !i.done).length;
+      const past = p.end < now && open > 0;
+      const rows = groups[k].slice().sort((a, b) => PARTS[a.part] - PARTS[b.part]).map(i =>
+        '<li><label class="item"><input type="checkbox" class="done" data-id="' + i.id + '"' + (i.done ? ' checked' : '') + '><span>' + esc(i.text) + '</span></label>' +
+        '<span class="when">' + (i.part || '') + '</span>' +
+        '<button type="button" class="del" data-del="' + i.id + '" aria-label="remove">x</button></li>').join('');
+      return '<h2' + (past ? ' class="past"' : '') + '><span>' + p.label + '</span><span>' + (past ? 'passed' : open + ' open') + '</span></h2><ul class="plain">' + rows + '</ul>';
+    }).join('');
+  }
+
+  $('#form').addEventListener('submit', e => {
+    e.preventDefault();
+    const text = $('#text').value.trim();
+    if (!text) { $('#text').focus(); return; }
+    items.push({ id: Date.now(), text, key: sel.value, part: $('#part').value, done: false });
+    $('#text').value = '';
+    save(); render();
+  });
+
+  $('#list').addEventListener('click', e => {
+    const del = e.target.closest('[data-del]');
+    if (del) { items = items.filter(i => i.id !== +del.dataset.del); save(); render(); }
+  });
+  $('#list').addEventListener('change', e => {
+    const cb = e.target.closest('.done');
+    if (!cb) return;
+    const it = items.find(i => i.id === +cb.dataset.id);
+    if (it) { it.done = cb.checked; save(); render(); }
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

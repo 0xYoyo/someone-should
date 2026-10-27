@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a disposable camera app that locks photos away for a random time</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* tool */
+#view { position: relative; aspect-ratio: 4/3; background: var(--ink); border-radius: var(--radius); overflow: hidden; display: grid; place-items: center; }
+#view video { width: 100%; height: 100%; object-fit: cover; display: none; }
+#view.live video { display: block; }
+#idle { color: var(--paper); text-align: center; padding: 0 var(--gutter); }
+#view.live #idle { display: none; }
+.seg button { flex: 1 1 0; padding: 0 8px; border-color: var(--line); }
+.seg button[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: var(--paper); }
+label.btn { display: inline-flex; align-items: center; min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); border-radius: var(--radius); cursor: pointer; }
+label.btn input { position: absolute; width: 1px; height: 1px; opacity: 0; min-height: 0; padding: 0; border: 0; }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.cell { aspect-ratio: 1; border: 1.5px solid var(--line); border-radius: var(--radius); overflow: hidden; display: grid; place-items: center; position: relative; }
+.cell img { width: 100%; height: 100%; object-fit: cover; }
+.cell.locked { background: repeating-linear-gradient(45deg, transparent 0 8px, var(--line) 8px 9px); }
+#msg { min-height: 1.45em; }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a disposable camera app that locks photos away for a random time</h1>
+<main id="app" class="stack">
+  <div id="view"><video id="vid" playsinline muted></video><div id="idle">tap to start the camera</div></div>
+  <div class="row">
+    <button id="start" class="primary">Start camera</button>
+    <button id="shoot" disabled>Shoot</button>
+    <label class="btn" id="pickl">Use photo<input id="pick" type="file" accept="image/*" capture="environment"></label>
+  </div>
+  <div id="msg" class="meta"></div>
+  <div class="meta">reveals after a random wait between</div>
+  <div class="row seg" id="range">
+    <button data-r="0" aria-pressed="false">1-2 min</button>
+    <button data-r="1" aria-pressed="true">1-24 h</button>
+    <button data-r="2" aria-pressed="false">1-7 days</button>
+  </div>
+  <div id="status" class="meta"></div>
+  <div id="roll" class="grid"></div>
+</main>
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const MIN = 60000, H = 60 * MIN, D = 24 * H;
+  const RANGES = [[MIN, 2 * MIN], [H, D], [D, 7 * D]];
+  let photos = store.get('rrc.photos', []);
+  let range = store.get('rrc.range', 1);
+  let stream = null;
+  const msg = t => { $('#msg').textContent = t || ''; };
+
+  function save() {
+    if (!store.set('rrc.photos', photos)) {
+      photos.pop();
+      msg('Roll is full. Delete some revealed photos.');
+      return false;
+    }
+    return true;
+  }
+
+  function addPhoto(data) {
+    const [lo, hi] = RANGES[range];
+    // the reveal time is never shown, so the wait stays a surprise
+    photos.push({ id: Date.now() + '' + Math.random().toString(36).slice(2, 6), data, at: Date.now() + lo + Math.random() * (hi - lo) });
+    if (save()) msg('Locked. You will not see it until it is ready.');
+    render();
+  }
+
+  function render() {
+    const now = Date.now();
+    $$('#range button').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.r === range)));
+    const locked = photos.filter(p => p.at > now).length;
+    const open = photos.length - locked;
+    $('#status').textContent = photos.length
+      ? locked + ' locked, ' + open + ' revealed'
+      : 'Empty roll. Shoot something and wait.';
+    const roll = $('#roll');
+    const sig = photos.map(p => p.id + (p.at > now ? 'L' : 'R')).join();
+    if (roll.dataset.sig === sig) return;
+    roll.dataset.sig = sig;
+    roll.textContent = '';
+    photos.slice().reverse().forEach(p => {
+      const c = document.createElement('div');
+      if (p.at > now) {
+        c.className = 'cell locked';
+        c.innerHTML = '<span class="meta">locked</span>';
+      } else {
+        c.className = 'cell';
+        const img = document.createElement('img');
+        img.src = p.data; img.alt = 'revealed photo';
+        const x = document.createElement('button');
+        x.textContent = 'x'; x.setAttribute('aria-label', 'delete photo');
+        x.style.cssText = 'position:absolute;right:0;top:0;min-width:44px;padding:0;background:var(--paper);border-width:0 0 1.5px 1.5px';
+        x.onclick = () => { photos = photos.filter(q => q.id !== p.id); save(); render(); };
+        c.append(img, x);
+      }
+      roll.append(c);
+    });
+  }
+
+  function fit(w, h) { const s = Math.min(1, 800 / Math.max(w, h)); return [Math.round(w * s), Math.round(h * s)]; }
+  function fromSource(src, w, h) {
+    const [cw, ch] = fit(w, h);
+    const c = document.createElement('canvas');
+    c.width = cw; c.height = ch;
+    c.getContext('2d').drawImage(src, 0, 0, cw, ch);
+    addPhoto(c.toDataURL('image/jpeg', 0.6));
+  }
+
+  $('#start').onclick = async () => {
+    if (stream) return;
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { msg('No camera here. Use a photo instead.'); return; }
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+      const v = $('#vid');
+      v.srcObject = stream; await v.play();
+      $('#view').classList.add('live');
+      $('#shoot').disabled = false;
+      $('#start').textContent = 'Camera on';
+      msg('');
+    } catch { stream = null; msg('Camera blocked. Use a photo instead.'); }
+  };
+  $('#shoot').onclick = () => {
+    const v = $('#vid');
+    if (v.videoWidth) fromSource(v, v.videoWidth, v.videoHeight);
+  };
+  $('#pick').onchange = e => {
+    const f = e.target.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      const img = new Image();
+      img.onload = () => fromSource(img, img.naturalWidth, img.naturalHeight);
+      img.onerror = () => msg('That file is not a photo.');
+      img.src = r.result;
+    };
+    r.readAsDataURL(f);
+    e.target.value = '';
+  };
+  $$('#range button').forEach(b => b.onclick = () => { range = +b.dataset.r; store.set('rrc.range', range); render(); });
+
+  render();
+  setInterval(render, 5000);
+})();
+</script>
+</body>
+</html>

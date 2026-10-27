@@ -1,0 +1,60 @@
+{
+  "slug": "one-internet-time-clock",
+  "wish": "someone should make a timezone for the internet",
+  "year": 2016,
+  "agreed": 71,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/4ahepn/",
+      "date": "2016-03-15",
+      "points": 57,
+      "comments": 14
+    }
+  ],
+  "spec": "Shows one shared internet time: Swatch .beats (1000 per day, same everywhere) beside UTC and local time.\nType a local HH:MM to get its beat, or a beat number to get your local time and UTC.\nIt does not sync with a server; it uses the device clock.",
+  "tests": [
+    {
+      "expect": {
+        "sel": "#beats",
+        "matches": "@\\d{3}\\.\\d{2}"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#lt-out",
+        "matches": "@\\d{3}\\.\\d{2}"
+      }
+    },
+    {
+      "type": {
+        "sel": "#b",
+        "text": "0"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#b-out",
+        "contains": "UTC 23:00"
+      }
+    },
+    {
+      "type": {
+        "sel": "#lt",
+        "text": "99"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#lt-out",
+        "contains": "HH:MM"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:50:00Z",
+  "model": "sonnet-5.5",
+  "minutes": 3,
+  "approved": false,
+  "notes": "Uses the device clock; no network."
+}

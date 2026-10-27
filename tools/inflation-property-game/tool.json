@@ -1,0 +1,45 @@
+{
+  "slug": "inflation-property-game",
+  "wish": "someone should make a Monopoly edition where inflation changes prices",
+  "year": 2022,
+  "agreed": 65,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/rtrknf/",
+      "date": "2022-01-01",
+      "points": 53,
+      "comments": 12
+    }
+  ],
+  "spec": "Two-player hot-seat property game on a 12-square loop: roll, buy, pay rent, collect salary passing Start.\\nAfter every round a random inflation rate (-2% to +10%) rescales all prices, rents and salary; 20 rounds, richest wins, or a player going broke loses.\\nIt does not do auctions, mortgages, houses or online play.",
+  "tests": [
+    {
+      "tap": "#go"
+    },
+    {
+      "tap": "#buy"
+    },
+    {
+      "tap": "#go"
+    },
+    {
+      "tap": "#go"
+    },
+    {
+      "tap": "#go"
+    },
+    {
+      "expect": {
+        "sel": "#round",
+        "contains": "Round 2"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:50:00Z",
+  "model": "sonnet-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": ""
+}

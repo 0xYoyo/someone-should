@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a diary and habit tracker where you score each positive or negative event of the day</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+.meta { font-size: 16px; }
+#total { display: flex; align-items: baseline; gap: 12px; }
+.pos { color: var(--built); }
+.neg { color: var(--no); }
+.scores { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.scores button { padding: 0; min-width: 44px; }
+.scores button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.chart { display: flex; align-items: center; gap: 4px; height: 120px; position: relative; }
+.chart .col { flex: 1; height: 100%; position: relative; }
+.chart .bar { position: absolute; left: 15%; right: 15%; background: var(--meta); }
+.chart .bar.pos { background: var(--built); }
+.chart .bar.neg { background: var(--no); }
+.chart .col.sel .bar { outline: 1.5px solid var(--ink); }
+.chart .mid { position: absolute; left: 0; right: 0; top: 50%; border-top: 1px solid var(--line); }
+.days { display: flex; gap: 4px; }
+.days span { flex: 1; text-align: center; }
+ul.plain li button { min-width: var(--tap); padding: 0; border-color: var(--line); }
+.pts { font: 500 17px var(--mono); min-width: 3ch; }
+.nav button { min-width: var(--tap); }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a diary and habit tracker where you score each positive or negative event of the day</h1>
+
+<main id="app" class="stack">
+  <div class="row nav" style="justify-content:space-between">
+    <button id="prev" aria-label="Previous day">&lt;</button>
+    <span id="date" class="meta"></span>
+    <button id="next" aria-label="Next day">&gt;</button>
+  </div>
+  <div id="total"><span class="big" id="sum">0</span><span class="meta" id="count"></span></div>
+  <form id="form" class="stack" autocomplete="off">
+    <input id="note" type="text" maxlength="80" placeholder="What happened" aria-label="What happened">
+    <div class="scores" id="scores" role="group" aria-label="Score"></div>
+    <button type="submit" id="add" class="primary">Add</button>
+    <div id="err" class="meta no" role="status"></div>
+  </form>
+  <ul id="list" class="plain"></ul>
+  <div class="stack">
+    <div class="meta">Last 14 days</div>
+    <div class="chart" id="chart"></div>
+    <div class="days meta" id="labels"></div>
+  </div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const key = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  const today = new Date(); today.setHours(12, 0, 0, 0);
+  const todayKey = key(today);
+  const view = new Date(today);
+  let score = 1;
+
+  // days: { "2026-10-27": [{n: "text", p: 2}] }
+  let days = store.get('ssd-days', null);
+  let sample = false;
+  if (!days || typeof days !== 'object') {
+    sample = true;
+    days = {};
+    const ex = [
+      [['Walked to work', 2], ['Skipped lunch', -1], ['Called mum', 3], ['Missed the bus', -2]],
+      [['Gym', 3], ['Ate well', 1]], [['Late night', -2], ['Finished report', 2]],
+      [['Argument', -3], ['Cooked dinner', 2]], [['Read 30 minutes', 2]], [['Lazy day', -1], ['Long run', 3]],
+      [['Good sleep', 2], ['Missed gym', -1], ['Helped a friend', 2]], [['Spent too much', -2]],
+      [['Meditated', 1], ['Healthy lunch', 1]], [['Rain, stayed in', 0]], [['Promotion news', 3], ['Junk food', -1]]
+    ];
+    ex.forEach((evs, i) => {
+      const d = new Date(today); d.setDate(d.getDate() - (ex.length - i));
+      days[key(d)] = evs.map(([n, p]) => ({ n, p }));
+    });
+    days[todayKey] = [{ n: 'Good coffee', p: 1 }, { n: 'Forgot keys', p: -2 }, { n: 'Finished the draft', p: 3 }];
+  }
+  const save = () => { if (!sample) store.set('ssd-days', days); };
+  const sum = k => (days[k] || []).reduce((a, e) => a + e.p, 0);
+  const fmt = p => (p > 0 ? '+' : '') + p;
+  const cls = p => p > 0 ? 'pos' : p < 0 ? 'neg' : '';
+
+  const scoresEl = $('#scores');
+  for (let p = -3; p <= 3; p++) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = fmt(p); b.dataset.p = p;
+    b.setAttribute('aria-pressed', p === score);
+    b.className = p > 0 ? 'sp' : p < 0 ? 'sn' : 'sz';
+    b.addEventListener('click', () => {
+      score = p;
+      [...scoresEl.children].forEach(c => c.setAttribute('aria-pressed', +c.dataset.p === score));
+    });
+    scoresEl.appendChild(b);
+  }
+
+  function render() {
+    const k = key(view);
+    $('#date').textContent = k === todayKey ? 'Today, ' + k : k;
+    $('#next').disabled = k >= todayKey;
+    $('#next').style.opacity = k >= todayKey ? .3 : 1;
+    const evs = days[k] || [];
+    const s = sum(k);
+    const sumEl = $('#sum');
+    sumEl.textContent = fmt(s);
+    sumEl.className = 'big ' + cls(s);
+    $('#count').textContent = evs.length ? evs.length + (evs.length === 1 ? ' event' : ' events') : '';
+    const list = $('#list');
+    list.innerHTML = '';
+    if (!evs.length) {
+      const li = document.createElement('li');
+      li.className = 'empty'; li.textContent = 'Nothing scored for this day.';
+      list.appendChild(li);
+    }
+    evs.forEach((e, i) => {
+      const li = document.createElement('li');
+      const left = document.createElement('span');
+      left.className = 'row';
+      const pts = document.createElement('span');
+      pts.className = 'pts ' + cls(e.p); pts.textContent = fmt(e.p);
+      const t = document.createElement('span'); t.textContent = e.n;
+      left.append(pts, t);
+      const del = document.createElement('button');
+      del.type = 'button'; del.textContent = '×'; del.setAttribute('aria-label', 'Delete ' + e.n);
+      del.addEventListener('click', () => {
+        evs.splice(i, 1);
+        if (!evs.length) delete days[k];
+        sample = false; save(); render();
+      });
+      li.append(left, del);
+      list.appendChild(li);
+    });
+    const chart = $('#chart'), labels = $('#labels');
+    chart.innerHTML = '<div class="mid"></div>'; labels.innerHTML = '';
+    const range = [];
+    for (let i = 13; i >= 0; i--) { const d = new Date(today); d.setDate(d.getDate() - i); range.push(d); }
+    const max = Math.max(3, ...range.map(d => Math.abs(sum(key(d)))));
+    range.forEach(d => {
+      const v = sum(key(d));
+      const col = document.createElement('div');
+      col.className = 'col' + (key(d) === k ? ' sel' : '');
+      const bar = document.createElement('div');
+      bar.className = 'bar ' + cls(v);
+      bar.style.height = Math.max(v === 0 ? 0 : 2, Math.abs(v) / max * 50) + '%';
+      if (v >= 0) bar.style.bottom = '50%'; else bar.style.top = '50%';
+      col.title = key(d) + ': ' + fmt(v);
+      col.appendChild(bar);
+      chart.appendChild(col);
+      const l = document.createElement('span'); l.textContent = d.getDate();
+      labels.appendChild(l);
+    });
+  }
+
+  $('#prev').addEventListener('click', () => { view.setDate(view.getDate() - 1); render(); });
+  $('#next').addEventListener('click', () => { if (key(view) < todayKey) { view.setDate(view.getDate() + 1); render(); } });
+  $('#form').addEventListener('submit', ev => {
+    ev.preventDefault();
+    const n = $('#note').value.trim();
+    if (!n) { $('#err').textContent = 'Write what happened first.'; return; }
+    $('#err').textContent = '';
+    if (sample) { days = {}; sample = false; }
+    const k = key(view);
+    (days[k] = days[k] || []).push({ n, p: score });
+    save();
+    $('#note').value = '';
+    render();
+  });
+  render();
+})();
+</script>
+</body>
+</html>

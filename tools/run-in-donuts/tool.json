@@ -1,0 +1,54 @@
+{
+  "slug": "run-in-donuts",
+  "wish": "someone should make a running app that shows your progress in terms of popular foods",
+  "year": 2016,
+  "agreed": 72,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/4whnqy/",
+      "date": "2016-08-06",
+      "points": 65,
+      "comments": 7
+    }
+  ],
+  "spec": "Turns a run (distance and body weight) into calories burned, shown as counts of donuts, pizza slices, burgers and other common foods.\nEnter distance and weight in km/kg or mi/lb; the donut count updates as you type, and you can log runs to keep a running total.\nIt does not track routes, pace or heart rate, and the calorie figure is an estimate.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#dist",
+        "text": "10"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#hero",
+        "contains": "2.9 donuts"
+      }
+    },
+    {
+      "tap": "#log"
+    },
+    {
+      "expect": {
+        "sel": "#total",
+        "contains": "Logged so far"
+      }
+    },
+    {
+      "tap": "#imperial"
+    },
+    {
+      "expect": {
+        "sel": "#dl",
+        "contains": "mi"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:47:59Z",
+  "model": "sonnet-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": ""
+}
