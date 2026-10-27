@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T01:45:38.651Z",
+ "updated": "2026-10-27T01:45:58.304Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -328,9 +328,14 @@
   },
   {
    "slug": "mystery-string-decoder",
-   "status": "pending",
+   "status": "pass",
    "attempts": 1,
-   "model": "opus-5.5"
+   "model": "opus-5.5",
+   "kb": 17.2,
+   "tests": "6/6",
+   "built": "2026-10-27T01:43:12Z",
+   "minutes": 9,
+   "approved": false
   },
   {
    "slug": "highlight-text-matches",

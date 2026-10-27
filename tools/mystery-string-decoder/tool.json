@@ -1,0 +1,54 @@
+{
+  "slug": "mystery-string-decoder",
+  "wish": "someone should make a tool that tries many decoders on a mystery string",
+  "year": 2015,
+  "agreed": 13,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/18615/convert-an-enigmatic-string-using-many-common-decoding-algorithms-to-check-whic",
+      "date": "2015-04-10",
+      "points": 12,
+      "comments": 1
+    }
+  ],
+  "spec": "Runs a pasted string through 17 decoders (base64, base32, hex, binary, octal, decimal, A1Z26, URL, HTML entities, escapes, quoted-printable, morse, JWT, atbash, rot47, reverse, best Caesar shift) plus gzip/zlib inside base64, and every two-step chain of them.\nPaste the string; readable results are ranked first with a score, each can be copied or fed back in with 'decode this'.\nIt does not crack encryption or hashes (MD5, SHA, AES) and sends nothing anywhere.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#input",
+        "text": "aGVsbG8gd29ybGQ="
+      }
+    },
+    {
+      "wait": 500
+    },
+    {
+      "expect": {
+        "sel": "#results li .out",
+        "contains": "hello world"
+      }
+    },
+    {
+      "type": {
+        "sel": "#input",
+        "text": "NDg2NTZjNmM2ZjJjMjA2NjcyNjk2NTZlNjQ="
+      }
+    },
+    {
+      "wait": 500
+    },
+    {
+      "expect": {
+        "sel": "#results li .chain",
+        "contains": "base64 → hex"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:43:12Z",
+  "model": "opus-5.5",
+  "minutes": 9,
+  "approved": false,
+  "notes": ""
+}
