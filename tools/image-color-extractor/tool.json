@@ -1,0 +1,54 @@
+{
+  "slug": "image-color-extractor",
+  "wish": "someone should make a web app that extracts all the colours of an image",
+  "year": 2014,
+  "agreed": 7,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/14825/web-app-to-extract-all-colours-of-an-image",
+      "date": "2014-12-23",
+      "points": 6,
+      "comments": 1
+    }
+  ],
+  "spec": "Lists the colours of an image you choose, drop or paste, with hex, RGB and share of pixels, at three levels of detail up to every colour.\nPick an image, switch detail, tap a colour to copy its hex, tap the image to read one pixel, copy the palette as hex, CSS or JSON.\nIt does not upload the image anywhere and does not name the colours.",
+  "tests": [
+    {
+      "tap": "#sample"
+    },
+    {
+      "wait": 400
+    },
+    {
+      "expect": {
+        "sel": "#colors li",
+        "count": 3
+      }
+    },
+    {
+      "expect": {
+        "sel": "#colors .hex",
+        "contains": "#1f4e79"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#colors .pct",
+        "contains": "50%"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#count",
+        "contains": "3 colours"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:54:46Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Works fully offline; images are decoded locally with createImageBitmap or a data: URL fallback."
+}

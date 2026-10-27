@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a web app that extracts all the colours of an image</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+.pick { display: inline-flex; align-items: center; justify-content: center; min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); border-radius: var(--radius); cursor: pointer; background: var(--ink); color: var(--paper); }
+.pick input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+#drop { border: 1.5px dashed var(--line); border-radius: var(--radius); padding: 12px; display: grid; gap: 12px; }
+#drop.over { border-color: var(--ink); }
+#preview { display: none; max-width: 100%; height: auto; max-height: 50vh; justify-self: start; border-radius: var(--radius); cursor: crosshair; touch-action: manipulation; }
+#preview.on { display: block; }
+#status { min-height: 1.45em; color: var(--meta); display: flex; gap: 10px; align-items: center; }
+#status i { width: 24px; height: 24px; border-radius: var(--radius); border: 1px solid var(--line); flex: none; }
+#bar { height: 28px; display: flex; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); }
+#bar span { height: 100%; min-width: 1px; }
+#colors li { padding: 0; }
+#colors button { width: 100%; display: flex; align-items: center; gap: 12px; border: 0; padding: 6px 0; border-radius: 0; text-align: left; font-variant-numeric: tabular-nums; }
+.sw { width: 40px; height: 40px; border-radius: var(--radius); border: 1px solid var(--line); flex: none; }
+.hex { font-family: var(--mono); flex: 1; }
+.rgb { color: var(--meta); font-family: var(--mono); }
+.pct { min-width: 4.2em; text-align: right; }
+@media (max-width: 380px) { .rgb { display: none; } }
+select { width: auto; }
+#out { font: 16px/1.4 var(--mono); min-height: 7em; resize: vertical; }
+.hide { display: none !important; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a web app that extracts all the colours of an image</h1>
+
+<main id="app" class="stack">
+  <div id="drop">
+    <div class="row">
+      <label class="pick" role="button" tabindex="0">Choose image<input id="file" type="file" accept="image/*"></label>
+      <button id="sample" type="button">Try a sample</button>
+    </div>
+    <canvas id="preview" aria-label="Image preview, tap to read a pixel"></canvas>
+    <div id="status">Choose, drop or paste an image. Nothing leaves your device.</div>
+  </div>
+
+  <section id="result" class="stack hide">
+    <div class="row">
+      <span id="count" class="big" style="font-size:28px"></span>
+      <select id="detail" aria-label="Detail">
+        <option value="main">main colours</option>
+        <option value="more">more colours</option>
+        <option value="all">every colour</option>
+      </select>
+    </div>
+    <div id="bar" aria-hidden="true"></div>
+    <ul id="colors" class="plain"></ul>
+    <div class="row">
+      <select id="fmt" aria-label="Format">
+        <option value="hex">hex + share</option>
+        <option value="css">CSS variables</option>
+        <option value="json">JSON</option>
+      </select>
+      <button id="copy" type="button" class="primary">Copy palette</button>
+    </div>
+    <textarea id="out" readonly spellcheck="false" aria-label="Palette"></textarea>
+  </section>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const ANALYSE_MAX = 320;   // long side of the analysis bitmap
+  const PREVIEW_MAX = 900;
+  // merge distance and minimum share per detail level
+  const LEVELS = { main: { dist: 40, min: 0.004, cap: 16 }, more: { dist: 22, min: 0.001, cap: 48 }, all: { dist: 0, min: 0, cap: 600 } };
+
+  const preview = $('#preview'), pctx = preview.getContext('2d', { willReadFrequently: true });
+  const statusEl = $('#status');
+  let buckets = null, total = 0, palette = [];
+
+  const hex2 = n => n.toString(16).padStart(2, '0');
+  const toHex = c => '#' + hex2(c[0]) + hex2(c[1]) + hex2(c[2]);
+  const say = (text, color) => {
+    statusEl.textContent = '';
+    if (color) { const i = document.createElement('i'); i.style.background = color; statusEl.append(i); }
+    statusEl.append(text);
+  };
+
+  // count every pixel into 15-bit buckets, keeping exact sums so averages stay true
+  function analyse(src, w, h) {
+    const s = Math.min(1, ANALYSE_MAX / Math.max(w, h));
+    const aw = Math.max(1, Math.round(w * s)), ah = Math.max(1, Math.round(h * s));
+    const c = document.createElement('canvas'); c.width = aw; c.height = ah;
+    const ctx = c.getContext('2d', { willReadFrequently: true });
+    ctx.imageSmoothingEnabled = s < 1;
+    ctx.drawImage(src, 0, 0, aw, ah);
+    const d = ctx.getImageData(0, 0, aw, ah).data;
+    const map = new Map();
+    total = 0;
+    for (let i = 0; i < d.length; i += 4) {
+      if (d[i + 3] < 128) continue;
+      const r = d[i], g = d[i + 1], b = d[i + 2];
+      const key = ((r >> 3) << 10) | ((g >> 3) << 5) | (b >> 3);
+      let e = map.get(key);
+      if (!e) { e = [0, 0, 0, 0]; map.set(key, e); }
+      e[0] += r; e[1] += g; e[2] += b; e[3]++;
+      total++;
+    }
+    buckets = [...map.values()].sort((a, b) => b[3] - a[3]);
+  }
+
+  // redmean-weighted RGB distance: cheap and close to perceived difference
+  function dist(a, b) {
+    const rm = (a[0] + b[0]) / 2, dr = a[0] - b[0], dg = a[1] - b[1], db = a[2] - b[2];
+    return Math.sqrt((2 + rm / 256) * dr * dr + 4 * dg * dg + (2 + (255 - rm) / 256) * db * db) / 3;
+  }
+
+  function group(level) {
+    const L = LEVELS[level];
+    const groups = [];
+    // "every colour": each 15-bit bucket is its own colour, no merging needed
+    if (level === 'all') for (const e of buckets) groups.push({ s: [e[0], e[1], e[2]], n: e[3] });
+    else for (const e of buckets) {
+      const c = [e[0] / e[3], e[1] / e[3], e[2] / e[3]];
+      let best = null, bd = L.dist;
+      for (const g of groups) { const dd = dist(c, g.c); if (dd < bd) { bd = dd; best = g; } }
+      if (best) { best.s[0] += e[0]; best.s[1] += e[1]; best.s[2] += e[2]; best.n += e[3]; }
+      else if (groups.length < 4000) groups.push({ c, s: [e[0], e[1], e[2]], n: e[3] });
+      else { // too many groups: fold into nearest
+        let nb = groups[0], nd = Infinity;
+        for (const g of groups) { const dd = dist(c, g.c); if (dd < nd) { nd = dd; nb = g; } }
+        nb.s[0] += e[0]; nb.s[1] += e[1]; nb.s[2] += e[2]; nb.n += e[3];
+      }
+    }
+    return groups
+      .map(g => ({ rgb: g.s.map(v => Math.round(v / g.n)), share: g.n / total }))
+      .sort((a, b) => b.share - a.share)
+      .filter(g => g.share >= L.min)
+      .slice(0, L.cap);
+  }
+
+  const fmtPct = s => (s >= 0.1 ? (s * 100).toFixed(0) : s >= 0.001 ? (s * 100).toFixed(1) : '<0.1') + '%';
+
+  function render() {
+    if (!buckets) return;
+    const level = $('#detail').value;
+    store.set('ice-detail', level);
+    palette = total ? group(level) : [];
+    const more = level === 'all' && buckets.length > palette.length ? ' of ' + buckets.length : '';
+    $('#result').classList.remove('hide');
+    if (!palette.length) { $('#count').textContent = 'no visible pixels'; $('#colors').textContent = ''; $('#bar').textContent = ''; $('#out').value = ''; return; }
+    $('#count').textContent = palette.length + more + (palette.length === 1 && !more ? ' colour' : ' colours');
+    const bar = $('#bar'), list = $('#colors');
+    bar.textContent = ''; list.textContent = '';
+    const fb = document.createDocumentFragment(), fl = document.createDocumentFragment();
+    for (const p of palette) {
+      const h = toHex(p.rgb);
+      const s = document.createElement('span'); s.style.background = h; s.style.flexGrow = p.share; fb.append(s);
+      const li = document.createElement('li');
+      const b = document.createElement('button'); b.type = 'button'; b.dataset.hex = h;
+      b.innerHTML = `<i class="sw" style="background:${h}"></i><span class="hex">${h}</span><span class="rgb">${p.rgb.join(' ')}</span><span class="pct">${fmtPct(p.share)}</span>`;
+      li.append(b); fl.append(li);
+    }
+    bar.append(fb); list.append(fl);
+    writeOut();
+  }
+
+  function writeOut() {
+    const f = $('#fmt').value;
+    store.set('ice-fmt', f);
+    let t;
+    if (f === 'css') t = ':root {\n' + palette.map((p, i) => `  --c${i + 1}: ${toHex(p.rgb)}; /* ${fmtPct(p.share)} */`).join('\n') + '\n}';
+    else if (f === 'json') t = JSON.stringify(palette.map(p => ({ hex: toHex(p.rgb), share: +(p.share * 100).toFixed(2) })), null, 1);
+    else t = palette.map(p => toHex(p.rgb) + '  ' + fmtPct(p.share)).join('\n');
+    $('#out').value = t;
+  }
+
+  async function copy(text, label) {
+    let ok = false;
+    try { await navigator.clipboard.writeText(text); ok = true; } catch {}
+    if (!ok) {
+      const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.append(ta); ta.select();
+      try { ok = document.execCommand('copy'); } catch {}
+      ta.remove();
+    }
+    say(ok ? 'copied ' + label : 'copy blocked, select the text below');
+  }
+
+  function show(src, w, h, name) {
+    const s = Math.min(1, PREVIEW_MAX / Math.max(w, h));
+    preview.width = Math.max(1, Math.round(w * s)); preview.height = Math.max(1, Math.round(h * s));
+    pctx.clearRect(0, 0, preview.width, preview.height);
+    pctx.drawImage(src, 0, 0, preview.width, preview.height);
+    preview.classList.add('on');
+    analyse(src, w, h);
+    render();
+    say((name ? name + ' — ' : '') + w + '×' + h + '. Tap the image to read one pixel.');
+  }
+
+  async function load(file) {
+    if (!file || !/^image\//.test(file.type)) { say('That is not an image file.'); return; }
+    say('reading…');
+    try {
+      let src;
+      if (window.createImageBitmap) {
+        try { src = await createImageBitmap(file); } catch { src = null; }
+      }
+      if (!src) {
+        const url = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(file); });
+        src = await new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = url; });
+      }
+      const w = src.width || src.naturalWidth, h = src.height || src.naturalHeight;
+      show(src, w, h, file.name);
+    } catch { say('Could not read that image.'); }
+  }
+
+  function sample() {
+    const c = document.createElement('canvas'); c.width = 200; c.height = 100;
+    const x = c.getContext('2d');
+    x.fillStyle = '#1f4e79'; x.fillRect(0, 0, 100, 100);
+    x.fillStyle = '#f2c14e'; x.fillRect(100, 0, 60, 100);
+    x.fillStyle = '#c8321e'; x.fillRect(160, 0, 40, 100);
+    show(c, 200, 100, 'sample');
+  }
+
+  $('#file').addEventListener('change', e => { load(e.target.files[0]); e.target.value = ''; });
+  $('.pick').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('#file').click(); } });
+  $('#sample').addEventListener('click', sample);
+  $('#detail').addEventListener('change', render);
+  $('#fmt').addEventListener('change', writeOut);
+  $('#copy').addEventListener('click', () => { if (palette.length) copy($('#out').value, palette.length + ' colours'); });
+  $('#colors').addEventListener('click', e => { const b = e.target.closest('button'); if (b) copy(b.dataset.hex, b.dataset.hex); });
+
+  preview.addEventListener('click', e => {
+    const r = preview.getBoundingClientRect();
+    const px = Math.floor((e.clientX - r.left) * preview.width / r.width), py = Math.floor((e.clientY - r.top) * preview.height / r.height);
+    if (px < 0 || py < 0 || px >= preview.width || py >= preview.height) return;
+    const d = pctx.getImageData(px, py, 1, 1).data;
+    const h = toHex([d[0], d[1], d[2]]);
+    say(h + '  rgb ' + d[0] + ' ' + d[1] + ' ' + d[2], h);
+  });
+
+  const drop = $('#drop');
+  ['dragenter', 'dragover'].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach(t => drop.addEventListener(t, () => drop.classList.remove('over')));
+  drop.addEventListener('drop', e => { e.preventDefault(); load(e.dataTransfer.files[0]); });
+  document.addEventListener('paste', e => {
+    const item = [...(e.clipboardData?.items || [])].find(i => i.type.startsWith('image/'));
+    if (item) load(item.getAsFile());
+  });
+
+  const lv = store.get('ice-detail', 'main'); if (LEVELS[lv]) $('#detail').value = lv;
+  const fm = store.get('ice-fmt', 'hex'); if (['hex', 'css', 'json'].includes(fm)) $('#fmt').value = fm;
+})();
+</script>
+</body>
+</html>
