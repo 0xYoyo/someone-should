@@ -1,0 +1,54 @@
+{
+  "slug": "hex-file-viewer",
+  "wish": "someone should make a tool that views files as hex",
+  "year": 2014,
+  "agreed": 27,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/1098/what-is-a-good-hex-viewer-for-windows",
+      "date": "2014-02-14",
+      "points": 20,
+      "comments": 7
+    }
+  ],
+  "spec": "Opens any local file (or pasted text) and shows offsets, hex bytes and ASCII side by side, scrolling smoothly through large files.\nJump to an offset in hex or decimal, search for text or hex byte sequences, tap a byte to see its value in hex, decimal and binary.\nIt only reads: no editing, no saving, and the file never leaves the device.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#text",
+        "text": "hello world"
+      }
+    },
+    {
+      "tap": "#load-text"
+    },
+    {
+      "expect": {
+        "sel": "#view",
+        "contains": "68 65 6c 6c 6f 20 77 6f"
+      }
+    },
+    {
+      "type": {
+        "sel": "#q",
+        "text": "world"
+      }
+    },
+    {
+      "tap": "#find"
+    },
+    {
+      "expect": {
+        "sel": "#status",
+        "contains": "offset 0x6"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:50:10Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Whole file is read into memory with File.arrayBuffer; rows are virtualized so large files scroll without lag."
+}
