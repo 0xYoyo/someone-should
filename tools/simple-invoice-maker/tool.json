@@ -1,0 +1,68 @@
+{
+  "slug": "simple-invoice-maker",
+  "wish": "someone should make an app for invoicing and accounting",
+  "year": 2014,
+  "agreed": 21,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/2771/invoicing-and-accounting-software",
+      "date": "2014-03-27",
+      "points": 5,
+      "comments": 3
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/25843/recommended-software-for-invoicing-with-customer-order-databases",
+      "date": "2015-09-07",
+      "points": 6,
+      "comments": 1
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/3848/invoicing-program-to-increase-productivity",
+      "date": "2014-05-05",
+      "points": 5,
+      "comments": 1
+    }
+  ],
+  "spec": "Builds an invoice from your details, client, line items, discount and tax, with a live printable preview (print or save as PDF).\nType items and tap Add item; save to the ledger to auto-number the next invoice and track paid/outstanding totals per currency.\nDoes not send email, take payments, sync anywhere, or do double-entry bookkeeping; everything stays in this browser.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#item-desc",
+        "text": "Logo design"
+      }
+    },
+    {
+      "type": {
+        "sel": "#item-price",
+        "text": "250"
+      }
+    },
+    {
+      "tap": "#add-item"
+    },
+    {
+      "expect": {
+        "sel": "#total",
+        "matches": "250\\.00"
+      }
+    },
+    {
+      "tap": "#save"
+    },
+    {
+      "expect": {
+        "sel": "#ledger li",
+        "contains": "INV-0001"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T02:04:27Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Ledger, draft and your From details persist in localStorage; invoice numbers auto-increment from the highest saved one."
+}

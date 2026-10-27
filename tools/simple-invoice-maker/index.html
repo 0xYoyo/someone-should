@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app for invoicing and accounting</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+h1 { font-size: 16px; }
+#app > *, .stack > *, .two > *, .items-add > * { min-width: 0; }
+input, select { min-width: 0; max-width: 100%; }
+input[type=date] { padding: 10px 6px; }
+.lbl { display: grid; gap: 4px; }
+.lbl > span, .note { font: 16px/1.4 var(--mono); color: var(--meta); }
+textarea { min-height: 88px; resize: vertical; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.items-add { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.items-add .desc { grid-column: 1 / -1; }
+.items-add button { grid-column: 1 / -1; }
+section { border-top: 1px solid var(--line); padding-top: 16px; }
+h2 { font: 500 16px/1.3 var(--mono); color: var(--meta); margin: 0 0 8px; }
+#lines li .d { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+#lines li .n { font-variant-numeric: tabular-nums; white-space: nowrap; }
+button.x { padding: 0; width: 44px; flex: none; border-color: var(--line); }
+.err { color: var(--no); min-height: 1.45em; margin: 0; }
+#invoice { border: 1.5px solid var(--ink); border-radius: var(--radius); padding: 16px; display: grid; gap: 14px; overflow-wrap: anywhere; }
+#invoice .head { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+#invoice .title { font-size: 24px; font-weight: 600; letter-spacing: 0.04em; }
+#invoice .parties { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; white-space: pre-line; }
+#invoice table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+#invoice th, #invoice td { text-align: right; padding: 6px 0 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+#invoice th:first-child, #invoice td:first-child { text-align: left; padding-left: 0; }
+#invoice th { font-weight: 500; color: var(--meta); }
+#invoice .sum { display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; justify-self: end; font-variant-numeric: tabular-nums; }
+#invoice .sum .grand { font-weight: 600; font-size: 20px; }
+#ledger li { flex-wrap: wrap; }
+#ledger .who { flex: 1 1 140px; min-width: 0; overflow-wrap: anywhere; }
+#ledger .paid { color: var(--built); }
+#ledger .unpaid { color: var(--no); }
+.totals { display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; font-variant-numeric: tabular-nums; }
+@media print {
+  @page { margin: 16mm; }
+  html, body { background: #fff; color: #000; }
+  body { padding: 0; }
+  body > *:not(#app), #app > *:not(#invoice-wrap), #invoice-wrap > :not(#invoice) { display: none !important; }
+  #app, #invoice-wrap { display: block; border: 0; padding: 0; }
+  #invoice { border: 0; padding: 0; color: #000; }
+  #invoice th, #invoice td { border-color: #bbb; }
+}
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make an app for invoicing and accounting</h1>
+
+<main id="app" class="stack">
+  <section class="stack" style="border:0;padding:0">
+    <div class="two">
+      <label class="lbl"><span>Invoice no.</span><input id="inv-no" autocomplete="off"></label>
+      <label class="lbl"><span>Currency</span>
+        <select id="currency">
+          <option>USD</option><option>EUR</option><option>GBP</option><option>CAD</option><option>AUD</option>
+          <option>NZD</option><option>CHF</option><option>JPY</option><option>INR</option><option>ILS</option>
+          <option>SEK</option><option>NOK</option><option>DKK</option><option>PLN</option><option>BRL</option><option>MXN</option><option>ZAR</option>
+        </select>
+      </label>
+      <label class="lbl"><span>Date</span><input id="inv-date" type="date"></label>
+      <label class="lbl"><span>Due</span><input id="due-date" type="date"></label>
+    </div>
+    <label class="lbl"><span>From (you)</span><textarea id="from" rows="3" placeholder="Name, address, email, tax ID"></textarea></label>
+    <label class="lbl"><span>Bill to</span><textarea id="client" rows="3" placeholder="Client name and address"></textarea></label>
+  </section>
+
+  <section class="stack">
+    <h2>Line items</h2>
+    <div class="items-add">
+      <label class="lbl desc"><span>Description</span><input id="item-desc" autocomplete="off" placeholder="Design work"></label>
+      <label class="lbl"><span>Qty</span><input id="item-qty" inputmode="decimal" value="1"></label>
+      <label class="lbl"><span>Unit price</span><input id="item-price" inputmode="decimal" placeholder="0.00"></label>
+      <button id="add-item">Add item</button>
+    </div>
+    <p id="item-err" class="err" role="status"></p>
+    <ul id="lines" class="plain"></ul>
+    <div class="two">
+      <label class="lbl"><span>Tax %</span><input id="tax" inputmode="decimal" value="0"></label>
+      <label class="lbl"><span>Discount</span><input id="discount" inputmode="decimal" value="0"></label>
+    </div>
+    <label class="lbl"><span>Notes / payment terms</span><textarea id="notes" rows="2" placeholder="Bank details, payment terms"></textarea></label>
+  </section>
+
+  <section id="invoice-wrap" class="stack">
+    <h2>Invoice</h2>
+    <article id="invoice" aria-label="Invoice preview">
+      <div class="head"><span class="title">INVOICE</span><span id="pv-no"></span></div>
+      <div id="pv-dates"></div>
+      <div class="parties"><div><strong>From</strong><br><span id="pv-from"></span></div><div><strong>Bill to</strong><br><span id="pv-client"></span></div></div>
+      <table>
+        <thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Amount</th></tr></thead>
+        <tbody id="pv-lines"></tbody>
+      </table>
+      <div class="sum">
+        <span>Subtotal</span><span id="subtotal"></span>
+        <span id="disc-lbl">Discount</span><span id="disc-val"></span>
+        <span id="tax-lbl">Tax</span><span id="tax-val"></span>
+        <span class="grand">Total</span><span class="grand" id="total"></span>
+      </div>
+      <div id="pv-notes" style="white-space:pre-line"></div>
+    </article>
+    <div class="row">
+      <button id="print" class="primary">Print / save PDF</button>
+      <button id="save">Save to ledger</button>
+      <button id="new">New invoice</button>
+    </div>
+    <p id="save-msg" class="note" role="status"></p>
+  </section>
+
+  <section class="stack">
+    <h2>Ledger</h2>
+    <div class="totals" id="totals"></div>
+    <ul id="ledger" class="plain"></ul>
+  </section>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  // storage helper — never throws
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  const KEY_DRAFT = 'sim.draft', KEY_LEDGER = 'sim.ledger', KEY_ME = 'sim.from';
+  const today = () => new Date().toISOString().slice(0, 10);
+  const plusDays = (iso, n) => { const d = new Date(iso + 'T00:00:00Z'); if (isNaN(d)) return ''; d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+  const num = s => { const v = parseFloat(String(s).replace(/[^\d.,-]/g, '').replace(',', '.')); return isFinite(v) ? v : NaN; };
+  const round2 = v => Math.round(v * 100) / 100;
+
+  let ledger = store.get(KEY_LEDGER, []);
+  if (!Array.isArray(ledger)) ledger = [];
+
+  // "INV-0009" -> "INV-0010"; keeps zero padding.
+  const bump = no => {
+    const m = String(no).match(/^(.*?)(\d+)(\D*)$/);
+    if (!m) return (no ? no + '-' : 'INV-') + '0001';
+    const n = String(+m[2] + 1).padStart(m[2].length, '0');
+    return m[1] + n + m[3];
+  };
+  const nextNo = () => {
+    if (!ledger.length) return 'INV-0001';
+    let best = ledger[0].no;
+    for (const e of ledger) { const a = +(String(e.no).match(/\d+/g) || [0]).pop(), b = +(String(best).match(/\d+/g) || [0]).pop(); if (a > b) best = e.no; }
+    return bump(best);
+  };
+
+  const blank = () => ({ no: nextNo(), date: today(), due: plusDays(today(), 30), currency: 'USD', from: store.get(KEY_ME, ''), client: '', items: [], tax: '0', discount: '0', notes: '' });
+  let inv = store.get(KEY_DRAFT, null);
+  if (!inv || !Array.isArray(inv.items)) inv = blank();
+
+  const fmt = (v, cur) => {
+    try { return new Intl.NumberFormat(undefined, { style: 'currency', currency: cur || 'USD' }).format(v); }
+    catch { return (cur || '') + ' ' + v.toFixed(2); }
+  };
+  const fmtQty = v => (Math.round(v * 1000) / 1000).toString();
+  const fmtDate = iso => { if (!iso) return ''; const d = new Date(iso + 'T00:00:00'); return isNaN(d) ? iso : d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }); };
+
+  const calc = i => {
+    const sub = round2(i.items.reduce((s, it) => s + it.qty * it.price, 0));
+    const disc = Math.min(Math.max(num(i.discount) || 0, 0), sub);
+    const rate = Math.max(num(i.tax) || 0, 0);
+    const tax = round2((sub - disc) * rate / 100);
+    return { sub, disc, rate, tax, total: round2(sub - disc + tax) };
+  };
+
+  const fields = { 'inv-no': 'no', 'inv-date': 'date', 'due-date': 'due', currency: 'currency', from: 'from', client: 'client', tax: 'tax', discount: 'discount', notes: 'notes' };
+  const fillForm = () => { for (const [id, k] of Object.entries(fields)) $('#' + id).value = inv[k] ?? ''; };
+
+  const el = (tag, text, cls) => { const e = document.createElement(tag); if (text != null) e.textContent = text; if (cls) e.className = cls; return e; };
+
+  const render = () => {
+    const c = calc(inv), cur = inv.currency;
+    // editable line list
+    const lines = $('#lines'); lines.textContent = '';
+    if (!inv.items.length) lines.append(el('li', 'No items yet.', 'empty'));
+    inv.items.forEach((it, idx) => {
+      const li = el('li');
+      li.append(el('span', `${it.desc} — ${fmtQty(it.qty)} × ${fmt(it.price, cur)}`, 'd'), el('span', fmt(it.qty * it.price, cur), 'n'));
+      const x = el('button', '×', 'x'); x.setAttribute('aria-label', 'Remove ' + it.desc);
+      x.addEventListener('click', () => { inv.items.splice(idx, 1); changed(); });
+      li.append(x); lines.append(li);
+    });
+    // preview
+    $('#pv-no').textContent = inv.no ? 'No. ' + inv.no : '';
+    $('#pv-dates').textContent = [inv.date && 'Issued ' + fmtDate(inv.date), inv.due && 'Due ' + fmtDate(inv.due)].filter(Boolean).join('  ·  ');
+    $('#pv-from').textContent = inv.from || '—';
+    $('#pv-client').textContent = inv.client || '—';
+    const body = $('#pv-lines'); body.textContent = '';
+    if (!inv.items.length) { const tr = el('tr'); const td = el('td', 'No items yet.'); td.colSpan = 4; tr.append(td); body.append(tr); }
+    for (const it of inv.items) {
+      const tr = el('tr');
+      tr.append(el('td', it.desc), el('td', fmtQty(it.qty)), el('td', fmt(it.price, cur)), el('td', fmt(it.qty * it.price, cur)));
+      body.append(tr);
+    }
+    $('#subtotal').textContent = fmt(c.sub, cur);
+    const showDisc = c.disc > 0;
+    $('#disc-lbl').hidden = $('#disc-val').hidden = !showDisc;
+    $('#disc-val').textContent = '−' + fmt(c.disc, cur);
+    $('#tax-lbl').textContent = `Tax (${c.rate}%)`;
+    $('#tax-val').textContent = fmt(c.tax, cur);
+    $('#total').textContent = fmt(c.total, cur);
+    $('#pv-notes').textContent = inv.notes;
+    renderLedger();
+  };
+
+  const renderLedger = () => {
+    const ul = $('#ledger'); ul.textContent = '';
+    const tot = $('#totals'); tot.textContent = '';
+    if (!ledger.length) { ul.append(el('li', 'No saved invoices.', 'empty')); return; }
+    // totals per currency
+    const by = {};
+    for (const e of ledger) {
+      const b = by[e.currency] || (by[e.currency] = { paid: 0, owed: 0 });
+      e.paid ? b.paid += e.total : b.owed += e.total;
+    }
+    for (const [cur, b] of Object.entries(by)) {
+      tot.append(el('span', `Outstanding ${cur}`), el('span', fmt(b.owed, cur), 'unpaid'), el('span', `Paid ${cur}`), el('span', fmt(b.paid, cur)));
+    }
+    [...ledger].sort((a, b) => String(b.date).localeCompare(String(a.date)) || String(b.no).localeCompare(String(a.no))).forEach(e => {
+      const li = el('li');
+      const who = el('span', null, 'who');
+      who.append(el('strong', e.no), document.createTextNode(' ' + ((e.client || '').split('\n')[0] || '—') + ' · ' + fmtDate(e.date) + ' · ' + fmt(e.total, e.currency)));
+      const st = el('button', e.paid ? 'Paid' : 'Unpaid', e.paid ? 'paid' : 'unpaid');
+      st.setAttribute('aria-label', `Mark ${e.no} ${e.paid ? 'unpaid' : 'paid'}`);
+      st.addEventListener('click', () => { e.paid = !e.paid; store.set(KEY_LEDGER, ledger); renderLedger(); });
+      const op = el('button', 'Open');
+      op.addEventListener('click', () => { inv = JSON.parse(JSON.stringify(e.data)); fillForm(); changed(); $('#save-msg').textContent = 'Opened ' + e.no + '.'; window.scrollTo(0, 0); });
+      const del = el('button', '×', 'x'); del.setAttribute('aria-label', 'Delete ' + e.no);
+      del.addEventListener('click', () => { ledger = ledger.filter(x => x !== e); store.set(KEY_LEDGER, ledger); renderLedger(); });
+      li.append(who, st, op, del); ul.append(li);
+    });
+  };
+
+  const changed = () => { store.set(KEY_DRAFT, inv); render(); };
+
+  for (const [id, k] of Object.entries(fields)) {
+    $('#' + id).addEventListener('input', ev => {
+      inv[k] = ev.target.value;
+      if (k === 'from') store.set(KEY_ME, inv.from);
+      changed();
+    });
+  }
+
+  const addItem = () => {
+    const desc = $('#item-desc').value.trim(), qty = num($('#item-qty').value), price = num($('#item-price').value);
+    const err = $('#item-err');
+    if (!desc) { err.textContent = 'Add a description.'; return; }
+    if (!(qty > 0)) { err.textContent = 'Quantity must be a number above 0.'; return; }
+    if (isNaN(price)) { err.textContent = 'Unit price must be a number.'; return; }
+    err.textContent = '';
+    inv.items.push({ desc, qty, price });
+    $('#item-desc').value = ''; $('#item-qty').value = '1'; $('#item-price').value = '';
+    $('#item-desc').focus();
+    changed();
+  };
+  $('#add-item').addEventListener('click', addItem);
+  for (const id of ['#item-desc', '#item-qty', '#item-price']) $(id).addEventListener('keydown', e => { if (e.key === 'Enter') addItem(); });
+
+  $('#print').addEventListener('click', () => { if (!inv.items.length) { $('#save-msg').textContent = 'Add at least one item first.'; return; } window.print(); });
+
+  $('#save').addEventListener('click', () => {
+    const msg = $('#save-msg');
+    if (!inv.items.length) { msg.textContent = 'Add at least one item first.'; return; }
+    if (!String(inv.no).trim()) { msg.textContent = 'Give it an invoice number.'; return; }
+    const c = calc(inv);
+    const entry = { no: inv.no.trim(), client: inv.client, date: inv.date, currency: inv.currency, total: c.total, paid: false, data: JSON.parse(JSON.stringify(inv)) };
+    const i = ledger.findIndex(e => e.no === entry.no);
+    if (i >= 0) { entry.paid = ledger[i].paid; ledger[i] = entry; msg.textContent = `Updated ${entry.no}.`; }
+    else { ledger.push(entry); msg.textContent = `Saved ${entry.no}. Next number: ${nextNo()}.`; }
+    store.set(KEY_LEDGER, ledger);
+    renderLedger();
+  });
+
+  $('#new').addEventListener('click', () => {
+    const keep = { from: inv.from, currency: inv.currency, tax: inv.tax, notes: inv.notes };
+    inv = Object.assign(blank(), keep);
+    fillForm(); changed();
+    $('#save-msg').textContent = 'Started ' + inv.no + '.';
+  });
+
+  fillForm();
+  render();
+})();
+</script>
+</body>
+</html>

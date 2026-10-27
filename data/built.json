@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T02:06:14.644Z",
+ "updated": "2026-10-27T02:06:19.637Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -873,9 +873,14 @@
   },
   {
    "slug": "simple-invoice-maker",
-   "status": "pending",
+   "status": "pass",
    "attempts": 1,
-   "model": "opus-5.5"
+   "model": "opus-5.5",
+   "kb": 17.7,
+   "tests": "6/6",
+   "built": "2026-10-27T02:04:27Z",
+   "minutes": 6,
+   "approved": false
   },
   {
    "slug": "fountain-screenplay-formatter",
