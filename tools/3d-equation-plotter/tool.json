@@ -1,0 +1,54 @@
+{
+  "slug": "3d-equation-plotter",
+  "wish": "someone should make a tool that plots math equations in 3D",
+  "year": 2014,
+  "agreed": 16,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/2822/math-equations-software-for-3d-plotting",
+      "date": "2014-03-29",
+      "points": 11,
+      "comments": 5
+    }
+  ],
+  "spec": "Plots any z = f(x, y) as a shaded, height-tinted 3D surface over x and y ranges you choose.\nType an equation (sin, cos, sqrt, exp, ln, ^, pi, implicit multiplication like 2xy), tap Plot, drag to rotate, pinch or buttons to zoom.\nDoes not plot implicit surfaces, parametric curves or several equations at once; extreme spikes are clipped and the range is shown.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#eq",
+        "text": "x^2 - y^2"
+      }
+    },
+    {
+      "tap": "#plot"
+    },
+    {
+      "expect": {
+        "sel": "#msg",
+        "contains": "z from -25 to 25"
+      }
+    },
+    {
+      "type": {
+        "sel": "#eq",
+        "text": "2xy + sin("
+      }
+    },
+    {
+      "tap": "#plot"
+    },
+    {
+      "expect": {
+        "sel": "#msg",
+        "contains": "unfinished"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T02:00:22Z",
+  "model": "opus-5.5",
+  "minutes": 8,
+  "approved": false,
+  "notes": "Own expression parser because the CSP forbids eval/new Function."
+}
