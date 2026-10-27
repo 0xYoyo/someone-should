@@ -1,0 +1,48 @@
+{
+  "slug": "compass-and-straightedge",
+  "wish": "someone should make a WYSIWYG geometry tool",
+  "year": 2014,
+  "agreed": 11,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/7419/wysiwyg-geometry-tool",
+      "date": "2014-06-30",
+      "points": 10,
+      "comments": 1
+    }
+  ],
+  "spec": "A compass-and-straightedge board: points, segments, lines, circles and angles, with crossings you can pin as points; drag a point and every construction built on it follows, with lengths and angles updating live.\nPick a tool, tap the board (snaps to a 1-unit grid unless Snap is off), drag solid points in Move; Undo, Delete and Clear; the drawing is kept on this device.\nIt does not do coordinates algebra, export images, or construct perpendiculars and bisectors in one step: you build them with circles, as on paper.",
+  "tests": [
+    {
+      "tap": "#t-seg"
+    },
+    {
+      "tap": "#g-1-1"
+    },
+    {
+      "tap": "#g-4-5"
+    },
+    {
+      "expect": {
+        "sel": "#readout",
+        "contains": "AB = 5.00"
+      }
+    },
+    {
+      "tap": "#undo"
+    },
+    {
+      "expect": {
+        "sel": "#pts .pt",
+        "count": 1
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T02:00:22Z",
+  "model": "opus-5.5",
+  "minutes": 9,
+  "approved": false,
+  "notes": "1 unit = one grid square. Intersection points are dependent: they move with their parents and disappear when the curves stop crossing."
+}

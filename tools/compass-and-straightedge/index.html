@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a WYSIWYG geometry tool</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+.tools { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.tools button { padding: 0 4px; font-size: 16px; }
+.tools button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+#hint { font-size: 16px; color: var(--meta); margin: 0; height: 1.45em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#board { display: block; width: 100%; height: min(58dvh, 460px); border: 1.5px solid var(--line); border-radius: var(--radius); touch-action: none; user-select: none; -webkit-user-select: none; cursor: crosshair; }
+#board .bg { fill: transparent; }
+#board .grid circle { fill: var(--line); }
+#board .crv { stroke: var(--ink); stroke-width: 1.6; fill: none; }
+#board .crv.line { stroke-dasharray: none; opacity: .75; }
+#board .arc { stroke: var(--no); stroke-width: 1.6; fill: none; }
+#board .pt { fill: var(--paper); stroke: var(--ink); stroke-width: 2; }
+#board .pt.free { fill: var(--ink); }
+#board .pt.sel { stroke: var(--no); fill: var(--no); }
+#board .cand { fill: none; stroke: var(--meta); stroke-width: 1; stroke-dasharray: 2 2; pointer-events: none; }
+#board text { font: 16px var(--sans); fill: var(--ink); pointer-events: none; paint-order: stroke; stroke: var(--paper); stroke-width: 4px; stroke-linejoin: round; }
+#board text.len { fill: var(--meta); font-family: var(--mono); }
+#board text.deg { fill: var(--no); font-family: var(--mono); }
+.side { display: flex; gap: 6px; }
+.side button { flex: 1; padding: 0 4px; }
+#readout li { font-family: var(--mono); font-size: 16px; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a WYSIWYG geometry tool</h1>
+
+<main id="app" class="stack">
+  <div class="tools" role="toolbar" aria-label="Tools">
+    <button id="t-move" data-tool="move">Move</button>
+    <button id="t-point" data-tool="point">Point</button>
+    <button id="t-seg" data-tool="seg">Segment</button>
+    <button id="t-line" data-tool="line">Line</button>
+    <button id="t-circ" data-tool="circ">Circle</button>
+    <button id="t-ang" data-tool="ang">Angle</button>
+    <button id="t-del" data-tool="del">Delete</button>
+    <button id="snap" aria-pressed="true">Snap</button>
+  </div>
+  <p id="hint"></p>
+  <svg id="board" aria-label="Drawing board">
+    <rect class="bg" x="0" y="0" width="100%" height="100%"/>
+    <g class="grid" id="grid"></g>
+    <g id="curves"></g>
+    <g id="marks"></g>
+    <g id="pts"></g>
+  </svg>
+  <div class="side">
+    <button id="undo">Undo</button>
+    <button id="clear">Clear</button>
+  </div>
+  <ul class="plain" id="readout"></ul>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  const KEY = 'compass-and-straightedge';
+  const U = 40;          // pixels per unit, also the grid spacing
+  const HIT = 22;        // touch radius for picking points
+  const HINTS = {
+    move: 'Drag a solid point.',
+    point: 'Tap to place a point.',
+    seg: 'Tap two points.',
+    line: 'Tap two points.',
+    circ: 'Tap the center, then the edge.',
+    ang: 'Tap three points, vertex second.',
+    del: 'Tap something to remove it.'
+  };
+  const NEED = { seg: 2, line: 2, circ: 2, ang: 3 };
+
+  const saved = store.get(KEY, null);
+  let objs = Array.isArray(saved?.objs) ? saved.objs : [];
+  let snap = saved?.snap !== false;
+  let nextId = objs.reduce((m, o) => Math.max(m, o.id), 0) + 1;
+  let tool = 'seg';
+  let sel = [];
+  let hist = [];
+  let pos = new Map();   // resolved point positions, id -> {x,y}
+  let W = 0, H = 0;
+
+  const board = $('#board');
+  const byId = (id) => objs.find(o => o.id === id);
+  const isPt = (o) => o.t === 'p' || o.t === 'x';
+  const isCurve = (o) => o.t === 'seg' || o.t === 'line' || o.t === 'circ';
+  const fmt = (v) => (v / U).toFixed(2);
+
+  function save() { store.set(KEY, { objs, snap }); }
+  function pushHist() { hist.push(JSON.stringify(objs)); if (hist.length > 100) hist.shift(); }
+
+  function label() {
+    const used = new Set(objs.filter(isPt).map(o => o.name));
+    for (let n = 0; ; n++) {
+      const s = String.fromCharCode(65 + (n % 26)) + (n >= 26 ? Math.floor(n / 26) : '');
+      if (!used.has(s)) return s;
+    }
+  }
+
+  // --- geometry -----------------------------------------------------------
+  function curveGeom(o) {
+    if (o.t === 'circ') {
+      const c = pos.get(o.c), r = pos.get(o.r);
+      if (!c || !r) return null;
+      return { k: 'c', x: c.x, y: c.y, r: Math.hypot(r.x - c.x, r.y - c.y) };
+    }
+    const p = pos.get(o.p), q = pos.get(o.q);
+    if (!p || !q || (p.x === q.x && p.y === q.y)) return null;
+    return { k: 'l', seg: o.t === 'seg', x1: p.x, y1: p.y, x2: q.x, y2: q.y };
+  }
+
+  function onSeg(g, t) { return !g.seg || (t > -1e-9 && t < 1 + 1e-9); }
+
+  function intersect(g1, g2) {
+    if (!g1 || !g2) return [];
+    if (g1.k === 'c' && g2.k === 'l') [g1, g2] = [g2, g1];
+    if (g1.k === 'l' && g2.k === 'l') {
+      const dx1 = g1.x2 - g1.x1, dy1 = g1.y2 - g1.y1, dx2 = g2.x2 - g2.x1, dy2 = g2.y2 - g2.y1;
+      const den = dx1 * dy2 - dy1 * dx2;
+      if (Math.abs(den) < 1e-9) return [];
+      const t = ((g2.x1 - g1.x1) * dy2 - (g2.y1 - g1.y1) * dx2) / den;
+      const u = ((g2.x1 - g1.x1) * dy1 - (g2.y1 - g1.y1) * dx1) / den;
+      if (!onSeg(g1, t) || !onSeg(g2, u)) return [null];
+      return [{ x: g1.x1 + t * dx1, y: g1.y1 + t * dy1 }];
+    }
+    if (g1.k === 'l') {
+      const dx = g1.x2 - g1.x1, dy = g1.y2 - g1.y1, fx = g1.x1 - g2.x, fy = g1.y1 - g2.y;
+      const a = dx * dx + dy * dy, b = 2 * (fx * dx + fy * dy), c = fx * fx + fy * fy - g2.r * g2.r;
+      const disc = b * b - 4 * a * c;
+      if (disc < 0) return [null, null];
+      const s = Math.sqrt(disc);
+      return [(-b - s) / (2 * a), (-b + s) / (2 * a)].map(t => onSeg(g1, t) ? { x: g1.x1 + t * dx, y: g1.y1 + t * dy } : null);
+    }
+    const dx = g2.x - g1.x, dy = g2.y - g1.y, d = Math.hypot(dx, dy);
+    if (d < 1e-9 || d > g1.r + g2.r || d < Math.abs(g1.r - g2.r)) return [null, null];
+    const a = (g1.r * g1.r - g2.r * g2.r + d * d) / (2 * d), h = Math.sqrt(Math.max(0, g1.r * g1.r - a * a));
+    const mx = g1.x + a * dx / d, my = g1.y + a * dy / d;
+    return [{ x: mx + h * dy / d, y: my - h * dx / d }, { x: mx - h * dy / d, y: my + h * dx / d }];
+  }
+
+  function resolve() {
+    pos = new Map();
+    const geo = new Map();
+    for (const o of objs) {
+      if (o.t === 'p') pos.set(o.id, { x: o.x, y: o.y });
+      else if (o.t === 'x') {
+        const a = byId(o.a), b = byId(o.b);
+        const p = a && b ? intersect(geo.get(a.id), geo.get(b.id))[o.k] : null;
+        if (p) pos.set(o.id, p);
+      } else if (isCurve(o)) geo.set(o.id, curveGeom(o));
+    }
+    return geo;
+  }
+
+  function depsOf(o) {
+    if (o.t === 'x') return [o.a, o.b];
+    if (o.t === 'seg' || o.t === 'line') return [o.p, o.q];
+    if (o.t === 'circ') return [o.c, o.r];
+    if (o.t === 'ang') return [o.a, o.v, o.b];
+    return [];
+  }
+
+  function remove(id) {
+    const gone = new Set([id]);
+    for (const o of objs) if (depsOf(o).some(d => gone.has(d))) gone.add(o.id);
+    objs = objs.filter(o => !gone.has(o.id));
+  }
+
+  // --- picking ------------------------------------------------------------
+  function pickPoint(x, y, r = HIT) {
+    let best = null, bd = r;
+    for (const o of objs) {
+      if (!isPt(o)) continue;
+      const p = pos.get(o.id); if (!p) continue;
+      const d = Math.hypot(p.x - x, p.y - y);
+      if (d < bd) { bd = d; best = o; }
+    }
+    return best;
+  }
+
+  function pickCrossing(x, y, geo) {
+    const curves = objs.filter(isCurve);
+    let best = null, bd = 18;
+    for (let i = 0; i < curves.length; i++) for (let j = i + 1; j < curves.length; j++) {
+      intersect(geo.get(curves[i].id), geo.get(curves[j].id)).forEach((p, k) => {
+        if (!p) return;
+        const d = Math.hypot(p.x - x, p.y - y);
+        if (d < bd) { bd = d; best = { a: curves[i].id, b: curves[j].id, k }; }
+      });
+    }
+    return best;
+  }
+
+  function distToCurve(g, x, y) {
+    if (!g) return Infinity;
+    if (g.k === 'c') return Math.abs(Math.hypot(x - g.x, y - g.y) - g.r);
+    const dx = g.x2 - g.x1, dy = g.y2 - g.y1;
+    let t = ((x - g.x1) * dx + (y - g.y1) * dy) / (dx * dx + dy * dy);
+    if (g.seg) t = Math.max(0, Math.min(1, t));
+    return Math.hypot(x - (g.x1 + t * dx), y - (g.y1 + t * dy));
+  }
+
+  function snapXY(x, y) { return snap ? { x: Math.round(x / U) * U, y: Math.round(y / U) * U } : { x, y }; }
+
+  // Returns the id of an existing or newly made point at (x, y).
+  function pointAt(x, y, geo) {
+    const hit = pickPoint(x, y);
+    if (hit) return hit.id;
+    const cr = pickCrossing(x, y, geo);
+    const o = cr ? { id: nextId++, t: 'x', a: cr.a, b: cr.b, k: cr.k, name: label() }
+                 : { id: nextId++, t: 'p', ...snapXY(x, y), name: label() };
+    objs.push(o);
+    return o.id;
+  }
+
+  // --- actions ------------------------------------------------------------
+  function tap(x, y) {
+    const geo = resolve();
+    if (tool === 'move') return;
+    if (tool === 'del') {
+      let target = pickPoint(x, y);
+      if (!target) {
+        let bd = 14;
+        for (const o of objs) {
+          if (o.t === 'ang') { const v = pos.get(o.v); if (v && Math.hypot(v.x - x, v.y - y) < 30 && bd > 13) { target = o; bd = 13; } }
+          else if (isCurve(o)) { const d = distToCurve(geo.get(o.id), x, y); if (d < bd) { bd = d; target = o; } }
+        }
+      }
+      if (target) { pushHist(); remove(target.id); }
+      return;
+    }
+    pushHist();
+    const id = pointAt(x, y, geo);
+    if (tool === 'point') return;
+    if (sel[sel.length - 1] === id) { hist.pop(); return; }
+    sel.push(id);
+    if (sel.length < NEED[tool]) return;
+    const [a, b, c] = sel;
+    if (tool === 'seg' || tool === 'line') objs.push({ id: nextId++, t: tool, p: a, q: b });
+    else if (tool === 'circ') objs.push({ id: nextId++, t: 'circ', c: a, r: b });
+    else if (tool === 'ang' && a !== c) objs.push({ id: nextId++, t: 'ang', a, v: b, b: c });
+    sel = [];
+  }
+
+  // --- drawing ------------------------------------------------------------
+  function drawGrid() {
+    const r = board.getBoundingClientRect();
+    W = Math.round(r.width); H = Math.round(r.height);
+    board.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    let s = '';
+    for (let i = 0; i * U <= W; i++) for (let j = 0; j * U <= H; j++) s += `<circle id="g-${i}-${j}" cx="${i * U}" cy="${j * U}" r="2"/>`;
+    $('#grid').innerHTML = s;
+  }
+
+  function angleOf(o) {
+    const a = pos.get(o.a), v = pos.get(o.v), b = pos.get(o.b);
+    if (!a || !v || !b) return null;
+    const a1 = Math.atan2(a.y - v.y, a.x - v.x), a2 = Math.atan2(b.y - v.y, b.x - v.x);
+    let d = a2 - a1;
+    while (d <= -Math.PI) d += 2 * Math.PI;
+    while (d > Math.PI) d -= 2 * Math.PI;
+    return { v, a1, d, deg: Math.abs(d) * 180 / Math.PI };
+  }
+
+  const nm = (id) => byId(id)?.name ?? '?';
+
+  function render() {
+    const geo = resolve();
+    let cv = '', mk = '', pt = '';
+    const rows = [];
+    const L = 4000;
+    for (const o of objs) {
+      if (isCurve(o)) {
+        const g = geo.get(o.id); if (!g) continue;
+        if (g.k === 'c') {
+          cv += `<circle class="crv" cx="${g.x}" cy="${g.y}" r="${g.r}"/>`;
+          rows.push([`circle ${nm(o.c)}`, `r = ${fmt(g.r)}`]);
+        } else if (g.seg) {
+          const len = Math.hypot(g.x2 - g.x1, g.y2 - g.y1);
+          cv += `<line class="crv" x1="${g.x1}" y1="${g.y1}" x2="${g.x2}" y2="${g.y2}"/>`;
+          const nx = -(g.y2 - g.y1) / len, ny = (g.x2 - g.x1) / len;
+          mk += `<text class="len" text-anchor="middle" x="${(g.x1 + g.x2) / 2 + nx * 14}" y="${(g.y1 + g.y2) / 2 + ny * 14 + 5}">${fmt(len)}</text>`;
+          rows.push([nm(o.p) + nm(o.q), `= ${fmt(len)}`]);
+        } else {
+          const len = Math.hypot(g.x2 - g.x1, g.y2 - g.y1), ux = (g.x2 - g.x1) / len, uy = (g.y2 - g.y1) / len;
+          cv += `<line class="crv line" x1="${g.x1 - ux * L}" y1="${g.y1 - uy * L}" x2="${g.x1 + ux * L}" y2="${g.y1 + uy * L}"/>`;
+          const sl = Math.abs(ux) < 1e-9 ? 'vertical' : `slope ${(-uy / ux).toFixed(2)}`;
+          rows.push([`line ${nm(o.p)}${nm(o.q)}`, sl]);
+        }
+      } else if (o.t === 'ang') {
+        const A = angleOf(o); if (!A) continue;
+        const r = 26, a2 = A.a1 + A.d;
+        const x1 = A.v.x + r * Math.cos(A.a1), y1 = A.v.y + r * Math.sin(A.a1);
+        const x2 = A.v.x + r * Math.cos(a2), y2 = A.v.y + r * Math.sin(a2);
+        mk += `<path class="arc" d="M${x1} ${y1}A${r} ${r} 0 0 ${A.d > 0 ? 1 : 0} ${x2} ${y2}"/>`;
+        const mid = A.a1 + A.d / 2;
+        mk += `<text class="deg" text-anchor="middle" x="${A.v.x + 50 * Math.cos(mid)}" y="${A.v.y + 50 * Math.sin(mid) + 5}">${A.deg.toFixed(1)}°</text>`;
+        rows.push([`∠${nm(o.a)}${nm(o.v)}${nm(o.b)}`, `= ${A.deg.toFixed(1)}°`]);
+      }
+    }
+    for (const o of objs) {
+      if (!isPt(o)) continue;
+      const p = pos.get(o.id); if (!p) continue;
+      const cls = 'pt' + (o.t === 'p' ? ' free' : '') + (sel.includes(o.id) ? ' sel' : '');
+      pt += `<circle class="${cls}" data-id="${o.id}" cx="${p.x}" cy="${p.y}" r="${o.t === 'p' ? 5 : 4.5}"/>`;
+      pt += `<text x="${p.x + 9}" y="${p.y - 9}">${o.name}</text>`;
+    }
+    $('#curves').innerHTML = cv;
+    $('#marks').innerHTML = mk;
+    $('#pts').innerHTML = pt;
+    const ro = $('#readout');
+    ro.innerHTML = rows.length ? '' : '<li class="empty">No measurements yet.</li>';
+    for (const [k, v] of rows) {
+      const li = document.createElement('li');
+      li.textContent = k + ' ' + v;
+      ro.appendChild(li);
+    }
+    $('#hint').textContent = sel.length ? `${HINTS[tool].replace(/\.$/, '')}: ${sel.length} of ${NEED[tool]}` : HINTS[tool];
+    $$('[data-tool]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.tool === tool)));
+    $('#snap').setAttribute('aria-pressed', String(snap));
+    $('#undo').disabled = !hist.length;
+    save();
+  }
+
+  // --- input --------------------------------------------------------------
+  function local(e) {
+    const r = board.getBoundingClientRect();
+    return { x: (e.clientX - r.left) * W / r.width, y: (e.clientY - r.top) * H / r.height };
+  }
+
+  let down = null;
+  board.addEventListener('pointerdown', (e) => {
+    const p = local(e);
+    resolve();
+    const hit = tool !== 'del' ? pickPoint(p.x, p.y) : null;
+    down = { ...p, drag: hit && hit.t === 'p' ? hit : null, moved: false };
+    try { board.setPointerCapture(e.pointerId); } catch {}
+  });
+  board.addEventListener('pointermove', (e) => {
+    if (!down || !down.drag) return;
+    const p = local(e);
+    if (!down.moved && Math.hypot(p.x - down.x, p.y - down.y) < 6) return;
+    if (!down.moved) { pushHist(); down.moved = true; }
+    const s = snapXY(Math.max(0, Math.min(W, p.x)), Math.max(0, Math.min(H, p.y)));
+    const o = byId(down.drag.id);
+    if (o) { o.x = s.x; o.y = s.y; render(); }
+  });
+  const end = (e) => {
+    if (!down) return;
+    const d = down; down = null;
+    if (!d.moved && e.type === 'pointerup') { tap(d.x, d.y); render(); }
+  };
+  board.addEventListener('pointerup', end);
+  board.addEventListener('pointercancel', end);
+
+  $$('[data-tool]').forEach(b => b.addEventListener('click', () => { tool = b.dataset.tool; sel = []; render(); }));
+  $('#snap').addEventListener('click', () => { snap = !snap; render(); });
+  $('#undo').addEventListener('click', () => {
+    if (!hist.length) return;
+    objs = JSON.parse(hist.pop()); sel = [];
+    nextId = objs.reduce((m, o) => Math.max(m, o.id), 0) + 1;
+    render();
+  });
+  $('#clear').addEventListener('click', () => { if (!objs.length) return; pushHist(); objs = []; sel = []; render(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { sel = []; render(); }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); $('#undo').click(); }
+  });
+  window.addEventListener('resize', () => { drawGrid(); render(); });
+
+  drawGrid();
+  render();
+})();
+</script>
+</body>
+</html>
