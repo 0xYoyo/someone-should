@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a calculator for how much phone data you can use per day</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+label { display: grid; gap: 4px; }
+label span { font: 13px/1.4 var(--mono); color: var(--meta); }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.unit { display: flex; gap: 0; }
+.unit button { flex: 1; border-radius: 0; border-color: var(--line); }
+.unit button[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.result { border-top: 1px solid var(--line); padding-top: 16px; }
+.bar { height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; margin: 10px 0; }
+.bar i { display: block; height: 100%; background: var(--ink); width: 0; }
+.bar.over i { background: var(--no); }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a calculator for how much phone data you can use per day</h1>
+
+<main id="app" class="stack">
+  <div class="unit" role="group" aria-label="unit">
+    <button id="u-gb" aria-pressed="true">GB</button>
+    <button id="u-mb" aria-pressed="false">MB</button>
+  </div>
+  <div class="pair">
+    <label><span>monthly allowance</span><input id="plan" type="number" inputmode="decimal" min="0" step="any" value="10"></label>
+    <label><span>used so far</span><input id="used" type="number" inputmode="decimal" min="0" step="any" value="4.2"></label>
+  </div>
+  <label><span>plan resets on</span><input id="reset" type="date"></label>
+  <section class="result" aria-live="polite">
+    <div class="meta">you can use</div>
+    <div class="big" id="perday">-</div>
+    <div class="bar" id="bar"><i></i></div>
+    <div class="meta" id="detail"></div>
+  </section>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  let unit = 'GB';
+  const iso = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  const startOfDay = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
+  // default reset date: 12 days from today
+  const def = startOfDay(new Date()); def.setDate(def.getDate() + 12);
+
+  const saved = store.get('dda', null);
+  if (saved) {
+    unit = saved.unit === 'MB' ? 'MB' : 'GB';
+    $('#plan').value = saved.plan;
+    $('#used').value = saved.used;
+    $('#reset').value = saved.reset || iso(def);
+    // a saved reset date in the past rolls forward by whole months
+    rollForward();
+  } else {
+    $('#reset').value = iso(def);
+  }
+
+  function rollForward() {
+    const v = $('#reset').value;
+    if (!v) return;
+    const p = v.split('-').map(Number);
+    let d = new Date(p[0], p[1] - 1, p[2]);
+    const today = startOfDay(new Date());
+    let n = 0;
+    while (d < today && n++ < 600) d = new Date(d.getFullYear(), d.getMonth() + 1, p[2]);
+    if (n) $('#reset').value = iso(d);
+  }
+
+  function fmt(gb) {
+    // gb is in the current display unit
+    if (unit === 'MB') return Math.round(gb).toLocaleString() + ' MB';
+    if (gb < 1) return Math.round(gb * 1000) + ' MB';
+    return (Math.round(gb * 100) / 100).toLocaleString() + ' GB';
+  }
+
+  function calc() {
+    const plan = parseFloat($('#plan').value);
+    const used = parseFloat($('#used').value);
+    const rv = $('#reset').value;
+    const out = $('#perday'), detail = $('#detail'), bar = $('#bar');
+    bar.classList.remove('over');
+    $('#bar i').style.width = '0';
+    if (!(plan >= 0) || !(used >= 0) || !rv) {
+      out.textContent = '-';
+      detail.textContent = 'fill in all three fields';
+      return;
+    }
+    store.set('dda', { unit, plan: $('#plan').value, used: $('#used').value, reset: rv });
+    const p = rv.split('-').map(Number);
+    const reset = new Date(p[0], p[1] - 1, p[2]);
+    const days = Math.round((reset - startOfDay(new Date())) / 86400000);
+    if (days < 1) {
+      out.textContent = '-';
+      detail.textContent = 'pick a reset date after today';
+      return;
+    }
+    const left = plan - used;
+    $('#bar i').style.width = Math.min(100, plan > 0 ? used / plan * 100 : 100) + '%';
+    if (left <= 0) {
+      bar.classList.add('over');
+      out.textContent = '0 ' + unit;
+      out.classList.add('no');
+      detail.textContent = 'allowance used up, ' + days + (days === 1 ? ' day' : ' days') + ' to reset';
+      return;
+    }
+    out.classList.remove('no');
+    out.textContent = fmt(left / days) + ' / day';
+    detail.textContent = fmt(left) + ' left over ' + days + (days === 1 ? ' day' : ' days');
+  }
+
+  function setUnit(u) {
+    if (u === unit) return;
+    const k = u === 'MB' ? 1000 : 0.001;
+    ['#plan', '#used'].forEach(s => {
+      const v = parseFloat($(s).value);
+      if (v >= 0) $(s).value = Math.round(v * k * 1000) / 1000;
+    });
+    unit = u;
+    sync();
+  }
+  function sync() {
+    $('#u-gb').setAttribute('aria-pressed', unit === 'GB');
+    $('#u-mb').setAttribute('aria-pressed', unit === 'MB');
+    calc();
+  }
+
+  $('#u-gb').addEventListener('click', () => setUnit('GB'));
+  $('#u-mb').addEventListener('click', () => setUnit('MB'));
+  ['#plan', '#used', '#reset'].forEach(s => $(s).addEventListener('input', calc));
+  sync();
+})();
+</script>
+</body>
+</html>

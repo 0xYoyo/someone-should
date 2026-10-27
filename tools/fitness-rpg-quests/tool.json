@@ -1,0 +1,68 @@
+{
+  "slug": "fitness-rpg-quests",
+  "wish": "someone should make an RPG-style fitness app",
+  "year": 2015,
+  "agreed": 212,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/7ufa4a/",
+      "date": "2018-02-01",
+      "points": 135,
+      "comments": 8
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/2vrqob/",
+      "date": "2015-02-13",
+      "points": 42,
+      "comments": 6
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/AppIdeas/comments/14jq8b7/",
+      "date": "2023-06-26",
+      "points": 13,
+      "comments": 8
+    }
+  ],
+  "spec": "Log a workout (strength, cardio or mobility, minutes) to earn xp, raise STR/END/AGI and level up. Three daily quests rotate by date and pay a bonus once done. Everything is saved on this device; it does not sync, track location or use a heart-rate sensor.",
+  "tests": [
+    {
+      "expect": {
+        "sel": "#quests li",
+        "count": 3
+      }
+    },
+    {
+      "tap": "#k-end"
+    },
+    {
+      "type": {
+        "sel": "#mins",
+        "text": "30"
+      }
+    },
+    {
+      "tap": "#log"
+    },
+    {
+      "expect": {
+        "sel": "#history li",
+        "contains": "Cardio 30 min"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#xp",
+        "matches": "\\d+ / \\d+ xp"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:40:08Z",
+  "model": "sonnet-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": ""
+}

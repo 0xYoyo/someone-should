@@ -1,0 +1,68 @@
+{
+  "slug": "cart-running-total",
+  "wish": "someone should make an app that adds up the price of everything you put in your cart",
+  "year": 2013,
+  "agreed": 360,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/2lskdf/",
+      "date": "2014-11-09",
+      "points": 151,
+      "comments": 28
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/CrazyIdeas/comments/193hro/",
+      "date": "2013-02-23",
+      "points": 123,
+      "comments": 38
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/AppIdeas/comments/1ovbq8t/",
+      "date": "2025-11-12",
+      "points": 4,
+      "comments": 16
+    }
+  ],
+  "spec": "Adds up the price of items as you tap them into a cart, with quantity, optional tax percent and a budget.\\nType a price (and optional name and quantity), tap add; the total updates and each line can be removed.\\nIt does not look up prices, scan barcodes or know store discounts.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#price",
+        "text": "2.50"
+      }
+    },
+    {
+      "tap": "#add"
+    },
+    {
+      "expect": {
+        "sel": "#total",
+        "contains": "16.22"
+      }
+    },
+    {
+      "type": {
+        "sel": "#budget",
+        "text": "15"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#budgetline",
+        "contains": "over budget"
+      }
+    },
+    {
+      "tap": "#clear"
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:39:17Z",
+  "model": "sonnet-5.5",
+  "minutes": 3,
+  "approved": false,
+  "notes": ""
+}

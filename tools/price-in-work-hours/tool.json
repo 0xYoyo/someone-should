@@ -1,0 +1,82 @@
+{
+  "slug": "price-in-work-hours",
+  "wish": "someone should make an app that converts shopping prices into hours of your life",
+  "year": 2018,
+  "agreed": 278,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/SomebodyMakeThis/comments/sl32vy/",
+      "date": "2022-02-05",
+      "points": 112,
+      "comments": 35
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/SomebodyMakeThis/comments/r6apt8/",
+      "date": "2021-12-01",
+      "points": 72,
+      "comments": 12
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/SomebodyMakeThis/comments/soegyd/",
+      "date": "2022-02-09",
+      "points": 15,
+      "comments": 2
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/AppIdeas/comments/8hmib5/",
+      "date": "2018-05-07",
+      "points": 12,
+      "comments": 4
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/AppIdeas/comments/eyiqoe/",
+      "date": "2020-02-04",
+      "points": 4,
+      "comments": 10
+    }
+  ],
+  "spec": "Converts a price into hours and minutes of your own take-home pay.\nEnter your hourly take-home once, then type any price; add prices to a list to see the total in work time.\nIt does not guess your wage, convert currencies, or account for tax.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#price",
+        "text": "100"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#time",
+        "contains": "5 h"
+      }
+    },
+    {
+      "tap": "#add"
+    },
+    {
+      "type": {
+        "sel": "#price",
+        "text": "10"
+      }
+    },
+    {
+      "tap": "#add"
+    },
+    {
+      "expect": {
+        "sel": "#total",
+        "contains": "5 h 30 min"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:39:24Z",
+  "model": "sonnet-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": ""
+}

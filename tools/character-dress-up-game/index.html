@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a game where customizing your character is the game</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+#stage { display: block; width: 100%; max-width: 240px; margin: 0 auto; background: var(--line); border-radius: var(--radius); }
+#stage svg { display: block; width: 100%; height: auto; }
+.opt { display: grid; grid-template-columns: 76px 44px 1fr 44px; gap: 6px; align-items: center; }
+.opt button { padding: 0; width: 44px; }
+.opt .val { text-align: center; }
+.lab { color: var(--meta); font-size: 16px; }
+.sw { display: flex; gap: 6px; flex-wrap: wrap; }
+.sw button { width: 44px; min-height: 44px; padding: 0; border-radius: 50%; border: 2px solid var(--line); }
+.sw button.on { border-color: var(--ink); box-shadow: 0 0 0 2px var(--paper) inset; }
+#gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 10px; }
+.look { position: relative; background: var(--line); border-radius: var(--radius); }
+.look button.load { display: block; width: 100%; min-height: 0; padding: 0; border: 0; }
+.look svg { display: block; width: 100%; height: auto; }
+.look button.del { position: absolute; top: 0; right: 0; width: 44px; min-height: 44px; border: 0; font-size: 20px; }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a game where customizing your character is the game</h1>
+<main id="app" class="stack">
+  <div id="stage"></div>
+  <div class="row" style="justify-content:center">
+    <button id="random" class="primary">Random</button>
+    <button id="save">Save look</button>
+    <button id="png">Export PNG</button>
+  </div>
+  <div id="opts" class="stack"></div>
+  <div class="stack" id="colors"></div>
+  <div id="msg" class="empty" style="padding:0">Nothing saved yet.</div>
+  <div id="gallery"></div>
+</main>
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const SKIN = ['#f6d5b8', '#e8b48a', '#c98a5e', '#8d5a3b', '#5a3825'];
+  const HAIRC = ['#1b1b1b', '#5a3825', '#c9892b', '#d94f3d', '#6a5acd', '#e9e4d6'];
+  const OUTC = ['#2e7d4f', '#c8321e', '#2b5fb4', '#e0b030', '#7a3c9e', '#141414'];
+
+  // Each part draws into a 200x240 box.
+  const PARTS = {
+    hair: { label: 'Hair', names: ['Short', 'Spiky', 'Long', 'Bun', 'Bald'],
+      back: (i, c) => i === 2 ? `<path d="M52 100 Q50 190 66 200 L134 200 Q150 190 148 100 Z" fill="${c}"/>` : '',
+      front: (i, c) => [
+        `<path d="M54 92 Q52 44 100 44 Q148 44 146 92 Q130 66 100 66 Q70 66 54 92Z" fill="${c}"/>`,
+        `<path d="M54 92 L58 52 L74 70 L84 38 L100 64 L116 38 L126 70 L142 52 L146 92 Q130 70 100 70 Q70 70 54 92Z" fill="${c}"/>`,
+        `<path d="M52 104 Q46 44 100 42 Q154 44 148 104 Q144 70 100 66 Q56 70 52 104Z" fill="${c}"/>`,
+        `<path d="M54 92 Q52 48 100 48 Q148 48 146 92 Q130 68 100 68 Q70 68 54 92Z" fill="${c}"/><circle cx="100" cy="36" r="16" fill="${c}"/>`,
+        ''][i] },
+    eyes: { label: 'Eyes', names: ['Round', 'Sleepy', 'Happy', 'Wide'], draw: i => [
+      '<circle cx="82" cy="104" r="5" fill="#141414"/><circle cx="118" cy="104" r="5" fill="#141414"/>',
+      '<path d="M74 106 H90 M110 106 H126" stroke="#141414" stroke-width="4" stroke-linecap="round"/>',
+      '<path d="M74 108 Q82 98 90 108 M110 108 Q118 98 126 108" stroke="#141414" stroke-width="4" fill="none" stroke-linecap="round"/>',
+      '<circle cx="82" cy="104" r="9" fill="#fff" stroke="#141414" stroke-width="2"/><circle cx="118" cy="104" r="9" fill="#fff" stroke="#141414" stroke-width="2"/><circle cx="82" cy="104" r="4" fill="#141414"/><circle cx="118" cy="104" r="4" fill="#141414"/>'][i] },
+    mouth: { label: 'Mouth', names: ['Smile', 'Flat', 'Open', 'Smirk'], draw: i => [
+      '<path d="M82 132 Q100 148 118 132" stroke="#141414" stroke-width="4" fill="none" stroke-linecap="round"/>',
+      '<path d="M86 138 H114" stroke="#141414" stroke-width="4" stroke-linecap="round"/>',
+      '<ellipse cx="100" cy="138" rx="12" ry="9" fill="#7a1f1f"/>',
+      '<path d="M84 138 Q104 142 118 128" stroke="#141414" stroke-width="4" fill="none" stroke-linecap="round"/>'][i] },
+    outfit: { label: 'Outfit', names: ['Tee', 'Hoodie', 'Dress', 'Suit'], draw: (i, c) => [
+      `<path d="M50 240 L54 188 Q100 172 146 188 L150 240Z" fill="${c}"/>`,
+      `<path d="M44 240 L50 186 Q100 166 150 186 L156 240Z" fill="${c}"/><path d="M80 176 Q100 196 120 176" stroke="#0003" stroke-width="4" fill="none"/><path d="M100 196 V226" stroke="#0003" stroke-width="3"/>`,
+      `<path d="M62 240 L72 188 Q100 176 128 188 L138 240Z" fill="${c}"/><path d="M62 240 L40 240 L56 226Z M138 240 L160 240 L144 226Z" fill="${c}"/>`,
+      `<path d="M50 240 L54 188 Q100 172 146 188 L150 240Z" fill="${c}"/><path d="M100 178 L86 240 H114Z" fill="#fff"/><path d="M100 184 L96 200 L100 232 L104 200Z" fill="#141414"/>`][i] },
+    hat: { label: 'Hat', names: ['None', 'Cap', 'Wizard', 'Crown'], draw: (i, c) => [
+      '',
+      `<path d="M54 80 Q56 40 100 40 Q144 40 146 80Z" fill="${c}"/><path d="M130 76 H176 Q176 84 130 84Z" fill="${c}"/>`,
+      `<path d="M46 80 H154 L100 -6Z" fill="${c}"/><path d="M40 82 H160" stroke="${c}" stroke-width="8" stroke-linecap="round"/>`,
+      '<path d="M60 56 L66 26 L84 46 L100 18 L116 46 L134 26 L140 56Z" fill="#e0b030" stroke="#141414" stroke-width="2"/>'][i] }
+  };
+  const KEYS = ['hair', 'eyes', 'mouth', 'outfit', 'hat'];
+  const COLORS = [['skin', 'Skin', SKIN], ['hairc', 'Hair colour', HAIRC], ['outc', 'Outfit colour', OUTC]];
+
+  let st = store.get('state', null) || { hair: 0, eyes: 0, mouth: 0, outfit: 0, hat: 0, skin: 1, hairc: 1, outc: 0 };
+  let saved = store.get('saved', []);
+  if (!Array.isArray(saved)) saved = [];
+
+  function svg(s) {
+    const sk = SKIN[s.skin], hc = HAIRC[s.hairc], oc = OUTC[s.outc];
+    return `<svg viewBox="0 0 200 240" width="200" height="240">` +
+      PARTS.hair.back(s.hair, hc) +
+      PARTS.outfit.draw(s.outfit, oc) +
+      `<rect x="88" y="150" width="24" height="34" fill="${sk}"/>` +
+      `<ellipse cx="100" cy="108" rx="46" ry="50" fill="${sk}"/>` +
+      `<circle cx="54" cy="112" r="8" fill="${sk}"/><circle cx="146" cy="112" r="8" fill="${sk}"/>` +
+      PARTS.eyes.draw(s.eyes) + PARTS.mouth.draw(s.mouth) +
+      PARTS.hair.front(s.hair, hc) + PARTS.hat.draw(s.hat, hc === '#1b1b1b' ? oc : hc) +
+      `</svg>`;
+  }
+
+  function buildControls() {
+    $('#opts').innerHTML = KEYS.map(k => `<div class="opt"><span class="lab">${PARTS[k].label}</span>` +
+      `<button data-prev="${k}" aria-label="Previous ${PARTS[k].label}">&lsaquo;</button>` +
+      `<span class="val" id="v-${k}"></span>` +
+      `<button data-next="${k}" aria-label="Next ${PARTS[k].label}">&rsaquo;</button></div>`).join('');
+    $('#colors').innerHTML = COLORS.map(([k, label, list]) => `<div><div class="lab">${label}</div><div class="sw">` +
+      list.map((c, i) => `<button data-c="${k}" data-i="${i}" style="background:${c}" aria-label="${label} ${i + 1}"></button>`).join('') + `</div></div>`).join('');
+  }
+
+  function render() {
+    $('#stage').innerHTML = svg(st);
+    KEYS.forEach(k => { $('#v-' + k).textContent = PARTS[k].names[st[k]]; });
+    document.querySelectorAll('[data-c]').forEach(b => b.classList.toggle('on', st[b.dataset.c] === +b.dataset.i));
+    store.set('state', st);
+  }
+
+  function say(t) { $('#msg').style.display = t ? '' : 'none'; $('#msg').textContent = t; }
+
+  function renderGallery() {
+    say(saved.length ? '' : 'Nothing saved yet.');
+    $('#gallery').innerHTML = saved.map((s, i) => `<div class="look"><button class="load" data-load="${i}" aria-label="Load look ${i + 1}">${svg(s)}</button>` +
+      `<button class="del" data-del="${i}" aria-label="Delete look ${i + 1}">&times;</button></div>`).join('');
+  }
+
+  function randomize() {
+    KEYS.forEach(k => { st[k] = Math.floor(Math.random() * PARTS[k].names.length); });
+    st.skin = Math.floor(Math.random() * SKIN.length);
+    st.hairc = Math.floor(Math.random() * HAIRC.length);
+    st.outc = Math.floor(Math.random() * OUTC.length);
+    render();
+  }
+
+  function exportPng() {
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const c = document.createElement('canvas');
+        c.width = 600; c.height = 720;
+        const x = c.getContext('2d');
+        x.fillStyle = '#d9d4c7'; x.fillRect(0, 0, 600, 720);
+        x.drawImage(img, 0, 0, 600, 720);
+        const a = document.createElement('a');
+        a.href = c.toDataURL('image/png');
+        a.download = 'my-character.png';
+        document.body.appendChild(a); a.click(); a.remove();
+      } catch { say('Could not export the image.'); }
+    };
+    img.onerror = () => say('Could not export the image.');
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg(st).replace('<svg ', '<svg xmlns="http:' + '//www.w3' + '.org/2000/svg" '));
+  }
+
+  document.addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    const d = b.dataset;
+    if (d.next || d.prev) {
+      const k = d.next || d.prev, n = PARTS[k].names.length;
+      st[k] = (st[k] + (d.next ? 1 : n - 1)) % n;
+      render();
+    } else if (d.c) { st[d.c] = +d.i; render(); }
+    else if (d.load) { st = Object.assign({}, saved[+d.load]); render(); }
+    else if (d.del) { saved.splice(+d.del, 1); store.set('saved', saved); renderGallery(); }
+    else if (b.id === 'random') randomize();
+    else if (b.id === 'save') { saved.unshift(Object.assign({}, st)); saved = saved.slice(0, 24); store.set('saved', saved); renderGallery(); }
+    else if (b.id === 'png') exportPng();
+  });
+
+  buildControls();
+  render();
+  renderGallery();
+})();
+</script>
+</body>
+</html>

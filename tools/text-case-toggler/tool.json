@@ -1,0 +1,65 @@
+{
+  "slug": "text-case-toggler",
+  "wish": "someone should make a tool where highlighting text and pressing caps lock switches its case",
+  "year": 2015,
+  "agreed": 513,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/9wmo3y/",
+      "date": "2018-11-13",
+      "points": 200,
+      "comments": 20
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/32smjl/",
+      "date": "2015-04-16",
+      "points": 193,
+      "comments": 22
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/SomebodyMakeThis/comments/bn15p7/",
+      "date": "2019-05-10",
+      "points": 53,
+      "comments": 25
+    }
+  ],
+  "spec": "Edit or paste text in the box and flip the case of the selection (or all text if nothing is selected): upper, lower, title, inverted.\nSelect text and press Caps Lock, or tap a button; Caps Lock cycles upper, lower, title.\nIt cannot act in other apps or on the system Caps Lock; it works only inside its own text box.",
+  "tests": [
+    {
+      "tap": "#upper"
+    },
+    {
+      "expect": {
+        "sel": "#out",
+        "contains": "THE QUICK BROWN FOX"
+      }
+    },
+    {
+      "tap": "#title"
+    },
+    {
+      "expect": {
+        "sel": "#out",
+        "contains": "The Quick Brown Fox"
+      }
+    },
+    {
+      "tap": "#invert"
+    },
+    {
+      "expect": {
+        "sel": "#out",
+        "contains": "tHE qUICK"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:39:20Z",
+  "model": "sonnet-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": "Cannot intercept Caps Lock outside the page; works inside the text box only."
+}

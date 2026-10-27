@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an oven timer that counts negative after it hits zero</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+#time{font-size:min(24vw,104px);text-align:center;padding:28px 0 12px;font-family:var(--mono);letter-spacing:-0.03em}
+#time.over{color:var(--no)}
+#state{text-align:center;color:var(--meta);font-size:16px;min-height:24px}
+#state.over{color:var(--no)}
+.row button{flex:1 1 0;min-width:64px}
+.pre button{padding:0 8px}
+.set{display:flex;gap:10px;align-items:center}
+.set label{font-size:16px;color:var(--meta);white-space:nowrap}
+.set input{width:120px;font-family:var(--mono);font-size:20px;text-align:center}
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make an oven timer that counts negative after it hits zero</h1>
+
+<main id="app" class="stack">
+  <div id="time" class="big">10:00</div>
+  <div id="state">ready</div>
+  <div class="row pre" id="pre">
+    <button data-m="5">5</button><button data-m="10">10</button><button data-m="15">15</button><button data-m="20">20</button><button data-m="30">30</button><button data-m="45">45</button>
+  </div>
+  <div class="set"><label for="set">minutes</label><input id="set" value="10:00" inputmode="text" autocomplete="off"></div>
+  <div class="row">
+    <button id="start" class="primary">start</button>
+    <button id="reset">reset</button>
+  </div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  const timeEl = $('#time'), stateEl = $('#state'), startBtn = $('#start'), setEl = $('#set');
+  const HINT = 'enter minutes, like 12 or 1:30';
+  let total = 600;        // seconds set
+  let endAt = 0;          // epoch ms when it hits zero; 0 = not running
+  let pausedLeft = null;  // ms left while paused (negative = overdue)
+  let tick = null, beeped = 0, audio = null;
+
+  const fmt = s => {
+    const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), ss = s % 60;
+    const p = n => String(n).padStart(2, '0');
+    return h ? h + ':' + p(m) + ':' + p(ss) : m + ':' + p(ss);
+  };
+  const parse = v => {
+    const p = String(v).trim().split(':');
+    if (p.length > 2 || p.some(x => !/^\d+(\.\d+)?$/.test(x))) return null;
+    const sec = Math.round(p.length === 2 ? +p[0] * 60 + +p[1] : +p[0] * 60);
+    return sec > 0 && sec <= 359999 ? sec : null;
+  };
+  const save = () => store.set('okt', { total, endAt, pausedLeft });
+
+  function beep() {
+    try {
+      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      const t = audio.currentTime;
+      for (let i = 0; i < 3; i++) {
+        const o = audio.createOscillator(), g = audio.createGain();
+        o.frequency.value = 880; o.connect(g); g.connect(audio.destination);
+        g.gain.setValueAtTime(0.2, t + i * 0.25); g.gain.setValueAtTime(0, t + i * 0.25 + 0.15);
+        o.start(t + i * 0.25); o.stop(t + i * 0.25 + 0.16);
+      }
+    } catch {}
+    try { navigator.vibrate && navigator.vibrate([200, 100, 200]); } catch {}
+  }
+
+  function render() {
+    let left = endAt ? endAt - Date.now() : (pausedLeft != null ? pausedLeft : total * 1000);
+    const over = left < 0;
+    // before zero show seconds remaining rounded up; after zero show seconds overdue, with a minus
+    const text = over ? '-' + fmt(Math.floor(-left / 1000)) : fmt(Math.ceil(left / 1000));
+    timeEl.textContent = text;
+    timeEl.classList.toggle('over', over);
+    stateEl.classList.toggle('over', over);
+    if (endAt) stateEl.textContent = over ? 'overdue' : 'running';
+    else stateEl.textContent = pausedLeft != null ? (over ? 'paused, overdue' : 'paused') : 'ready';
+    startBtn.textContent = endAt ? 'pause' : (pausedLeft != null ? 'resume' : 'start');
+    if (endAt && over && beeped < 3 && -left >= beeped * 30000) { beeped++; beep(); }
+    document.title = endAt ? text : $('#wish').textContent;
+  }
+  function loop() {
+    clearInterval(tick); tick = null;
+    if (endAt) tick = setInterval(render, 200);
+    render();
+  }
+
+  function start() {
+    if (endAt) { pausedLeft = endAt - Date.now(); endAt = 0; }
+    else {
+      if (pausedLeft == null) {
+        const s = parse(setEl.value);
+        if (!s) { stateEl.textContent = HINT; return; }
+        total = s; pausedLeft = s * 1000; beeped = 0;
+      }
+      endAt = Date.now() + pausedLeft; pausedLeft = null;
+      // unlock audio on this tap so the beep can play later
+      try { audio = audio || new (window.AudioContext || window.webkitAudioContext)(); audio.resume && audio.resume(); } catch {}
+    }
+    save(); loop();
+  }
+  function reset() {
+    endAt = 0; pausedLeft = null; beeped = 0;
+    const s = parse(setEl.value); if (s) total = s;
+    save(); loop();
+  }
+
+  startBtn.addEventListener('click', start);
+  $('#reset').addEventListener('click', reset);
+  $$('#pre button').forEach(b => b.addEventListener('click', () => { setEl.value = b.dataset.m + ':00'; reset(); }));
+  setEl.addEventListener('input', () => {
+    if (endAt || pausedLeft != null) return;
+    const s = parse(setEl.value);
+    if (s) { total = s; render(); } else stateEl.textContent = HINT;
+  });
+  setEl.addEventListener('keydown', e => { if (e.key === 'Enter') { setEl.blur(); start(); } });
+
+  const saved = store.get('okt', null);
+  if (saved && typeof saved.total === 'number') {
+    total = saved.total; endAt = saved.endAt || 0; pausedLeft = saved.pausedLeft == null ? null : saved.pausedLeft;
+    if (endAt && endAt < Date.now()) beeped = 3;
+    setEl.value = fmt(total);
+  }
+  loop();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+{
+  "slug": "cat-perspective-game",
+  "wish": "someone should make a cat simulator game from the perspective of a cat",
+  "year": 2018,
+  "agreed": 293,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/9n82et/",
+      "date": "2018-10-11",
+      "points": 183,
+      "comments": 11
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/9p5xg0/",
+      "date": "2018-10-18",
+      "points": 84,
+      "comments": 15
+    }
+  ],
+  "spec": "A top-down house where you are the cat: knock five things off shelves for points, nap in the moving sunbeam for a steady trickle.\nTap the floor to walk, or use the buttons to go for the nearest object or the sun.\nThe human wanders, tidies what you drop and costs you points if they see you knock something; no sound, no levels.",
+  "tests": [
+    {
+      "tap": "#hunt"
+    },
+    {
+      "wait": 1000
+    },
+    {
+      "expect": {
+        "sel": "#score",
+        "matches": "^[1-9]\\d*$"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#msg",
+        "contains": "crash"
+      }
+    },
+    {
+      "tap": "#restart"
+    },
+    {
+      "expect": {
+        "sel": "#score",
+        "contains": "0"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:39:46Z",
+  "model": "sonnet-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": ""
+}

@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a game where you are the boss in a boss battle against nimble AI players</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+canvas{display:block;width:100%;max-width:480px;aspect-ratio:1;border:1.5px solid var(--line);border-radius:var(--radius);touch-action:none;background:transparent}
+.bar{display:flex;gap:12px;justify-content:space-between;max-width:480px}
+.bar span{font:16px/1.4 var(--mono)}
+.ctl{max-width:480px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.ctl button{width:100%}
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a game where you are the boss in a boss battle against nimble AI players</h1>
+<main id="app" class="stack">
+<div class="bar"><span id="wave">wave 1</span><span id="hp">boss 200</span><span id="alive">heroes 4</span></div>
+<canvas id="c" width="320" height="320" aria-label="arena"></canvas>
+<div class="ctl"><button id="slam" class="primary">slam</button><button id="roar">roar</button><button id="start">start</button></div>
+<div class="meta" id="msg">drag in the arena to move. slam crushes, roar pushes back.</div>
+</main>
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = s => document.querySelector(s);
+  const cv = $('#c'), g = cv.getContext('2d'), S = 320;
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const KINDS = {
+    fighter: { hp: 34, spd: 105, range: 36, dmg: 4, rate: 0.8, col: '#c8321e' },
+    ranger:  { hp: 24, spd: 120, range: 130, dmg: 2, rate: 0.9, col: '#2e7d4f' },
+    mage:    { hp: 24, spd: 100, range: 100, dmg: 3, rate: 1.2, col: '#3a5fb0' },
+    healer:  { hp: 26, spd: 115, range: 150, dmg: 0, rate: 2.0, col: '#b8860b' }
+  };
+  const ORDER = ['fighter', 'ranger', 'mage', 'healer'];
+  const SLAM_R = 70, SLAM_T = 0.7, SLAM_CD = 1.4, ROAR_CD = 6, ROAR_R = 120;
+  let boss, heroes, zones, shots, wave, running, over, best = store.get('best', 0), tx, ty, t0 = 0;
+  let slamCd = 0, roarCd = 0;
+
+  function spawn() {
+    const m = Math.pow(1.2, wave - 1);
+    heroes = ORDER.map((k, i) => {
+      const d = KINDS[k], a = i * Math.PI / 2 + 0.7;
+      const hp = Math.round(d.hp * m);
+      return { k, hp, max: hp, x: S / 2 + Math.cos(a) * 130, y: S / 2 + Math.sin(a) * 130, cd: Math.random(),
+               react: 0, dodge: null, side: Math.random() < 0.5 ? 1 : -1, ...d };
+    });
+  }
+  function reset() {
+    boss = { x: S / 2, y: S / 2, hp: 200, max: 200, r: 24, spd: 62 };
+    tx = boss.x; ty = boss.y; wave = 1; zones = []; shots = []; over = false; slamCd = 0; roarCd = 0;
+    spawn();
+  }
+  function slam() {
+    if (slamCd > 0 || over) return;
+    slamCd = SLAM_CD; zones.push({ x: boss.x, y: boss.y, r: SLAM_R, t: SLAM_T });
+  }
+  function roar() {
+    if (roarCd > 0 || over) return;
+    roarCd = ROAR_CD;
+    heroes.forEach(h => {
+      const d = Math.hypot(h.x - boss.x, h.y - boss.y) || 1;
+      if (d < ROAR_R) { h.x += (h.x - boss.x) / d * 70; h.y += (h.y - boss.y) / d * 70; h.hp -= 6; }
+    });
+    zones.push({ x: boss.x, y: boss.y, r: ROAR_R, t: 0.25, roar: true });
+  }
+  function clamp(h) { h.x = Math.max(8, Math.min(S - 8, h.x)); h.y = Math.max(8, Math.min(S - 8, h.y)); }
+  function moveTo(h, x, y, sp, dt) {
+    const d = Math.hypot(x - h.x, y - h.y);
+    if (d > 1) { const s = Math.min(sp * dt, d); h.x += (x - h.x) / d * s; h.y += (y - h.y) / d * s; }
+    clamp(h);
+  }
+
+  function step(dt) {
+    if (over) return;
+    slamCd = Math.max(0, slamCd - dt); roarCd = Math.max(0, roarCd - dt);
+    if (!running) {  // attract mode: boss plays itself, cannot lose
+      const n = heroes.reduce((a, h) => Math.hypot(h.x - boss.x, h.y - boss.y) < SLAM_R ? a + 1 : a, 0);
+      if (n && slamCd === 0) slam();
+      const h0 = heroes[0]; if (h0) { tx = h0.x; ty = h0.y; }
+    }
+    moveTo(boss, tx, ty, boss.spd, dt);
+    // zones
+    zones = zones.filter(z => {
+      z.t -= dt;
+      if (z.t > 0) return true;
+      if (!z.roar) heroes.forEach(h => { if (Math.hypot(h.x - z.x, h.y - z.y) < z.r) h.hp -= 18 + wave * 2; });
+      return false;
+    });
+    // heroes
+    heroes.forEach(h => {
+      const dBoss = Math.hypot(boss.x - h.x, boss.y - h.y) || 1;
+      const z = zones.find(q => !q.roar && Math.hypot(h.x - q.x, h.y - q.y) < q.r + 6);
+      if (z) {
+        h.react += dt;
+        if (h.react > 0.22 + Math.min(0.2, wave * 0.01) * -1 + Math.random() * 0.002) {
+          const d = Math.hypot(h.x - z.x, h.y - z.y) || 1;
+          moveTo(h, h.x + (h.x - z.x) / d * 60, h.y + (h.y - z.y) / d * 60, h.spd * 1.25, dt);
+        }
+        return;
+      }
+      h.react = 0;
+      if (h.k === 'healer') {
+        const ally = heroes.filter(a => a.hp < a.max).sort((a, b) => a.hp / a.max - b.hp / b.max)[0];
+        if (dBoss < 110) moveTo(h, h.x - (boss.x - h.x) / dBoss * 40, h.y - (boss.y - h.y) / dBoss * 40, h.spd, dt);
+        h.cd -= dt;
+        if (ally && h.cd <= 0) { ally.hp = Math.min(ally.max, ally.hp + 9); h.cd = h.rate; shots.push({ x: ally.x, y: ally.y, t: 0.3, heal: true }); }
+        return;
+      }
+      if (dBoss > h.range) moveTo(h, boss.x, boss.y, h.spd, dt);
+      else if (dBoss < h.range * 0.6 && h.k !== 'fighter') moveTo(h, h.x - (boss.x - h.x) / dBoss * 40, h.y - (boss.y - h.y) / dBoss * 40, h.spd, dt);
+      else moveTo(h, h.x - (boss.y - h.y) / dBoss * h.side * 30, h.y + (boss.x - h.x) / dBoss * h.side * 30, h.spd * 0.6, dt);
+      h.cd -= dt;
+      if (h.cd <= 0 && dBoss <= h.range + 6) {
+        h.cd = h.rate;
+        if (running) boss.hp -= h.dmg;
+        shots.push({ x: h.x, y: h.y, bx: boss.x, by: boss.y, t: 0.15 });
+      }
+    });
+    shots = shots.filter(s => (s.t -= dt) > 0);
+    const before = heroes.length;
+    heroes = heroes.filter(h => h.hp > 0);
+    if (!running && boss.hp < boss.max) boss.hp = boss.max;
+    if (running && boss.hp <= 0) { boss.hp = 0; over = true; running = false; best = Math.max(best, wave); store.set('best', best); }
+    if (!heroes.length) {
+      if (running) { wave++; boss.hp = Math.min(boss.max, boss.hp + 40); zones = []; }
+      spawn();
+    }
+    void before;
+  }
+
+  function draw() {
+    const ink = css('--ink'), line = css('--line'), no = css('--no'), meta = css('--meta');
+    g.clearRect(0, 0, S, S);
+    g.strokeStyle = line; g.lineWidth = 1;
+    for (let i = 40; i < S; i += 40) { g.beginPath(); g.moveTo(i, 0); g.lineTo(i, S); g.moveTo(0, i); g.lineTo(S, i); g.stroke(); }
+    zones.forEach(z => {
+      g.beginPath(); g.arc(z.x, z.y, z.r, 0, 7);
+      if (z.roar) { g.strokeStyle = ink; g.lineWidth = 2; g.stroke(); }
+      else { g.fillStyle = no; g.globalAlpha = 0.15 + 0.25 * (1 - z.t / SLAM_T); g.fill(); g.globalAlpha = 1; g.strokeStyle = no; g.lineWidth = 2; g.stroke(); }
+    });
+    shots.forEach(s => {
+      g.strokeStyle = s.heal ? '#2e7d4f' : ink; g.lineWidth = 2; g.beginPath();
+      if (s.heal) g.arc(s.x, s.y, 14, 0, 7); else { g.moveTo(s.x, s.y); g.lineTo(s.bx, s.by); }
+      g.stroke();
+    });
+    g.fillStyle = ink; g.beginPath(); g.arc(boss.x, boss.y, boss.r, 0, 7); g.fill();
+    g.fillStyle = css('--paper'); g.fillRect(boss.x - 12, boss.y - 8, 7, 7); g.fillRect(boss.x + 5, boss.y - 8, 7, 7);
+    heroes.forEach(h => {
+      g.fillStyle = h.col; g.beginPath(); g.arc(h.x, h.y, 9, 0, 7); g.fill();
+      g.fillStyle = line; g.fillRect(h.x - 12, h.y - 17, 24, 3);
+      g.fillStyle = h.col; g.fillRect(h.x - 12, h.y - 17, 24 * Math.max(0, h.hp / h.max), 3);
+    });
+    g.font = '18px ui-monospace, Menlo, Consolas, monospace'; g.textAlign = 'center';
+    g.fillStyle = meta;
+    if (!running && !over) { g.fillText('tap start', S / 2, S - 14); }
+    if (over) { g.fillStyle = no; g.fillText('you fell on wave ' + wave, S / 2, 30); g.fillStyle = meta; g.fillText('best ' + best, S / 2, S - 14); }
+  }
+  function hud() {
+    $('#wave').textContent = 'wave ' + wave;
+    $('#hp').textContent = 'boss ' + Math.ceil(boss.hp);
+    $('#alive').textContent = 'heroes ' + heroes.length;
+    $('#slam').disabled = slamCd > 0; $('#roar').disabled = roarCd > 0;
+    $('#slam').style.opacity = slamCd > 0 ? 0.5 : 1; $('#roar').style.opacity = roarCd > 0 ? 0.5 : 1;
+    if (over) $('#msg').textContent = 'the heroes won. best wave ' + best + '.';
+  }
+
+  let last = 0;
+  function loop(ts) {
+    const dt = Math.min(0.05, (ts - last) / 1000 || 0.016); last = ts;
+    step(dt); draw(); hud(); requestAnimationFrame(loop);
+  }
+  function aim(e) {
+    const r = cv.getBoundingClientRect();
+    tx = (e.clientX - r.left) / r.width * S; ty = (e.clientY - r.top) / r.height * S;
+  }
+  cv.addEventListener('pointerdown', e => { if (running) aim(e); });
+  cv.addEventListener('pointermove', e => { if (running && e.buttons) aim(e); });
+  $('#slam').addEventListener('click', () => { if (running) slam(); });
+  $('#roar').addEventListener('click', () => { if (running) roar(); });
+  $('#start').addEventListener('click', () => {
+    reset(); running = true; $('#start').textContent = 'restart';
+    $('#msg').textContent = 'drag in the arena to move. slam crushes, roar pushes back.';
+  });
+  document.addEventListener('keydown', e => {
+    if (!running) return;
+    if (e.key === ' ') { e.preventDefault(); slam(); } else if (e.key === 'r') roar();
+  });
+  reset(); running = false;
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

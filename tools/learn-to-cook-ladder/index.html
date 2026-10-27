@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a couch-to-5k style app that teaches cooking one recipe at a time</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+.meta { font-size: 16px; }
+.bar { height: 8px; border: 1.5px solid var(--ink); border-radius: var(--radius); overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--ink); width: 0; }
+h2 { font-size: 28px; line-height: 1.15; font-weight: 500; margin: 0; }
+h3 { font: 500 16px/1.3 var(--mono); color: var(--meta); margin: 8px 0 0; }
+.chk { display: flex; align-items: center; gap: 12px; min-height: var(--tap); border-bottom: 1px solid var(--line); cursor: pointer; }
+.chk input { width: 28px; min-height: 28px; height: 28px; flex: none; margin: 0; accent-color: var(--ink); }
+.chk.on span { color: var(--meta); text-decoration: line-through; }
+ol.steps { margin: 0; padding-left: 24px; display: grid; gap: 10px; }
+.rungs { display: grid; gap: 0; }
+.rung { display: flex; justify-content: space-between; gap: 12px; text-align: left; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; min-height: var(--tap); width: 100%; padding: 8px 0; }
+.rung.cur { font-weight: 600; }
+.rung .built { font-family: var(--mono); }
+#cooked { width: 100%; }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a couch-to-5k style app that teaches cooking one recipe at a time</h1>
+<main id="app" class="stack">
+  <div class="row" style="justify-content:space-between"><span id="progress" class="meta"></span><span id="next-label" class="meta"></span></div>
+  <div class="bar" aria-hidden="true"><i id="fill"></i></div>
+  <section id="card" class="stack" aria-live="polite">
+    <div class="meta" id="rung-no"></div>
+    <h2 id="current-title"></h2>
+    <h3 id="skill"></h3>
+    <div id="ingredients"></div>
+    <ol id="steps" class="steps"></ol>
+    <button id="cooked" class="primary" type="button">Mark cooked</button>
+  </section>
+  <div class="meta">The ladder</div>
+  <div id="rungs" class="rungs"></div>
+  <button id="reset" type="button">Start over</button>
+</main>
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  // [name, skill, minutes, ingredients, steps]
+  const R = [["Boiled eggs","Timing",12,["2 eggs","Water","Bowl of cold water"],["Cover the eggs with cold water in a small pot.","Bring to a boil, then turn the heat off and cover. Wait 9 minutes.","Move the eggs into cold water for 2 minutes.","Peel under a little water. Yolk should be set and pale."]],["Scrambled eggs","Low heat",8,["3 eggs","1 tbsp butter","Salt"],["Beat the eggs with a pinch of salt.","Melt the butter in a pan on low heat.","Pour in the eggs. Stir slowly with a spatula.","Take off the heat while still glossy. They finish cooking on the plate."]],["Buttered pasta","Salted water",15,["200 g pasta","2 tbsp butter","Grated cheese","Salt"],["Boil a big pot of water. Add a generous spoon of salt.","Add pasta. Stir once in the first minute.","Taste at the time on the packet. It should be tender with a small bite.","Save a cup of the water, drain, then toss with butter, cheese and a splash of the water."]],["Plain rice","Absorption",25,["1 cup rice","2 cups water","Pinch of salt"],["Rinse the rice until the water is less cloudy.","Put rice, water and salt in a pot with a lid. Bring to a boil.","Turn to the lowest heat, lid on. Do not lift it for 15 minutes.","Off the heat, rest 5 minutes. Fluff with a fork."]],["Grilled cheese","Pan browning",10,["2 slices bread","Cheese","Butter"],["Butter one side of each slice.","Put cheese between the slices, butter sides out.","Cook in a pan on medium-low for 3 minutes, until deep golden.","Flip, cook 3 more minutes until the cheese melts."]],["Chicken thighs","Searing, doneness",35,["4 chicken thighs, skin on","Salt, pepper","Oil"],["Pat the chicken dry. Salt both sides.","Heat oil in a pan on medium-high. Lay thighs skin side down.","Leave them alone for 8 minutes until the skin releases and browns.","Flip, lower the heat, cover and cook 12 minutes. Thickest part should reach 74 C or run clear."]],["Tomato sauce","Simmering",30,["1 tin tomatoes","1 onion","2 garlic cloves","Olive oil","Salt"],["Chop the onion finely. Soften it in oil on medium heat for 8 minutes.","Add sliced garlic for 30 seconds. Do not let it brown.","Add the tomatoes and salt. Break them up with a spoon.","Simmer on low for 15 minutes, stirring now and then. Taste and adjust salt."]],["Roasted vegetables","High oven heat",40,["Carrots, potatoes or broccoli","Olive oil","Salt"],["Heat the oven to 220 C.","Cut the vegetables into pieces of similar size.","Toss with oil and salt. Spread in one layer, not piled.","Roast 25 to 30 minutes, turning once, until browned at the edges."]],["Omelette","Folding",8,["3 eggs","Butter","Salt","Cheese, optional"],["Beat the eggs with salt.","Melt butter in a non-stick pan on medium heat until it foams.","Pour in the eggs. Pull the edges to the middle so raw egg runs underneath.","When just wet on top, add filling, fold in half and slide onto a plate."]],["Vinaigrette salad","Emulsifying",10,["3 tbsp olive oil","1 tbsp vinegar or lemon","1 tsp mustard","Salt","Salad leaves"],["Put vinegar, mustard and salt in a jar.","Add the oil. Close the lid and shake hard for 15 seconds.","Taste on a leaf, not from the spoon. Adjust.","Dress the leaves just before eating, a little at a time."]],["Fried rice","Very hot pan",15,["2 cups cold cooked rice","2 eggs","Frozen peas","Soy sauce","Oil","Spring onion"],["Break up the cold rice with your hands.","Heat oil in a wide pan on high. Scramble the eggs quickly and push aside.","Add rice and peas. Press and let it sit 30 seconds, then stir. Repeat.","Add soy sauce around the edge of the pan. Finish with spring onion."]],["Baked potatoes","Oven timing",75,["2 large potatoes","Oil","Salt","Butter"],["Heat the oven to 200 C.","Scrub, dry and prick the potatoes with a fork. Rub with oil and salt.","Bake directly on the rack for 60 minutes.","Cut open, fluff the inside with a fork, add butter."]],["Vegetable soup","Knife work, sweating",45,["1 onion","2 carrots","2 potatoes","Stock or water","Oil","Salt"],["Dice everything into pieces about 1 cm.","Cook the onion in oil with a pinch of salt on medium-low for 8 minutes without browning.","Add carrots, potatoes and enough stock to cover. Bring to a gentle boil.","Simmer 20 minutes until soft. Taste, then salt."]],["Pancakes","Batter, flipping",25,["1 cup flour","1 cup milk","1 egg","1 tbsp sugar","1 tsp baking powder","Butter"],["Whisk the dry ingredients. Add milk and egg. Stir until just combined; lumps are fine.","Rest the batter 5 minutes.","Heat a buttered pan on medium. Pour a small ladle.","Flip when bubbles open on top and the edges look dry, about 2 minutes."]],["Lentil soup","Building flavour",40,["1 cup red lentils","1 onion","2 garlic cloves","1 tsp cumin","4 cups water","Lemon","Salt"],["Soften the chopped onion in oil. Add garlic and cumin for 1 minute.","Add rinsed lentils and the water. Bring to a boil.","Simmer 20 minutes until the lentils fall apart.","Add salt and a squeeze of lemon. The lemon is what makes it taste finished."]],["Roast chicken","Roasting, resting",100,["1 whole chicken","Oil","Salt","1 lemon, optional"],["Take the chicken out of the fridge 30 minutes ahead. Heat the oven to 220 C.","Pat dry. Rub with oil and plenty of salt, inside and out.","Roast 20 minutes, then lower to 190 C and roast about 50 minutes more.","Check the thigh reaches 74 C and juices run clear. Rest 15 minutes before cutting."]],["Pan-seared salmon","Fish, skin crisping",15,["2 salmon fillets, skin on","Oil","Salt","Lemon"],["Pat the fish very dry. Salt it.","Heat oil in a pan on medium-high. Lay fillets skin side down and press flat for 10 seconds.","Cook 4 minutes without moving, until the skin is crisp and the flesh is opaque most of the way up.","Flip for 30 seconds. Serve with lemon."]],["Vegetable stir-fry","Mise en place",20,["Mixed vegetables","2 garlic cloves","1 tbsp soy sauce","Oil","Rice to serve"],["Cut everything first and set it by the stove, in the order it goes in.","Heat the pan until very hot. Add oil, then hard vegetables like carrot.","After 2 minutes add soft vegetables and garlic. Keep it moving.","Add soy sauce, cook 1 minute. Serve right away over rice."]],["No-knead bread","Patience",960,["3 cups flour","1.5 tsp salt","1/4 tsp yeast","1.5 cups water"],["Mix everything in a bowl until no dry flour remains. Cover.","Leave at room temperature 12 to 18 hours.","Heat the oven to 230 C with a lidded pot inside for 30 minutes.","Tip the dough into the hot pot, lid on, bake 30 minutes. Lid off, bake 15 more. Cool before slicing."]],["Full dinner for two","Timing two dishes",60,["Roast vegetables","Chicken thighs or salmon","Rice or pasta"],["Work backwards from when you want to eat. Write the finish time down.","Start whatever takes longest: oven items first.","Start the side while the main cooks. Prepare the sauce or salad during waiting time.","Plate everything together. Note what finished early or late."]]];
+  let done = store.get('ltcl.done', []);
+  if (!Array.isArray(done)) done = [];
+  let ticks = store.get('ltcl.ticks', {});
+  let view = null;
+
+  const firstOpen = () => { const i = R.findIndex((_, n) => !done.includes(n)); return i < 0 ? R.length : i; };
+  const esc = s => s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  const dur = m => m >= 120 ? Math.round(m / 60) + ' h' : m + ' min';
+
+  function render() {
+    const n = done.length;
+    if (view === null || view >= R.length) view = Math.min(firstOpen(), R.length - 1);
+    $('#progress').textContent = n + ' of ' + R.length + ' cooked';
+    $('#fill').style.width = (n / R.length * 100) + '%';
+    $('#next-label').textContent = n >= R.length ? 'ladder complete' : '';
+    const r = R[view];
+    $('#rung-no').textContent = 'Rung ' + (view + 1) + ' · ' + dur(r[2]);
+    $('#current-title').textContent = r[0];
+    $('#skill').textContent = 'Skill: ' + r[1];
+    $('#ingredients').innerHTML = r[3].map((t, i) => {
+      const on = !!(ticks[view] && ticks[view][i]);
+      return '<label class="chk' + (on ? ' on' : '') + '"><input type="checkbox" data-i="' + i + '"' + (on ? ' checked' : '') + '><span>' + esc(t) + '</span></label>';
+    }).join('');
+    $('#steps').innerHTML = r[4].map(s => '<li>' + esc(s) + '</li>').join('');
+    const isDone = done.includes(view);
+    const b = $('#cooked');
+    b.textContent = isDone ? 'Cooked. Undo' : 'Mark cooked';
+    b.className = isDone ? '' : 'primary';
+    $('#rungs').innerHTML = R.map((x, i) =>
+      '<button type="button" class="rung' + (i === view ? ' cur' : '') + '" data-r="' + i + '"><span>' + (i + 1) + '. ' + esc(x[0]) + '</span><span class="' + (done.includes(i) ? 'built' : 'meta') + '">' + (done.includes(i) ? 'cooked' : esc(x[1])) + '</span></button>').join('');
+  }
+
+  $('#cooked').addEventListener('click', () => {
+    const i = done.indexOf(view);
+    if (i >= 0) done.splice(i, 1);
+    else { done.push(view); }
+    store.set('ltcl.done', done);
+    if (i < 0) { const nx = firstOpen(); view = nx < R.length ? nx : view; }
+    render();
+    window.scrollTo(0, 0);
+  });
+  $('#ingredients').addEventListener('change', e => {
+    const i = e.target.dataset.i;
+    if (i == null) return;
+    ticks[view] = ticks[view] || {};
+    ticks[view][i] = e.target.checked;
+    store.set('ltcl.ticks', ticks);
+    e.target.parentNode.classList.toggle('on', e.target.checked);
+  });
+  $('#rungs').addEventListener('click', e => {
+    const b = e.target.closest('[data-r]');
+    if (!b) return;
+    view = +b.dataset.r;
+    render();
+    window.scrollTo(0, 0);
+  });
+  $('#reset').addEventListener('click', () => {
+    if ($('#reset').dataset.sure !== '1') { $('#reset').dataset.sure = '1'; $('#reset').textContent = 'Tap again to erase progress'; return; }
+    done = []; ticks = {}; view = 0;
+    store.set('ltcl.done', done); store.set('ltcl.ticks', ticks);
+    $('#reset').dataset.sure = ''; $('#reset').textContent = 'Start over';
+    render();
+  });
+  render();
+})();
+</script>
+</body>
+</html>

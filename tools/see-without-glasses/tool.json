@@ -1,0 +1,60 @@
+{
+  "slug": "see-without-glasses",
+  "wish": "someone should make a website where you type your vision level and see what you see without glasses",
+  "year": 2013,
+  "agreed": 409,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/CrazyIdeas/comments/18vb6d/",
+      "date": "2013-02-20",
+      "points": 391,
+      "comments": 18
+    }
+  ],
+  "spec": "Shows a sample sign and scene blurred the way each eye sees it without glasses.\nType the sphere number from your prescription for each eye and pick a viewing distance, or load your own photo.\nIt ignores astigmatism and focusing effort, so it approximates; it is not an eye test.",
+  "tests": [
+    {
+      "expect": {
+        "sel": "#info",
+        "contains": "Clear only closer than"
+      }
+    },
+    {
+      "type": {
+        "sel": "#od",
+        "text": "-5"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#info",
+        "contains": "20 cm"
+      }
+    },
+    {
+      "type": {
+        "sel": "#os",
+        "text": "2"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#info",
+        "contains": "Blurred at every distance"
+      }
+    },
+    {
+      "type": {
+        "sel": "#os",
+        "text": "abc"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:40:00Z",
+  "model": "sonnet-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": "Photo is read locally via FileReader and never leaves the device."
+}

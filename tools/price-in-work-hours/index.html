@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app that converts shopping prices into hours of your life</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+label { display: grid; gap: 4px; }
+label span { font: 13px/1.4 var(--mono); color: var(--meta); }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+#result { padding: 16px 0 8px; }
+#sub { color: var(--meta); min-height: 1.45em; }
+.err { color: var(--no); min-height: 1.45em; }
+li .t { font-variant-numeric: tabular-nums; white-space: nowrap; }
+li button { padding: 0 12px; min-width: var(--tap); }
+#total { font-weight: 500; }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make an app that converts shopping prices into hours of your life</h1>
+
+<main id="app" class="stack">
+  <div class="pair">
+    <label><span>take-home per hour</span><input id="wage" inputmode="decimal" value="20" autocomplete="off"></label>
+    <label><span>price</span><input id="price" inputmode="decimal" value="49.99" autocomplete="off"></label>
+  </div>
+  <div id="result"><div class="big" id="time"></div><div id="sub"></div></div>
+  <div class="err" id="err" role="status"></div>
+  <div class="row"><button class="primary" id="add">add to list</button><button id="clear">clear list</button></div>
+  <ul class="plain" id="list"></ul>
+  <div class="empty" id="empty">Added prices show up here.</div>
+  <div class="row" id="totalrow" hidden><span id="total"></span></div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  // storage helper — never throws
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const wageEl = $('#wage'), priceEl = $('#price');
+  let items = store.get('items', []);
+  if (!Array.isArray(items)) items = [];
+  const savedWage = store.get('wage', null);
+  if (savedWage) wageEl.value = savedWage;
+
+  const num = s => {
+    const n = parseFloat(String(s).replace(',', '.').replace(/[^0-9.]/g, ''));
+    return isFinite(n) ? n : NaN;
+  };
+  // minutes of work -> "2 h 30 min"
+  function fmt(hours) {
+    const mins = Math.round(hours * 60);
+    if (mins < 1) return 'under 1 min';
+    const h = Math.floor(mins / 60), m = mins % 60;
+    if (h === 0) return m + ' min';
+    return m ? h + ' h ' + m + ' min' : h + ' h';
+  }
+  function sub(hours) {
+    if (hours >= 8) return 'about ' + (Math.round(hours / 8 * 10) / 10) + ' working days of 8 h';
+    return '';
+  }
+
+  function render() {
+    const wage = num(wageEl.value), price = num(priceEl.value);
+    const err = $('#err');
+    if (!(wage > 0)) {
+      err.textContent = 'Enter what you take home per hour.';
+      $('#time').textContent = '–'; $('#sub').textContent = '';
+    } else if (!(price >= 0)) {
+      err.textContent = 'Enter a price.';
+      $('#time').textContent = '–'; $('#sub').textContent = '';
+    } else {
+      err.textContent = '';
+      const h = price / wage;
+      $('#time').textContent = fmt(h);
+      $('#sub').textContent = sub(h);
+    }
+    const list = $('#list');
+    list.textContent = '';
+    items.forEach((it, i) => {
+      const li = document.createElement('li');
+      const a = document.createElement('span');
+      a.textContent = it.price.toFixed(2);
+      const t = document.createElement('span');
+      t.className = 't';
+      t.textContent = fmt(it.price / it.wage);
+      const b = document.createElement('button');
+      b.textContent = '×';
+      b.setAttribute('aria-label', 'remove');
+      b.addEventListener('click', () => { items.splice(i, 1); store.set('items', items); render(); });
+      li.append(a, t, b);
+      list.append(li);
+    });
+    $('#empty').hidden = items.length > 0;
+    $('#totalrow').hidden = items.length === 0;
+    const hrs = items.reduce((s, it) => s + it.price / it.wage, 0);
+    const sum = items.reduce((s, it) => s + it.price, 0);
+    $('#total').textContent = items.length ? 'Total ' + sum.toFixed(2) + ' = ' + fmt(hrs) : '';
+  }
+
+  function onInput() { store.set('wage', wageEl.value); render(); }
+  wageEl.addEventListener('input', onInput);
+  priceEl.addEventListener('input', render);
+  priceEl.addEventListener('keydown', e => { if (e.key === 'Enter') $('#add').click(); });
+  $('#add').addEventListener('click', () => {
+    const wage = num(wageEl.value), price = num(priceEl.value);
+    if (!(wage > 0) || !(price >= 0)) { render(); return; }
+    items.push({ price, wage });
+    store.set('items', items);
+    priceEl.value = '';
+    priceEl.focus();
+    render();
+  });
+  $('#clear').addEventListener('click', () => { items = []; store.set('items', items); render(); });
+  render();
+})();
+</script>
+</body>
+</html>

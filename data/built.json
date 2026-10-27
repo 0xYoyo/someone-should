@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T02:13:09.144Z",
+ "updated": "2026-10-27T08:41:01.853Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -1099,6 +1099,182 @@
    "tests": "6/6",
    "built": "2026-10-27T02:08:17Z",
    "minutes": 6,
+   "approved": false
+  },
+  {
+   "slug": "random-daily-objective",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 7.2,
+   "tests": "6/6",
+   "built": "2026-10-27T08:39:15Z",
+   "minutes": 4,
+   "approved": false
+  },
+  {
+   "slug": "cart-running-total",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 8.1,
+   "tests": "6/6",
+   "built": "2026-10-27T08:39:17Z",
+   "minutes": 3,
+   "approved": false
+  },
+  {
+   "slug": "keep-in-touch-reminders",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 7.1,
+   "tests": "6/6",
+   "built": "2026-10-27T08:39:23Z",
+   "minutes": 4,
+   "approved": false
+  },
+  {
+   "slug": "price-in-work-hours",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 7.4,
+   "tests": "6/6",
+   "built": "2026-10-27T08:39:24Z",
+   "minutes": 4,
+   "approved": false
+  },
+  {
+   "slug": "text-case-toggler",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 5.6,
+   "tests": "6/6",
+   "built": "2026-10-27T08:39:20Z",
+   "minutes": 4,
+   "approved": false
+  },
+  {
+   "slug": "see-without-glasses",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 7.9,
+   "tests": "6/6",
+   "built": "2026-10-27T08:40:00Z",
+   "minutes": 4,
+   "approved": false
+  },
+  {
+   "slug": "friends-local-times",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 8.9,
+   "tests": "6/6",
+   "built": "2026-10-27T08:39:23Z",
+   "minutes": 5,
+   "approved": false
+  },
+  {
+   "slug": "twenty-questions-dinner",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 9.8,
+   "tests": "6/6",
+   "built": "2026-10-27T08:39:30Z",
+   "minutes": 5,
+   "approved": false
+  },
+  {
+   "slug": "fake-call-escape",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 8.9,
+   "tests": "6/6",
+   "built": "2026-10-27T08:39:23Z",
+   "minutes": 4,
+   "approved": false
+  },
+  {
+   "slug": "cat-perspective-game",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 11.3,
+   "tests": "6/6",
+   "built": "2026-10-27T08:39:46Z",
+   "minutes": 6,
+   "approved": false
+  },
+  {
+   "slug": "overtime-kitchen-timer",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 8.4,
+   "tests": "6/6",
+   "built": "2026-10-27T08:39:46Z",
+   "minutes": 6,
+   "approved": false
+  },
+  {
+   "slug": "character-dress-up-game",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 12.4,
+   "tests": "6/6",
+   "built": "2026-10-27T08:40:05Z",
+   "minutes": 5,
+   "approved": false
+  },
+  {
+   "slug": "are-we-there-yet-bar",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 7,
+   "tests": "6/6",
+   "built": "2026-10-27T08:40:31Z",
+   "minutes": 1,
+   "approved": false
+  },
+  {
+   "slug": "daily-data-allowance",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 8,
+   "tests": "6/6",
+   "built": "2026-10-27T08:40:32Z",
+   "minutes": 4,
+   "approved": false
+  },
+  {
+   "slug": "fitness-rpg-quests",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 10.5,
+   "tests": "6/6",
+   "built": "2026-10-27T08:40:08Z",
+   "minutes": 6,
+   "approved": false
+  },
+  {
+   "slug": "fridge-expiry-list",
+   "status": "pass",
+   "attempts": 1,
+   "model": "sonnet-5.5",
+   "kb": 7.7,
+   "tests": "6/6",
+   "built": "2026-10-27T08:40:33Z",
+   "minutes": 3,
    "approved": false
   }
  ]

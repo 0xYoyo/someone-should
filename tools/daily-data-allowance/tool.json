@@ -1,0 +1,64 @@
+{
+  "slug": "daily-data-allowance",
+  "wish": "someone should make a calculator for how much phone data you can use per day",
+  "year": 2016,
+  "agreed": 248,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/55x3s1/",
+      "date": "2016-10-05",
+      "points": 183,
+      "comments": 20
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/4xbgcb/",
+      "date": "2016-08-12",
+      "points": 36,
+      "comments": 9
+    }
+  ],
+  "spec": "Shows how much mobile data you can use per day until your plan resets.\nEnter monthly allowance, data used so far and the reset date; switch GB or MB.\nIt does not read your real usage from the phone or carrier; you type the numbers.",
+  "tests": [
+    {
+      "expect": {
+        "sel": "#perday",
+        "matches": "\\d"
+      }
+    },
+    {
+      "type": {
+        "sel": "#plan",
+        "text": "20"
+      }
+    },
+    {
+      "type": {
+        "sel": "#used",
+        "text": "20"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#perday",
+        "contains": "0 GB"
+      }
+    },
+    {
+      "tap": "#u-mb"
+    },
+    {
+      "expect": {
+        "sel": "#plan",
+        "matches": "^$|."
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:40:32Z",
+  "model": "sonnet-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": ""
+}

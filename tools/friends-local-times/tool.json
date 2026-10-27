@@ -1,0 +1,61 @@
+{
+  "slug": "friends-local-times",
+  "wish": "someone should make a timezone app for people, not places",
+  "year": 2020,
+  "agreed": 275,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/km5zoc/",
+      "date": "2020-12-29",
+      "points": 226,
+      "comments": 30
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/SomebodyMakeThis/comments/1hfrdb1/",
+      "date": "2024-12-16",
+      "points": 11,
+      "comments": 8
+    }
+  ],
+  "spec": "Shows each saved person's current local time, with an awake, edge or asleep marker.\nAdd a name and a city or time zone; slide forward up to 24 hours or tap Best hour for everyone.\nIt does not sync, send invites, or know anyone's real schedule; awake means 08:00 to 22:00.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#name",
+        "text": "Sam"
+      }
+    },
+    {
+      "type": {
+        "sel": "#zone",
+        "text": "Tokyo"
+      }
+    },
+    {
+      "tap": "#add"
+    },
+    {
+      "expect": {
+        "sel": "#people li:last-child",
+        "contains": "Sam"
+      }
+    },
+    {
+      "tap": "#best"
+    },
+    {
+      "expect": {
+        "sel": "#slot",
+        "matches": "awake"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:39:23Z",
+  "model": "sonnet-5.5",
+  "minutes": 5,
+  "approved": false,
+  "notes": ""
+}

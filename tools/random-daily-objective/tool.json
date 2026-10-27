@@ -1,0 +1,51 @@
+{
+  "slug": "random-daily-objective",
+  "wish": "someone should make an app that gives you random objectives for the day",
+  "year": 2013,
+  "agreed": 284,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/CrazyIdeas/comments/1nhjzz/",
+      "date": "2013-10-01",
+      "points": 263,
+      "comments": 21
+    }
+  ],
+  "spec": "Gives one small real-life objective per day, picked from a built-in list of 30.\nOpen it to see today's objective; tap done to count the day in a local streak, or take one reroll.\nIt does not send reminders, sync across devices, or accept custom objectives.",
+  "tests": [
+    {
+      "tap": "#done"
+    },
+    {
+      "expect": {
+        "sel": "#streak",
+        "contains": "streak: 1 day"
+      }
+    },
+    {
+      "tap": "#done"
+    },
+    {
+      "expect": {
+        "sel": "#streak",
+        "contains": "streak: 0"
+      }
+    },
+    {
+      "tap": "#reroll"
+    },
+    {
+      "expect": {
+        "sel": "#msg",
+        "contains": "used"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:39:15Z",
+  "model": "sonnet-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": ""
+}

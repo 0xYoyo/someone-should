@@ -1,0 +1,62 @@
+{
+  "slug": "fake-call-escape",
+  "wish": "someone should make an app that calls you back after a few minutes so you can leave a conversation",
+  "year": 2020,
+  "agreed": 343,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/nypjom/",
+      "date": "2021-06-13",
+      "points": 157,
+      "comments": 21
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/fc1t5a/",
+      "date": "2020-03-01",
+      "points": 121,
+      "comments": 25
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/AppIdeas/comments/1r9uofm/",
+      "date": "2026-02-20",
+      "points": 7,
+      "comments": 12
+    }
+  ],
+  "spec": "Sets a timer and a caller name, then shows a full-screen incoming call with ring tone and vibration when it ends.\nPick a caller and delay, tap Start timer, keep the page open; accept to get a fake call screen with a running clock.\nIt does not run with the screen locked or the page closed, and places no real call.",
+  "tests": [
+    {
+      "tap": "#start"
+    },
+    {
+      "expect": {
+        "sel": "#count",
+        "matches": "^0[23]:\\d\\d$"
+      }
+    },
+    {
+      "tap": "#cancel"
+    },
+    {
+      "tap": "#preview"
+    },
+    {
+      "tap": "#accept"
+    },
+    {
+      "expect": {
+        "sel": "#talkName",
+        "contains": "Mom"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:39:23Z",
+  "model": "sonnet-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": "Offline by design; a locked screen or closed page cannot ring, so the page requests a screen wake lock while waiting."
+}

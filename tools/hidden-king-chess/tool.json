@@ -1,0 +1,51 @@
+{
+ "slug": "hidden-king-chess",
+ "wish": "someone should make a chess variant where a hidden random piece is the king",
+ "year": 2015,
+ "agreed": 255,
+ "sources": [
+  {
+   "site": "reddit",
+   "url": "https://www.reddit.com/r/Lightbulb/comments/3al3nr/",
+   "date": "2015-06-21",
+   "points": 234,
+   "comments": 21
+  }
+ ],
+ "spec": "Two-player pass-and-play chess where each side secretly has one of its 16 pieces crowned as the king.\nTap a piece then a square to move; show my king outlines your own secret king; capture the opponent's hidden king to win and both are revealed.\nNo check, castling or en passant; pawns promote to queen; one device, no engine.",
+ "tests": [
+  {
+   "expect": {
+    "sel": "#status",
+    "contains": "White to move"
+   }
+  },
+  {
+   "tap": "#peek"
+  },
+  {
+   "expect": {
+    "sel": ".sq.mine",
+    "count": 1
+   }
+  },
+  {
+   "tap": "[data-sq=\"e2\"]"
+  },
+  {
+   "tap": "[data-sq=\"e4\"]"
+  },
+  {
+   "expect": {
+    "sel": "#status",
+    "contains": "Black to move"
+   }
+  }
+ ],
+ "status": "pending",
+ "built": "2026-10-27T08:40:52Z",
+ "model": "sonnet-5.5",
+ "minutes": 4,
+ "approved": false,
+ "notes": "Pass-and-play on one device; the player to move taps show my king to see their own secret king."
+}

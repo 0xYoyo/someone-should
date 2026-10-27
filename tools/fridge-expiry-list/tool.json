@@ -1,0 +1,68 @@
+{
+  "slug": "fridge-expiry-list",
+  "wish": "someone should make an app that tells you which food in your kitchen is expiring soon",
+  "year": 2020,
+  "agreed": 248,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/hsj3gd/",
+      "date": "2020-07-16",
+      "points": 123,
+      "comments": 20
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/v5657m/",
+      "date": "2022-06-05",
+      "points": 57,
+      "comments": 34
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/AppIdeas/comments/16syk6g/",
+      "date": "2023-09-26",
+      "points": 5,
+      "comments": 9
+    }
+  ],
+  "spec": "Keeps a list of foods with expiry dates, sorted soonest first, with red for today or past and bold for the next 3 days.\nType a food, pick 1d/3d/1w/1m or a date, tap Add; tap x to remove.\nIt does not scan barcodes, send reminders or sync between devices.",
+  "tests": [
+    {
+      "expect": {
+        "sel": "#list li",
+        "contains": "milk"
+      }
+    },
+    {
+      "type": {
+        "sel": "#name",
+        "text": "cheese"
+      }
+    },
+    {
+      "tap": "#d3"
+    },
+    {
+      "tap": "#add"
+    },
+    {
+      "expect": {
+        "sel": "#list li",
+        "count": 1
+      }
+    },
+    {
+      "expect": {
+        "sel": "#sum",
+        "matches": "\\d to use within 3 days"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:40:33Z",
+  "model": "sonnet-5.5",
+  "minutes": 3,
+  "approved": false,
+  "notes": ""
+}

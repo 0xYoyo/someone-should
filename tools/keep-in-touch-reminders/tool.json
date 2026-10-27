@@ -1,0 +1,103 @@
+{
+  "slug": "keep-in-touch-reminders",
+  "wish": "someone should make a personal CRM app that reminds you to stay in touch with people",
+  "year": 2014,
+  "agreed": 569,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/5exa4a/",
+      "date": "2016-11-26",
+      "points": 181,
+      "comments": 19
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/9cy86j/",
+      "date": "2018-09-04",
+      "points": 54,
+      "comments": 19
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/AppIdeas/comments/1raf3ir/",
+      "date": "2026-02-21",
+      "points": 17,
+      "comments": 16
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/SomebodyMakeThis/comments/3gfbsq/",
+      "date": "2015-08-10",
+      "points": 16,
+      "comments": 12
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/AppIdeas/comments/g99fqz/",
+      "date": "2020-04-27",
+      "points": 17,
+      "comments": 10
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/SomebodyMakeThis/comments/36spvk/",
+      "date": "2015-05-21",
+      "points": 11,
+      "comments": 15
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/AppIdeas/comments/5fjrn0/",
+      "date": "2016-11-29",
+      "points": 17,
+      "comments": 9
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/2dad3t/",
+      "date": "2014-08-12",
+      "points": 17,
+      "comments": 6
+    }
+  ],
+  "spec": "Keeps a list of people with how often you want to be in touch; shows who is overdue first.\nAdd a name and a rhythm, tap Talked after a catch-up to reset the clock.\nIt does not send notifications or read contacts; everything stays on this device.",
+  "tests": [
+    {
+      "expect": {
+        "sel": "#summary",
+        "contains": "2 overdue"
+      }
+    },
+    {
+      "type": {
+        "sel": "#name",
+        "text": "Dana"
+      }
+    },
+    {
+      "tap": "#add"
+    },
+    {
+      "expect": {
+        "sel": "#list",
+        "contains": "Dana"
+      }
+    },
+    {
+      "tap": "#list li:first-child .done"
+    },
+    {
+      "expect": {
+        "sel": "#summary",
+        "contains": "1 overdue"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:39:23Z",
+  "model": "sonnet-5.5",
+  "minutes": 4,
+  "approved": false,
+  "notes": ""
+}

@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a game where you have to beat a copy of yourself as the final boss</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+canvas { display: block; width: 100%; max-width: 420px; aspect-ratio: 1; border: 1.5px solid var(--ink); border-radius: var(--radius); touch-action: none; background: var(--paper); }
+#phase { font: 500 17px/1.3 var(--mono); }
+#stats { display: flex; gap: 16px; }
+.pad { display: grid; gap: 10px; max-width: 420px; }
+.pad .row button { flex: 1; }
+#fire { min-height: 56px; }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a game where you have to beat a copy of yourself as the final boss</h1>
+<main id="app" class="stack">
+  <div id="phase">Round 1: move and shoot. 10 s is recorded.</div>
+  <canvas id="c" width="420" height="420" aria-label="arena"></canvas>
+  <div id="stats" class="meta"><span id="time">10.0 s</span><span id="hp">boss 5</span><span id="lives">you 3</span><span id="best"></span></div>
+  <div class="pad">
+    <div class="row">
+      <button id="start" class="primary">Start</button>
+      <button id="skip" hidden>Face your ghost now</button>
+      <button id="fire" hidden>Fire</button>
+    </div>
+    <div id="msg" class="meta">Drag in the arena to move. Space or Fire to shoot.</div>
+  </div>
+</main>
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const cv = $('#c'), g = cv.getContext('2d');
+  const S = 4.2; // canvas px per world unit (world is 100 x 100)
+  const DT = 1 / 30, REC = 300, SPEED = 28, SHOT = 70, HP = 5;
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+  let mode = 'idle'; // idle | record | boss | over
+  let me, ghost, rec, tick, shots, cool, inv, lives, bossHp, elapsed, target, acc, last;
+  const keys = {};
+
+  function fresh() { return { x: 50, y: 80, fx: 0, fy: -1 }; }
+  function reset() {
+    me = fresh(); ghost = fresh(); shots = []; cool = 0; inv = 0; tick = 0; target = null; acc = 0;
+  }
+
+  function setPhase(t) { $('#phase').textContent = t; }
+  function setMsg(t) { $('#msg').textContent = t; }
+  function best() { const b = store.get('best', null); $('#best').textContent = b ? 'best ' + b.toFixed(1) + ' s' : ''; }
+
+  function inputVec() {
+    let dx = (keys.ArrowRight || keys.d ? 1 : 0) - (keys.ArrowLeft || keys.a ? 1 : 0);
+    let dy = (keys.ArrowDown || keys.s ? 1 : 0) - (keys.ArrowUp || keys.w ? 1 : 0);
+    if (!dx && !dy && target) {
+      const tx = target.x - me.x, ty = target.y - me.y;
+      if (Math.hypot(tx, ty) > 2) { dx = tx; dy = ty; }
+    }
+    const l = Math.hypot(dx, dy);
+    return l ? [dx / l, dy / l] : [0, 0];
+  }
+
+  function move(p, dx, dy) {
+    if (dx || dy) { p.fx = dx; p.fy = dy; }
+    p.x = Math.min(97, Math.max(3, p.x + dx * SPEED * DT));
+    p.y = Math.min(97, Math.max(3, p.y + dy * SPEED * DT));
+  }
+
+  function shoot(p, owner) { shots.push({ x: p.x, y: p.y, dx: p.fx, dy: p.fy, life: 36, owner }); }
+
+  function begin() {
+    reset(); rec = []; mode = 'record'; elapsed = 0;
+    $('#start').hidden = true; $('#skip').hidden = false; $('#fire').hidden = false;
+    $('#hp').textContent = ''; $('#lives').textContent = '';
+    setPhase('Round 1: this run is being recorded'); setMsg('Move around and shoot. Your ghost repeats all of it.');
+  }
+
+  function startBoss() {
+    const r = rec.slice();
+    reset(); rec = r; mode = 'boss'; elapsed = 0; lives = 3; bossHp = HP;
+    $('#skip').hidden = true;
+    setPhase('Final boss: your ghost'); setMsg('Hit the ghost 5 times. Its shots and touch cost a life.');
+    ui();
+  }
+
+  function ui() {
+    if (mode === 'record') $('#time').textContent = ((REC - tick) * DT).toFixed(1) + ' s';
+    else if (mode === 'boss') { $('#time').textContent = elapsed.toFixed(1) + ' s'; $('#hp').textContent = 'boss ' + bossHp; $('#lives').textContent = 'you ' + lives; }
+  }
+
+  function end(won) {
+    mode = 'over';
+    $('#skip').hidden = true; $('#fire').hidden = true; $('#start').hidden = false; $('#start').textContent = 'Play again';
+    if (won) {
+      const b = store.get('best', null);
+      if (!b || elapsed < b) store.set('best', elapsed);
+      setPhase('You beat yourself'); setMsg('Took ' + elapsed.toFixed(1) + ' s.');
+    } else { setPhase('Your ghost wins'); setMsg('Play again to record a new ghost.'); }
+    best();
+  }
+
+  function step() {
+    if (mode === 'record') {
+      const [dx, dy] = inputVec(); move(me, dx, dy);
+      let f = 0;
+      if (wantFire && cool <= 0) { shoot(me, 'me'); cool = 9; f = 1; }
+      wantFire = false; cool--;
+      rec.push([me.x, me.y, f]);
+      tick++; ui();
+      if (tick >= REC) startBoss();
+    } else if (mode === 'boss') {
+      const [dx, dy] = inputVec(); move(me, dx, dy);
+      if (wantFire && cool <= 0) { shoot(me, 'me'); cool = 9; }
+      wantFire = false; cool--;
+      const i = tick % REC, f = rec[i] || [50, 80, 0];
+      const gx = f[0] - ghost.x, gy = f[1] - ghost.y, gl = Math.hypot(gx, gy);
+      if (gl > 0.05) { ghost.fx = gx / gl; ghost.fy = gy / gl; }
+      if (i === 0) { ghost.fx = 0; ghost.fy = -1; }
+      ghost.x = f[0]; ghost.y = f[1];
+      if (f[2]) shoot(ghost, 'ghost');
+      tick++; elapsed += DT; inv--;
+      for (const s of shots) {
+        s.x += s.dx * SHOT * DT; s.y += s.dy * SHOT * DT; s.life--;
+        if (s.owner === 'me' && Math.hypot(s.x - ghost.x, s.y - ghost.y) < 4.5) { s.life = 0; bossHp--; }
+        if (s.owner === 'ghost' && inv <= 0 && Math.hypot(s.x - me.x, s.y - me.y) < 3.5) { s.life = 0; hurt(); }
+      }
+      if (inv <= 0 && Math.hypot(ghost.x - me.x, ghost.y - me.y) < 5) hurt();
+      shots = shots.filter(s => s.life > 0 && s.x > 0 && s.x < 100 && s.y > 0 && s.y < 100);
+      ui();
+      if (bossHp <= 0) end(true); else if (lives <= 0) end(false);
+    }
+  }
+  function hurt() { lives--; inv = 30; }
+
+  let wantFire = false;
+
+  function dot(x, y, r, fill, stroke) {
+    g.beginPath(); g.arc(x * S, y * S, r * S, 0, 7);
+    if (fill) { g.fillStyle = fill; g.fill(); }
+    if (stroke) { g.lineWidth = 2; g.strokeStyle = stroke; g.stroke(); }
+  }
+
+  function draw() {
+    const ink = css('--ink'), no = css('--no'), paper = css('--paper'), line = css('--line');
+    g.clearRect(0, 0, 420, 420);
+    g.fillStyle = paper; g.fillRect(0, 0, 420, 420);
+    g.strokeStyle = line; g.lineWidth = 1;
+    for (let i = 1; i < 5; i++) { g.beginPath(); g.moveTo(i * 84, 0); g.lineTo(i * 84, 420); g.moveTo(0, i * 84); g.lineTo(420, i * 84); g.stroke(); }
+    const demo = mode === 'idle';
+    const gh = demo ? { x: 62, y: 30 } : ghost;
+    if (mode === 'boss' || demo) {
+      dot(gh.x, gh.y, 3.2, null, no);
+      dot(gh.x, gh.y, 1.2, no);
+    }
+    for (const s of shots) dot(s.x, s.y, 1.2, s.owner === 'me' ? ink : no);
+    if (demo) { dot(38, 70, 3, ink); dot(38, 58, 1.2, ink); }
+    else if (!(mode === 'boss' && inv > 0 && inv % 6 < 3)) dot(me.x, me.y, 3, ink);
+  }
+
+  function frame(t) {
+    if (!last) last = t;
+    acc += Math.min(0.25, (t - last) / 1000); last = t;
+    while (acc >= DT) { acc -= DT; step(); }
+    draw(); requestAnimationFrame(frame);
+  }
+
+  function pt(e) {
+    const r = cv.getBoundingClientRect();
+    return { x: (e.clientX - r.left) / r.width * 100, y: (e.clientY - r.top) / r.height * 100 };
+  }
+  cv.addEventListener('pointerdown', e => { target = pt(e); try { cv.setPointerCapture(e.pointerId); } catch {} });
+  cv.addEventListener('pointermove', e => { if (target) target = pt(e); });
+  const up = () => { target = null; };
+  cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+  addEventListener('keydown', e => {
+    if (e.key === ' ') { wantFire = true; e.preventDefault(); }
+    else { keys[e.key.length === 1 ? e.key.toLowerCase() : e.key] = true; if (e.key.startsWith('Arrow')) e.preventDefault(); }
+  });
+  addEventListener('keyup', e => { keys[e.key.length === 1 ? e.key.toLowerCase() : e.key] = false; });
+
+  $('#start').addEventListener('click', begin);
+  $('#skip').addEventListener('click', () => { if (mode === 'record') startBoss(); });
+  $('#fire').addEventListener('click', () => { wantFire = true; });
+
+  reset(); best(); requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

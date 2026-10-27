@@ -1,0 +1,57 @@
+{
+  "slug": "are-we-there-yet-bar",
+  "wish": "someone should make a progress bar for the back seat so kids can see if we're there yet",
+  "year": 2014,
+  "agreed": 267,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/28gzan/",
+      "date": "2014-06-18",
+      "points": 245,
+      "comments": 22
+    }
+  ],
+  "spec": "Shows a big progress bar with a car driving toward the finish, percent done and time left.\nSet the leave and arrive times; the bar fills as the clock moves.\nIt does not track location or traffic; it only follows the clock.",
+  "tests": [
+    {
+      "expect": {
+        "sel": "#pct",
+        "matches": "\\d+%"
+      }
+    },
+    {
+      "type": {
+        "sel": "#dep",
+        "text": "00:00"
+      }
+    },
+    {
+      "type": {
+        "sel": "#arr",
+        "text": "23:59"
+      }
+    },
+    {
+      "wait": 300
+    },
+    {
+      "expect": {
+        "sel": "#left",
+        "contains": "to go"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#car",
+        "visible": true
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:40:31Z",
+  "model": "sonnet-5.5",
+  "minutes": 1,
+  "approved": false,
+  "notes": "Offline; follows the device clock only."
+}

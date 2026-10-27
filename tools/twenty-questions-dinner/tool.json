@@ -1,0 +1,79 @@
+{
+  "slug": "twenty-questions-dinner",
+  "wish": "someone should make a 20 questions tool that helps you work out what you want to eat",
+  "year": 2011,
+  "agreed": 456,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/Lightbulb/comments/8wdq6n/",
+      "date": "2018-07-05",
+      "points": 336,
+      "comments": 29
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/SomebodyMakeThis/comments/hiz6p/",
+      "date": "2011-05-24",
+      "points": 15,
+      "comments": 22
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/AppIdeas/comments/f7405r/",
+      "date": "2020-02-21",
+      "points": 17,
+      "comments": 8
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/AppIdeas/comments/5ib4i5/",
+      "date": "2016-12-14",
+      "points": 10,
+      "comments": 7
+    },
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/AppIdeas/comments/dy6wq2/",
+      "date": "2019-11-18",
+      "points": 6,
+      "comments": 6
+    }
+  ],
+  "spec": "Asks up to 20 yes/no/don't-care questions, each chosen to split the remaining dishes closest to half, from a built-in list of about 70 dishes.\nTap yes, no or don't care; it narrows to one dish and offers 'something else' to cycle the rest.\nIt does not know your pantry, allergies or what is open nearby.",
+  "tests": [
+    {
+      "expect": {
+        "sel": "#q",
+        "matches": "\\?"
+      }
+    },
+    {
+      "tap": "#yes"
+    },
+    {
+      "expect": {
+        "sel": "#step",
+        "contains": "2"
+      }
+    },
+    {
+      "tap": "#no"
+    },
+    {
+      "tap": "#back"
+    },
+    {
+      "expect": {
+        "sel": "#step",
+        "contains": "2"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:39:30Z",
+  "model": "sonnet-5.5",
+  "minutes": 5,
+  "approved": false,
+  "notes": ""
+}

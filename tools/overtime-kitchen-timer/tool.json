@@ -1,0 +1,51 @@
+{
+  "slug": "overtime-kitchen-timer",
+  "wish": "someone should make an oven timer that counts negative after it hits zero",
+  "year": 2013,
+  "agreed": 801,
+  "sources": [
+    {
+      "site": "reddit",
+      "url": "https://www.reddit.com/r/CrazyIdeas/comments/1dudjo/",
+      "date": "2013-05-07",
+      "points": 775,
+      "comments": 26
+    }
+  ],
+  "spec": "Counts down from a set time and, at zero, beeps and keeps counting in red negative time (-0:42) so you see how overdue the food is.\nPick a preset or type minutes or m:ss, tap start; pause, resume or reset any time; state survives a reload.\nIt does not run in the background when the tab is closed, and it will not alarm if the phone is locked and silenced.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#set",
+        "text": "0:01"
+      }
+    },
+    {
+      "tap": "#start"
+    },
+    {
+      "wait": 1500
+    },
+    {
+      "wait": 1000
+    },
+    {
+      "expect": {
+        "sel": "#time",
+        "matches": "^-0:0\\d"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#state",
+        "contains": "overdue"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T08:39:46Z",
+  "model": "sonnet-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Beep and timing run while the page is open; offline, no background alarm."
+}
