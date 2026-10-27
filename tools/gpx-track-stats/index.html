@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app that calculates distance and elevation gain from a GPX file</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+.pick { display: inline-flex; align-items: center; min-height: var(--tap); padding: 0 18px; border-radius: var(--radius); background: var(--ink); color: var(--paper); cursor: pointer; }
+.pick:focus-within { outline: 2px solid var(--ink); outline-offset: 2px; }
+#file { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.drop { border: 1.5px dashed var(--line); border-radius: var(--radius); padding: 14px; }
+.drop.over { border-color: var(--ink); }
+textarea { min-height: 96px; font: 16px/1.4 var(--mono); resize: vertical; }
+.lbl { font-size: 16px; color: var(--meta); }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 12px; }
+.grid .v { font-size: 28px; font-weight: 500; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.grid .u { font-size: 16px; color: var(--meta); margin-left: 4px; }
+#hero .u { font-size: 20px; color: var(--meta); margin-left: 6px; }
+svg { width: 100%; height: auto; display: block; }
+.axis { font: 16px var(--mono); fill: var(--meta); }
+#err { color: var(--no); }
+#err:empty, #msg:empty { display: none; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make an app that calculates distance and elevation gain from a GPX file</h1>
+
+<main id="app" class="stack">
+  <div class="drop stack" id="drop">
+    <div class="row">
+      <label class="pick">Open GPX file<input type="file" id="file" accept=".gpx,application/gpx+xml,application/xml,text/xml"></label>
+      <button id="sample" type="button">Sample track</button>
+    </div>
+    <textarea id="paste" placeholder="or paste GPX here" aria-label="GPX text" spellcheck="false"></textarea>
+    <div class="row">
+      <button id="go" type="button">Calculate</button>
+      <button id="units" type="button" aria-label="Switch units">km / m</button>
+    </div>
+  </div>
+
+  <p id="err" role="alert"></p>
+  <p class="empty" id="msg">Nothing opened yet. Files stay on this device.</p>
+
+  <section id="out" class="stack" hidden aria-live="polite">
+    <div class="lbl" id="name"></div>
+    <div class="big" id="hero"><span id="dist">0</span><span class="u" id="distU">km</span></div>
+    <div class="grid">
+      <div><div class="lbl">Elevation gain</div><div class="v"><span id="gain">0</span><span class="u eu">m</span></div></div>
+      <div><div class="lbl">Elevation loss</div><div class="v"><span id="loss">0</span><span class="u eu">m</span></div></div>
+      <div><div class="lbl">Highest</div><div class="v"><span id="max">–</span><span class="u eu">m</span></div></div>
+      <div><div class="lbl">Lowest</div><div class="v"><span id="min">–</span><span class="u eu">m</span></div></div>
+      <div><div class="lbl">Total time</div><div class="v" id="total">–</div></div>
+      <div><div class="lbl">Moving time</div><div class="v" id="moving">–</div></div>
+      <div><div class="lbl">Moving pace</div><div class="v"><span id="pace">–</span><span class="u" id="paceU">/km</span></div></div>
+      <div><div class="lbl">Moving speed</div><div class="v"><span id="speed">–</span><span class="u" id="speedU">km/h</span></div></div>
+    </div>
+    <div>
+      <div class="lbl">Elevation profile</div>
+      <svg id="profile" viewBox="0 0 360 180" role="img" aria-label="Elevation profile"></svg>
+    </div>
+    <div class="lbl" id="points"></div>
+  </section>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  let imperial = store.get('gpx-units-imperial', false);
+  let last = null;
+
+  const R = 6371008.8;
+  const rad = d => d * Math.PI / 180;
+  function haversine(a, b) {
+    const dLat = rad(b.lat - a.lat), dLon = rad(b.lon - a.lon);
+    const h = Math.sin(dLat / 2) ** 2 + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLon / 2) ** 2;
+    return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
+  }
+
+  // Returns an array of segments; each segment is an array of {lat, lon, ele, t}.
+  function parse(text) {
+    const doc = new DOMParser().parseFromString(text, 'application/xml');
+    if (doc.getElementsByTagName('parsererror').length) throw new Error('That is not valid GPX (XML did not parse).');
+    const pick = (el, tag) => { const n = el.getElementsByTagNameNS('*', tag)[0] || el.getElementsByTagName(tag)[0]; return n ? n.textContent.trim() : null; };
+    const pts = list => [...list].map(p => {
+      const ele = pick(p, 'ele'), time = pick(p, 'time');
+      return {
+        lat: parseFloat(p.getAttribute('lat')), lon: parseFloat(p.getAttribute('lon')),
+        ele: ele != null && ele !== '' && isFinite(+ele) ? +ele : null,
+        t: time ? Date.parse(time) || null : null
+      };
+    }).filter(p => isFinite(p.lat) && isFinite(p.lon));
+    const byTag = (root, tag) => { const a = root.getElementsByTagNameNS('*', tag); return a.length ? a : root.getElementsByTagName(tag); };
+    let segs = [...byTag(doc, 'trkseg')].map(s => pts(byTag(s, 'trkpt')));
+    if (!segs.some(s => s.length)) segs = [...byTag(doc, 'rte')].map(r => pts(byTag(r, 'rtept')));
+    if (!segs.some(s => s.length)) segs = [pts(byTag(doc, 'wpt'))];
+    segs = segs.filter(s => s.length);
+    if (!segs.length) throw new Error('No track points found in that file.');
+    const name = pick(doc.documentElement, 'name');
+    return { segs, name };
+  }
+
+  // Elevation gain with a small hysteresis so GPS noise does not pile up.
+  const THRESH = 3;
+  function climb(eles) {
+    let gain = 0, loss = 0, ref = null;
+    for (const e of eles) {
+      if (e == null) continue;
+      if (ref == null) { ref = e; continue; }
+      const d = e - ref;
+      if (d >= THRESH) { gain += d; ref = e; }
+      else if (d <= -THRESH) { loss -= d; ref = e; }
+    }
+    return { gain, loss };
+  }
+
+  function analyse({ segs, name }) {
+    let dist = 0, gain = 0, loss = 0, moving = 0, movingDist = 0, n = 0;
+    let tMin = Infinity, tMax = -Infinity, eMin = Infinity, eMax = -Infinity;
+    const profile = [];
+    for (const seg of segs) {
+      const c = climb(seg.map(p => p.ele));
+      gain += c.gain; loss += c.loss;
+      for (let i = 0; i < seg.length; i++) {
+        const p = seg[i]; n++;
+        if (p.t != null) { tMin = Math.min(tMin, p.t); tMax = Math.max(tMax, p.t); }
+        if (p.ele != null) { eMin = Math.min(eMin, p.ele); eMax = Math.max(eMax, p.ele); }
+        if (i > 0) {
+          const q = seg[i - 1], d = haversine(q, p);
+          dist += d;
+          if (p.t != null && q.t != null) {
+            const dt = (p.t - q.t) / 1000;
+            // moving: faster than 0.5 m/s and not a recording gap longer than 10 min
+            if (dt > 0 && dt < 600 && d / dt > 0.5) { moving += dt; movingDist += d; }
+          }
+        }
+        if (p.ele != null) profile.push([dist, p.ele]);
+      }
+    }
+    return {
+      name, n, dist, gain, loss, profile,
+      eMin: isFinite(eMin) ? eMin : null, eMax: isFinite(eMax) ? eMax : null,
+      total: isFinite(tMin) && tMax > tMin ? (tMax - tMin) / 1000 : null,
+      moving: moving > 0 ? moving : null, movingDist
+    };
+  }
+
+  const fmtTime = s => {
+    s = Math.round(s);
+    const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), sec = s % 60;
+    return h ? `${h}:${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}` : `${m}:${String(sec).padStart(2, '0')}`;
+  };
+  const num = (v, d) => v.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+
+  function render() {
+    const r = last;
+    if (!r) return;
+    const dU = imperial ? 1609.344 : 1000, eU = imperial ? 3.28084 : 1;
+    const dName = imperial ? 'mi' : 'km', eName = imperial ? 'ft' : 'm';
+    $('#units').textContent = imperial ? 'mi / ft' : 'km / m';
+    $('#name').textContent = r.name || '';
+    $('#dist').textContent = num(r.dist / dU, 2);
+    $('#distU').textContent = dName;
+    $('#gain').textContent = num(r.gain * eU, 0);
+    $('#loss').textContent = num(r.loss * eU, 0);
+    $('#max').textContent = r.eMax == null ? '–' : num(r.eMax * eU, 0);
+    $('#min').textContent = r.eMin == null ? '–' : num(r.eMin * eU, 0);
+    document.querySelectorAll('.eu').forEach(e => { e.textContent = eName; });
+    $('#total').textContent = r.total ? fmtTime(r.total) : '–';
+    $('#moving').textContent = r.moving ? fmtTime(r.moving) : '–';
+    if (r.moving && r.movingDist > 0) {
+      $('#pace').textContent = fmtTime(r.moving / (r.movingDist / dU));
+      $('#speed').textContent = num(r.movingDist / dU / (r.moving / 3600), 1);
+    } else { $('#pace').textContent = '–'; $('#speed').textContent = '–'; }
+    $('#paceU').textContent = '/' + dName;
+    $('#speedU').textContent = imperial ? 'mph' : 'km/h';
+    $('#points').textContent = `${r.n.toLocaleString('en-US')} points` + (r.total ? '' : ' · no timestamps, so no time or pace');
+    drawProfile(r.profile, dU, eU, dName, eName);
+    $('#out').hidden = false;
+    $('#msg').textContent = '';
+  }
+
+  function drawProfile(pts, dU, eU, dName, eName) {
+    const svg = $('#profile');
+    if (pts.length < 2) { svg.innerHTML = '<text class="axis" x="0" y="24">No elevation in this file.</text>'; return; }
+    const W = 360, H = 180, L = 4, T = 26, B = 152;
+    const xMax = pts[pts.length - 1][0] || 1;
+    let lo = Infinity, hi = -Infinity;
+    for (const [, e] of pts) { if (e < lo) lo = e; if (e > hi) hi = e; }
+    if (hi - lo < 10) { const m = (hi + lo) / 2; lo = m - 5; hi = m + 5; }
+    // thin to at most ~360 points
+    const step = Math.max(1, Math.floor(pts.length / 360));
+    const xy = [];
+    for (let i = 0; i < pts.length; i += step) xy.push(pts[i]);
+    if (xy[xy.length - 1] !== pts[pts.length - 1]) xy.push(pts[pts.length - 1]);
+    const X = d => (L + d / xMax * (W - 2 * L)).toFixed(1);
+    const Y = e => (B - (e - lo) / (hi - lo) * (B - T)).toFixed(1);
+    const line = xy.map(([d, e], i) => (i ? 'L' : 'M') + X(d) + ' ' + Y(e)).join('');
+    const area = line + `L${X(xMax)} ${B}L${X(0)} ${B}Z`;
+    svg.innerHTML =
+      `<path d="${area}" fill="currentColor" opacity="0.12"/>` +
+      `<path d="${line}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>` +
+      `<line x1="${L}" x2="${W - L}" y1="${B}" y2="${B}" stroke="currentColor" opacity="0.3"/>` +
+      `<text class="axis" x="${L}" y="18">${num(hi * eU, 0)} ${eName}</text>` +
+      `<text class="axis" x="${L}" y="176">${num(lo * eU, 0)} ${eName}</text>` +
+      `<text class="axis" x="${W - L}" y="176" text-anchor="end">${num(xMax / dU, 1)} ${dName}</text>`;
+  }
+
+  function run(text, label) {
+    $('#err').textContent = '';
+    if (!text || !text.trim()) { $('#err').textContent = 'Open a .gpx file or paste its contents first.'; return; }
+    try {
+      last = analyse(parse(text));
+      if (!last.name && label) last.name = label;
+      render();
+    } catch (e) {
+      $('#err').textContent = e.message || 'Could not read that file.';
+    }
+  }
+
+  function readFile(f) {
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = () => run(String(r.result), f.name);
+    r.onerror = () => { $('#err').textContent = 'Could not read that file.'; };
+    r.readAsText(f);
+  }
+
+  // A synthetic hill loop, generated locally so the tool can be tried without a file.
+  function sampleGpx() {
+    const start = Date.UTC(2024, 5, 1, 7, 0, 0);
+    let s = '<?xml version="1.0"?><gpx version="1.1" creator="sample"><trk><name>Sample hill loop</name><trkseg>';
+    const N = 240;
+    for (let i = 0; i <= N; i++) {
+      const a = i / N * 2 * Math.PI;
+      const lat = 46.55 + 0.02 * Math.sin(a), lon = 7.98 + 0.03 * (1 - Math.cos(a));
+      const ele = 1200 + 320 * Math.sin(a / 2) + 25 * Math.sin(a * 6);
+      const pause = i > 120 ? 600000 : 0; // a 10-minute stop at the top
+      const t = new Date(start + i * 25000 + pause).toISOString();
+      s += `<trkpt lat="${lat.toFixed(6)}" lon="${lon.toFixed(6)}"><ele>${ele.toFixed(1)}</ele><time>${t}</time></trkpt>`;
+    }
+    return s + '</trkseg></trk></gpx>';
+  }
+
+  $('#file').addEventListener('change', e => readFile(e.target.files[0]));
+  $('#go').addEventListener('click', () => run($('#paste').value));
+  $('#sample').addEventListener('click', () => { const g = sampleGpx(); $('#paste').value = ''; run(g); });
+  $('#units').addEventListener('click', () => { imperial = !imperial; store.set('gpx-units-imperial', imperial); $('#units').textContent = imperial ? 'mi / ft' : 'km / m'; render(); });
+  $('#units').textContent = imperial ? 'mi / ft' : 'km / m';
+
+  const drop = $('#drop');
+  ['dragenter', 'dragover'].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.remove('over'); }));
+  drop.addEventListener('drop', e => readFile(e.dataTransfer && e.dataTransfer.files[0]));
+})();
+</script>
+</body>
+</html>

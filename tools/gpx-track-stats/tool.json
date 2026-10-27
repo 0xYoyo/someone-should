@@ -1,0 +1,61 @@
+{
+  "slug": "gpx-track-stats",
+  "wish": "someone should make an app that calculates distance and elevation gain from a GPX file",
+  "year": 2014,
+  "agreed": 21,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/2613/application-for-calculating-distance-and-elevation-from-gpx-file",
+      "date": "2014-03-22",
+      "points": 9,
+      "comments": 2
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/3788/statistical-analysis-of-gpx-files",
+      "date": "2014-05-02",
+      "points": 7,
+      "comments": 3
+    }
+  ],
+  "spec": "Reads a GPX track, route or waypoint file and shows total distance, elevation gain and loss, high and low points, total and moving time, pace, speed and an elevation profile.\nOpen or drop a .gpx file (or paste its text) and the numbers appear; one tap switches km/m and mi/ft.\nIt does not upload anything, edit tracks, show a map, or fill in missing elevation from terrain data.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#paste",
+        "text": "<gpx><trk><trkseg><trkpt lat=\"0\" lon=\"0\"><ele>100</ele><time>2024-01-01T10:00:00Z</time></trkpt><trkpt lat=\"0\" lon=\"0.01\"><ele>160</ele><time>2024-01-01T10:10:00Z</time></trkpt><trkpt lat=\"0\" lon=\"0.02\"><ele>140</ele><time>2024-01-01T10:20:00Z</time></trkpt></trkseg></trk></gpx>"
+      }
+    },
+    {
+      "tap": "#go"
+    },
+    {
+      "expect": {
+        "sel": "#dist",
+        "contains": "2.22"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#gain",
+        "contains": "60"
+      }
+    },
+    {
+      "tap": "#sample"
+    },
+    {
+      "expect": {
+        "sel": "#profile path",
+        "count": 2
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:43:13Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Elevation gain uses a 3 m hysteresis to suppress GPS noise. Moving time counts segments faster than 0.5 m/s with gaps under 10 minutes. Sample track is generated locally, not a real recording."
+}
