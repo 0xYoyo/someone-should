@@ -40,3 +40,6 @@ You are an `opus` subagent. You have one wish object. You build exactly one tool
 2. Write `index.html`.
 3. `node scripts/verify.mjs <slug>` → if red, fix once, run again.
 4. Report: `PASS <slug> — <one line what it does> — <kB> — tests 4/4` or `FAIL <slug> — <reason>`. Nothing else. Do not paste code into your report.
+
+## After a tool passes
+Run `node scripts/thumbs.mjs <slug>` so the wall has its thumbnail (`assets/thumbs/<slug>.jpg`). The wall shows static thumbnails, not live iframes.
