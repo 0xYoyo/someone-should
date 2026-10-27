@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app that simulates electrical circuits</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+.tools { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.tools button { padding: 0 6px; }
+#board { position: relative; touch-action: manipulation; }
+#board svg { position: absolute; inset: 0; overflow: visible; }
+.edge { position: absolute; border: 0; background: transparent; padding: 0; min-height: 0; border-radius: var(--radius); }
+.edge:hover { background: color-mix(in srgb, var(--line) 50%, transparent); }
+.dot { fill: var(--meta); }
+.w { stroke: var(--ink); stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.thick { stroke-width: 5; }
+.selbg { fill: var(--line); }
+.glass { stroke: var(--ink); stroke-width: 2.5; }
+.hint { color: var(--meta); margin: 0; }
+#summary { font-weight: 500; margin: 0; }
+#summary.bad { color: var(--no); }
+#editor { border: 1.5px solid var(--line); border-radius: var(--radius); padding: 12px; }
+#editor label { display: flex; gap: 10px; align-items: center; }
+#editor input { width: 110px; }
+.nums { font-family: var(--mono); font-size: 16px; font-variant-numeric: tabular-nums; text-align: right; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make an app that simulates electrical circuits</h1>
+
+<main id="app" class="stack">
+  <div class="tools" id="tools">
+    <button id="t-wire" data-t="wire">Wire</button>
+    <button id="t-bat" data-t="bat">Battery</button>
+    <button id="t-res" data-t="res">Resistor</button>
+    <button id="t-bulb" data-t="bulb">Bulb</button>
+    <button id="t-sw" data-t="sw">Switch</button>
+    <button id="t-erase" data-t="erase">Erase</button>
+  </div>
+  <p class="hint">Pick a part, tap a line between two dots. Tap a switch to flip it.</p>
+  <div id="board"><svg id="svg" aria-hidden="true"></svg></div>
+  <p id="summary" aria-live="polite"></p>
+  <div id="editor" class="stack" hidden></div>
+  <ul class="plain" id="parts"></ul>
+  <div class="row"><button id="ex">Example</button><button id="clear">Clear</button></div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  const COLS = 5, ROWS = 6, PAD = 22;
+  const G_WIRE = 1000;          // wires and closed switches: 1 milliohm
+  const G_BAT = 100;            // battery internal resistance: 10 milliohm
+  const BULB_R = 12, BULB_P = 3; // a 6 V, 0.5 A bulb
+  const NAMES = { wire: 'Wire', bat: 'Battery', res: 'Resistor', bulb: 'Bulb', sw: 'Switch' };
+  const DEFAULT = { bat: 9, res: 100 };
+
+  let parts = store.get('scs.parts', {});
+  if (!parts || typeof parts !== 'object') parts = {};
+  let tool = store.get('scs.tool', 'wire');
+  let sel = null;
+  let S = 70;
+  let result = null;
+
+  const board = $('#board'), svg = $('#svg');
+
+  // edge key -> its two node coordinates
+  function ends(key) {
+    const [d, i, j] = key.split('-'); const x = +i, y = +j;
+    return d === 'h' ? [[x, y], [x + 1, y]] : [[x, y], [x, y + 1]];
+  }
+  const nid = ([x, y]) => y * COLS + x;
+  const save = () => { store.set('scs.parts', parts); store.set('scs.tool', tool); };
+
+  function buildEdges() {
+    for (let j = 0; j < ROWS; j++) for (let i = 0; i < COLS - 1; i++) addEdge('h-' + i + '-' + j);
+    for (let j = 0; j < ROWS - 1; j++) for (let i = 0; i < COLS; i++) addEdge('v-' + i + '-' + j);
+  }
+  function addEdge(key) {
+    const b = document.createElement('button');
+    b.className = 'edge'; b.id = 'e-' + key; b.dataset.k = key;
+    b.setAttribute('aria-label', (key[0] === 'h' ? 'horizontal' : 'vertical') + ' slot ' + key.slice(2));
+    b.addEventListener('click', () => tapEdge(key));
+    board.appendChild(b);
+  }
+  function layout() {
+    const w = $('#app').clientWidth || 328;
+    S = Math.max(68, Math.min(84, Math.floor((w - 2 * PAD) / (COLS - 1))));
+    board.style.width = (S * (COLS - 1) + 2 * PAD) + 'px';
+    board.style.height = (S * (ROWS - 1) + 2 * PAD) + 'px';
+    $$('.edge').forEach(b => {
+      const [d, i, j] = b.dataset.k.split('-'); const x = PAD + i * S, y = PAD + j * S;
+      const st = b.style;
+      if (d === 'h') { st.left = (x + 12) + 'px'; st.top = (y - 22) + 'px'; st.width = (S - 24) + 'px'; st.height = '44px'; }
+      else { st.left = (x - 22) + 'px'; st.top = (y + 12) + 'px'; st.width = '44px'; st.height = (S - 24) + 'px'; }
+    });
+    draw();
+  }
+
+  function tapEdge(key) {
+    const p = parts[key];
+    if (tool === 'erase') { if (p) delete parts[key]; if (sel === key) sel = null; }
+    else if (p) { if (p.t === 'sw') p.on = !p.on; sel = key; }
+    else {
+      parts[key] = { t: tool };
+      if (tool in DEFAULT) parts[key].v = DEFAULT[tool];
+      if (tool === 'sw') parts[key].on = true;
+      sel = tool === 'wire' ? null : key;
+    }
+    update();
+  }
+
+  // Nodal analysis. Every part is a conductance; a battery is a Norton source.
+  function solve() {
+    const keys = Object.keys(parts);
+    const els = [];
+    for (const k of keys) {
+      const p = parts[k]; const [a, b] = ends(k).map(nid);
+      let g = 0, src = 0, plus = a, minus = b;
+      if (p.t === 'wire') g = G_WIRE;
+      else if (p.t === 'sw') g = p.on ? G_WIRE : 0;
+      else if (p.t === 'res') g = 1 / Math.max(+p.v || 0, 0.001);
+      else if (p.t === 'bulb') g = 1 / BULB_R;
+      else if (p.t === 'bat') { g = G_BAT; src = +p.v || 0; if (p.flip) { plus = b; minus = a; } }
+      if (g > 0) els.push({ k, a, b, g, src, plus, minus, t: p.t });
+    }
+    // union-find so each separate piece of circuit gets its own ground
+    const par = new Map(); const find = x => { while (par.get(x) !== x) { par.set(x, par.get(par.get(x))); x = par.get(x); } return x; };
+    const touch = x => { if (!par.has(x)) par.set(x, x); };
+    els.forEach(e => { touch(e.a); touch(e.b); par.set(find(e.a), find(e.b)); });
+    const ground = new Set(); const seenRoot = new Set();
+    [...par.keys()].sort((x, y) => x - y).forEach(n => { const r = find(n); if (!seenRoot.has(r)) { seenRoot.add(r); ground.add(n); } });
+    const idx = new Map(); [...par.keys()].forEach(n => { if (!ground.has(n)) idx.set(n, idx.size); });
+    const N = idx.size;
+    const A = Array.from({ length: N }, () => new Float64Array(N + 1));
+    const stamp = (n, m, g) => {
+      const i = idx.get(n), j = idx.get(m);
+      if (i !== undefined) A[i][i] += g;
+      if (j !== undefined) A[j][j] += g;
+      if (i !== undefined && j !== undefined) { A[i][j] -= g; A[j][i] -= g; }
+    };
+    els.forEach(e => {
+      stamp(e.a, e.b, e.g);
+      if (e.src) {
+        const I = e.src * e.g;
+        if (idx.has(e.plus)) A[idx.get(e.plus)][N] += I;
+        if (idx.has(e.minus)) A[idx.get(e.minus)][N] -= I;
+      }
+    });
+    // Gaussian elimination with partial pivoting
+    for (let c = 0; c < N; c++) {
+      let piv = c; for (let r = c + 1; r < N; r++) if (Math.abs(A[r][c]) > Math.abs(A[piv][c])) piv = r;
+      if (Math.abs(A[piv][c]) < 1e-12) continue;
+      [A[c], A[piv]] = [A[piv], A[c]];
+      for (let r = 0; r < N; r++) if (r !== c) { const f = A[r][c] / A[c][c]; if (f) for (let k = c; k <= N; k++) A[r][k] -= f * A[c][k]; }
+    }
+    const V = n => { const i = idx.get(n); return i === undefined || Math.abs(A[i][i]) < 1e-12 ? 0 : A[i][N] / A[i][i]; };
+    const out = {};
+    els.forEach(e => {
+      const vab = e.src ? V(e.plus) - V(e.minus) : V(e.a) - V(e.b);
+      const i = e.src ? (e.src - vab) * e.g : vab * e.g;
+      out[e.k] = { v: Math.abs(vab), i: Math.abs(i), p: Math.abs(vab * i), short: e.src ? Math.abs(i) > Math.abs(e.src) * e.g * 0.5 : false };
+    });
+    keys.forEach(k => { if (!out[k]) out[k] = { v: 0, i: 0, p: 0 }; });
+    return out;
+  }
+
+  const z = x => (x < 5e-4 ? 0 : x);
+  const fmtA = i => (i > 0 && i < 0.01 ? (i * 1000).toFixed(2) + ' mA' : z(i).toFixed(3) + ' A');
+  const fmtV = v => z(v).toFixed(2) + ' V';
+  const fmtW = p => (p > 0 && p < 0.01 ? (p * 1000).toFixed(1) + ' mW' : z(p).toFixed(2) + ' W');
+
+  function labels() {
+    const n = {}, out = {};
+    Object.keys(parts).forEach(k => { const t = parts[k].t; if (t === 'wire') return; n[t] = (n[t] || 0) + 1; out[k] = NAMES[t] + ' ' + n[t]; });
+    return out;
+  }
+
+  // SVG is built as markup; each "node" is a small builder that collects children
+  function el(tag, attrs, parent) {
+    const node = { tag, attrs, kids: [] };
+    if (parent) parent.kids.push(node);
+    return node;
+  }
+  const esc = v => String(v).replace(/[&<>"]/g, c => '&#' + c.charCodeAt(0) + ';');
+  const markup = n => '<' + n.tag + Object.keys(n.attrs).map(a => ' ' + a + '="' + esc(n.attrs[a]) + '"').join('') + '>' + n.kids.map(markup).join('') + '</' + n.tag + '>';
+
+  function drawPart(k, p, r, svg) {
+    const [[x, y]] = ends(k); const vert = k[0] === 'v';
+    const g = el('g', { transform: 'translate(' + (PAD + x * S) + ' ' + (PAD + y * S) + ')' + (vert ? ' rotate(90)' : '') }, svg);
+    if (k === sel) el('rect', { x: 6, y: -20, width: S - 12, height: 40, rx: 4, class: 'selbg' }, g);
+    const c = S / 2, L = (x1, y1, x2, y2, cls) => el('line', { x1, y1, x2, y2, class: cls || 'w' }, g);
+    if (p.t === 'wire') L(0, 0, S, 0);
+    else if (p.t === 'res') {
+      L(0, 0, c - 15, 0); L(c + 15, 0, S, 0);
+      let d = 'M' + (c - 15) + ' 0'; for (let s = 0; s < 6; s++) d += ' L' + (c - 12.5 + s * 5) + ' ' + (s % 2 ? 7 : -7); d += ' L' + (c + 15) + ' 0';
+      el('path', { d, class: 'w' }, g);
+    } else if (p.t === 'bat') {
+      const h = el('g', { transform: p.flip ? 'translate(' + S + ' 0) scale(-1 1)' : '' }, g);
+      const l = (x1, y1, x2, y2, cls) => el('line', { x1, y1, x2, y2, class: cls || 'w' }, h);
+      l(0, 0, c - 5, 0); l(c + 5, 0, S, 0); l(c - 5, -14, c - 5, 14); l(c + 5, -7, c + 5, 7, 'w thick');
+      el('path', { d: 'M' + (c - 19) + ' -13 h8 M' + (c - 15) + ' -17 v8', class: 'w' }, h);
+    } else if (p.t === 'bulb') {
+      L(0, 0, c - 13, 0); L(c + 13, 0, S, 0);
+      const b = r ? Math.min(1, Math.sqrt(r.p / BULB_P)) : 0;
+      el('circle', { cx: c, cy: 0, r: 13, class: 'glass', fill: b > 0.02 ? 'rgba(240,180,0,' + (0.25 + 0.75 * b).toFixed(2) + ')' : 'none' }, g);
+      L(c - 9, -9, c + 9, 9); L(c - 9, 9, c + 9, -9);
+    } else if (p.t === 'sw') {
+      L(0, 0, c - 12, 0); L(c + 12, 0, S, 0);
+      if (p.on) L(c - 12, 0, c + 12, 0); else L(c - 12, 0, c + 9, -14);
+      el('circle', { cx: c - 12, cy: 0, r: 3, class: 'w' }, g); el('circle', { cx: c + 12, cy: 0, r: 3, class: 'w' }, g);
+    }
+  }
+
+  function draw() {
+    const root = el('g', {});
+    for (const k in parts) drawPart(k, parts[k], result && result[k], root);
+    for (let j = 0; j < ROWS; j++) for (let i = 0; i < COLS; i++) el('circle', { cx: PAD + i * S, cy: PAD + j * S, r: 3, class: 'dot' }, root);
+    svg.innerHTML = markup(root);
+  }
+
+  function render() {
+    const names = labels();
+    // summary line
+    const sum = $('#summary'); sum.classList.remove('bad');
+    const bats = Object.keys(parts).filter(k => parts[k].t === 'bat');
+    if (!Object.keys(parts).length) sum.textContent = 'Empty board. Place a battery and close the loop.';
+    else if (!bats.length) sum.textContent = 'Nothing flows without a battery.';
+    else if (bats.some(k => result[k].short)) { sum.textContent = 'Short circuit: a battery is wired straight to itself.'; sum.classList.add('bad'); }
+    else if (bats.every(k => result[k].i < 5e-4)) sum.textContent = 'No current flows. The circuit is open.';
+    else sum.textContent = bats.map(k => names[k] + ' supplies ' + fmtA(result[k].i)).join(' · ');
+
+    // parts list
+    const ul = $('#parts'); ul.textContent = '';
+    Object.keys(names).forEach(k => {
+      const p = parts[k], r = result[k];
+      const li = document.createElement('li'); li.id = 'p-' + k;
+      const a = document.createElement('span');
+      a.textContent = names[k] + (p.t === 'bat' ? ' (' + p.v + ' V)' : p.t === 'res' ? ' (' + p.v + ' Ω)' : p.t === 'sw' ? (p.on ? ' (closed)' : ' (open)') : '');
+      const b = document.createElement('span'); b.className = 'nums';
+      b.textContent = p.t === 'sw' ? fmtA(r.i) : fmtV(r.v) + ' · ' + fmtA(r.i) + (p.t === 'bat' ? '' : ' · ' + fmtW(r.p));
+      li.append(a, b); ul.appendChild(li);
+    });
+
+    // editor for the selected part
+    const ed = $('#editor');
+    if (!sel || !parts[sel] || parts[sel].t === 'wire') { ed.hidden = true; ed.textContent = ''; return; }
+    const p = parts[sel];
+    ed.hidden = false; ed.textContent = '';
+    const head = document.createElement('div'); head.className = 'row';
+    const ttl = document.createElement('strong'); ttl.textContent = names[sel]; head.appendChild(ttl);
+    ed.appendChild(head);
+    if (p.t === 'bat' || p.t === 'res') {
+      const lab = document.createElement('label');
+      const inp = document.createElement('input'); inp.type = 'number'; inp.id = 'val'; inp.inputMode = 'decimal';
+      inp.min = p.t === 'res' ? '0.001' : '0'; inp.step = 'any'; inp.value = p.v;
+      const err = document.createElement('span'); err.className = 'no';
+      inp.addEventListener('input', () => {
+        const v = parseFloat(inp.value);
+        if (!isFinite(v) || v < 0 || (p.t === 'res' && v === 0)) { err.textContent = 'Use a positive number.'; return; }
+        err.textContent = ''; p.v = v; save(); result = solve(); draw(); renderList();
+      });
+      lab.append(p.t === 'bat' ? 'Voltage' : 'Resistance', inp, p.t === 'bat' ? 'V' : 'Ω', err);
+      ed.appendChild(lab);
+    } else if (p.t === 'bulb') {
+      const s = document.createElement('div'); s.textContent = '6 V, 0.5 A bulb (12 Ω). Glows with power.'; ed.appendChild(s);
+    }
+    const row = document.createElement('div'); row.className = 'row';
+    const btn = (txt, id, fn) => { const b = document.createElement('button'); b.textContent = txt; b.id = id; b.addEventListener('click', fn); row.appendChild(b); };
+    if (p.t === 'bat') btn('Flip + side', 'flip', () => { p.flip = !p.flip; update(); });
+    if (p.t === 'sw') btn(p.on ? 'Open switch' : 'Close switch', 'toggle', () => { p.on = !p.on; update(); });
+    btn('Remove', 'remove', () => { delete parts[sel]; sel = null; update(); });
+    btn('Done', 'done', () => { sel = null; update(); });
+    ed.appendChild(row);
+  }
+
+  // re-render list and summary without rebuilding the editor (keeps input focus)
+  function renderList() { const keep = sel; const ed = $('#editor'); const saved = [...ed.childNodes]; render(); if (keep) { ed.textContent = ''; saved.forEach(n => ed.appendChild(n)); ed.hidden = false; } }
+
+  function update() { save(); result = solve(); draw(); render(); }
+
+  function setTool(t) {
+    tool = t; $$('#tools button').forEach(b => b.classList.toggle('primary', b.dataset.t === t));
+    $$('#tools button').forEach(b => b.setAttribute('aria-pressed', b.dataset.t === t));
+    save();
+  }
+
+  $('#tools').addEventListener('click', e => { const b = e.target.closest('button'); if (b) setTool(b.dataset.t); });
+  $('#ex').addEventListener('click', () => {
+    parts = {
+      'v-0-0': { t: 'wire' }, 'h-0-0': { t: 'wire' }, 'h-1-0': { t: 'sw', on: true }, 'h-2-0': { t: 'wire' },
+      'v-3-0': { t: 'bulb' }, 'v-3-1': { t: 'wire' },
+      'h-2-2': { t: 'res', v: 6 }, 'h-1-2': { t: 'wire' }, 'h-0-2': { t: 'wire' },
+      'v-0-1': { t: 'bat', v: 9 }
+    };
+    sel = null; update();
+  });
+  $('#clear').addEventListener('click', () => { parts = {}; sel = null; update(); });
+
+  buildEdges();
+  setTool(['wire', 'bat', 'res', 'bulb', 'sw', 'erase'].includes(tool) ? tool : 'wire');
+  result = solve();
+  layout();
+  render();
+  addEventListener('resize', layout);
+})();
+</script>
+</body>
+</html>

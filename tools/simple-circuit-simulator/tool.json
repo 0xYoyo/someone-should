@@ -1,0 +1,51 @@
+{
+  "slug": "simple-circuit-simulator",
+  "wish": "someone should make an app that simulates electrical circuits",
+  "year": 2014,
+  "agreed": 20,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/3354/software-for-simulating-electrical-circuits",
+      "date": "2014-04-18",
+      "points": 17,
+      "comments": 3
+    }
+  ],
+  "spec": "Place wires, batteries, resistors, bulbs and switches on a dot grid and it solves the DC circuit live with nodal analysis.\nPick a part, tap a line between two dots to place it, tap a part to edit its value, flip it or remove it; tap a switch to open or close it.\nIt does not do AC, capacitors, inductors, diodes or time-varying behaviour; batteries and wires are near-ideal (10 and 1 milliohm).",
+  "tests": [
+    {
+      "tap": "#ex"
+    },
+    {
+      "expect": {
+        "sel": "#summary",
+        "contains": "0.500 A"
+      }
+    },
+    {
+      "tap": "#e-h-1-0"
+    },
+    {
+      "expect": {
+        "sel": "#summary",
+        "contains": "open"
+      }
+    },
+    {
+      "tap": "#e-h-1-0"
+    },
+    {
+      "expect": {
+        "sel": "#p-v-3-0",
+        "contains": "0.500 A"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:39:41Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": ""
+}
