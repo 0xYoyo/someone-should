@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app that reminds me where I put things</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+label { display: grid; gap: 6px; font-size: 16px; color: var(--meta); }
+#answer { min-height: 1.2em; }
+#answer .big { display: block; overflow-wrap: anywhere; }
+#answer .meta { display: block; margin-top: 6px; }
+#list li { align-items: stretch; }
+#list .pick { flex: 1; min-width: 0; text-align: left; border: 0; padding: 0; display: grid; gap: 2px; min-height: var(--tap); }
+#list .what { font-weight: 500; overflow-wrap: anywhere; }
+#list .where { overflow-wrap: anywhere; }
+#list .del { padding: 0 12px; border-color: var(--line); color: var(--meta); font-size: 16px; align-self: center; }
+#msg { font-size: 16px; color: var(--meta); min-height: 1.45em; margin: 0; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make an app that reminds me where I put things</h1>
+
+<main id="app" class="stack">
+  <form id="form" class="stack" autocomplete="off">
+    <label>what<input id="what" type="text" placeholder="keys, passport, charger" enterkeyhint="next" autocapitalize="none"></label>
+    <label>where<input id="where" type="text" placeholder="blue coat, left pocket" enterkeyhint="done"></label>
+    <div class="row"><button id="save" class="primary" type="submit">Remember</button></div>
+    <p id="msg" role="status"></p>
+  </form>
+  <div id="answer" aria-live="polite"></div>
+  <ul id="list" class="plain"></ul>
+  <p id="empty" class="empty">Nothing saved yet.</p>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const KEY = 'where-did-i-put-it.v1';
+
+  let items = store.get(KEY, []);
+  if (!Array.isArray(items)) items = [];
+
+  const what = $('#what'), where = $('#where'), list = $('#list'), answer = $('#answer'), msg = $('#msg'), empty = $('#empty');
+  const norm = s => s.trim().toLowerCase().replace(/\s+/g, ' ');
+
+  function ago(t) {
+    const d = Math.floor((Date.now() - t) / 86400000);
+    if (d <= 0) {
+      const m = Math.floor((Date.now() - t) / 60000);
+      if (m < 1) return 'just now';
+      if (m < 60) return m + ' min ago';
+      return Math.floor(m / 60) + ' h ago';
+    }
+    if (d === 1) return 'yesterday';
+    if (d < 60) return d + ' days ago';
+    return new Date(t).toLocaleDateString();
+  }
+
+  function matches(q) {
+    if (!q) return items;
+    const words = q.split(' ');
+    return items.filter(it => {
+      const hay = norm(it.what + ' ' + it.where);
+      return words.every(w => hay.includes(w));
+    });
+  }
+
+  function render() {
+    const q = norm(what.value);
+    const shown = matches(q).slice().sort((a, b) => b.t - a.t);
+    list.textContent = '';
+    for (const it of shown) {
+      const li = document.createElement('li');
+      const pick = document.createElement('button');
+      pick.type = 'button';
+      pick.className = 'pick';
+      pick.dataset.id = it.id;
+      const a = document.createElement('span'); a.className = 'what'; a.textContent = it.what;
+      const b = document.createElement('span'); b.className = 'where'; b.textContent = it.where;
+      const c = document.createElement('span'); c.className = 'meta'; c.textContent = ago(it.t);
+      pick.append(a, b, c);
+      const del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'del';
+      del.dataset.del = it.id;
+      del.textContent = 'Found';
+      del.setAttribute('aria-label', 'Found ' + it.what + ', remove');
+      li.append(pick, del);
+      list.append(li);
+    }
+
+    answer.textContent = '';
+    const exact = q && items.find(it => norm(it.what) === q);
+    const best = exact || (q && shown.length === 1 ? shown[0] : null);
+    if (best) {
+      const big = document.createElement('span'); big.className = 'big'; big.textContent = best.where;
+      const m = document.createElement('span'); m.className = 'meta'; m.textContent = best.what + ', ' + ago(best.t);
+      answer.append(big, m);
+    }
+
+    empty.hidden = shown.length > 0;
+    empty.textContent = items.length ? 'No match. Add where it is above.' : 'Nothing saved yet.';
+    $('#save').textContent = exact ? 'Moved it' : 'Remember';
+  }
+
+  function save() {
+    store.set(KEY, items) || (msg.textContent = 'Not saved on this device — storage is off.');
+  }
+
+  $('#form').addEventListener('submit', e => {
+    e.preventDefault();
+    const w = what.value.trim().replace(/\s+/g, ' ');
+    const p = where.value.trim().replace(/\s+/g, ' ');
+    if (!w) { msg.textContent = 'Name the thing first.'; what.focus(); return; }
+    if (!p) { msg.textContent = 'Where is it?'; where.focus(); return; }
+    const existing = items.find(it => norm(it.what) === norm(w));
+    if (existing) { existing.where = p; existing.what = w; existing.t = Date.now(); }
+    else items.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), what: w, where: p, t: Date.now() });
+    msg.textContent = existing ? 'Updated.' : 'Saved.';
+    save();
+    what.value = ''; where.value = '';
+    render();
+    what.focus();
+  });
+
+  what.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); where.focus(); }
+  });
+  what.addEventListener('input', () => { msg.textContent = ''; render(); });
+  where.addEventListener('input', () => { msg.textContent = ''; });
+
+  list.addEventListener('click', e => {
+    const del = e.target.closest('[data-del]');
+    if (del) {
+      items = items.filter(it => it.id !== del.dataset.del);
+      save(); render();
+      return;
+    }
+    const pick = e.target.closest('[data-id]');
+    if (pick) {
+      const it = items.find(x => x.id === pick.dataset.id);
+      if (!it) return;
+      what.value = it.what; where.value = '';
+      render();
+      where.focus();
+      msg.textContent = 'Moved it? Type the new place.';
+    }
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

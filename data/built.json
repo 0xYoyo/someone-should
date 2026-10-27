@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T02:07:55.154Z",
+ "updated": "2026-10-27T02:09:00.251Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -1025,9 +1025,14 @@
   },
   {
    "slug": "where-did-i-put-it",
-   "status": "pending",
+   "status": "pass",
    "attempts": 1,
-   "model": "opus-5.5"
+   "model": "opus-5.5",
+   "kb": 8.5,
+   "tests": "6/6",
+   "built": "2026-10-27T02:08:16Z",
+   "minutes": 4,
+   "approved": false
   },
   {
    "slug": "private-workout-log",
