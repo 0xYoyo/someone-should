@@ -1,0 +1,71 @@
+{
+  "slug": "file-checksum-checker",
+  "wish": "someone should make a file integrity checker",
+  "year": 2014,
+  "agreed": 78,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/167/file-integrity-checker",
+      "date": "2014-02-05",
+      "points": 43,
+      "comments": 4
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/21492/tool-to-validate-the-integrity-of-my-data-files",
+      "date": "2015-07-26",
+      "points": 12,
+      "comments": 5
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/13714/portable-app-for-calculating-one-selectable-hash-for-a-selected-file",
+      "date": "2014-11-06",
+      "points": 12,
+      "comments": 2
+    }
+  ],
+  "spec": "Computes SHA-256, SHA-1, MD5 and CRC32 of any dropped files or pasted text, on the device, in chunks so large files work.\nPaste an expected hash or a checksum list to see which file and algorithm match; files seen before show unchanged or changed since the date they were remembered.\nIt does not upload anything, does not scan folders recursively, and does not repair files.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#text",
+        "text": "abc"
+      }
+    },
+    {
+      "wait": 200
+    },
+    {
+      "expect": {
+        "sel": "#results",
+        "contains": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+      }
+    },
+    {
+      "type": {
+        "sel": "#expected",
+        "text": "MD5 (download.iso) = 900150983cd24fb0d6963f7d28e17f72"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#verdict",
+        "contains": "MD5 matches"
+      }
+    },
+    {
+      "expect": {
+        "sel": "button.hash.hit",
+        "contains": "900150983cd24fb0d6963f7d28e17f72"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:50:10Z",
+  "model": "opus-5.5",
+  "minutes": 8,
+  "approved": false,
+  "notes": "Hashing is pure JS (no crypto.subtle) so it streams files of any size in 4 MB chunks. Remembered hashes are keyed by file name in localStorage."
+}
