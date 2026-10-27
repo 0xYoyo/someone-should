@@ -1,0 +1,54 @@
+{
+  "slug": "wine-cellar-log",
+  "wish": "someone should make an app to manage a wine cellar",
+  "year": 2014,
+  "agreed": 8,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/2744/free-wine-cellar-management-software",
+      "date": "2014-03-26",
+      "points": 6,
+      "comments": 2
+    }
+  ],
+  "spec": "Keeps a log of the bottles in your cellar: wine, vintage, count, rack location and drinking window.\nAdd bottles with the form, tap minus when you open one, search by name, vintage or rack, and switch to Drink now for what is ready, soonest deadline first.\nIt does not look up wines, prices or ratings and keeps everything on this device only.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#name",
+        "text": "Chateau Musar 2016 Rack B3"
+      }
+    },
+    {
+      "type": {
+        "sel": "#to",
+        "text": "2045"
+      }
+    },
+    {
+      "tap": "#add"
+    },
+    {
+      "tap": "#tab-now"
+    },
+    {
+      "expect": {
+        "sel": "#list li",
+        "contains": "Chateau Musar"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#nowcount",
+        "matches": "^1$"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T02:04:27Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": ""
+}

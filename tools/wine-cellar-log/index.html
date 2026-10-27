@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app to manage a wine cellar</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+h1 { font-size: 16px; }
+main { max-width: 560px; }
+form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+form .full { grid-column: 1 / -1; }
+label { display: grid; gap: 4px; font-size: 16px; color: var(--meta); min-width: 0; }
+label input { color: var(--ink); }
+.counts { display: flex; gap: 20px; flex-wrap: wrap; font-variant-numeric: tabular-nums; }
+.counts b { font-size: 28px; font-weight: 500; display: block; line-height: 1.1; }
+.counts span { font-size: 16px; color: var(--meta); }
+.tabs { display: flex; gap: 8px; }
+.tabs button { flex: 1; padding: 0 8px; border-color: var(--line); }
+.tabs button[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: var(--paper); }
+#list li { align-items: flex-start; }
+.w { min-width: 0; flex: 1; }
+.w .n { font-weight: 500; overflow-wrap: anywhere; }
+.w .d { font-size: 16px; color: var(--meta); }
+.w .late { color: var(--no); }
+.w .now { color: var(--built); }
+.q { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.q button { width: 44px; padding: 0; }
+.q output { min-width: 28px; text-align: center; font-variant-numeric: tabular-nums; }
+#msg { font-size: 16px; color: var(--no); min-height: 0; }
+#msg:empty { display: none; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make an app to manage a wine cellar</h1>
+
+<main id="app" class="stack">
+  <form id="add-form" autocomplete="off">
+    <label class="full">Wine<input id="name" placeholder="Producer, wine" required></label>
+    <label>Vintage<input id="vintage" inputmode="numeric" placeholder="2018"></label>
+    <label>Bottles<input id="qty" inputmode="numeric" value="1"></label>
+    <label class="full">Location<input id="loc" placeholder="Rack B, row 3"></label>
+    <label>Drink from<input id="from" inputmode="numeric" placeholder="year"></label>
+    <label>Drink by<input id="to" inputmode="numeric" placeholder="year"></label>
+    <button id="add" class="primary full" type="submit">Add to cellar</button>
+  </form>
+  <div id="msg" role="status"></div>
+
+  <div class="counts">
+    <div><b id="bottles">0</b><span>bottles</span></div>
+    <div><b id="wines">0</b><span>wines</span></div>
+    <div><b id="nowcount">0</b><span>drink now</span></div>
+  </div>
+
+  <div class="tabs">
+    <button id="tab-all" type="button" aria-pressed="true">All</button>
+    <button id="tab-now" type="button" aria-pressed="false">Drink now</button>
+  </div>
+  <input id="search" type="search" placeholder="Search wine, vintage, location">
+  <ul id="list" class="plain"></ul>
+  <p id="empty" class="empty"></p>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const KEY = 'wine-cellar-log';
+  const YEAR = new Date().getFullYear();
+  let wines = store.get(KEY, []);
+  if (!Array.isArray(wines)) wines = [];
+  let tab = 'all';
+
+  const year = v => { const n = parseInt(String(v).trim(), 10); return n >= 1800 && n <= 2200 ? n : null; };
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const save = () => store.set(KEY, wines);
+
+  // ready: in window; late: past "drink by"; wait: before "drink from"
+  function state(w) {
+    if (w.to && YEAR > w.to) return 'late';
+    if (w.from && YEAR < w.from) return 'wait';
+    if (w.from || w.to) return 'now';
+    return 'none';
+  }
+  const drinkable = w => w.qty > 0 && (state(w) === 'now' || state(w) === 'late');
+
+  function windowText(w) {
+    const s = state(w);
+    const span = w.from && w.to ? `${w.from}–${w.to}` : w.from ? `from ${w.from}` : w.to ? `by ${w.to}` : '';
+    if (s === 'late') return `<span class="late">past window ${esc(span)}</span>`;
+    if (s === 'now') return `<span class="now">drink now ${esc(span)}</span>`;
+    if (s === 'wait') return `hold until ${w.from}`;
+    return '';
+  }
+
+  function render() {
+    const q = $('#search').value.trim().toLowerCase();
+    $('#bottles').textContent = wines.reduce((a, w) => a + w.qty, 0);
+    $('#wines').textContent = wines.filter(w => w.qty > 0).length;
+    $('#nowcount').textContent = wines.filter(drinkable).reduce((a, w) => a + w.qty, 0);
+
+    let rows = tab === 'now' ? wines.filter(drinkable) : wines.slice();
+    if (q) rows = rows.filter(w => `${w.name} ${w.vintage || ''} ${w.loc}`.toLowerCase().includes(q));
+    if (tab === 'now') rows.sort((a, b) => (a.to || 9999) - (b.to || 9999));
+    else rows.sort((a, b) => (b.qty > 0) - (a.qty > 0) || a.name.localeCompare(b.name) || (a.vintage || 0) - (b.vintage || 0));
+
+    $('#list').innerHTML = rows.map(w => {
+      const bits = [w.loc ? esc(w.loc) : '', windowText(w)].filter(Boolean).join(' · ');
+      return `<li data-id="${w.id}">
+        <div class="w"><div class="n">${esc(w.name)}${w.vintage ? ' ' + w.vintage : ' NV'}</div>${bits ? `<div class="d">${bits}</div>` : ''}</div>
+        <div class="q">
+          <button type="button" class="drink" data-act="-1" aria-label="Drank one">−</button>
+          <output>${w.qty}</output>
+          <button type="button" class="more" data-act="1" aria-label="Add one">+</button>
+          ${w.qty === 0 ? '<button type="button" class="del" data-act="del" aria-label="Remove">×</button>' : ''}
+        </div></li>`;
+    }).join('');
+
+    $('#empty').textContent = rows.length ? '' :
+      q ? 'No match.' : tab === 'now' ? 'Nothing in its drinking window.' : 'Cellar is empty.';
+  }
+
+  $('#add-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const name = $('#name').value.trim();
+    const vintage = year($('#vintage').value);
+    const qty = parseInt($('#qty').value, 10);
+    const from = year($('#from').value);
+    const to = year($('#to').value);
+    const msg = $('#msg');
+    if (!name) { msg.textContent = 'Name the wine.'; return; }
+    if ($('#vintage').value.trim() && !vintage) { msg.textContent = 'Vintage should be a year.'; return; }
+    if (!(qty > 0)) { msg.textContent = 'Bottles should be 1 or more.'; return; }
+    if (from && to && from > to) { msg.textContent = 'Drink from is after drink by.'; return; }
+    msg.textContent = '';
+    const loc = $('#loc').value.trim();
+    const same = wines.find(w => w.name.toLowerCase() === name.toLowerCase() && w.vintage === vintage && w.loc.toLowerCase() === loc.toLowerCase());
+    if (same) {
+      same.qty += qty;
+      if (from) same.from = from;
+      if (to) same.to = to;
+    } else {
+      wines.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name, vintage, qty, loc, from, to });
+    }
+    save();
+    ['#name', '#vintage', '#loc', '#from', '#to'].forEach(s => { $(s).value = ''; });
+    $('#qty').value = '1';
+    render();
+  });
+
+  $('#list').addEventListener('click', e => {
+    const b = e.target.closest('button[data-act]');
+    if (!b) return;
+    const id = b.closest('li').dataset.id;
+    const w = wines.find(x => x.id === id);
+    if (!w) return;
+    if (b.dataset.act === 'del') wines = wines.filter(x => x !== w);
+    else w.qty = Math.max(0, w.qty + Number(b.dataset.act));
+    save();
+    render();
+  });
+
+  function setTab(t) {
+    tab = t;
+    $('#tab-all').setAttribute('aria-pressed', t === 'all');
+    $('#tab-now').setAttribute('aria-pressed', t === 'now');
+    render();
+  }
+  $('#tab-all').addEventListener('click', () => setTab('all'));
+  $('#tab-now').addEventListener('click', () => setTab('now'));
+  $('#search').addEventListener('input', render);
+
+  render();
+})();
+</script>
+</body>
+</html>
