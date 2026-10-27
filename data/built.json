@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T01:46:27.121Z",
+ "updated": "2026-10-27T01:47:09.349Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -361,9 +361,14 @@
   },
   {
    "slug": "family-tree-maker",
-   "status": "pending",
+   "status": "pass",
    "attempts": 1,
-   "model": "opus-5.5"
+   "model": "opus-5.5",
+   "kb": 17.7,
+   "tests": "6/6",
+   "built": "2026-10-27T01:43:13Z",
+   "minutes": 14,
+   "approved": false
   },
   {
    "slug": "colorblind-image-filter",

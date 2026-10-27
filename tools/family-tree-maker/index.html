@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app that makes family trees simple enough for anyone</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+
+/* ---- tool styles below ---- */
+.two { display: grid; grid-template-columns: 1fr 9em; gap: 10px; }
+#acts { gap: 8px; }
+#acts button { flex: 1 1 auto; }
+#msg { min-height: 1.45em; margin: 0; color: var(--meta); }
+#msg.err { color: var(--no); }
+#tree { overflow: auto; border: 1px solid var(--line); border-radius: var(--radius); max-height: 70dvh; -webkit-overflow-scrolling: touch; }
+#tree .empty { padding: 24px 16px; }
+#tree svg { display: block; }
+.box rect { fill: var(--paper); stroke: var(--ink); stroke-width: 1.5; }
+.box text { fill: var(--ink); font: 16px var(--sans); }
+.box text.y { fill: var(--meta); }
+.box { cursor: pointer; }
+.box.sel rect { fill: var(--ink); }
+.box.sel text { fill: var(--paper); }
+.link, .couple { fill: none; stroke: var(--ink); stroke-width: 1.5; }
+.couple { stroke-width: 2.5; }
+#sel { border-top: 1px solid var(--line); padding-top: 12px; }
+#sel[hidden] { display: none; }
+.file { gap: 8px; }
+.file button { flex: 1 1 auto; }
+
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make an app that makes family trees simple enough for anyone</h1>
+
+<main id="app" class="stack">
+  <div class="two">
+    <input id="name" placeholder="Name" autocomplete="off" aria-label="Name">
+    <input id="born" placeholder="Years" autocomplete="off" aria-label="Years, optional" inputmode="numeric">
+  </div>
+  <div id="acts" class="row"></div>
+  <p id="msg" role="status"></p>
+  <div id="tree"></div>
+  <div id="sel" class="stack" hidden>
+    <div class="two">
+      <input id="sel-name" aria-label="Edit name">
+      <input id="sel-born" aria-label="Edit years" inputmode="numeric">
+    </div>
+    <div class="row"><button id="del">Remove <span id="sel-who"></span></button></div>
+  </div>
+  <div class="row file">
+    <button id="save">Save file</button>
+    <button id="load">Open file</button>
+    <button id="svg">Export picture</button>
+    <input id="file" type="file" accept=".json,application/json" hidden>
+  </div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  // storage helper — never throws
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  const KEY = 'family-tree-maker';
+  const W = 150, H = 60, GX = 20, GY = 70, CG = 36, PAD = 12;
+
+  function clean(d) {
+    const people = [], couples = [], ids = new Set();
+    if (d && Array.isArray(d.people)) for (const p of d.people) {
+      if (!p || !Number.isFinite(p.id) || ids.has(p.id)) continue;
+      ids.add(p.id);
+      people.push({ id: p.id, name: String(p.name || '?').slice(0, 60), years: String(p.years || '').slice(0, 20), parents: Array.isArray(p.parents) ? p.parents.filter(Number.isFinite).slice(0, 2) : [] });
+    }
+    for (const p of people) p.parents = p.parents.filter(id => ids.has(id) && id !== p.id);
+    if (d && Array.isArray(d.couples)) for (const c of d.couples) {
+      if (Array.isArray(c) && ids.has(c[0]) && ids.has(c[1]) && c[0] !== c[1]) couples.push([c[0], c[1]]);
+    }
+    const sel = d && ids.has(d.sel) ? d.sel : (people[0] ? people[0].id : null);
+    return { people, couples, sel };
+  }
+
+  let S = clean(store.get(KEY, null));
+  const save = () => store.set(KEY, S);
+  const byId = id => S.people.find(p => p.id === id);
+  const partnersOf = id => S.couples.filter(c => c.includes(id)).map(c => c[0] === id ? c[1] : c[0]);
+  const childrenOf = id => S.people.filter(p => p.parents.includes(id));
+  const isCouple = (a, b) => S.couples.some(c => (c[0] === a && c[1] === b) || (c[0] === b && c[1] === a));
+  const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  const nameIn = $('#name'), bornIn = $('#born'), msgEl = $('#msg'), treeEl = $('#tree');
+  function msg(t, err) { msgEl.textContent = t || ''; msgEl.className = err ? 'err' : ''; }
+
+  function newPerson() {
+    const name = nameIn.value.trim();
+    if (!name) { msg('Type a name first.', true); nameIn.focus(); return null; }
+    const id = S.people.reduce((m, p) => Math.max(m, p.id), 0) + 1;
+    const p = { id, name: name.slice(0, 60), years: bornIn.value.trim().slice(0, 20), parents: [] };
+    S.people.push(p);
+    nameIn.value = ''; bornIn.value = '';
+    return p;
+  }
+
+  function act(kind, withId) {
+    const sel = byId(S.sel);
+    if (kind !== 'add' && !sel) return;
+    if (kind === 'parent' && sel.parents.length >= 2) { msg(sel.name + ' already has two parents.', true); return; }
+    const p = newPerson();
+    if (!p) return;
+    if (kind === 'add') S.sel = p.id;
+    else if (kind === 'parent') {
+      const other = sel.parents[0];
+      sel.parents.push(p.id);
+      if (other != null && !isCouple(other, p.id)) S.couples.push([other, p.id]);
+    } else if (kind === 'partner') S.couples.push([sel.id, p.id]);
+    else if (kind === 'child') p.parents = withId != null ? [sel.id, withId] : [sel.id];
+    msg('Added ' + p.name + '.');
+    save(); render();
+    nameIn.focus();
+  }
+
+  // ---- layout ----
+  function generations() {
+    const g = new Map(S.people.map(p => [p.id, 0]));
+    for (let i = 0; i < 60; i++) {
+      let changed = false;
+      const bump = (id, v) => { if (v > g.get(id)) { g.set(id, v); changed = true; } };
+      for (const p of S.people) if (p.parents.length) bump(p.id, Math.max(...p.parents.map(q => g.get(q))) + 1);
+      for (const [a, b] of S.couples) { const m = Math.max(g.get(a), g.get(b)); bump(a, m); bump(b, m); }
+      for (const p of S.people) if (!p.parents.length) {
+        const kids = childrenOf(p.id);
+        if (kids.length) bump(p.id, Math.min(...kids.map(k => g.get(k.id))) - 1);
+      }
+      if (!changed) break;
+    }
+    const min = Math.min(...g.values());
+    for (const [k, v] of g) g.set(k, v - min);
+    return g;
+  }
+
+  function clustersOf(row) {
+    const inRow = new Set(row.map(p => p.id)), seen = new Set(), out = [];
+    for (const p of row) {
+      if (seen.has(p.id)) continue;
+      // collect partner-connected group in this row
+      const group = [], stack = [p.id];
+      seen.add(p.id);
+      while (stack.length) {
+        const id = stack.pop(); group.push(id);
+        for (const q of partnersOf(id)) if (inRow.has(q) && !seen.has(q)) { seen.add(q); stack.push(q); }
+      }
+      // order as a chain so a person with two partners sits between them
+      const deg = id => partnersOf(id).filter(q => group.includes(q)).length;
+      const start = group.slice().sort((a, b) => deg(a) - deg(b))[0];
+      const order = [], vis = new Set();
+      const walk = id => { vis.add(id); order.push(id); for (const q of partnersOf(id)) if (group.includes(q) && !vis.has(q)) walk(q); };
+      walk(start);
+      out.push({ ids: order, width: order.length * W + (order.length - 1) * GX });
+    }
+    return out;
+  }
+
+  function place(clusters, desired) {
+    clusters.forEach((c, i) => { c.want = desired(c); c.i = i; });
+    clusters.sort((a, b) => (a.want ?? Infinity) - (b.want ?? Infinity) || a.i - b.i);
+    let cursor = null;
+    for (const c of clusters) {
+      let left = c.want != null ? c.want - c.width / 2 : (cursor ?? 0);
+      if (cursor != null) left = Math.max(left, cursor);
+      c.left = left; cursor = left + c.width + CG;
+    }
+  }
+
+  function layout() {
+    const g = generations(), x = new Map();
+    const maxG = Math.max(0, ...g.values());
+    const rows = [];
+    for (let i = 0; i <= maxG; i++) rows.push(clustersOf(S.people.filter(p => g.get(p.id) === i)));
+    const setX = c => c.ids.forEach((id, k) => x.set(id, c.left + k * (W + GX) + W / 2));
+    const mean = a => a.reduce((s, v) => s + v, 0) / a.length;
+    // down: children under their parents
+    for (const row of rows) {
+      place(row, c => {
+        const ks = c.ids.flatMap(id => { const ps = byId(id).parents.filter(q => x.has(q)); return ps.length ? [mean(ps.map(q => x.get(q)))] : []; });
+        return ks.length ? mean(ks) : null;
+      });
+      row.forEach(setX);
+    }
+    // up: parents without parents of their own centre over their children
+    for (let i = rows.length - 2; i >= 0; i--) {
+      place(rows[i], c => {
+        const rooted = c.ids.some(id => byId(id).parents.length);
+        const kids = c.ids.flatMap(id => childrenOf(id).map(k => x.get(k.id)));
+        return !rooted && kids.length ? mean(kids) : c.left + c.width / 2;
+      });
+      rows[i].forEach(setX);
+    }
+    const minX = Math.min(...x.values()) - W / 2;
+    for (const [k, v] of x) x.set(k, v - minX + PAD);
+    return { g, x, maxG };
+  }
+
+  function treeSVG(selId) {
+    const { g, x, maxG } = layout();
+    const y = id => PAD + g.get(id) * (H + GY);
+    const w = Math.max(...x.values()) + W / 2 + PAD, h = PAD * 2 + (maxG + 1) * H + maxG * GY;
+    let lines = '', boxes = '';
+    for (const [a, b] of S.couples) {
+      const [l, r] = x.get(a) <= x.get(b) ? [a, b] : [b, a];
+      if (g.get(l) === g.get(r)) {
+        const yy = y(l) + H / 2, dx = x.get(r) - x.get(l);
+        lines += dx <= W + GX + 1
+          ? `<path class="couple" d="M${x.get(l) + W / 2} ${yy}H${x.get(r) - W / 2}"/>`
+          : `<path class="couple" d="M${x.get(l)} ${y(l)}Q${(x.get(l) + x.get(r)) / 2} ${y(l) - GY / 2} ${x.get(r)} ${y(r)}"/>`;
+      } else {
+        const [t, u] = g.get(a) < g.get(b) ? [a, b] : [b, a];
+        lines += `<path class="couple" d="M${x.get(t)} ${y(t) + H}L${x.get(u)} ${y(u)}"/>`;
+      }
+    }
+    const fam = new Map();
+    for (const p of S.people) {
+      if (!p.parents.length) continue;
+      const ps = p.parents, key = ps.slice().sort().join('-');
+      if (!fam.has(key)) fam.set(key, fam.size);
+      const ox = ps.reduce((s, q) => s + x.get(q), 0) / ps.length;
+      const oy = ps.length === 2 && g.get(ps[0]) === g.get(ps[1]) && isCouple(ps[0], ps[1]) ? y(ps[0]) + H / 2 : Math.max(...ps.map(q => y(q))) + H;
+      const cy = y(p.id), mid = cy - GY / 2 + ((fam.get(key) % 3) - 1) * 10;
+      lines += `<path class="link" d="M${ox} ${oy}V${mid}H${x.get(p.id)}V${cy}"/>`;
+    }
+    for (const p of S.people) {
+      const l = x.get(p.id) - W / 2, t = y(p.id);
+      const name = p.name.length > 15 ? p.name.slice(0, 14) + '…' : p.name;
+      boxes += `<g class="box${p.id === selId ? ' sel' : ''}" data-id="${p.id}"><rect x="${l}" y="${t}" width="${W}" height="${H}" rx="4"/>` +
+        `<text x="${l + 10}" y="${t + (p.years ? 25 : 36)}">${esc(name)}</text>` +
+        (p.years ? `<text class="y" x="${l + 10}" y="${t + 47}">${esc(p.years)}</text>` : '') + '</g>';
+    }
+    return { svg: `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${lines}${boxes}</svg>`, x };
+  }
+
+  // ---- render ----
+  function button(label, kind, extra) {
+    const b = document.createElement('button');
+    b.textContent = label; b.dataset.kind = kind;
+    if (extra) Object.assign(b, extra);
+    return b;
+  }
+
+  function render() {
+    const acts = $('#acts'), sel = byId(S.sel);
+    acts.replaceChildren();
+    if (!sel) {
+      acts.append(button('Add first person', 'add', { id: 'add', className: 'primary' }));
+    } else {
+      const partners = partnersOf(sel.id).map(byId);
+      for (const q of partners) acts.append(button(`Child of ${sel.name} & ${q.name}`, 'child', { className: 'child', value: q.id }));
+      acts.append(button(`Child of ${sel.name}` + (partners.length ? ' only' : ''), 'child', { className: 'child', id: 'add-child' }));
+      acts.append(button(`Partner of ${sel.name}`, 'partner', { id: 'add-partner' }));
+      if (sel.parents.length < 2) acts.append(button(`Parent of ${sel.name}`, 'parent', { id: 'add-parent' }));
+    }
+    if (!S.people.length) {
+      treeEl.innerHTML = '<p class="empty">No one yet. Start with yourself.</p>';
+    } else {
+      const { svg, x } = treeSVG(S.sel);
+      treeEl.innerHTML = svg;
+      if (sel) treeEl.scrollLeft = Math.max(0, x.get(sel.id) - treeEl.clientWidth / 2);
+    }
+    const box = $('#sel');
+    box.hidden = !sel;
+    if (sel) {
+      if (document.activeElement !== $('#sel-name')) $('#sel-name').value = sel.name;
+      if (document.activeElement !== $('#sel-born')) $('#sel-born').value = sel.years;
+      $('#sel-who').textContent = sel.name;
+    }
+  }
+
+  $('#acts').addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    act(b.dataset.kind, b.value ? Number(b.value) : null);
+  });
+  nameIn.addEventListener('keydown', e => { if (e.key === 'Enter') { const b = $('#acts button'); if (b) b.click(); } });
+  bornIn.addEventListener('keydown', e => { if (e.key === 'Enter') { const b = $('#acts button'); if (b) b.click(); } });
+
+  treeEl.addEventListener('click', e => {
+    const b = e.target.closest('.box');
+    if (!b) return;
+    S.sel = Number(b.dataset.id); msg(''); save(); render();
+  });
+
+  $('#sel-name').addEventListener('input', e => {
+    const p = byId(S.sel), v = e.target.value.trim();
+    if (p && v) { p.name = v.slice(0, 60); save(); render(); }
+  });
+  $('#sel-born').addEventListener('input', e => {
+    const p = byId(S.sel);
+    if (p) { p.years = e.target.value.trim().slice(0, 20); save(); render(); }
+  });
+  $('#del').addEventListener('click', () => {
+    const p = byId(S.sel);
+    if (!p) return;
+    S.people = S.people.filter(q => q.id !== p.id);
+    for (const q of S.people) q.parents = q.parents.filter(id => id !== p.id);
+    S.couples = S.couples.filter(c => !c.includes(p.id));
+    S.sel = S.people[0] ? S.people[0].id : null;
+    msg('Removed ' + p.name + '.'); save(); render();
+  });
+
+  // ---- files ----
+  function download(name, type, text) {
+    try {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([text], { type }));
+      a.download = name;
+      document.body.append(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    } catch { msg('This browser blocked the download.', true); }
+  }
+  $('#save').addEventListener('click', () => {
+    if (!S.people.length) { msg('Nothing to save yet.', true); return; }
+    download('family-tree.json', 'application/json', JSON.stringify({ people: S.people, couples: S.couples }, null, 1));
+  });
+  $('#svg').addEventListener('click', () => {
+    if (!S.people.length) { msg('Nothing to export yet.', true); return; }
+    const { svg } = treeSVG(null);
+    const style = '<style>rect{fill:#fff;stroke:#141414;stroke-width:1.5}text{fill:#141414;font:16px -apple-system,Segoe UI,Roboto,sans-serif}text.y{fill:#6b6b6b}path{fill:none;stroke:#141414;stroke-width:1.5}.couple{stroke-width:2.5}</style>';
+    download('family-tree.svg', 'image/svg+xml', svg.replace(/<svg([^>]*)>/, `<svg xmlns="${'http:' + '//www.w3.org/2000/svg'}"$1>${style}<rect width="100%" height="100%" style="fill:#f4f1ea;stroke:none"/>`));
+  });
+  $('#load').addEventListener('click', () => $('#file').click());
+  $('#file').addEventListener('change', e => {
+    const f = e.target.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try {
+        const d = clean(JSON.parse(r.result));
+        if (!d.people.length) throw 0;
+        S = d; save(); render(); msg('Opened ' + d.people.length + ' people.');
+      } catch { msg('That file is not a saved family tree.', true); }
+      e.target.value = '';
+    };
+    r.readAsText(f);
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

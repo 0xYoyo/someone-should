@@ -1,0 +1,68 @@
+{
+  "slug": "family-tree-maker",
+  "wish": "someone should make an app that makes family trees simple enough for anyone",
+  "year": 2014,
+  "agreed": 31,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/10971/offline-genealogy-software",
+      "date": "2014-08-25",
+      "points": 10,
+      "comments": 3
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/20098/simple-layman-genealogy-software",
+      "date": "2015-06-05",
+      "points": 8,
+      "comments": 1
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/54015/program-to-visually-organize-family-trees",
+      "date": "2018-12-27",
+      "points": 6,
+      "comments": 3
+    }
+  ],
+  "spec": "Builds a family tree from names alone and draws it by generation, with partners side by side and lines to their children.\nType a name, tap whether they are a parent, partner or child of the selected person; tap anyone in the tree to select, rename or remove them. Remarriage and half-siblings are handled by choosing which partner a child belongs to.\nWorks offline and stays on this device; saves and reopens a JSON file and exports the tree as an SVG picture, but does not search records or sync anywhere.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#name",
+        "text": "Ada"
+      }
+    },
+    {
+      "tap": "#add"
+    },
+    {
+      "type": {
+        "sel": "#name",
+        "text": "Ben"
+      }
+    },
+    {
+      "tap": "#add-child"
+    },
+    {
+      "expect": {
+        "sel": "#tree",
+        "contains": "Ben"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#tree .link",
+        "count": 1
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:43:13Z",
+  "model": "opus-5.5",
+  "minutes": 14,
+  "approved": false,
+  "notes": "Saving and opening files uses local download and file picker only; no network."
+}
