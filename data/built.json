@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T01:35:48.769Z",
+ "updated": "2026-10-27T01:36:16.439Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -91,9 +91,14 @@
   },
   {
    "slug": "packet-header-diagram",
-   "status": "pending",
+   "status": "pass",
    "attempts": 1,
-   "model": "opus-5.5"
+   "model": "opus-5.5",
+   "kb": 15.1,
+   "tests": "6/6",
+   "built": "2026-10-27T01:34:29Z",
+   "minutes": 9,
+   "approved": false
   },
   {
    "slug": "frame-step-video-player",

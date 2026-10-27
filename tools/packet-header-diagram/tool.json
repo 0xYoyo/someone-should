@@ -1,0 +1,57 @@
+{
+  "slug": "packet-header-diagram",
+  "wish": "someone should make a tool that draws binary protocol figures from a spec",
+  "year": 2022,
+  "agreed": 68,
+  "sources": [
+    {
+      "site": "hn",
+      "url": "https://news.ycombinator.com/item?id=30895905",
+      "date": "2022-04-03",
+      "points": 51,
+      "comments": 17
+    }
+  ],
+  "spec": "Draws an RFC-style packet header figure, as SVG and as ASCII art, from a plain list of field names and bit widths.\nType one field per line (\"Source Port: 16\", \"Options: *\" for variable length), pick bits per row, then copy the ASCII or download the SVG.\nIt does not read RFC text, C structs or ASN.1, and it does not decode real packets.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#spec",
+        "text": "Version: 4\nIHL: 4\nTotal Length: 16\nSource Address: 32"
+      }
+    },
+    {
+      "tap": "#draw"
+    },
+    {
+      "expect": {
+        "sel": "#ascii",
+        "contains": "Source Address"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#ascii",
+        "matches": "\\+-\\+-\\+-\\+"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#svgwrap rect.field",
+        "count": 6
+      }
+    },
+    {
+      "expect": {
+        "sel": "#status",
+        "contains": "56 bits (7 bytes)"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:34:29Z",
+  "model": "opus-5.5",
+  "minutes": 9,
+  "approved": false,
+  "notes": "Fields fill rows left to right; a partial last row is shaded as padding. Fields wider than a row continue across rows with the label on the widest segment."
+}

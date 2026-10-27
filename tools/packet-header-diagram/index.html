@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that draws binary protocol figures from a spec</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+textarea { min-height: 220px; font: 16px/1.5 var(--mono); resize: vertical; }
+label { display: block; }
+.controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.controls select { width: 100%; }
+.scroll { overflow-x: auto; border: 1.5px solid var(--line); border-radius: var(--radius); padding: 12px; -webkit-overflow-scrolling: touch; }
+pre#ascii { margin: 0; font: 14px/1.25 var(--mono); white-space: pre; }
+#svgwrap svg { display: block; }
+#status { font: 15px/1.4 var(--mono); color: var(--meta); margin: 0; }
+#status.err { color: var(--no); }
+.exports { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.exports button { width: 100%; }
+h2 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 8px 0 0; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that draws binary protocol figures from a spec</h1>
+
+<main id="app" class="stack">
+  <label for="spec" class="stack" style="gap:6px"><span id="hint">One field per line: name, then bits. Use * for variable length.</span>
+  <textarea id="spec" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea></label>
+  <div class="controls">
+    <select id="width" aria-label="Bits per row">
+      <option value="8">8 bits per row</option>
+      <option value="16">16 bits per row</option>
+      <option value="32" selected>32 bits per row</option>
+      <option value="64">64 bits per row</option>
+    </select>
+    <button id="draw" class="primary">Draw</button>
+  </div>
+  <p id="status" role="status"></p>
+  <h2>Figure</h2>
+  <div class="scroll" id="svgwrap"></div>
+  <h2>ASCII (RFC style)</h2>
+  <div class="scroll"><pre id="ascii"></pre></div>
+  <div class="exports">
+    <button id="copyAscii">Copy ASCII</button>
+    <button id="saveSvg">Download SVG</button>
+    <button id="copySvg">Copy SVG</button>
+    <button id="example">Example: TCP</button>
+  </div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const TCP = `Source Port: 16
+Destination Port: 16
+Sequence Number: 32
+Acknowledgment Number: 32
+Data Offset: 4
+Reserved: 4
+CWR: 1
+ECE: 1
+URG: 1
+ACK: 1
+PSH: 1
+RST: 1
+SYN: 1
+FIN: 1
+Window: 16
+Checksum: 16
+Urgent Pointer: 16
+Options: *`;
+
+  const spec = $('#spec'), widthSel = $('#width'), status = $('#status');
+  let lastSvg = '', lastAscii = '';
+
+  // "Name: 16", "Name 16", "Name = 16 bits", "16 Name", "Name: *"
+  function parse(text) {
+    const fields = [], errors = [];
+    text.split('\n').forEach((raw, i) => {
+      const line = raw.trim();
+      if (!line || line.startsWith('#') || line.startsWith('//')) return;
+      let m = line.match(/^(.+?)[\s:=,|]+(\d+|\*|\?)\s*(bits?|b)?$/i);
+      let name, bits;
+      if (m) { name = m[1].trim(); bits = m[2]; }
+      else if ((m = line.match(/^(\d+)\s*(?:bits?|b)?[\s:=,|]+(.+)$/i))) { bits = m[1]; name = m[2].trim(); }
+      else { errors.push(`line ${i + 1}: needs a bit width`); return; }
+      if (bits === '*' || bits === '?') fields.push({ name, bits: 0, variable: true });
+      else {
+        const n = parseInt(bits, 10);
+        if (n < 1 || n > 4096) { errors.push(`line ${i + 1}: width must be 1 to 4096`); return; }
+        fields.push({ name, bits: n, variable: false });
+      }
+    });
+    return { fields, errors };
+  }
+
+  // Lay fields onto rows of W bits. Each row: array of cells {field index or -1 (padding)}.
+  // Returns rows: [{ kind: 'fixed', cells: [fi per bit] } | { kind: 'var', fi }]
+  function layout(fields, W) {
+    const rows = [];
+    let cur = null;
+    const flush = () => { if (cur) { while (cur.cells.length < W) cur.cells.push(-1); rows.push(cur); cur = null; } };
+    fields.forEach((f, fi) => {
+      if (f.variable) { flush(); rows.push({ kind: 'var', fi }); return; }
+      for (let b = 0; b < f.bits; b++) {
+        if (!cur) cur = { kind: 'fixed', cells: [] };
+        cur.cells.push(fi);
+        if (cur.cells.length === W) { rows.push(cur); cur = null; }
+      }
+    });
+    flush();
+    return rows;
+  }
+
+  // Segments within a fixed row: runs of same field index.
+  function segments(cells) {
+    const out = [];
+    cells.forEach((fi, b) => {
+      const last = out[out.length - 1];
+      if (last && last.fi === fi) last.len++;
+      else out.push({ fi, start: b, len: 1 });
+    });
+    return out;
+  }
+
+  // Which row should carry the label of a field that spans several rows: the widest segment, first wins.
+  function labelPlacement(rows) {
+    const best = new Map();
+    rows.forEach((r, ri) => {
+      if (r.kind === 'var') { best.set(r.fi, { ri, start: 0, len: Infinity }); return; }
+      segments(r.cells).forEach(s => {
+        if (s.fi < 0) return;
+        const cur = best.get(s.fi);
+        if (!cur || s.len > cur.len) best.set(s.fi, { ri, start: s.start });
+        if (!cur || s.len > cur.len) best.get(s.fi).len = s.len;
+      });
+    });
+    return best;
+  }
+
+  function fit(text, room) {
+    if (room <= 0) return '';
+    if (text.length <= room) return text;
+    return room <= 1 ? text.slice(0, room) : text.slice(0, room - 1) + '~';
+  }
+
+  function center(text, room) {
+    const pad = room - text.length, l = Math.floor(pad / 2);
+    return ' '.repeat(l) + text + ' '.repeat(pad - l);
+  }
+
+  function ascii(fields, rows, W) {
+    const lines = [];
+    const tens = [], ones = [];
+    for (let b = 0; b < W; b++) {
+      tens.push(b % 10 === 0 ? String(b / 10 % 10) : ' ');
+      ones.push(String(b % 10));
+    }
+    lines.push(' ' + tens.join(' ').replace(/\s+$/, ''));
+    lines.push(' ' + ones.join(' '));
+    const full = '+' + '-+'.repeat(W);
+    const labels = labelPlacement(rows);
+
+    // border between two fixed rows: blank where the same field continues straight down
+    const border = (a, b) => {
+      if (!a || !b || a.kind !== 'fixed' || b.kind !== 'fixed') return full;
+      let s = '+';
+      for (let i = 0; i < W; i++) {
+        const cont = a.cells[i] === b.cells[i] && a.cells[i] >= 0;
+        s += cont ? ' ' : '-';
+        const nextCont = i + 1 < W && a.cells[i + 1] === b.cells[i + 1] && a.cells[i + 1] >= 0;
+        s += (i === W - 1 || !cont || !nextCont) ? '+' : ' ';
+      }
+      return s;
+    };
+
+    lines.push(full);
+    rows.forEach((r, ri) => {
+      if (r.kind === 'var') {
+        const room = W * 2 - 1;
+        lines.push('/' + center(fit(fields[r.fi].name, room - 2), room) + '/');
+        lines.push('/' + ' '.repeat(room) + '/');
+      } else {
+        let s = '|';
+        segments(r.cells).forEach(seg => {
+          const room = seg.len * 2 - 1;
+          const lp = labels.get(seg.fi);
+          const text = seg.fi >= 0 && lp && lp.ri === ri && lp.start === seg.start ? fit(fields[seg.fi].name, room) : '';
+          s += center(text, room) + '|';
+        });
+        lines.push(s);
+      }
+      lines.push(border(r, rows[ri + 1]));
+    });
+    return lines.join('\n');
+  }
+
+  const SVG_NS = ['http:', '', 'www.w3.org', '2000', 'svg'].join('/');
+  const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  function svg(fields, rows, W) {
+    const cw = W > 32 ? 18 : 26, rh = 44, top = 30, left = 2, fs = 16, charW = fs * 0.6;
+    const width = left * 2 + W * cw;
+    const height = top + rows.length * rh + 2;
+    const labels = labelPlacement(rows);
+    const ink = '#141414', fill = '#ffffff', pad = '#e9e5db';
+    const out = [];
+    out.push(`<svg xmlns="${SVG_NS}" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="${fs}">`);
+    out.push(`<rect width="${width}" height="${height}" fill="${fill}"/>`);
+    for (let b = 0; b < W; b++) {
+      if (W <= 32 || b % 4 === 0) out.push(`<text x="${left + b * cw + cw / 2}" y="20" text-anchor="middle" fill="#6b6b6b">${b}</text>`);
+    }
+    rows.forEach((r, ri) => {
+      const y = top + ri * rh;
+      if (r.kind === 'var') {
+        const x0 = left, x1 = left + W * cw;
+        out.push(`<rect class="field" x="${x0}" y="${y}" width="${x1 - x0}" height="${rh}" fill="${fill}" stroke="${ink}" stroke-width="1.5" stroke-dasharray="6 4"/>`);
+        out.push(`<text x="${(x0 + x1) / 2}" y="${y + rh / 2 + 6}" text-anchor="middle" fill="${ink}">${esc(fields[r.fi].name)} (variable)</text>`);
+        return;
+      }
+      segments(r.cells).forEach(seg => {
+        const x = left + seg.start * cw, w = seg.len * cw;
+        const isPad = seg.fi < 0;
+        out.push(`<rect class="field" x="${x}" y="${y}" width="${w}" height="${rh}" fill="${isPad ? pad : fill}" stroke="${ink}" stroke-width="1.5"/>`);
+        // tick marks at each bit boundary inside the field
+        for (let k = 1; k < seg.len; k++) {
+          const tx = x + k * cw;
+          out.push(`<line x1="${tx}" y1="${y + rh - 6}" x2="${tx}" y2="${y + rh}" stroke="${ink}" stroke-width="1"/>`);
+        }
+        if (isPad) return;
+        const lp = labels.get(seg.fi);
+        const f = fields[seg.fi];
+        const isLabel = lp && lp.ri === ri && lp.start === seg.start;
+        const room = Math.floor((w - 6) / charW);
+        let text = isLabel ? f.name : '';
+        if (isLabel && f.bits > 1 && f.bits <= W && (text + ' (' + f.bits + ')').length <= room) text += ` (${f.bits})`;
+        if (!isLabel && room >= 3) text = '...';
+        text = fit(text, room);
+        if (text) out.push(`<text x="${x + w / 2}" y="${y + rh / 2 + 6}" text-anchor="middle" fill="${ink}">${esc(text)}</text>`);
+        if (isLabel && fit(f.name, room) !== f.name) out.push(`<title>${esc(f.name)}</title>`);
+      });
+    });
+    out.push('</svg>');
+    return out.join('\n');
+  }
+
+  function render() {
+    const W = parseInt(widthSel.value, 10);
+    store.set('phd.spec', spec.value);
+    store.set('phd.width', W);
+    const { fields, errors } = parse(spec.value);
+    if (!fields.length) {
+      $('#svgwrap').innerHTML = '';
+      $('#ascii').textContent = '';
+      lastSvg = lastAscii = '';
+      status.className = errors.length ? 'err' : '';
+      status.textContent = errors.length ? errors[0] : 'No fields yet. Try "Version: 4".';
+      return;
+    }
+    const rows = layout(fields, W);
+    lastAscii = ascii(fields, rows, W);
+    lastSvg = svg(fields, rows, W);
+    $('#ascii').textContent = lastAscii;
+    $('#svgwrap').innerHTML = lastSvg;
+    const fixedBits = fields.reduce((n, f) => n + f.bits, 0);
+    const variable = fields.some(f => f.variable);
+    const bytes = fixedBits / 8;
+    let msg = `${fields.length} fields, ${fixedBits} bits` + (Number.isInteger(bytes) ? ` (${bytes} bytes)` : '') + (variable ? ' + variable' : '');
+    if (errors.length) { status.className = 'err'; msg = errors[0] + '. ' + msg; } else status.className = '';
+    status.textContent = msg;
+  }
+
+  function flash(btn, text) {
+    const old = btn.dataset.label || btn.textContent;
+    btn.dataset.label = old;
+    btn.textContent = text;
+    setTimeout(() => { btn.textContent = old; }, 1200);
+  }
+
+  async function copy(text, btn) {
+    if (!text) { status.textContent = 'Nothing to copy yet.'; return; }
+    try { await navigator.clipboard.writeText(text); flash(btn, 'Copied'); }
+    catch {
+      const ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      let ok = false; try { ok = document.execCommand('copy'); } catch {}
+      ta.remove();
+      ok ? flash(btn, 'Copied') : (status.textContent = 'Copy blocked here. Select the text and copy it.');
+    }
+  }
+
+  $('#copyAscii').addEventListener('click', e => copy(lastAscii, e.currentTarget));
+  $('#copySvg').addEventListener('click', e => copy(lastSvg, e.currentTarget));
+  $('#saveSvg').addEventListener('click', () => {
+    if (!lastSvg) { status.textContent = 'Nothing to save yet.'; return; }
+    const url = URL.createObjectURL(new Blob([lastSvg], { type: 'image/svg+xml' }));
+    const a = document.createElement('a');
+    a.href = url; a.download = 'packet-header.svg';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
+  $('#example').addEventListener('click', () => { spec.value = TCP; render(); });
+  $('#draw').addEventListener('click', render);
+  widthSel.addEventListener('change', render);
+  let t;
+  spec.addEventListener('input', () => { clearTimeout(t); t = setTimeout(render, 150); });
+
+  spec.value = store.get('phd.spec', TCP);
+  const w = String(store.get('phd.width', 32));
+  if ([...widthSel.options].some(o => o.value === w)) widthSel.value = w;
+  render();
+})();
+</script>
+</body>
+</html>
