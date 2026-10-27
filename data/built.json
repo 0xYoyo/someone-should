@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T01:38:49.889Z",
+ "updated": "2026-10-27T01:38:51.205Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -270,9 +270,14 @@
   },
   {
    "slug": "spot-image-differences",
-   "status": "pending",
+   "status": "pass",
    "attempts": 1,
-   "model": "opus-5.5"
+   "model": "opus-5.5",
+   "kb": 15.7,
+   "tests": "6/6",
+   "built": "2026-10-27T01:37:19Z",
+   "minutes": 6,
+   "approved": false
   }
  ]
 }

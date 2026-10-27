@@ -1,0 +1,61 @@
+{
+  "slug": "spot-image-differences",
+  "wish": "someone should make a tool that shows the differences between two images",
+  "year": 2014,
+  "agreed": 26,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/10899/a-program-that-diffs-2-images",
+      "date": "2014-08-21",
+      "points": 10,
+      "comments": 3
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/86629/any-recommendation-for-image-comparison-tool",
+      "date": "2023-03-22",
+      "points": 7,
+      "comments": 6
+    }
+  ],
+  "spec": "Compares two images pixel by pixel, paints every differing pixel red, boxes the changed area and says whether they are identical.\nPick, drop or paste two images; switch between Diff, Slider and Blink views; raise the tolerance to ignore compression noise.\nIt does not align shifted or rotated images, and nothing leaves the device.",
+  "tests": [
+    {
+      "tap": "#sample"
+    },
+    {
+      "expect": {
+        "sel": "#verdict",
+        "matches": "^[\\d,]+ pixels differ"
+      }
+    },
+    {
+      "type": {
+        "sel": "#tol",
+        "text": "255"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#verdict",
+        "contains": "No differences above tolerance 255"
+      }
+    },
+    {
+      "tap": "#mode-slide"
+    },
+    {
+      "expect": {
+        "sel": "#split",
+        "visible": true
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:37:19Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Images are compared at full resolution up to 16 MP, scaled equally above that. Different sizes are compared from the top-left corner."
+}

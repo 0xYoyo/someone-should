@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that shows the differences between two images</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+.pick { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.file { position: relative; display: flex; align-items: center; justify-content: center; min-height: var(--tap); padding: 0 12px; border: 1.5px solid var(--ink); border-radius: var(--radius); cursor: pointer; text-align: center; overflow: hidden; }
+.file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; min-height: 0; padding: 0; border: 0; }
+.file span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.file.loaded { border-color: var(--line); }
+.file:focus-within { outline: 2px solid var(--ink); outline-offset: 2px; }
+.modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; }
+.modes button { border-radius: 0; padding: 0 8px; }
+.modes button + button { border-left-width: 0; }
+.modes button:first-child { border-radius: var(--radius) 0 0 var(--radius); }
+.modes button:last-child { border-radius: 0 var(--radius) var(--radius) 0; }
+.modes button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+#stage { position: relative; border: 1px solid var(--line); touch-action: pan-y; }
+#view { display: block; width: 100%; height: auto; image-rendering: pixelated; }
+#verdict { font-size: 22px; line-height: 1.25; font-weight: 500; margin: 0; }
+#detail { margin: 0; color: var(--meta); }
+.tol { display: grid; grid-template-columns: 1fr 96px; gap: 10px; align-items: center; }
+.tol input { text-align: right; }
+#split { width: 100%; min-height: var(--tap); padding: 0; border: 0; accent-color: var(--ink); }
+[hidden] { display: none !important; }
+#drop.over { outline: 2px dashed var(--ink); outline-offset: 4px; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that shows the differences between two images</h1>
+
+<main id="app" class="stack">
+  <div class="pick" id="drop">
+    <label class="file" id="labA"><input type="file" id="fileA" accept="image/*"><span>Image A</span></label>
+    <label class="file" id="labB"><input type="file" id="fileB" accept="image/*"><span>Image B</span></label>
+  </div>
+
+  <p id="verdict" aria-live="polite">Pick, drop or paste two images.</p>
+  <p id="detail"></p>
+
+  <section id="result" class="stack" hidden>
+    <div class="modes" role="group" aria-label="View">
+      <button id="mode-diff" aria-pressed="true">Diff</button>
+      <button id="mode-slide" aria-pressed="false">Slider</button>
+      <button id="mode-blink" aria-pressed="false">Blink</button>
+    </div>
+    <div id="stage"><canvas id="view" width="1" height="1"></canvas></div>
+    <input type="range" id="split" min="0" max="1000" value="500" aria-label="Slider position" hidden>
+    <label class="tol"><span>Tolerance per channel (0–255)</span><input type="number" id="tol" min="0" max="255" value="0" inputmode="numeric"></label>
+  </section>
+
+  <button id="sample">Try two sample images</button>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const MAX_PIXELS = 16e6; // above this, both images are scaled down equally before comparing
+  const imgs = { A: null, B: null }; // { canvas, name, w, h }
+  let diff = null;   // { canvas, count, total, box, maxDelta }
+  let mode = 'diff', blinkTimer = 0, blinkShowB = false;
+
+  const view = $('#view'), ctx = view.getContext('2d');
+  const tolInput = $('#tol'), split = $('#split');
+  tolInput.value = store.get('sid.tol', 0);
+
+  const say = (v, d = '') => { $('#verdict').textContent = v; $('#detail').textContent = d; };
+  const fmt = n => n.toLocaleString('en-US');
+
+  // ---- loading ----
+  function toCanvas(source, w, h, name) {
+    let scale = 1;
+    if (w * h > MAX_PIXELS) scale = Math.sqrt(MAX_PIXELS / (w * h));
+    const c = document.createElement('canvas');
+    c.width = Math.max(1, Math.round(w * scale));
+    c.height = Math.max(1, Math.round(h * scale));
+    c.getContext('2d').drawImage(source, 0, 0, c.width, c.height);
+    return { canvas: c, name, w, h, scaled: scale < 1 };
+  }
+
+  async function decode(file) {
+    if (window.createImageBitmap) {
+      try { const bmp = await createImageBitmap(file); return { src: bmp, w: bmp.width, h: bmp.height }; } catch {}
+    }
+    const url = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(file); });
+    const im = new Image();
+    await new Promise((res, rej) => { im.onload = res; im.onerror = rej; im.src = url; });
+    return { src: im, w: im.naturalWidth, h: im.naturalHeight };
+  }
+
+  async function load(slot, file) {
+    if (!file) return;
+    if (file.type && !file.type.startsWith('image/')) { say('That file is not an image.'); return; }
+    try {
+      const d = await decode(file);
+      if (!d.w || !d.h) throw new Error('empty');
+      setImage(slot, toCanvas(d.src, d.w, d.h, file.name || 'pasted image'));
+    } catch {
+      say('Could not read that image.', file.name || '');
+    }
+  }
+
+  function setImage(slot, im) {
+    imgs[slot] = im;
+    const lab = $('#lab' + slot);
+    lab.classList.add('loaded');
+    lab.querySelector('span').textContent = slot + ': ' + im.name;
+    compare();
+  }
+
+  $('#fileA').addEventListener('change', e => load('A', e.target.files[0]));
+  $('#fileB').addEventListener('change', e => load('B', e.target.files[0]));
+
+  // drop or paste: fills A first, then B
+  const nextSlot = () => (!imgs.A ? 'A' : !imgs.B ? 'B' : 'B');
+  async function takeFiles(list) {
+    const files = [...list].filter(f => f.type.startsWith('image/'));
+    if (!files.length) return;
+    if (files.length >= 2) { await load('A', files[0]); await load('B', files[1]); }
+    else await load(nextSlot(), files[0]);
+  }
+  const drop = document.body;
+  drop.addEventListener('dragover', e => { e.preventDefault(); $('#drop').classList.add('over'); });
+  drop.addEventListener('dragleave', () => $('#drop').classList.remove('over'));
+  drop.addEventListener('drop', e => { e.preventDefault(); $('#drop').classList.remove('over'); takeFiles(e.dataTransfer.files); });
+  document.addEventListener('paste', e => {
+    const files = [...(e.clipboardData?.items || [])].filter(i => i.kind === 'file').map(i => i.getAsFile()).filter(Boolean);
+    if (files.length) takeFiles(files);
+  });
+
+  // ---- comparing ----
+  function compare() {
+    if (!imgs.A || !imgs.B) {
+      say(imgs.A || imgs.B ? 'Now pick the other image.' : 'Pick, drop or paste two images.');
+      $('#result').hidden = true;
+      return;
+    }
+    const a = imgs.A, b = imgs.B;
+    const w = Math.max(a.canvas.width, b.canvas.width), h = Math.max(a.canvas.height, b.canvas.height);
+    const pa = pixels(a.canvas, w, h), pb = pixels(b.canvas, w, h);
+    const tol = clampTol();
+    const out = new ImageData(w, h), o = out.data;
+    let count = 0, maxDelta = 0, x0 = w, y0 = h, x1 = -1, y1 = -1;
+    for (let i = 0, p = 0; i < pa.length; i += 4, p++) {
+      const d = Math.max(Math.abs(pa[i] - pb[i]), Math.abs(pa[i + 1] - pb[i + 1]), Math.abs(pa[i + 2] - pb[i + 2]), Math.abs(pa[i + 3] - pb[i + 3]));
+      if (d > maxDelta) maxDelta = d;
+      if (d > tol) {
+        count++;
+        o[i] = 200; o[i + 1] = 50; o[i + 2] = 30; o[i + 3] = 255;
+        const x = p % w, y = (p - x) / w;
+        if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+      } else {
+        // faded grey copy of A so the red stands out
+        const g = (pa[i] * 0.3 + pa[i + 1] * 0.59 + pa[i + 2] * 0.11) * (pa[i + 3] / 255);
+        const v = 200 + g * 0.2;
+        o[i] = o[i + 1] = o[i + 2] = v; o[i + 3] = 255;
+      }
+    }
+    const c = document.createElement('canvas');
+    c.width = w; c.height = h;
+    c.getContext('2d').putImageData(out, 0, 0);
+    diff = { canvas: c, count, total: w * h, box: count ? [x0, y0, x1, y1] : null, w, h, maxDelta };
+    report(tol);
+    $('#result').hidden = false;
+    draw();
+  }
+
+  function pixels(cv, w, h) {
+    if (cv.width === w && cv.height === h) return cv.getContext('2d').getImageData(0, 0, w, h).data;
+    const t = document.createElement('canvas'); t.width = w; t.height = h;
+    const tc = t.getContext('2d'); tc.drawImage(cv, 0, 0);
+    return tc.getImageData(0, 0, w, h).data;
+  }
+
+  function clampTol() {
+    const v = Math.round(Number(tolInput.value));
+    return Number.isFinite(v) ? Math.min(255, Math.max(0, v)) : 0;
+  }
+
+  function report(tol) {
+    const a = imgs.A, b = imgs.B, d = diff;
+    const sameSize = a.w === b.w && a.h === b.h;
+    const notes = [];
+    if (!sameSize) notes.push(`Sizes differ: A ${a.w}×${a.h}, B ${b.w}×${b.h}. Compared from the top-left corner.`);
+    if (a.scaled || b.scaled) notes.push('Very large image: compared at reduced size.');
+    if (!d.count) {
+      if (tol === 0 && sameSize && !a.scaled && !b.scaled) say('Pixel-identical.', notes.join(' '));
+      else if (tol === 0) say('No differing pixels found.', notes.join(' '));
+      else say(`No differences above tolerance ${tol}.`, (d.maxDelta ? `Largest channel difference is ${d.maxDelta}. ` : 'Pixel-identical. ') + notes.join(' '));
+      return;
+    }
+    const pct = d.count / d.total * 100;
+    const pctTxt = pct < 0.01 ? '<0.01' : pct < 10 ? pct.toFixed(2) : pct.toFixed(1);
+    const [x0, y0, x1, y1] = d.box;
+    say(`${fmt(d.count)} ${d.count === 1 ? 'pixel differs' : 'pixels differ'} (${pctTxt}%).`,
+      `Changes span x ${x0}–${x1}, y ${y0}–${y1}. Largest channel difference: ${d.maxDelta}. ` + notes.join(' '));
+  }
+
+  // ---- drawing ----
+  function draw() {
+    if (!diff) return;
+    const { w, h } = diff;
+    if (view.width !== w || view.height !== h) { view.width = w; view.height = h; }
+    ctx.clearRect(0, 0, w, h);
+    const lw = Math.max(2, Math.round(Math.max(w, h) / 300));
+    if (mode === 'diff') {
+      ctx.drawImage(diff.canvas, 0, 0);
+      if (diff.box) {
+        const [x0, y0, x1, y1] = diff.box, pad = lw * 3;
+        ctx.strokeStyle = '#c8321e'; ctx.lineWidth = lw;
+        ctx.strokeRect(x0 - pad, y0 - pad, x1 - x0 + 1 + pad * 2, y1 - y0 + 1 + pad * 2);
+      }
+    } else if (mode === 'slide') {
+      const sx = Math.round(w * split.value / 1000);
+      ctx.drawImage(imgs.B.canvas, 0, 0);
+      ctx.save(); ctx.beginPath(); ctx.rect(0, 0, sx, h); ctx.clip();
+      ctx.clearRect(0, 0, sx, h); ctx.drawImage(imgs.A.canvas, 0, 0); ctx.restore();
+      ctx.fillStyle = '#c8321e'; ctx.fillRect(sx - lw / 2, 0, lw, h);
+    } else {
+      ctx.drawImage((blinkShowB ? imgs.B : imgs.A).canvas, 0, 0);
+    }
+  }
+
+  function setMode(m) {
+    mode = m;
+    for (const id of ['diff', 'slide', 'blink']) $('#mode-' + id).setAttribute('aria-pressed', String(id === m));
+    split.hidden = m !== 'slide';
+    clearInterval(blinkTimer);
+    if (m === 'blink') { blinkShowB = false; blinkTimer = setInterval(() => { blinkShowB = !blinkShowB; draw(); }, 600); }
+    draw();
+  }
+  $('#mode-diff').addEventListener('click', () => setMode('diff'));
+  $('#mode-slide').addEventListener('click', () => setMode('slide'));
+  $('#mode-blink').addEventListener('click', () => setMode('blink'));
+  split.addEventListener('input', draw);
+
+  // drag directly on the image to move the slider
+  const stage = $('#stage');
+  function slideTo(e) {
+    if (mode !== 'slide') return;
+    const r = view.getBoundingClientRect();
+    split.value = Math.round(Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)) * 1000);
+    draw();
+  }
+  stage.addEventListener('pointerdown', e => { if (mode === 'slide') { stage.setPointerCapture(e.pointerId); slideTo(e); } });
+  stage.addEventListener('pointermove', e => { if (e.buttons || e.pointerType === 'touch') slideTo(e); });
+
+  tolInput.addEventListener('input', () => { store.set('sid.tol', clampTol()); if (imgs.A && imgs.B) compare(); });
+
+  // ---- sample pair: same scene, five changes ----
+  function scene(changed) {
+    const c = document.createElement('canvas'); c.width = 480; c.height = 320;
+    const g = c.getContext('2d');
+    g.fillStyle = '#bfdcef'; g.fillRect(0, 0, 480, 200);
+    g.fillStyle = '#7fb069'; g.fillRect(0, 200, 480, 120);
+    g.fillStyle = changed ? '#f2c14e' : '#f4d35e'; g.beginPath(); g.arc(400, 60, 30, 0, 7); g.fill();
+    g.fillStyle = '#c8553d'; g.fillRect(80, 130, 140, 100);
+    g.fillStyle = '#5a3d2b'; g.beginPath(); g.moveTo(70, 130); g.lineTo(150, changed ? 70 : 80); g.lineTo(230, 130); g.fill();
+    g.fillStyle = '#2d4059'; g.fillRect(135, 180, 30, 50);
+    g.fillStyle = '#e8f1f2'; g.fillRect(95, 150, 25, 25);
+    if (!changed) g.fillRect(180, 150, 25, 25);
+    g.fillStyle = '#3b6e3b'; g.fillRect(320, 150, 16, 80);
+    g.fillStyle = '#2e7d4f'; g.beginPath(); g.arc(328, 140, changed ? 40 : 38, 0, 7); g.fill();
+    g.fillStyle = '#ffffff'; g.beginPath(); g.ellipse(120, 50, 40, 16, 0, 0, 7); g.fill();
+    if (changed) { g.fillStyle = '#d62839'; g.beginPath(); g.arc(260, 270, 8, 0, 7); g.fill(); }
+    return c;
+  }
+  $('#sample').addEventListener('click', () => {
+    setImage('A', { canvas: scene(false), name: 'sample-a.png', w: 480, h: 320, scaled: false });
+    setImage('B', { canvas: scene(true), name: 'sample-b.png', w: 480, h: 320, scaled: false });
+  });
+})();
+</script>
+</body>
+</html>
