@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an IDE for Brainfuck</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+textarea { font: 16px/1.5 var(--mono); min-height: 150px; resize: vertical; word-break: break-all; }
+#view { font: 16px/1.5 var(--mono); margin: 0; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); white-space: pre-wrap; word-break: break-all; max-height: 220px; overflow: auto; }
+#view mark { background: var(--ink); color: var(--paper); border-radius: 2px; }
+#view .bp { color: var(--no); }
+.btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.btns button { padding: 0 6px; }
+label { display: block; font-size: 16px; color: var(--meta); margin-bottom: 4px; }
+#tape { display: grid; grid-template-columns: repeat(9, 1fr); gap: 4px; font: 16px/1.2 var(--mono); text-align: center; }
+#tape div { border: 1.5px solid var(--line); border-radius: var(--radius); padding: 6px 0; font-variant-numeric: tabular-nums; min-width: 0; }
+#tape div.cur { border-color: var(--ink); font-weight: 600; }
+#tape small { display: block; font-size: 13px; color: var(--meta); }
+#out { font: 16px/1.5 var(--mono); margin: 0; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); min-height: 48px; white-space: pre-wrap; word-break: break-all; }
+#status { font: 15px/1.4 var(--mono); color: var(--meta); min-height: 21px; }
+#status.err { color: var(--no); }
+.cellinfo { font: 15px/1.4 var(--mono); color: var(--meta); }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make an IDE for Brainfuck</h1>
+
+<main id="app" class="stack">
+  <div>
+    <label for="code">code &mdash; <span style="font-family:var(--mono)">#</span> sets a breakpoint</label>
+    <textarea id="code" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off"></textarea>
+    <pre id="view" hidden></pre>
+  </div>
+  <div class="btns">
+    <button id="run" class="primary">Run</button>
+    <button id="step">Step</button>
+    <button id="over">Over ]</button>
+    <button id="reset">Reset</button>
+  </div>
+  <div id="status" aria-live="polite"></div>
+  <div>
+    <label>tape</label>
+    <div id="tape"></div>
+    <div class="cellinfo" id="cellinfo"></div>
+  </div>
+  <div>
+    <label for="input">input</label>
+    <input id="input" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="read by ,  (empty = 0)">
+  </div>
+  <div>
+    <label>output</label>
+    <pre id="out"></pre>
+  </div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const HELLO = '++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.';
+  const TAPE = 30000, CHUNK = 100000;
+  const codeEl = $('#code'), viewEl = $('#view'), inputEl = $('#input'), outEl = $('#out'),
+        statusEl = $('#status'), tapeEl = $('#tape'), infoEl = $('#cellinfo'), runBtn = $('#run');
+
+  codeEl.value = store.get('bf.code', HELLO);
+  inputEl.value = store.get('bf.input', '');
+
+  let m = null;        // machine state, null = not loaded
+  let timer = 0;       // running loop handle
+
+  // Compile: keep only ops (+ '#' breakpoints), remember source offsets and bracket pairs.
+  function load() {
+    const src = codeEl.value, ops = [], pos = [], stack = [];
+    for (let i = 0; i < src.length; i++) {
+      if ('+-<>.,[]#'.includes(src[i])) { ops.push(src[i]); pos.push(i); }
+    }
+    const jump = new Int32Array(ops.length);
+    for (let i = 0; i < ops.length; i++) {
+      if (ops[i] === '[') stack.push(i);
+      else if (ops[i] === ']') {
+        if (!stack.length) return fail(`unmatched ] at char ${pos[i] + 1}`);
+        const j = stack.pop(); jump[i] = j; jump[j] = i;
+      }
+    }
+    if (stack.length) return fail(`unmatched [ at char ${pos[stack.pop()] + 1}`);
+    m = { src, ops, pos, jump, ip: 0, dp: 0, tape: new Uint8Array(TAPE), out: '',
+          inp: new TextEncoder().encode(inputEl.value), ip0: 0, steps: 0, done: false, err: '' };
+    return true;
+  }
+
+  function fail(msg) { m = null; setStatus(msg, true); return false; }
+
+  // Execute up to n ops. Returns 'done' | 'break' | 'error' | 'more'.
+  function exec(n, stopAtBp, stopAtIp = -1) {
+    const { ops, jump, tape } = m;
+    let first = true;
+    while (n-- > 0) {
+      if (m.ip >= ops.length) { m.done = true; return 'done'; }
+      const op = ops[m.ip];
+      if (op === '#' && stopAtBp && !first) return 'break';
+      if (m.ip === stopAtIp) return 'break';
+      first = false;
+      switch (op) {
+        case '+': tape[m.dp]++; break;
+        case '-': tape[m.dp]--; break;
+        case '>': if (++m.dp >= TAPE) { m.dp--; m.err = 'pointer ran past cell 29999'; return 'error'; } break;
+        case '<': if (--m.dp < 0) { m.dp = 0; m.err = 'pointer moved left of cell 0'; return 'error'; } break;
+        case '.': m.out += String.fromCharCode(tape[m.dp]); break;
+        case ',': tape[m.dp] = m.ip0 < m.inp.length ? m.inp[m.ip0++] : 0; break;
+        case '[': if (!tape[m.dp]) m.ip = jump[m.ip]; break;
+        case ']': if (tape[m.dp]) m.ip = jump[m.ip]; break;
+      }
+      m.ip++; m.steps++;
+    }
+    if (m.ip >= ops.length) { m.done = true; return 'done'; }
+    return 'more';
+  }
+
+  function setStatus(t, err) { statusEl.textContent = t; statusEl.className = err ? 'err' : ''; }
+
+  function esc(s) { return s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]); }
+
+  function render(result) {
+    if (!m) { viewEl.hidden = true; codeEl.hidden = false; return; }
+    outEl.textContent = m.out;
+    // code view with current op highlighted
+    const at = m.ip < m.ops.length ? m.pos[m.ip] : -1;
+    const s = m.src;
+    let html = '';
+    if (at < 0) html = esc(s);
+    else html = esc(s.slice(0, at)) + '<mark>' + esc(s[at]) + '</mark>' + esc(s.slice(at + 1));
+    viewEl.innerHTML = html.replace(/#/g, '<span class="bp">#</span>');
+    codeEl.hidden = true; viewEl.hidden = false;
+    const mk = viewEl.querySelector('mark');
+    if (mk) { const top = mk.offsetTop - viewEl.offsetTop; if (top < viewEl.scrollTop || top > viewEl.scrollTop + viewEl.clientHeight - 30) viewEl.scrollTop = top - 60; }
+    // tape window of 9 cells around the pointer
+    const start = Math.max(0, Math.min(TAPE - 9, m.dp - 4));
+    let cells = '';
+    for (let i = start; i < start + 9; i++) {
+      cells += `<div class="${i === m.dp ? 'cur' : ''}">${m.tape[i]}<small>${i}</small></div>`;
+    }
+    tapeEl.innerHTML = cells;
+    const v = m.tape[m.dp];
+    infoEl.textContent = `ptr ${m.dp} = ${v}` + (v >= 32 && v < 127 ? ` '${String.fromCharCode(v)}'` : '') +
+      ` · input ${m.ip0}/${m.inp.length} used`;
+    const where = m.ip < m.ops.length ? `next ${m.ops[m.ip]} at char ${m.pos[m.ip] + 1}` : 'end';
+    if (result === 'error') setStatus(`error: ${m.err} · step ${m.steps}`, true);
+    else if (result === 'done') setStatus(`finished in ${m.steps} steps`);
+    else if (result === 'break') setStatus(`paused · step ${m.steps} · ${where}`);
+    else if (result === 'running') setStatus(`running · step ${m.steps}`);
+    else setStatus(`step ${m.steps} · ${where}`);
+  }
+
+  function stop() { if (timer) { clearTimeout(timer); timer = 0; } runBtn.textContent = 'Run'; }
+
+  function ensure() {
+    if (m && !m.done && !m.err) return true;
+    return load();
+  }
+
+  function run() {
+    if (timer) { stop(); render('break'); return; }
+    if (!ensure()) return;
+    runBtn.textContent = 'Pause';
+    const tick = () => {
+      const r = exec(CHUNK, true);
+      if (r === 'more') { render('running'); timer = setTimeout(tick, 0); return; }
+      timer = 0; runBtn.textContent = 'Run'; render(r);
+    };
+    tick();
+  }
+
+  function step() {
+    stop();
+    if (!ensure()) return;
+    render(exec(1, false));
+  }
+
+  // Step over: if on '[' skip whole loop; if inside a loop, run until it exits.
+  function over() {
+    stop();
+    if (!ensure()) return;
+    const { ops, jump } = m;
+    let target = -1;
+    if (ops[m.ip] === '[') target = jump[m.ip] + 1;
+    else {
+      // find enclosing loop end
+      let depth = 0;
+      for (let i = m.ip; i < ops.length; i++) {
+        if (ops[i] === '[') depth++;
+        else if (ops[i] === ']') { if (depth === 0) { target = i + 1; break; } depth--; }
+      }
+    }
+    if (target < 0) return render(exec(1, false));
+    let r = exec(1, false), budget = 50000000;
+    while (r === 'more' && m.ip !== target && budget > 0) { r = exec(Math.min(CHUNK, budget), true, target); budget -= CHUNK; }
+    if (r === 'more' && m.ip !== target) r = 'break';
+    render(r === 'more' ? 'step' : r);
+  }
+
+  function reset() {
+    stop(); m = null;
+    viewEl.hidden = true; codeEl.hidden = false;
+    outEl.textContent = '';
+    tapeEl.innerHTML = '';
+    for (let i = 0; i < 9; i++) tapeEl.insertAdjacentHTML('beforeend', `<div class="${i ? '' : 'cur'}">0<small>${i}</small></div>`);
+    infoEl.textContent = 'ptr 0 = 0';
+    setStatus('ready');
+  }
+
+  runBtn.addEventListener('click', run);
+  $('#step').addEventListener('click', step);
+  $('#over').addEventListener('click', over);
+  $('#reset').addEventListener('click', reset);
+  viewEl.addEventListener('click', () => { if (!timer) reset(); codeEl.focus(); });
+  codeEl.addEventListener('input', () => store.set('bf.code', codeEl.value));
+  inputEl.addEventListener('input', () => { store.set('bf.input', inputEl.value); if (m && !timer) reset(); });
+
+  reset();
+})();
+</script>
+</body>
+</html>

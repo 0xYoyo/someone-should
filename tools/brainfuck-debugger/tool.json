@@ -1,0 +1,48 @@
+{
+  "slug": "brainfuck-debugger",
+  "wish": "someone should make an IDE for Brainfuck",
+  "year": 2014,
+  "agreed": 14,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/3639/brainfuck-ide-for-windows",
+      "date": "2014-04-28",
+      "points": 11,
+      "comments": 3
+    }
+  ],
+  "spec": "Edit Brainfuck code, then run it, step one instruction at a time, or step over a whole loop; # in the code is a breakpoint.\nShows the current instruction highlighted in the source, a tape window around the pointer, input consumed, and output; code and input are remembered.\nNo compiler to native code, no file open/save dialogs, no extended dialects; 30000 8-bit wrapping cells, EOF reads 0.",
+  "tests": [
+    {
+      "tap": "#step"
+    },
+    {
+      "tap": "#step"
+    },
+    {
+      "expect": {
+        "sel": "#cellinfo",
+        "contains": "ptr 0 = 2"
+      }
+    },
+    {
+      "tap": "#run"
+    },
+    {
+      "wait": 500
+    },
+    {
+      "expect": {
+        "sel": "#out",
+        "contains": "Hello World!"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T02:00:22Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": ""
+}
