@@ -1,0 +1,250 @@
+{"k":"se:11041","text":"OCR with GUI for correcting mistakes?","date":"2014-08-27","points":8,"comments":1,"tags":["gui","ocr"]}
+{"k":"se:11065","text":"Blocked or not? Webapp that checks where your URL is censored","date":"2014-08-28","points":8,"comments":1,"tags":["web-apps","network-monitor"]}
+{"k":"se:11593","text":"PCRE / Extended regex library in Java?","date":"2014-09-18","points":8,"comments":1,"tags":["library","java","regex"]}
+{"k":"se:12004","text":"General-purpose, open-source, GUI relational database management application","date":"2014-10-07","points":8,"comments":1,"tags":["linux","open-source","database","gui"]}
+{"k":"se:13338","text":"Window resizing software","date":"2014-10-21","points":8,"comments":1,"tags":["gratis","window-manager","windows-xp"]}
+{"k":"se:13353","text":"Need program to help remove information from scanned documents","date":"2014-10-21","points":8,"comments":1,"tags":["pdf","ocr","scanning"]}
+{"k":"se:14691","text":"App or extension that creates a time delay for visiting distracting sites?","date":"2014-12-17","points":8,"comments":1,"tags":["productivity"]}
+{"k":"se:14886","text":"Lightweight PDF viewer to navigate through files in a folder","date":"2014-12-26","points":8,"comments":1,"tags":["windows","pdf","pdf-viewer"]}
+{"k":"se:15005","text":"Video player that displays multiple (3 or more) subtitle tracks at once","date":"2015-01-02","points":8,"comments":1,"tags":["windows","video","media-player"]}
+{"k":"se:16202","text":"SSH key management","date":"2015-01-11","points":8,"comments":1,"tags":["linux","ssh"]}
+{"k":"se:16442","text":"Javascript library for flowcharting","date":"2015-01-20","points":8,"comments":1,"tags":["open-source","javascript","java","html"]}
+{"k":"se:16898","text":"Getting Things Done (GTD) web or cross-platform app","date":"2015-02-04","points":8,"comments":1,"tags":["project-management","productivity"]}
+{"k":"se:17710","text":"Windows application to see clipboard contents (hex/text)","date":"2015-03-06","points":8,"comments":1,"tags":["windows","clipboard","hex-viewer"]}
+{"k":"se:18728","text":"PDF content extraction software","date":"2015-04-14","points":8,"comments":1,"tags":["open-source","pdf","images","table"]}
+{"k":"se:19709","text":"An android app that could send GPS data to a server","date":"2015-05-21","points":8,"comments":1,"tags":["android","networking","logs","gps"]}
+{"k":"se:20098","text":"Simple layman genealogy software","date":"2015-06-05","points":8,"comments":1,"tags":["open-source","genealogy"]}
+{"k":"se:23438","text":"Android stock launcher, just without the Google Now search bar","date":"2015-08-31","points":8,"comments":1,"tags":["android","open-source","launcher"]}
+{"k":"se:24983","text":"What data backup software provides these specific features?","date":"2015-09-21","points":8,"comments":1,"tags":["windows","backup","ftp","sftp"]}
+{"k":"se:25707","text":"A Database Management System that understands Relational Algebra Queries","date":"2015-10-15","points":8,"comments":1,"tags":["database","educational"]}
+{"k":"se:25802","text":"Upload and store large files","date":"2015-10-18","points":8,"comments":1,"tags":["open-source","web-apps","file-management"]}
+{"k":"se:26501","text":"Open source conference platform","date":"2015-11-17","points":8,"comments":1,"tags":["open-source","web-apps"]}
+{"k":"se:31811","text":"Web-browser for heavy browsing, alternative to Chrome","date":"2016-05-03","points":8,"comments":1,"tags":["osx","web-browser"]}
+{"k":"se:32288","text":"Software to calculate the speed of objects in videos","date":"2016-05-23","points":8,"comments":1,"tags":["gratis","open-source","video"]}
+{"k":"se:32574","text":"Personal CV manager with content-customization output","date":"2016-06-02","points":8,"comments":1,"tags":["pdf","information-management"]}
+{"k":"se:32617","text":"Adding DOIs in Google Scholar results","date":"2016-06-04","points":8,"comments":1,"tags":["chrome","google-apps","research"]}
+{"k":"se:33739","text":"A good alternative to Opera 12.17? (with web browsing and native email client)","date":"2016-06-08","points":8,"comments":1,"tags":["windows","gratis","web-browser","email-client"]}
+{"k":"se:34017","text":"Update images in documentation automatically","date":"2016-06-20","points":8,"comments":1,"tags":["images","automation","documentation-generator"]}
+{"k":"se:34765","text":"Lossless Screenshot Resizer - automatically detect empty regions","date":"2016-07-19","points":8,"comments":1,"tags":["windows","offline","image-processing","screenshot"]}
+{"k":"se:34931","text":"Open source note-taking app with tagging","date":"2016-07-24","points":8,"comments":1,"tags":["windows","linux","open-source","note-taking"]}
+{"k":"se:38096","text":"Video editing software for occasional use","date":"2016-12-12","points":8,"comments":1,"tags":["windows","video-editing"]}
+{"k":"se:43554","text":"Like XMind but with directed acyclic graph?","date":"2017-07-16","points":8,"comments":1,"tags":["mind-mapping"]}
+{"k":"se:43686","text":"What s a free and open source alternative to TeamViewer (remote control software) for GNU/Linux?","date":"2017-07-21","points":8,"comments":1,"tags":["open-source","remote-access","remote-desktop"]}
+{"k":"se:51330","text":"Sparse matrix library for Java","date":"2018-07-28","points":8,"comments":1,"tags":["java","matrix"]}
+{"k":"se:51338","text":"Software to select portion of screen, and click","date":"2018-07-29","points":8,"comments":1,"tags":["mouse","keyboard","accessibility"]}
+{"k":"se:74505","text":"Tool for converting json to openapi specification","date":"2020-05-15","points":8,"comments":1,"tags":["api"]}
+{"k":"se:93596","text":"Any custom Android keyboard that isn t on the Google Play Store that s safe to download?","date":"2025-08-08","points":8,"comments":1,"tags":["android","android-app","keyboard"]}
+{"k":"se:94917","text":"Android app that reliably warns me before shutdown (1% battery)","date":"2025-11-16","points":8,"comments":1,"tags":["android","notification","battery"]}
+{"k":"se:16","text":"Free equivalent for Splunk log manager","date":"2014-02-04","points":7,"comments":2,"tags":["linux","gratis","logs"]}
+{"k":"se:359","text":"QuakeLive alternative on Linux","date":"2014-02-05","points":7,"comments":2,"tags":["linux","game"]}
+{"k":"se:432","text":"Simple HTTP packet analyzer for debugging applications?","date":"2014-02-05","points":7,"comments":2,"tags":["http","networking"]}
+{"k":"se:873","text":"Geocaching app for iOS?","date":"2014-02-10","points":7,"comments":2,"tags":["ios","gps"]}
+{"k":"se:962","text":"Edit and search/browse image metadata","date":"2014-02-11","points":7,"comments":2,"tags":["linux","open-source","images","collection-manager"]}
+{"k":"se:1633","text":"Presentation software showing map of slides?","date":"2014-02-25","points":7,"comments":2,"tags":["open-source","presentation"]}
+{"k":"se:1671","text":"Monitor computer temperature to a log file under Windows","date":"2014-02-25","points":7,"comments":2,"tags":["windows","hardware"]}
+{"k":"se:2425","text":"Program to open an Apple Keynote (.key) file in Windows or Linux","date":"2014-03-17","points":7,"comments":2,"tags":["document-converter","presentation"]}
+{"k":"se:2877","text":"Access my Android s file system without a data cable","date":"2014-04-01","points":7,"comments":2,"tags":["android","cross-platform","file-synchronization"]}
+{"k":"se:4029","text":"Software which integrates project management, routines and daily todolist","date":"2014-04-15","points":7,"comments":2,"tags":["project-management","time-management","todo"]}
+{"k":"se:3346","text":"Zenity alternative for Android","date":"2014-04-18","points":7,"comments":2,"tags":["android","notification"]}
+{"k":"se:3594","text":"Direct computer to computer video chat","date":"2014-04-25","points":7,"comments":2,"tags":["windows","chat"]}
+{"k":"se:3708","text":"Movie player where volume can be increased over 100%","date":"2014-04-29","points":7,"comments":2,"tags":["linux","media-player"]}
+{"k":"se:3736","text":"Audio cutting tool for Linux","date":"2014-04-30","points":7,"comments":2,"tags":["linux","audio"]}
+{"k":"se:3929","text":"Outlook and Google Calendar/Contacts Sync","date":"2014-05-07","points":7,"comments":2,"tags":["windows","calendar","google-apps"]}
+{"k":"se:3943","text":"English thesaurus program for Windows","date":"2014-05-08","points":7,"comments":2,"tags":["windows","offline","language","thesaurus"]}
+{"k":"se:4158","text":"Easy way to create an Android app","date":"2014-05-16","points":7,"comments":2,"tags":["android","web-apps"]}
+{"k":"se:4299","text":"Android application to block calls and text messages in a cell phone","date":"2014-05-21","points":7,"comments":2,"tags":["gratis","android"]}
+{"k":"se:4434","text":"Windirstat that takes into account symlinks","date":"2014-05-26","points":7,"comments":2,"tags":["windows","gratis","file-management"]}
+{"k":"se:4584","text":"Android Camera App for taking photo over photo","date":"2014-05-31","points":7,"comments":2,"tags":["android","photography","camera"]}
+{"k":"se:7082","text":"WordPress plugin suggestion for event registration","date":"2014-06-19","points":7,"comments":2,"tags":["wordpress"]}
+{"k":"se:7414","text":"Web app for distributing software updates to customers (customer support)","date":"2014-06-30","points":7,"comments":2,"tags":["web-apps","file-management","cms","ftp"]}
+{"k":"se:7617","text":"PDF editing software for removal of dark scan margins","date":"2014-07-08","points":7,"comments":2,"tags":["pdf","automation","image-editing"]}
+{"k":"se:9908","text":"Free online service to cut a GIF file","date":"2014-07-18","points":7,"comments":2,"tags":["gratis","web-apps","gif"]}
+{"k":"se:10047","text":"Software to generate all layout possibilities within a set of color","date":"2014-07-22","points":7,"comments":2,"tags":["user-interface","color"]}
+{"k":"se:10170","text":"Best incremental backup solution for Windows 8.1?","date":"2014-07-26","points":7,"comments":2,"tags":["windows-8","backup"]}
+{"k":"se:10272","text":"multi-user photo/picture manager/organizer/database software","date":"2014-07-30","points":7,"comments":2,"tags":["web-apps","database","photography","digital-asset-management"]}
+{"k":"se:10565","text":"Remove a text from every tag field of MP3 files in a batch process","date":"2014-08-09","points":7,"comments":2,"tags":["mp3"]}
+{"k":"se:10950","text":"Free PDF viewer that opens several pdf files in different tabs","date":"2014-08-24","points":7,"comments":2,"tags":["linux","open-source","ubuntu","pdf-viewer"]}
+{"k":"se:11769","text":"Node.js Console/Debugger for Windows","date":"2014-09-26","points":7,"comments":2,"tags":["windows","javascript","node.js"]}
+{"k":"se:11834","text":"Steganography library or command line program","date":"2014-09-29","points":7,"comments":2,"tags":["images"]}
+{"k":"se:12011","text":"Software that will blur (obfuscate, hide, pixelate) part of the video automatically","date":"2014-10-07","points":7,"comments":2,"tags":["windows","video","video-editing"]}
+{"k":"se:14073","text":"Track changes in a shared project folder","date":"2014-11-21","points":7,"comments":2,"tags":["project-management","collaboration","document-management","git"]}
+{"k":"se:14341","text":"Firefox addon for URL path sensitive password storage","date":"2014-12-02","points":7,"comments":2,"tags":["firefox","password-manager"]}
+{"k":"se:14667","text":"Synchronized Windows Explorer folder browsing","date":"2014-12-16","points":7,"comments":2,"tags":["windows","file-management"]}
+{"k":"se:14873","text":"Bulk export for Outlook emails, and cleaning up Microsoft junk HTML","date":"2014-12-26","points":7,"comments":2,"tags":["html","email","wordpress","outlook"]}
+{"k":"se:16223","text":"Libraries for identifying the face structure","date":"2015-01-12","points":7,"comments":2,"tags":["library","computer-vision","face-recognition"]}
+{"k":"se:16576","text":"I need software that selects a random item from a list, to help with indecisiveness","date":"2015-01-24","points":7,"comments":2,"tags":["windows","offline"]}
+{"k":"se:16812","text":"Dotfile Management Tool, for controlling which dotfiles at work vs at home","date":"2015-02-01","points":7,"comments":2,"tags":["gratis","linux","open-source","version-control"]}
+{"k":"se:17012","text":"Is there any Evernote version for Linux?","date":"2015-02-07","points":7,"comments":2,"tags":["linux","note-taking"]}
+{"k":"se:17317","text":"Desktop programs to beautify code","date":"2015-02-18","points":7,"comments":2,"tags":["windows-7","desktop-client","code-beautification"]}
+{"k":"se:17650","text":"C and C++ portable IDE with up-to-date compiler","date":"2015-03-03","points":7,"comments":2,"tags":["open-source","c++","ide","c"]}
+{"k":"se:17996","text":"A portable, free and simple video editor","date":"2015-03-17","points":7,"comments":2,"tags":["windows","gratis","video-editing","portable"]}
+{"k":"se:18026","text":"Simple C/C++ library for network graph manipulation","date":"2015-03-17","points":7,"comments":2,"tags":["library","c++","graphs","c"]}
+{"k":"se:18080","text":"Software that tells you in what country is a given latitude/longitude","date":"2015-03-20","points":7,"comments":2,"tags":["gratis","linux","web-apis","gis"]}
+{"k":"se:18574","text":"Free portable instant messaging audio/video calls for Windows, web, Android and J2ME","date":"2015-04-08","points":7,"comments":2,"tags":["windows","android","web-apps","chat"]}
+{"k":"se:19502","text":"Lightweight personal document management recommendations (open source/.net)","date":"2015-05-12","points":7,"comments":2,"tags":["windows","gratis","open-source",".net"]}
+{"k":"se:20103","text":"Chrome addon to open link in new tab to the right of the current tab","date":"2015-06-05","points":7,"comments":2,"tags":["chrome","productivity"]}
+{"k":"se:20320","text":"A photo viewing/organising software for Windows","date":"2015-06-15","points":7,"comments":2,"tags":["windows","gratis","images"]}
+{"k":"se:20482","text":"Selfcontained software to generate static HTML documentation from Markdown","date":"2015-06-20","points":7,"comments":2,"tags":["software-development","html","markdown","documentation-generator"]}
+{"k":"se:20758","text":"PDF viewer and/or reader having feature to play animations","date":"2015-06-30","points":7,"comments":2,"tags":["linux","pdf","ubuntu","pdf-viewer"]}
+{"k":"se:22854","text":"OneNote dark theme","date":"2015-08-09","points":7,"comments":2,"tags":["windows","dark-theme","microsoft-onenote"]}
+{"k":"se:22896","text":"GUI scripting for Linux","date":"2015-08-11","points":7,"comments":2,"tags":["gratis","linux","automation","scripting"]}
+{"k":"se:23179","text":"Project management plugin that provides gantt charts, issue dependencies for Github","date":"2015-08-19","points":7,"comments":2,"tags":["web-apps","project-management","github"]}
+{"k":"se:23214","text":"Offline bookmark synchronizer for Chrome","date":"2015-08-21","points":7,"comments":2,"tags":["offline","chrome","synchronization","bookmark"]}
+{"k":"se:23429","text":"App that can change your voice into different characters voices","date":"2015-08-30","points":7,"comments":2,"tags":["audio","voice-recording"]}
+{"k":"se:24715","text":"Free XML IDE (alternative for Stylus Studio)","date":"2015-09-10","points":7,"comments":2,"tags":["gratis","data-visualization","xml"]}
+{"k":"se:24776","text":"open source DNS management","date":"2015-09-13","points":7,"comments":2,"tags":["linux","open-source","web-services","dns"]}
+{"k":"se:24781","text":"Web service to alert me if my server fails","date":"2015-09-13","points":7,"comments":2,"tags":["web-services","web-server"]}
+{"k":"se:25087","text":"Light stable browser for Windows","date":"2015-09-24","points":7,"comments":2,"tags":["windows","web-browser"]}
+{"k":"se:25287","text":"Android app to alert me when offline for a long time","date":"2015-10-01","points":7,"comments":2,"tags":["android","monitoring","network-monitor","notification"]}
+{"k":"se:25495","text":"Open source software for document management in Linux?","date":"2015-10-08","points":7,"comments":2,"tags":["linux","open-source","document-management","digital-asset-management"]}
+{"k":"se:25623","text":"Online flexible survey constructor (maybe kind of decision making software)","date":"2015-10-12","points":7,"comments":2,"tags":["web-apps","web-services","cloud-service","survey"]}
+{"k":"se:26078","text":"Software for creating application help files","date":"2015-10-29","points":7,"comments":2,"tags":["windows","document-management"]}
+{"k":"se:26400","text":"Take notes and organize tasks by project, prioritiy, and urgency","date":"2015-11-13","points":7,"comments":2,"tags":["project-management","note-taking","time-management","knowledge-organization"]}
+{"k":"se:28138","text":"Converter that converts EML files to plain text","date":"2016-01-19","points":7,"comments":2,"tags":["gratis","email","document-converter","plain-text"]}
+{"k":"se:28273","text":"Programs for 3D chemical molecules?","date":"2016-01-25","points":7,"comments":2,"tags":["3d","scientific-computing"]}
+{"k":"se:28569","text":"Spell checking a .md file in GitHub while accessing the online .md editor","date":"2016-02-06","points":7,"comments":2,"tags":["chrome","github","spell-checker"]}
+{"k":"se:30060","text":"Alternative to Ghostery (tracker-blocker) add-on for Firefox?","date":"2016-02-24","points":7,"comments":2,"tags":["firefox","privacy","cookies"]}
+{"k":"se:31417","text":"Video chat for long distance, limited bandwidth users?","date":"2016-04-18","points":7,"comments":2,"tags":["video","chat","internet","video-conferencing"]}
+{"k":"se:32145","text":"Windows tool to find duplicate folders","date":"2016-05-17","points":7,"comments":2,"tags":["windows","directories","duplicate-files"]}
+{"k":"se:35567","text":"Online scheduling that takes varying transit times into account when offering scheduling options","date":"2016-08-18","points":7,"comments":2,"tags":["scheduling","resource-management","travel"]}
+{"k":"se:35572","text":"Windows Software to constantly record the last X minutes of desktop activity","date":"2016-08-18","points":7,"comments":2,"tags":["windows","screen-recording"]}
+{"k":"se:36170","text":"ToDo manager with dependencies and events","date":"2016-09-14","points":7,"comments":2,"tags":["windows","gratis","project-management","todo"]}
+{"k":"se:36652","text":"Software which can decrypt into 2 different files depending on the password?","date":"2016-10-06","points":7,"comments":2,"tags":["encryption"]}
+{"k":"se:37633","text":"An (n)curses-based debugger frontend?","date":"2016-11-19","points":7,"comments":2,"tags":["linux","software-development","debugging"]}
+{"k":"se:37849","text":"Drop-in replacement for PHP-based image gallery Gallery ?","date":"2016-11-28","points":7,"comments":2,"tags":["open-source","web-apps","php","web-server"]}
+{"k":"se:38274","text":"Module bundler for TypeScript in GreaseMonkey","date":"2016-12-21","points":7,"comments":2,"tags":["javascript","software-development","programming","compiler"]}
+{"k":"se:44914","text":"Tool for statistical performance measurement in production environments","date":"2017-08-02","points":7,"comments":2,"tags":["python","statistics","performance-analysis","django"]}
+{"k":"se:46986","text":"Email-based helpdesk","date":"2017-11-10","points":7,"comments":2,"tags":["gratis","linux","issue-tracker","help-desk"]}
+{"k":"se:46987","text":"Autotype Windows clipboard contents (password) into webpage that blocks Paste","date":"2017-11-10","points":7,"comments":2,"tags":["windows","clipboard"]}
+{"k":"se:47850","text":"Understanding computers better with assembly","date":"2017-12-31","points":7,"comments":2,"tags":["assembly"]}
+{"k":"se:51193","text":"Mouse and keyboard recording and replaying on Linux","date":"2018-07-22","points":7,"comments":2,"tags":["linux","automation","mouse","keyboard"]}
+{"k":"se:224","text":"Software for deleting music from directory rather than playlist","date":"2014-02-05","points":6,"comments":3,"tags":["windows","music","audio","file-management"]}
+{"k":"se:874","text":"Digital audio workstation software for Linux?","date":"2014-02-10","points":6,"comments":3,"tags":["linux","audio","music-production"]}
+{"k":"se:1044","text":"Free service for scheduled cross-posting to major social networks","date":"2014-02-13","points":6,"comments":3,"tags":["web-apps","automation","gratis","social-networks"]}
+{"k":"se:1437","text":"Revision based plain text collaboration apps","date":"2014-02-20","points":6,"comments":3,"tags":["web-apps","collaboration"]}
+{"k":"se:2165","text":"A software to monitor GPU temperature changes","date":"2014-03-09","points":6,"comments":3,"tags":["windows","gpu-monitor"]}
+{"k":"se:2308","text":"Browser extension for OpenPGP decryption of an e-mail in Gmail","date":"2014-03-14","points":6,"comments":3,"tags":["web-browser","gmail","encryption","pgp"]}
+{"k":"se:2323","text":"Javascript framework to create flow-like diagrams","date":"2014-03-14","points":6,"comments":3,"tags":["javascript","framework"]}
+{"k":"se:2390","text":"Linux program like Windows 7 MS Paint","date":"2014-03-16","points":6,"comments":3,"tags":["linux","image-editor","drawing"]}
+{"k":"se:2421","text":"Application to work with KeePass 2 files .KDBX on OS X","date":"2014-03-17","points":6,"comments":3,"tags":["osx","password-manager"]}
+{"k":"se:3198","text":"Speech recognition software for Windows that takes audio file as input and outputs text file","date":"2014-04-14","points":6,"comments":3,"tags":["windows","audio","speech-recognition"]}
+{"k":"se:3333","text":"Using image processing to infer if a seat is occupied","date":"2014-04-16","points":6,"comments":3,"tags":["image-processing"]}
+{"k":"se:3608","text":"Overlay subtitles over Web videos","date":"2014-04-26","points":6,"comments":3,"tags":["linux","video","web-browser","closed-captions"]}
+{"k":"se:3872","text":"Tool for checking hard disks for hardware failures","date":"2014-05-05","points":6,"comments":3,"tags":["windows","gratis","hardware","hard-disk"]}
+{"k":"se:4023","text":"IDE for web development that recognizes all syntax","date":"2014-05-11","points":6,"comments":3,"tags":["windows","web-development","ide"]}
+{"k":"se:5623","text":"Free PHP IDE with (zero configuration) debugging (for Windows)","date":"2014-06-02","points":6,"comments":3,"tags":["gratis","php","debugging"]}
+{"k":"se:5636","text":"Lighter alternatives to Visual C++ 2013?","date":"2014-06-02","points":6,"comments":3,"tags":["windows","c++","ide"]}
+{"k":"se:5677","text":"Utility to create HTTP requests and analyze responses, with history (like Postman)","date":"2014-06-04","points":6,"comments":3,"tags":["http"]}
+{"k":"se:5699","text":"Free, simple 3d modelling tool for jewelry design","date":"2014-06-05","points":6,"comments":3,"tags":["gratis","windows-7","modeling"]}
+{"k":"se:5754","text":"Num Lock Key indicator for Win8?","date":"2014-06-07","points":6,"comments":3,"tags":["windows-8","keyboard"]}
+{"k":"se:7268","text":"What is a good open source information retrieval library (search engine)?","date":"2014-06-24","points":6,"comments":3,"tags":["library","search-engine","nlp","data-analysis"]}
+{"k":"se:7493","text":"Web app for tracking arbitrary personal statistics?","date":"2014-07-02","points":6,"comments":3,"tags":["web-apps","charts","information-management"]}
+{"k":"se:7541","text":"Forging SSL/TLS packets with Scapy (python)","date":"2014-07-04","points":6,"comments":3,"tags":["library","python"]}
+{"k":"se:9687","text":"Creating 3D models from point clouds","date":"2014-07-10","points":6,"comments":3,"tags":["windows","modeling"]}
+{"k":"se:10970","text":"Font selection utitly","date":"2014-08-25","points":6,"comments":3,"tags":["windows","font-utility"]}
+{"k":"se:11817","text":"In-app triplestore like SQLite","date":"2014-09-28","points":6,"comments":3,"tags":["open-source","database","c++","cross-platform"]}
+{"k":"se:11880","text":"Speaker independent voice command recognition","date":"2014-10-01","points":6,"comments":3,"tags":["speech-recognition","voice-command"]}
+{"k":"se:12052","text":"Regular expression tool for windows","date":"2014-10-09","points":6,"comments":3,"tags":["gratis","windows-7","command-line","regex"]}
+{"k":"se:13975","text":"Software for prototyping in 3d","date":"2014-11-17","points":6,"comments":3,"tags":["linux","windows-7","presentation","modeling"]}
+{"k":"se:14002","text":"Is there a Open in Firefox Google Chrome extension?","date":"2014-11-18","points":6,"comments":3,"tags":["osx","chrome","firefox","browser-extension"]}
+{"k":"se:14192","text":"Easy tool to sketch beautiful network diagrams","date":"2014-11-25","points":6,"comments":3,"tags":["networking","diagram"]}
+{"k":"se:14354","text":"SVG to PNG batch conversion","date":"2014-12-03","points":6,"comments":3,"tags":["windows","image-processing","svg","image-conversion"]}
+{"k":"se:16788","text":"Screenshot Centric Documentation Tool","date":"2015-01-31","points":6,"comments":3,"tags":["windows","gratis","open-source","screenshot"]}
+{"k":"se:17967","text":"Personal knowledge management system with shallow learning curve","date":"2015-03-15","points":6,"comments":3,"tags":["linux","open-source","knowledge-organization","knowledge-base"]}
+{"k":"se:18150","text":"Task and resource management for non-projects","date":"2015-03-23","points":6,"comments":3,"tags":["project-management","planning"]}
+{"k":"se:19169","text":"Open-source / Inexpensive CRM?","date":"2015-05-01","points":6,"comments":3,"tags":["open-source","cms","crm"]}
+{"k":"se:19252","text":"What program will convert video frames to jpegs?","date":"2015-05-04","points":6,"comments":3,"tags":["video","images"]}
+{"k":"se:19704","text":"Android app to tell me how often I turn on the screen per day?","date":"2015-05-21","points":6,"comments":3,"tags":["android"]}
+{"k":"se:20020","text":"Cygwin alternative for OSX pbcopy?","date":"2015-06-02","points":6,"comments":3,"tags":["osx","clipboard"]}
+{"k":"se:20082","text":"Python library for complex web scraping?","date":"2015-06-04","points":6,"comments":3,"tags":["html","python","scraping"]}
+{"k":"se:20437","text":"Accounting software for small business","date":"2015-06-19","points":6,"comments":3,"tags":["osx","business-intelligence","accounting"]}
+{"k":"se:21690","text":"Tools for learning binary file formats","date":"2015-08-02","points":6,"comments":3,"tags":["data-analysis","file-format","hex-viewer","binary-data"]}
+{"k":"se:21741","text":"Telnet client for Android","date":"2015-08-04","points":6,"comments":3,"tags":["android","command-line","network-monitor","communication"]}
+{"k":"se:23325","text":"Viewer for Python pickle files","date":"2015-08-26","points":6,"comments":3,"tags":["windows-7","python"]}
+{"k":"se:25285","text":"Free software to look at CANbus messages on a Windows PC","date":"2015-09-30","points":6,"comments":3,"tags":["windows","gratis","software-development","embedded-systems"]}
+{"k":"se:25559","text":"Windows PDF viewer that lists highlighted TEXT (as on mac)?","date":"2015-10-09","points":6,"comments":3,"tags":["windows","pdf","pdf-viewer","annotation"]}
+{"k":"se:25640","text":"Mp3 tag editor that can import a csv file?","date":"2015-10-13","points":6,"comments":3,"tags":["windows","audio","mp3","id3"]}
+{"k":"se:26193","text":"What text editors let you view and edit multiple files in a single long page (similar to Scrivener s Scrivenings mode)?","date":"2015-11-03","points":6,"comments":3,"tags":["text-editor"]}
+{"k":"se:27488","text":"Decentralized/P2P virtual private network (VPN)","date":"2015-12-25","points":6,"comments":3,"tags":["windows","linux","open-source","vpn"]}
+{"k":"se:28571","text":"Running an application at a different time/date","date":"2016-02-06","points":6,"comments":3,"tags":["windows","software-testing"]}
+{"k":"se:30175","text":"Firefox addon to block attempts to make text unselectable?","date":"2016-02-29","points":6,"comments":3,"tags":["firefox"]}
+{"k":"se:30755","text":"User friendly firewall for Windows 10 to filter/block outgoing traffic?","date":"2016-03-22","points":6,"comments":3,"tags":["security","windows-10","privacy","firewall"]}
+{"k":"se:31484","text":"GUI-based file search utility (with Arch Linux package)","date":"2016-04-21","points":6,"comments":3,"tags":["gratis","linux","gui","arch-linux"]}
+{"k":"se:32497","text":"Extend system drive (C:) partition in windows 10","date":"2016-05-31","points":6,"comments":3,"tags":["windows-10","hard-disk"]}
+{"k":"se:34731","text":"Software to manage Linux machines","date":"2016-07-18","points":6,"comments":3,"tags":["linux","open-source"]}
+{"k":"se:36295","text":"Static site generator with dynamic pages","date":"2016-09-19","points":6,"comments":3,"tags":["static-site-generator"]}
+{"k":"se:39176","text":"Equivalent of Leechblock for Android","date":"2017-02-01","points":6,"comments":3,"tags":["android","productivity","website-blocker"]}
+{"k":"se:42394","text":"Is there an XML Renderer For Draw.io Graphs","date":"2017-05-17","points":6,"comments":3,"tags":["graphs","xml"]}
+{"k":"se:43614","text":"Reverse graph visualization","date":"2017-07-19","points":6,"comments":3,"tags":["linux","open-source","math","image-recognition"]}
+{"k":"se:45663","text":"Block pornography directly on network router","date":"2017-09-09","points":6,"comments":3,"tags":["website-blocker"]}
+{"k":"se:47145","text":"Code review tools for Gitlab","date":"2017-11-20","points":6,"comments":3,"tags":["code-review"]}
+{"k":"se:47704","text":"Open source tool to draw GUI mockups","date":"2017-12-20","points":6,"comments":3,"tags":["linux","open-source","gui","drawing"]}
+{"k":"se:48758","text":"Compare two images, and return the rate of similarity (e.g., in %)","date":"2018-02-20","points":6,"comments":3,"tags":["computer-vision"]}
+{"k":"se:49201","text":"Timer GUI utility","date":"2018-03-18","points":6,"comments":3,"tags":["linux","gui","time-management","productivity"]}
+{"k":"se:50269","text":"Command-line utility for rendering HTML+CSS to image","date":"2018-05-22","points":6,"comments":3,"tags":["linux","open-source","images","html"]}
+{"k":"se:51520","text":"Simple, private, non-syncing folder sharing","date":"2018-08-08","points":6,"comments":3,"tags":["file-synchronization","data-transfer"]}
+{"k":"se:51580","text":"Simple Text Editor for Desktop Environment","date":"2018-08-10","points":6,"comments":3,"tags":["linux","text-editor","debian"]}
+{"k":"se:52252","text":"PDF viewer with hyperlink preview","date":"2018-09-19","points":6,"comments":3,"tags":["pdf","pdf-viewer","hyperlink","file-preview"]}
+{"k":"se:52391","text":"Convert a huge PNG picture to an interactive, zoomable map?","date":"2018-09-27","points":6,"comments":3,"tags":["data-visualization","maps","web","png"]}
+{"k":"se:52682","text":"Language-agnostic code editor with advanced formatting/highlighting features","date":"2018-10-14","points":6,"comments":3,"tags":["windows","text-editor","ide","programming"]}
+{"k":"se:52692","text":"Alternatives to DIA - a floss diagram drawing software for linux","date":"2018-10-15","points":6,"comments":3,"tags":["linux","open-source","drawing"]}
+{"k":"se:53871","text":"Educational games to master unix command line?","date":"2018-12-23","points":6,"comments":3,"tags":["linux","command-line","game","educational"]}
+{"k":"se:54015","text":"Program to visually organize family trees","date":"2018-12-27","points":6,"comments":3,"tags":["windows","project-management","data-visualization"]}
+{"k":"se:56953","text":"Is there a software that simulates a pen and paper?","date":"2019-03-23","points":6,"comments":3,"tags":["pdf","pdf-viewer","pdf-editor","pdf-generation"]}
+{"k":"se:67473","text":"Linux emoji input","date":"2019-09-05","points":6,"comments":3,"tags":["gratis","linux","offline","input-method"]}
+{"k":"se:67620","text":"Save a web page locally that will always render accurately","date":"2019-09-08","points":6,"comments":3,"tags":["web-browser","web","archiving"]}
+{"k":"se:71033","text":"Alarm that sounds upon reaching destination","date":"2019-12-02","points":6,"comments":3,"tags":["android","alarm-clock"]}
+{"k":"se:72553","text":"Drawing and making notes with mouse on a pdf during presentation","date":"2020-03-18","points":6,"comments":3,"tags":["educational","presentation"]}
+{"k":"se:85348","text":"Command line SQL formatter or beautifier","date":"2023-02-17","points":6,"comments":3,"tags":["database","osx","offline","sql"]}
+{"k":"se:86920","text":"Where is the tool to turn off all known opt-out telemetry from Microsoft?","date":"2023-04-27","points":6,"comments":3,"tags":[".net","powershell","telemetry"]}
+{"k":"se:93434","text":"Which file manager for Android is free and ad-free?","date":"2025-06-27","points":6,"comments":3,"tags":["gratis","file-management","android-app","ad-free"]}
+{"k":"se:732","text":"Digital production management software that is flexible enough to cater its quirks?","date":"2014-02-08","points":5,"comments":4,"tags":["project-management"]}
+{"k":"se:841","text":"Translate a web page on Android from / to English","date":"2014-02-10","points":5,"comments":4,"tags":["android","offline","web-browser","translation"]}
+{"k":"se:853","text":"Tool to generate CSV lists from Wikidata","date":"2014-02-10","points":5,"comments":4,"tags":["web-apps","wikidata","csv"]}
+{"k":"se:2638","text":"Online C# code beautifier","date":"2014-03-23","points":5,"comments":4,"tags":["web-apps","c#","code-beautification"]}
+{"k":"se:2930","text":"A software to simulate a 3d building construction","date":"2014-04-03","points":5,"comments":4,"tags":["windows","simulation","floor-plan"]}
+{"k":"se:3080","text":"A Notepad++ equivalent for mac?","date":"2014-04-09","points":5,"comments":4,"tags":["gratis","osx","text-editor"]}
+{"k":"se:3298","text":"Dropbox alternatives using a standard protocol","date":"2014-04-16","points":5,"comments":4,"tags":["file-synchronization"]}
+{"k":"se:3493","text":"File tagging over several internal/external disks","date":"2014-04-22","points":5,"comments":4,"tags":["document-indexing"]}
+{"k":"se:4524","text":"Chrome extension that would stream Youtube music (no video)","date":"2014-05-28","points":5,"comments":4,"tags":["chrome","streaming","youtube"]}
+{"k":"se:11009","text":"C++11 thread pool implementation","date":"2014-08-26","points":5,"comments":4,"tags":["library","c++"]}
+{"k":"se:11056","text":"Javascript unit testing framework","date":"2014-08-27","points":5,"comments":4,"tags":["javascript","unit-tests","software-testing"]}
+{"k":"se:11185","text":"What web app for conducting polls has good support for range voting?","date":"2014-09-02","points":5,"comments":4,"tags":["web-apps","voting"]}
+{"k":"se:11378","text":"Save webpages for offline reading on Android","date":"2014-09-11","points":5,"comments":4,"tags":["android","web-browser","offline","archiving"]}
+{"k":"se:11783","text":"Software to draw processor schematics","date":"2014-09-26","points":5,"comments":4,"tags":["drawing"]}
+{"k":"se:11898","text":"CMS with real-time collaboration/co-authoring (like Google Docs)?","date":"2014-10-02","points":5,"comments":4,"tags":["cms","collaboration"]}
+{"k":"se:15105","text":"Is there a document management system that keeps track of child/forked documents?","date":"2015-01-06","points":5,"comments":4,"tags":["document-management","knowledge-organization","ecm"]}
+{"k":"se:16794","text":"QR Code Generator Library (no web service)","date":"2015-01-31","points":5,"comments":4,"tags":["library","software-development","php","c#"]}
+{"k":"se:17366","text":"Monitoring Software","date":"2015-02-20","points":5,"comments":4,"tags":["open-source","monitoring"]}
+{"k":"se:17837","text":"App as a remote controller","date":"2015-03-10","points":5,"comments":4,"tags":["android"]}
+{"k":"se:18380","text":"App to send message when battery is low?","date":"2015-03-31","points":5,"comments":4,"tags":["android","notification","battery"]}
+{"k":"se:18906","text":"Web-based Text Editor for Server Files","date":"2015-04-21","points":5,"comments":4,"tags":["web-apps","web-development","text-editor"]}
+{"k":"se:19756","text":"Standalone image slideshow player application for Windows?","date":"2015-05-23","points":5,"comments":4,"tags":["windows","portable","image-viewer","slideshow"]}
+{"k":"se:20215","text":"Collaborative password storage solution for web developers","date":"2015-06-10","points":5,"comments":4,"tags":["password-manager"]}
+{"k":"se:20605","text":"Free software for creating ISO images from files or discs?","date":"2015-06-25","points":5,"comments":4,"tags":["windows","gratis","optical-media","iso"]}
+{"k":"se:21583","text":"JS Charts/Graphs Library that plays well with AngularJS?","date":"2015-07-29","points":5,"comments":4,"tags":["javascript","graphs","charts","angularjs"]}
+{"k":"se:25030","text":"Cheap software/app to publish interactive graphs (like Excel s Pivot Charts) online","date":"2015-09-21","points":5,"comments":4,"tags":["data-visualization","charts"]}
+{"k":"hn:40096424","text":"Ask HN: Is there a tool to extract ALL emails, learn \"me\", draft responses","date":"2024-04-20","points":5,"comments":3}
+{"k":"hn:33663134","text":"Ask HN: Is there a tool to follow all the people I follow in Twitter in Mastodon","date":"2022-11-18","points":5,"comments":3}
+{"k":"hn:1705388","text":"Is there a tool that sends webpages to my kindle?","date":"2010-09-19","points":3,"comments":5}
+{"k":"hn:25913949","text":"How do you approach researching a topic?","date":"2021-01-26","points":6,"comments":2}
+{"k":"hn:2303181","text":"Github for product design","date":"2011-03-09","points":5,"comments":3}
+{"k":"hn:8050623","text":"Ask HN: Is there an app to find similar fonts across platforms","date":"2014-07-17","points":5,"comments":3}
+{"k":"hn:7486544","text":"Ask HN: Is there an app that shares data only by geolocation","date":"2014-03-28","points":3,"comments":5}
+{"k":"hn:3506442","text":"Ask HN: Is there a Yelp for Special Dietary needs? Can we build it?","date":"2012-01-24","points":5,"comments":3}
+{"k":"hn:2132439","text":"Ask HN: Daily Recurring Checklist","date":"2011-01-23","points":4,"comments":4}
+{"k":"hn:22499269","text":"Ask HN: Is there a website with advanced CSS puzzles?","date":"2020-03-05","points":5,"comments":3}
+{"k":"hn:15781170","text":"Ask HN: Is there a website that provides a feed of events/exhibits/trade shows?","date":"2017-11-26","points":4,"comments":4}
+{"k":"hn:15171955","text":"Ask HN: Is there a website to submit designs to be converted to HTML/CSS/JS?","date":"2017-09-05","points":3,"comments":5}
+{"k":"hn:30475318","text":"Ask HN: Consolidated Evidence of Google's Untrustworthiness?","date":"2022-02-26","points":5,"comments":3}
+{"k":"hn:5275269","text":"Ask HN: Where do you recycle electronics?","date":"2013-02-24","points":4,"comments":4}
+{"k":"hn:377118","text":"Ask HN: How to donate $$$ to Ruby?","date":"2008-11-26","points":3,"comments":5}
+{"k":"hn:41102781","text":"Ask HN: Is there less camaraderie among engineers?","date":"2024-07-29","points":8,"comments":0}
+{"k":"hn:3700512","text":"Ask HN: Is there room for DRM-free movie distribution?","date":"2012-03-13","points":8,"comments":0}
+{"k":"hn:48982796","text":"Ask HN: Is there a Moore's Law equivalent for compute/energy use?","date":"2026-07-20","points":7,"comments":1}
+{"k":"hn:43809559","text":"Ask HN: Is there a decent configuration format?","date":"2025-04-27","points":7,"comments":1}
+{"k":"hn:33516072","text":"Ask HN: Is there a counter of junk mail being deleted globally everyday?","date":"2022-11-08","points":7,"comments":1}
+{"k":"hn:2875226","text":"Ask HN: is there a Hacker News API (other than the unofficial one)?","date":"2011-08-11","points":7,"comments":1}
+{"k":"hn:22826455","text":"Ask HN: Is there an open-source standard for resume entries?","date":"2020-04-09","points":7,"comments":1}
+{"k":"hn:17466873","text":"Ask HN: Is there another way to get to “Real AI” than deep learning?","date":"2018-07-05","points":7,"comments":1}
+{"k":"hn:14694189","text":"Ask HN: Is there a random chat site (like omegle) that isn't taken over by bots?","date":"2017-07-04","points":7,"comments":1}

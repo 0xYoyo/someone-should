@@ -19,16 +19,24 @@ const oneLine = s => String(s ?? '').replace(/<[^>]+>/g, ' ').replace(/&[a-z#0-9
 // ---------- Hacker News (Algolia, open) ----------
 const HN_QUERIES = ['"someone should make"', '"someone should build"', '"somebody should make"', '"is there a tool"', '"is there an app"',
   '"is there a website"', '"i wish there was an app"', '"i wish there was a tool"', '"why isn\'t there an app"', '"does anyone know of an app"',
-  '"is there any app"', '"is there a simple app"', '"looking for an app that"', '"ask hn: is there"'];
+  '"is there any app"', '"is there a simple app"', '"looking for an app that"', '"ask hn: is there"', '"somebody should build"',
+  '"someone needs to make"', '"i wish there was a website"', '"why is there no app"', '"i would pay for an app"', '"i\'d pay for an app"'];
+// Pull the one sentence that carries the wish out of a long comment.
+const wishSentence = (text, q) => {
+  const phrase = q.replace(/"/g, '').replace(/^ask hn: /, '').toLowerCase();
+  const parts = text.split(/(?<=[.!?])\s+/);
+  const hit = parts.find(p => p.toLowerCase().includes(phrase)) ?? text;
+  return hit.slice(0, 220);
+};
 async function hn() {
   for (const q of HN_QUERIES) {
-    for (let page = 0; page < 50; page++) {
+    for (let page = 0; page < 10; page++) { // Algolia serves at most 1000 hits per query
       const u = `https://hn.algolia.com/api/v1/search?query=${encodeURIComponent(q)}&tags=(story,comment)&hitsPerPage=100&page=${page}`;
       const res = await fetch(u, { headers: { 'User-Agent': UA } });
       if (!res.ok) { console.error('hn', res.status, q, page); break; }
       const j = await res.json();
       for (const h of j.hits) {
-        const text = oneLine(h.title || h.comment_text || h.story_text);
+        const text = h.title ? oneLine(h.title) : wishSentence(oneLine(h.comment_text || h.story_text), q);
         if (!text) continue;
         emit({ site: 'hn', id: h.objectID, url: `https://news.ycombinator.com/item?id=${h.objectID}`, date: h.created_at?.slice(0, 10),
           points: h.points ?? 0, comments: h.num_comments ?? 0, text, query: q });
@@ -42,7 +50,7 @@ async function hn() {
 
 // ---------- Software Recommendations Stack Exchange (public API, no key: 300 req/day) ----------
 async function se() {
-  for (let page = 1; page <= 120; page++) {
+  for (let page = 1; page <= 60; page++) {
     const u = `https://api.stackexchange.com/2.3/questions?order=desc&sort=votes&site=softwarerecs&pagesize=100&page=${page}`;
     const res = await fetch(u, { headers: { 'User-Agent': UA } });
     if (!res.ok) { console.error('se', res.status, page); break; }
@@ -64,7 +72,8 @@ async function reddit() {
     let after = '', fails = 0;
     for (let page = 0; page < 10; page++) {
       const u = `https://old.reddit.com/r/${sub}/top.json?t=all&limit=100${after ? '&after=' + after : ''}`;
-      const res = await fetch(u, { headers: { 'User-Agent': UA } });
+      const res = await fetch(u, { headers: { 'User-Agent': UA }, redirect: 'manual' });
+      if (res.status >= 300 && res.status < 400) { console.error('reddit requires login, skipping'); return; }
       if (!res.ok) { console.error('reddit', res.status, sub); if (++fails >= 2) break; await sleep(8000); continue; }
       const j = await res.json();
       for (const c of j.data?.children ?? []) {
