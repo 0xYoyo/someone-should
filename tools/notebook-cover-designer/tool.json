@@ -1,0 +1,54 @@
+{
+ "slug": "notebook-cover-designer",
+ "wish": "someone should make an online designer for notepad book covers",
+ "year": 2021,
+ "agreed": 65,
+ "sources": [
+  {
+   "site": "reddit",
+   "url": "https://www.reddit.com/r/Lightbulb/comments/kohoss/",
+   "date": "2021-01-01",
+   "points": 57,
+   "comments": 8
+  }
+ ],
+ "spec": "Design a notebook cover: pick size (A6, A5, B5, Letter), colour, pattern, title and small line, optionally add a photo.\nType the text, tap options, watch the cover preview update, then download a 300 dpi PNG at the exact paper size.\nIt does not save images between visits, does not print, and has no spine or back cover.",
+ "tests": [
+  {
+   "expect": {
+    "sel": "#cover text.t",
+    "contains": "Field Notes"
+   }
+  },
+  {
+   "type": {
+    "sel": "#title",
+    "text": "Recipes"
+   }
+  },
+  {
+   "expect": {
+    "sel": "#cover text.t",
+    "contains": "Recipes"
+   }
+  },
+  {
+   "tap": "#pats button[data-v=\"grid\"]"
+  },
+  {
+   "expect": {
+    "sel": "#pats button[aria-pressed=\"true\"]",
+    "contains": "grid"
+   }
+  },
+  {
+   "tap": "#sizes button[data-v=\"A6\"]"
+  }
+ ],
+ "status": "pending",
+ "built": "2026-10-27T11:18:47Z",
+ "model": "sonnet-5.5",
+ "minutes": 6,
+ "approved": false,
+ "notes": "Image upload is read locally with FileReader; PNG export runs in the browser."
+}

@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a 3D game where you play an ant avoiding people stepping on you</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+canvas { display: block; width: 100%; max-width: 480px; aspect-ratio: 6 / 7; border: 1.5px solid var(--line); border-radius: var(--radius); touch-action: none; background: var(--paper); }
+#hud { max-width: 480px; justify-content: space-between; }
+#msg { min-height: 25px; }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a 3D game where you play an ant avoiding people stepping on you</h1>
+<main id="app" class="stack">
+  <div id="hud" class="row"><span class="big" id="score">0.0 s</span><span class="meta" id="best">best 0.0 s</span></div>
+  <canvas id="c" width="360" height="420" aria-label="Floor seen from above. Drag to steer the ant."></canvas>
+  <div id="msg">Drag to steer the ant. Dodge the shadows.</div>
+  <div class="row"><button id="start" class="primary">start</button></div>
+</main>
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const cv = $('#c'), g = cv.getContext('2d');
+  const W = 360, H = 420;
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+  let best = store.get('antBest', 0);
+  let playing = false, t = 0, last = 0, nextStomp = 0, over = false;
+  let ant = { x: W / 2, y: H * 0.7, a: -Math.PI / 2 };
+  let target = null, feet = [];
+  const SPEED = 130;
+
+  $('#best').textContent = 'best ' + best.toFixed(1) + ' s';
+
+  function addFoot(aim) {
+    // Early feet land on the ant; later ones scatter around it so you must keep moving.
+    const spread = aim ? 0 : Math.min(90, 20 + t * 3);
+    let x = ant.x + (Math.random() - 0.5) * spread * 2;
+    let y = ant.y + (Math.random() - 0.5) * spread * 2;
+    if (!playing) { x = Math.random() * W; y = Math.random() * H; }
+    x = Math.max(30, Math.min(W - 30, x)); y = Math.max(40, Math.min(H - 40, y));
+    const warn = playing ? Math.max(0.55, 1.2 - t * 0.02) : 1.4;
+    feet.push({ x, y, r: 36 + Math.random() * 10, age: 0, warn, hit: false, rot: (Math.random() - 0.5) * 0.8 });
+  }
+
+  function start() {
+    playing = true; over = false; t = 0; feet = [];
+    ant = { x: W / 2, y: H * 0.7, a: -Math.PI / 2 };
+    target = null; nextStomp = 0.9;
+    addFoot(true);
+    $('#msg').textContent = 'Drag to steer the ant. Dodge the shadows.';
+    $('#start').textContent = 'restart';
+  }
+
+  function die() {
+    playing = false; over = true;
+    const s = t;
+    if (s > best) { best = s; store.set('antBest', best); }
+    $('#best').textContent = 'best ' + best.toFixed(1) + ' s';
+    $('#msg').textContent = 'Squashed after ' + s.toFixed(1) + ' s.';
+    $('#start').textContent = 'again';
+  }
+
+  function update(dt) {
+    if (playing) {
+      t += dt;
+      $('#score').textContent = t.toFixed(1) + ' s';
+      if (target) {
+        const dx = target.x - ant.x, dy = target.y - ant.y, d = Math.hypot(dx, dy);
+        if (d > 3) {
+          const step = Math.min(d, SPEED * dt);
+          ant.x += dx / d * step; ant.y += dy / d * step;
+          ant.a = Math.atan2(dy, dx);
+        }
+      }
+      nextStomp -= dt;
+      if (nextStomp <= 0) {
+        addFoot(t < 4 || Math.random() < 0.4);
+        if (t > 15 && Math.random() < 0.4) addFoot(false);
+        nextStomp = Math.max(0.35, 1.0 - t * 0.02);
+      }
+    } else if (!over) {
+      nextStomp -= dt;
+      if (nextStomp <= 0) { addFoot(false); nextStomp = 0.7; }
+    }
+    for (const f of feet) {
+      f.age += dt;
+      if (!f.hit && f.age >= f.warn) {
+        f.hit = true;
+        if (playing && Math.hypot(ant.x - f.x, ant.y - f.y) < f.r) { f.squash = true; die(); }
+      }
+    }
+    feet = feet.filter(f => f.age < f.warn + 0.6);
+  }
+
+  function draw() {
+    const paper = css('--paper'), ink = css('--ink'), line = css('--line');
+    g.fillStyle = paper; g.fillRect(0, 0, W, H);
+    // floor boards
+    g.strokeStyle = line; g.lineWidth = 1;
+    for (let y = 0; y < H; y += 60) { g.beginPath(); g.moveTo(0, y); g.lineTo(W, y); g.stroke(); }
+    for (let r = 0; r < 7; r++) for (let x = (r % 2) * 60; x < W; x += 120) { g.beginPath(); g.moveTo(x, r * 60); g.lineTo(x, r * 60 + 60); g.stroke(); }
+
+    for (const f of feet) {
+      if (f.age < f.warn) {
+        // shadow grows and darkens as the foot comes down
+        const p = f.age / f.warn;
+        g.fillStyle = ink; g.globalAlpha = 0.08 + 0.3 * p;
+        g.beginPath(); g.ellipse(f.x, f.y, f.r * (0.35 + 0.65 * p), f.r * (0.35 + 0.65 * p) * 1.35, f.rot, 0, 7); g.fill();
+        g.globalAlpha = 0.5; g.strokeStyle = css('--no'); g.lineWidth = 1.5;
+        g.beginPath(); g.ellipse(f.x, f.y, f.r, f.r * 1.35, f.rot, 0, 7); g.stroke();
+      } else {
+        // the sole, fading out after impact
+        const k = 1 - (f.age - f.warn) / 0.6;
+        g.globalAlpha = Math.max(0, k) * 0.85; g.fillStyle = ink;
+        g.beginPath(); g.ellipse(f.x, f.y, f.r, f.r * 1.35, f.rot, 0, 7); g.fill();
+        g.fillStyle = paper; g.globalAlpha = Math.max(0, k) * 0.35;
+        for (let i = -2; i <= 2; i++) { g.fillRect(f.x - f.r * 0.6, f.y + i * 14 - 2, f.r * 1.2, 3); }
+      }
+      g.globalAlpha = 1;
+    }
+    drawAnt(ink);
+    if (!playing && !over) { g.fillStyle = ink; g.globalAlpha = 0.6; g.font = '500 18px ' + css('--mono'); g.textAlign = 'center'; g.fillText('tap start', W / 2, H - 24); g.globalAlpha = 1; }
+  }
+
+  function drawAnt(ink) {
+    g.save(); g.translate(ant.x, ant.y);
+    if (over) {
+      g.globalAlpha = 0.5; g.fillStyle = css('--no');
+      g.beginPath(); g.ellipse(0, 0, 14, 8, 0, 0, 7); g.fill(); g.restore(); return;
+    }
+    g.rotate(ant.a);
+    const wig = Math.sin(performance.now() / 60) * (target && playing ? 3 : 0);
+    g.strokeStyle = ink; g.lineWidth = 1.5;
+    for (const lx of [-4, 1, 6]) {
+      g.beginPath(); g.moveTo(lx, 0); g.lineTo(lx - 2, -10 + wig); g.moveTo(lx, 0); g.lineTo(lx - 2, 10 - wig); g.stroke();
+    }
+    g.fillStyle = ink;
+    g.beginPath(); g.ellipse(-8, 0, 7, 5, 0, 0, 7); g.fill();
+    g.beginPath(); g.ellipse(1, 0, 4, 3.5, 0, 0, 7); g.fill();
+    g.beginPath(); g.ellipse(9, 0, 4.5, 4, 0, 0, 7); g.fill();
+    g.beginPath(); g.moveTo(12, -1); g.lineTo(18, -6); g.moveTo(12, 1); g.lineTo(18, 6); g.stroke();
+    g.restore();
+  }
+
+  function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000 || 0); last = now;
+    update(dt); draw();
+    requestAnimationFrame(frame);
+  }
+
+  function setTarget(e) {
+    if (!playing) return;
+    const r = cv.getBoundingClientRect();
+    target = { x: (e.clientX - r.left) / r.width * W, y: (e.clientY - r.top) / r.height * H };
+  }
+  cv.addEventListener('pointerdown', e => { setTarget(e); try { cv.setPointerCapture(e.pointerId); } catch {} });
+  cv.addEventListener('pointermove', e => { if (e.buttons || e.pointerType === 'touch') setTarget(e); });
+  $('#start').addEventListener('click', start);
+  addEventListener('keydown', e => {
+    const d = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] }[e.key];
+    if (d && playing) { e.preventDefault(); target = { x: ant.x + d[0] * 60, y: ant.y + d[1] * 60 }; }
+  });
+
+  addFoot(false); feet[0].x = 90; feet[0].y = 110; feet[0].age = 0.7; nextStomp = 0.5;
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

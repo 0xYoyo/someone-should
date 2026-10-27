@@ -2112,6 +2112,50 @@
       "model": "sonnet-5.5",
       "approved": false,
       "wave": 2
+    },
+    {
+      "slug": "ant-dodge-the-feet",
+      "status": "pass",
+      "kb": 10,
+      "tests": "6/6",
+      "built": "2026-10-27T11:18:50Z",
+      "minutes": 1,
+      "model": "sonnet-5.5",
+      "approved": false,
+      "wave": 2
+    },
+    {
+      "slug": "closet-outfit-picker",
+      "status": "pass",
+      "kb": 11.1,
+      "tests": "6/6",
+      "built": "2026-10-27T11:18:51Z",
+      "minutes": 4,
+      "model": "sonnet-5.5",
+      "approved": false,
+      "wave": 2
+    },
+    {
+      "slug": "notebook-cover-designer",
+      "status": "pass",
+      "kb": 11.6,
+      "tests": "6/6",
+      "built": "2026-10-27T11:18:47Z",
+      "minutes": 6,
+      "model": "sonnet-5.5",
+      "approved": false,
+      "wave": 2
+    },
+    {
+      "slug": "interval-ping-timer",
+      "status": "pass",
+      "kb": 11.6,
+      "tests": "6/6",
+      "built": "2026-10-27T11:19:04Z",
+      "minutes": 5,
+      "model": "sonnet-5.5",
+      "approved": false,
+      "wave": 2
     }
   ]
 }

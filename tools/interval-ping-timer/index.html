@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app that pings at set intervals for a set time</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+
+h1, .meta { font-size: 16px; }
+.ring { position: relative; width: 240px; height: 240px; margin: 4px auto 8px; }
+.ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring circle { fill: none; stroke-width: 8; }
+.ring .bg { stroke: var(--line); }
+.ring .fg { stroke: var(--ink); stroke-linecap: butt; }
+.ring.flash .fg { stroke: var(--built); }
+.mid { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
+.fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+label { display: grid; gap: 6px; font-size: 16px; color: var(--meta); }
+.err { color: var(--no); min-height: 24px; margin: 0; }
+.row button { flex: 1; }
+.done { color: var(--built); }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make an app that pings at set intervals for a set time</h1>
+
+<main id="app" class="stack">
+  <div class="ring" id="ring">
+    <svg viewBox="0 0 100 100" aria-hidden="true">
+      <circle class="bg" cx="50" cy="50" r="45"></circle>
+      <circle class="fg" id="arc" cx="50" cy="50" r="45" stroke-dasharray="282.74" stroke-dashoffset="282.74"></circle>
+    </svg>
+    <div class="mid">
+      <div class="big" id="next">00:30</div>
+      <div class="meta">until next ping</div>
+      <div class="meta" id="count">0 of 10 pings</div>
+    </div>
+  </div>
+  <div class="meta" id="left" style="text-align:center">05:00 left</div>
+  <div class="fields">
+    <label>Ping every (seconds)<input id="every" type="number" inputmode="numeric" min="1" step="1" value="30"></label>
+    <label>For (minutes)<input id="total" type="number" inputmode="decimal" min="0.1" step="any" value="5"></label>
+  </div>
+  <label>Sound
+    <select id="tone">
+      <option value="beep">Beep</option>
+      <option value="chime">Chime</option>
+      <option value="low">Low</option>
+      <option value="click">Click</option>
+      <option value="off">Silent (vibrate only)</option>
+    </select>
+  </label>
+  <p class="err" id="err" role="status"></p>
+  <div class="row">
+    <button class="primary" id="start">Start</button>
+    <button id="reset">Reset</button>
+  </div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const CIRC = 282.74;
+  const els = {
+    ring: $('#ring'), arc: $('#arc'), next: $('#next'), count: $('#count'), left: $('#left'),
+    every: $('#every'), total: $('#total'), tone: $('#tone'), err: $('#err'),
+    start: $('#start'), reset: $('#reset')
+  };
+
+  // state: 'idle' | 'running' | 'paused' | 'done'
+  let state = 'idle';
+  let elapsed = 0;       // ms counted before the current run segment
+  let startedAt = 0;     // performance.now() when the segment began
+  let pinged = 0;
+  let timer = null;
+  let audio = null;
+  let wake = null;
+  let everyMs = 30000, totalMs = 300000, pingCount = 10;
+
+  const saved = store.get('ping-settings', null);
+  if (saved) {
+    if (saved.every > 0) els.every.value = saved.every;
+    if (saved.total > 0) els.total.value = saved.total;
+    if (saved.tone) els.tone.value = saved.tone;
+  }
+
+  const fmt = ms => {
+    const s = Math.max(0, Math.ceil(ms / 1000));
+    const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), r = s % 60;
+    const two = n => String(n).padStart(2, '0');
+    return h ? h + ':' + two(m) + ':' + two(r) : two(m) + ':' + two(r);
+  };
+
+  function readInputs() {
+    const e = Number(els.every.value), t = Number(els.total.value);
+    if (!(e >= 1)) return 'Interval must be at least 1 second.';
+    if (!(t > 0)) return 'Enter how many minutes to run.';
+    if (t * 60 < e) return 'Total time is shorter than one interval.';
+    everyMs = e * 1000;
+    totalMs = Math.round(t * 60000);
+    pingCount = Math.floor(totalMs / everyMs + 1e-9);
+    return '';
+  }
+
+  function getAudio() {
+    if (audio) return audio;
+    try { const C = window.AudioContext || window.webkitAudioContext; audio = C ? new C() : null; } catch { audio = null; }
+    return audio;
+  }
+
+  // one note: frequency, start offset, length, wave type
+  function note(ctx, f, at, len, type, vol) {
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type; o.frequency.value = f;
+    const t0 = ctx.currentTime + at;
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol, t0 + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + len);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(t0); o.stop(t0 + len + 0.02);
+  }
+
+  function sound(kind, final) {
+    if (kind !== 'off') {
+      const ctx = getAudio();
+      if (ctx) {
+        try {
+          if (ctx.state === 'suspended') ctx.resume();
+          if (kind === 'beep') note(ctx, 880, 0, 0.25, 'sine', 0.4);
+          else if (kind === 'chime') { note(ctx, 1319, 0, 0.7, 'sine', 0.35); note(ctx, 1760, 0.12, 0.7, 'sine', 0.2); }
+          else if (kind === 'low') note(ctx, 220, 0, 0.4, 'triangle', 0.5);
+          else if (kind === 'click') note(ctx, 1800, 0, 0.04, 'square', 0.25);
+          if (final) { note(ctx, 660, 0.35, 0.2, 'sine', 0.4); note(ctx, 990, 0.6, 0.35, 'sine', 0.4); }
+        } catch {}
+      }
+    }
+    try { if (navigator.vibrate) navigator.vibrate(final ? [200, 100, 200] : 120); } catch {}
+  }
+
+  function flash() {
+    els.ring.classList.add('flash');
+    setTimeout(() => els.ring.classList.remove('flash'), 400);
+  }
+
+  function render() {
+    const rem = Math.max(0, totalMs - elapsed);
+    const frac = Math.min(1, elapsed / totalMs);
+    els.arc.setAttribute('stroke-dashoffset', String(CIRC * (1 - frac)));
+    const toNext = state === 'done' ? 0 : Math.min(rem, (pinged + 1) * everyMs - elapsed);
+    els.next.textContent = state === 'done' ? 'Done' : fmt(toNext);
+    els.next.className = 'big' + (state === 'done' ? ' done' : '');
+    els.count.textContent = pinged + ' of ' + pingCount + (pingCount === 1 ? ' ping' : ' pings');
+    els.left.textContent = state === 'done' ? 'finished' : fmt(rem) + ' left' + (state === 'paused' ? ' (paused)' : '');
+    els.start.textContent = state === 'running' ? 'Pause' : state === 'paused' ? 'Resume' : state === 'done' ? 'Again' : 'Start';
+    const lock = state === 'running' || state === 'paused';
+    els.every.disabled = els.total.disabled = lock;
+  }
+
+  function tick() {
+    elapsed = Math.min(totalMs, elapsedBase + (performance.now() - startedAt));
+    while (pinged < pingCount && elapsed >= (pinged + 1) * everyMs - 1) {
+      pinged++;
+      const last = elapsed >= totalMs - 1 || (pinged === pingCount && totalMs - pinged * everyMs < 1);
+      sound(els.tone.value, last);
+      flash();
+    }
+    if (elapsed >= totalMs) {
+      stopTimer();
+      state = 'done';
+      if (pinged === pingCount && pingCount * everyMs < totalMs) sound(els.tone.value, true);
+      releaseWake();
+    }
+    render();
+  }
+
+  let elapsedBase = 0;
+  function startTimer() {
+    elapsedBase = elapsed;
+    startedAt = performance.now();
+    clearInterval(timer);
+    timer = setInterval(tick, 100);
+  }
+  function stopTimer() { clearInterval(timer); timer = null; }
+
+  async function takeWake() {
+    try { if (navigator.wakeLock) wake = await navigator.wakeLock.request('screen'); } catch { wake = null; }
+  }
+  function releaseWake() {
+    try { if (wake) wake.release(); } catch {}
+    wake = null;
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && state === 'running') { tick(); takeWake(); }
+  });
+
+  function reset() {
+    stopTimer();
+    releaseWake();
+    state = 'idle'; elapsed = 0; pinged = 0;
+    els.err.textContent = readInputs();
+    if (els.err.textContent) { pingCount = 0; totalMs = 1; }
+    render();
+  }
+
+  els.start.addEventListener('click', () => {
+    if (state === 'running') {
+      tick();
+      stopTimer(); releaseWake();
+      state = 'paused';
+      render();
+      return;
+    }
+    if (state === 'idle' || state === 'done') {
+      const msg = readInputs();
+      els.err.textContent = msg;
+      if (msg) return;
+      elapsed = 0; pinged = 0;
+      store.set('ping-settings', { every: Number(els.every.value), total: Number(els.total.value), tone: els.tone.value });
+    }
+    getAudio();
+    if (audio && audio.state === 'suspended') audio.resume();
+    state = 'running';
+    startTimer();
+    takeWake();
+    render();
+  });
+
+  els.reset.addEventListener('click', reset);
+  [els.every, els.total].forEach(el => el.addEventListener('input', () => {
+    if (state === 'idle' || state === 'done') reset();
+  }));
+  els.tone.addEventListener('change', () => {
+    store.set('ping-settings', { every: Number(els.every.value), total: Number(els.total.value), tone: els.tone.value });
+    sound(els.tone.value, false);
+  });
+
+  reset();
+})();
+</script>
+</body>
+</html>

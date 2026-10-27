@@ -1,0 +1,22 @@
+{
+ "slug": "closet-outfit-picker",
+ "wish": "someone should make a closet stylist app where you input your clothes",
+ "year": 2010,
+ "agreed": 60,
+ "sources": [{"site":"reddit","url":"https://www.reddit.com/r/SomebodyMakeThis/comments/dvhln/","date":"2010-10-24","points":16,"comments":12},{"site":"reddit","url":"https://www.reddit.com/r/SomebodyMakeThis/comments/b0b4bv/","date":"2019-03-12","points":10,"comments":8},{"site":"reddit","url":"https://www.reddit.com/r/AppIdeas/comments/l1huph/","date":"2021-01-20","points":7,"comments":7}],
+ "spec": "Builds an outfit from the clothes you list: top, bottom, shoes and a layer when the weather needs one.\nPick warm, mild or cold, tap Another outfit, add or remove pieces; Wearing this logs it so later picks favour pieces not worn lately.\nIt does not take photos, check a forecast or judge style beyond one loud colour per outfit.",
+ "tests": [
+  {"expect": {"sel": "#outfit .piece", "visible": true}},
+  {"tap": "#w-cold"},
+  {"expect": {"sel": "#outfit", "contains": "layer"}},
+  {"type": {"sel": "#name", "text": "yellow rain jacket"}},
+  {"tap": "#add"},
+  {"expect": {"sel": "#list", "contains": "yellow rain jacket"}}
+ ],
+ "status": "pending",
+ "built": "2026-10-27T11:18:51Z",
+ "model": "sonnet-5.5",
+ "minutes": 4,
+ "approved": false,
+ "notes": ""
+}

@@ -1,0 +1,51 @@
+{
+ "slug": "ant-dodge-the-feet",
+ "wish": "someone should make a 3D game where you play an ant avoiding people stepping on you",
+ "year": 2013,
+ "agreed": 62,
+ "sources": [
+  {
+   "site": "reddit",
+   "url": "https://www.reddit.com/r/CrazyIdeas/comments/1gl3qf/",
+   "date": "2013-06-18",
+   "points": 49,
+   "comments": 13
+  }
+ ],
+ "spec": "Top-down floor game: you are an ant, shadows of feet grow and then stomp.\nDrag on the floor to steer the ant out of the shadows; your score is seconds survived.\nIt is not 3D, has no sound and no levels; the best time is kept on this device.",
+ "tests": [
+  {
+   "tap": "#start"
+  },
+  {
+   "wait": 1500
+  },
+  {
+   "expect": {
+    "sel": "#msg",
+    "contains": "Squashed"
+   }
+  },
+  {
+   "tap": "#start"
+  },
+  {
+   "expect": {
+    "sel": "#msg",
+    "contains": "Drag"
+   }
+  },
+  {
+   "expect": {
+    "sel": "#score",
+    "matches": "\\d\\.\\d s"
+   }
+  }
+ ],
+ "status": "pending",
+ "built": "2026-10-27T11:18:50Z",
+ "model": "sonnet-5.5",
+ "minutes": 1,
+ "approved": false,
+ "notes": "Drawn top-down in 2D canvas; depth is suggested by growing shadows, not true 3D."
+}

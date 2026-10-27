@@ -1,0 +1,68 @@
+{
+ "slug": "interval-ping-timer",
+ "wish": "someone should make an app that pings at set intervals for a set time",
+ "year": 2020,
+ "agreed": 61,
+ "sources": [
+  {
+   "site": "reddit",
+   "url": "https://www.reddit.com/r/SomebodyMakeThis/comments/g4m20p/",
+   "date": "2020-04-20",
+   "points": 14,
+   "comments": 18
+  },
+  {
+   "site": "reddit",
+   "url": "https://www.reddit.com/r/AppIdeas/comments/f3lzsu/",
+   "date": "2020-02-14",
+   "points": 5,
+   "comments": 14
+  },
+  {
+   "site": "reddit",
+   "url": "https://www.reddit.com/r/AppIdeas/comments/o527c8/",
+   "date": "2021-06-21",
+   "points": 2,
+   "comments": 8
+  }
+ ],
+ "spec": "Pings at a set interval until a set total time has passed, with a countdown to the next ping, a progress ring and a count of pings so far.\nSet seconds between pings and minutes to run, pick a sound, press Start; Pause and Resume or Reset at any time.\nIt does not ping with the screen locked or the tab in the background on every phone, and it sends no notifications.",
+ "tests": [
+  {
+   "type": {
+    "sel": "#every",
+    "text": "1"
+   }
+  },
+  {
+   "type": {
+    "sel": "#total",
+    "text": "0.1"
+   }
+  },
+  {
+   "expect": {
+    "sel": "#count",
+    "contains": "0 of 6 pings"
+   }
+  },
+  {
+   "tap": "#start"
+  },
+  {
+   "wait": 1400
+  },
+  {
+   "expect": {
+    "sel": "#count",
+    "matches": "^[1-9] of 6"
+   }
+  }
+ ],
+ "status": "pending",
+ "built": "2026-10-27T11:19:04Z",
+ "model": "sonnet-5.5",
+ "minutes": 5,
+ "approved": false,
+ "notes": "Audio and vibration only fire while the page is open; browsers may throttle background tabs. A screen wake lock is requested when supported."
+}
