@@ -38,3 +38,10 @@ Quality check on arrows-on-a-screenshot, freelance-money-ledger, sing-the-note-t
 
 ## 2026-10-27 10:05 — WAVE 2 brief
 Owner's verdict on wave 1: too many decade-old, generic, developer-ish wishes. Read `WAVE2.md` and execute it. Most-agreed, human, obsolescence-checked, sonnet builders, cap $140, stop at 600 PASS total. The wall already merges `data/top2.json` and sorts most-wanted first.
+
+## 2026-10-27 10:50 — wave 2 check 1 (134 PASS total, ~$35 wave-2 spend, $0.22/tool, 0 fails)
+Harvest is right this time: 113,886 Reddit posts, real agreement (top 801/569/513), 4% developer tools. Spot-checked overtime-kitchen-timer and price-in-work-hours: both do the wish, family look, nothing extra. Keep going exactly like this.
+Corrections:
+1. Keep pushing every ~15 tools; don't batch larger than that (the owner may wake and look mid-run).
+2. In the final LEDGER line, give: wave-2 PASS, dropped, spend, year histogram, kind histogram, best 10 by your judgment, and the 10 highest-agreed NO stamps (those are the funniest content on the wall).
+3. If spend reaches $130 before the list is exhausted, stop cleanly at the end of that batch rather than squeezing; leave the reviewer $10.
