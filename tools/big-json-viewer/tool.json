@@ -1,0 +1,61 @@
+{
+  "slug": "big-json-viewer",
+  "wish": "someone should make a viewer for huge JSON files",
+  "year": 2014,
+  "agreed": 67,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/18839/viewer-for-huge-json-files-on-windows",
+      "date": "2015-04-19",
+      "points": 50,
+      "comments": 10
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/3277/render-json-with-collapsibility",
+      "date": "2014-04-15",
+      "points": 5,
+      "comments": 2
+    }
+  ],
+  "spec": "Opens or pastes JSON of tens of megabytes and shows it as a collapsible tree that only renders the rows on screen.\nTap a row to expand it and see its path; search keys and values in the background; tap a match to jump to it; copy the path.\nIt does not edit, format or save JSON, and nothing leaves the device.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#src",
+        "text": "{\"users\":[{\"name\":\"Ada\",\"tags\":[\"x\"]},{\"name\":\"Linus\"}]}"
+      }
+    },
+    {
+      "tap": "#view"
+    },
+    {
+      "expect": {
+        "sel": "#tree",
+        "contains": "users"
+      }
+    },
+    {
+      "type": {
+        "sel": "#q",
+        "text": "linus"
+      }
+    },
+    {
+      "tap": "#find"
+    },
+    {
+      "expect": {
+        "sel": ".hit",
+        "contains": "$.users[1].name"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:54:47Z",
+  "model": "opus-5.5",
+  "minutes": 8,
+  "approved": false,
+  "notes": "Checked with an 18 MB file: parse 180 ms, full search 0.7 s. One open array past about 700k items exceeds the browser scroll height, so the tail of it cannot be scrolled to (search still reaches it)."
+}

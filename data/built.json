@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T01:56:22.899Z",
+ "updated": "2026-10-27T01:56:39.872Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -575,9 +575,14 @@
   },
   {
    "slug": "big-json-viewer",
-   "status": "pending",
+   "status": "pass",
    "attempts": 1,
-   "model": "opus-5.5"
+   "model": "opus-5.5",
+   "kb": 13.5,
+   "tests": "6/6",
+   "built": "2026-10-27T01:54:47Z",
+   "minutes": 8,
+   "approved": false
   },
   {
    "slug": "offline-qr-code-maker",
