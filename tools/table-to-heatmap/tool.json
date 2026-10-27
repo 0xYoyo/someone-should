@@ -1,0 +1,51 @@
+{
+  "slug": "table-to-heatmap",
+  "wish": "someone should make a tool that makes a heatmap from a table of numbers",
+  "year": 2016,
+  "agreed": 11,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/35873/heatmap-chart-generator-for-table-matrix-data",
+      "date": "2016-09-01",
+      "points": 7,
+      "comments": 4
+    }
+  ],
+  "spec": "Turns a pasted table of numbers (spreadsheet, CSV or space-separated, labels optional) into a colored heatmap with a scale.\nPaste or type the table, pick colors and whether to scale across the whole table, each row or each column, then save as SVG or PNG.\nIt does not cluster or reorder rows, and blank or non-number cells are drawn hatched rather than guessed.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#data",
+        "text": "x,a,b\nr1,1,9\nr2,5,3"
+      }
+    },
+    {
+      "tap": "#draw"
+    },
+    {
+      "expect": {
+        "sel": "#status",
+        "contains": "2 rows × 2 columns, 1 to 9"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#map .cell",
+        "count": 4
+      }
+    },
+    {
+      "expect": {
+        "sel": "#map .row-label",
+        "contains": "r1"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T02:00:22Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "PNG export renders the SVG to a canvas locally; no network."
+}

@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T02:01:51.338Z",
+ "updated": "2026-10-27T02:01:55.932Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -753,9 +753,14 @@
   },
   {
    "slug": "table-to-heatmap",
-   "status": "pending",
+   "status": "pass",
    "attempts": 1,
-   "model": "opus-5.5"
+   "model": "opus-5.5",
+   "kb": 15.3,
+   "tests": "5/5",
+   "built": "2026-10-27T02:00:22Z",
+   "minutes": 6,
+   "approved": false
   },
   {
    "slug": "redact-a-scan",
