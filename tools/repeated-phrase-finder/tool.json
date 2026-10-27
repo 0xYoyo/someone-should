@@ -1,0 +1,54 @@
+{
+  "slug": "repeated-phrase-finder",
+  "wish": "someone should make a tool that detects repeated sentences or phrases in a document",
+  "year": 2015,
+  "agreed": 18,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/16200/detect-repeated-sentences-or-phrases-in-a-document",
+      "date": "2015-01-11",
+      "points": 16,
+      "comments": 2
+    }
+  ],
+  "spec": "Finds every sentence and every phrase of N or more words that appears more than once in pasted text, ignoring case and punctuation.\nPaste a document, pick a minimum length, tap Find repeats; tap a result to highlight each occurrence in the text and step through them.\nIt does not catch paraphrases or near-duplicates, and it does not upload anything: the text stays on the device.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#text",
+        "text": "The quick brown fox jumps over the lazy dog. Cats sleep all day long. Then the quick brown fox ran home to rest. Cats sleep all day long."
+      }
+    },
+    {
+      "tap": "#find"
+    },
+    {
+      "expect": {
+        "sel": "#results li",
+        "contains": "Cats sleep all day long."
+      }
+    },
+    {
+      "expect": {
+        "sel": "#results li:nth-child(2)",
+        "contains": "quick brown fox"
+      }
+    },
+    {
+      "tap": "#results li:nth-child(2)"
+    },
+    {
+      "expect": {
+        "sel": "#pos",
+        "contains": "1 of 2"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T02:08:16Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Exact matches only, case and punctuation ignored. Shorter phrases are listed only when they also occur outside a longer repeat."
+}

@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that detects repeated sentences or phrases in a document</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles ---- */
+textarea { min-height: 200px; resize: vertical; line-height: 1.45; }
+label.inline { display: flex; align-items: center; gap: 8px; }
+label.inline select { width: auto; }
+.controls { justify-content: space-between; }
+h2 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 8px 0 0; }
+#results li { cursor: pointer; align-items: flex-start; min-height: var(--tap); }
+#results li.on .ph { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+#results li .ph { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+#results li .n { font: 16px/1.45 var(--mono); white-space: nowrap; color: var(--meta); }
+#results li .n b { color: var(--ink); font-weight: 600; }
+.kind { font: 13px/1.4 var(--mono); color: var(--meta); display: block; }
+#doc { white-space: pre-wrap; overflow-wrap: anywhere; border-top: 1px solid var(--line); padding-top: 12px; }
+#doc mark { background: var(--ink); color: var(--paper); border-radius: 2px; padding: 0 1px; }
+#doc mark.cur { outline: 2px solid var(--no); outline-offset: 1px; }
+#nav { position: sticky; bottom: 0; background: var(--paper); padding: 8px 0; border-top: 1px solid var(--line); }
+#nav[hidden], #doc[hidden] { display: none; }
+#nav span { flex: 1; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that detects repeated sentences or phrases in a document</h1>
+
+<main id="app" class="stack">
+  <textarea id="text" placeholder="Paste a document" aria-label="Document text" spellcheck="false"></textarea>
+  <div class="row controls">
+    <label class="inline">min words
+      <select id="min" aria-label="Minimum phrase length in words">
+        <option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option><option>8</option><option>10</option>
+      </select>
+    </label>
+    <label class="inline">sort
+      <select id="sort" aria-label="Sort results">
+        <option value="len">longest</option><option value="count">most often</option>
+      </select>
+    </label>
+    <button id="find" class="primary">Find repeats</button>
+  </div>
+  <p id="status" class="meta" aria-live="polite"></p>
+  <ul id="results" class="plain"></ul>
+  <div id="doc" hidden></div>
+  <div id="nav" class="row" hidden>
+    <span id="pos" class="meta"></span>
+    <button id="prev" aria-label="Previous occurrence">Prev</button>
+    <button id="next" aria-label="Next occurrence">Next</button>
+  </div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const text = $('#text'), minSel = $('#min'), sortSel = $('#sort');
+  const results = $('#results'), status = $('#status'), docEl = $('#doc');
+  const nav = $('#nav'), pos = $('#pos');
+
+  text.value = store.get('rpf.text', '');
+  minSel.value = String(store.get('rpf.min', 3));
+  sortSel.value = store.get('rpf.sort', 'len');
+
+  let src = '', items = [], active = null, cur = 0;
+
+  // Words with character offsets. Apostrophes and hyphens stay inside words.
+  function tokenize(s) {
+    const re = /[\p{L}\p{N}]+(?:['’\-][\p{L}\p{N}]+)*/gu;
+    const words = [];
+    let m;
+    while ((m = re.exec(s))) words.push({ w: m[0].toLowerCase().replace(/’/g, "'"), a: m.index, b: m.index + m[0].length });
+    return words;
+  }
+
+  // Repeated word sequences of length >= min, keeping only maximal ones:
+  // a shorter phrase is listed only if it also occurs outside the longer repeats.
+  function findPhrases(words, min) {
+    const ids = new Map(), seq = new Int32Array(words.length);
+    words.forEach((t, i) => { let id = ids.get(t.w); if (id == null) ids.set(t.w, id = ids.size); seq[i] = id; });
+    const levels = [];
+    let starts = null; // positions whose (n-1)-gram repeated
+    for (let n = min; n <= words.length; n++) {
+      const groups = new Map();
+      const cand = starts || Array.from({ length: words.length - n + 1 }, (_, i) => i);
+      for (const p of cand) {
+        if (p + n > words.length) continue;
+        let key = '';
+        for (let j = p; j < p + n; j++) key += seq[j] + ',';
+        const g = groups.get(key);
+        if (g) g.push(p); else groups.set(key, [p]);
+      }
+      const rep = [];
+      const next = [];
+      for (const ps of groups.values()) if (ps.length > 1) { rep.push(ps); next.push(...ps); }
+      if (!rep.length) break;
+      levels.push({ n, rep });
+      starts = next;
+    }
+    // top-down: mark word ranges covered by longer kept phrases
+    const covers = [];
+    const out = [];
+    const inside = (p, n) => covers.some(c => p >= c.a && p + n <= c.b);
+    for (let i = levels.length - 1; i >= 0; i--) {
+      const { n, rep } = levels[i];
+      const added = [];
+      for (const ps of rep) {
+        // drop occurrences that overlap themselves (e.g. "a a a a")
+        const occ = [];
+        for (const p of ps) if (!occ.length || p >= occ[occ.length - 1] + n) occ.push(p);
+        if (occ.length < 2) continue;
+        if (occ.every(p => inside(p, n))) continue;
+        out.push({ kind: 'phrase', words: n, spans: occ.map(p => [words[p].a, words[p + n - 1].b]) });
+        occ.forEach(p => added.push({ a: p, b: p + n }));
+      }
+      covers.push(...added);
+    }
+    return out;
+  }
+
+  // Whole sentences that appear more than once (case and spacing ignored).
+  function findSentences(s, min) {
+    const re = /[^.!?\n]+(?:[.!?]+["'”’)]*|\n|$)/g;
+    const groups = new Map();
+    let m;
+    while ((m = re.exec(s))) {
+      if (!m[0]) { re.lastIndex++; continue; }
+      const raw = m[0];
+      const lead = raw.length - raw.trimStart().length;
+      const body = raw.trim();
+      const toks = tokenize(body), n = toks.length;
+      if (n < min) continue;
+      const key = toks.map(t => t.w).join(' ');
+      const a = m.index + lead, b = a + body.length;
+      const w = (a + toks[0].a) + ':' + n;
+      const g = groups.get(key);
+      if (g) { g.spans.push([a, b]); g.wk.push(w); } else groups.set(key, { kind: 'sentence', words: n, spans: [[a, b]], wk: [w] });
+    }
+    return [...groups.values()].filter(g => g.spans.length > 1);
+  }
+
+  function esc(s) { return s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+  function run() {
+    src = text.value;
+    const min = +minSel.value;
+    store.set('rpf.text', src); store.set('rpf.min', min); store.set('rpf.sort', sortSel.value);
+    active = null; nav.hidden = true;
+    results.innerHTML = '';
+    if (!src.trim()) { status.textContent = 'Paste some text first.'; docEl.hidden = true; return; }
+    const words = tokenize(src);
+    if (words.length > 200000) { status.textContent = 'Too long. Try under 200,000 words.'; return; }
+    const sentences = findSentences(src, min);
+    const sentKeys = new Set(sentences.map(x => x.wk.join('|')));
+    // a phrase that is exactly a repeated sentence is listed once, as the sentence
+    const phrases = findPhrases(words, min).filter(p => !sentKeys.has(p.spans.map(s => s[0] + ':' + p.words).join('|')));
+    items = sentences.concat(phrases);
+    const byLen = (x, y) => y.words - x.words || y.spans.length - x.spans.length;
+    const byCount = (x, y) => y.spans.length - x.spans.length || y.words - x.words;
+    items.sort(sortSel.value === 'count' ? byCount : byLen);
+    items.sort((x, y) => (x.kind === y.kind ? 0 : x.kind === 'sentence' ? -1 : 1));
+    if (!items.length) {
+      status.textContent = `No repeats of ${min}+ words in ${words.length} words.`;
+      docEl.hidden = true;
+      return;
+    }
+    const ns = sentences.length, np = phrases.length;
+    status.textContent = `${ns} repeated sentence${ns === 1 ? '' : 's'}, ${np} repeated phrase${np === 1 ? '' : 's'} in ${words.length} words.`;
+    const frag = document.createDocumentFragment();
+    items.forEach((it, i) => {
+      const li = document.createElement('li');
+      li.tabIndex = 0;
+      li.setAttribute('role', 'button');
+      li.dataset.i = i;
+      const t = src.slice(it.spans[0][0], it.spans[0][1]).replace(/\s+/g, ' ');
+      li.innerHTML = `<span class="ph"><span class="kind">${it.kind}, ${it.words} words</span>${esc(t)}</span><span class="n"><b>${it.spans.length}</b>×</span>`;
+      frag.appendChild(li);
+    });
+    results.appendChild(frag);
+    docEl.hidden = false;
+    renderDoc();
+  }
+
+  function renderDoc() {
+    if (!active) { docEl.textContent = src; return; }
+    let html = '', at = 0;
+    active.spans.forEach(([a, b], k) => {
+      html += esc(src.slice(at, a)) + `<mark${k === cur ? ' class="cur"' : ''}>` + esc(src.slice(a, b)) + '</mark>';
+      at = b;
+    });
+    docEl.innerHTML = html + esc(src.slice(at));
+  }
+
+  function show(k) {
+    const n = active.spans.length;
+    cur = (k + n) % n;
+    renderDoc();
+    pos.textContent = `${cur + 1} of ${n}`;
+    const m = docEl.querySelectorAll('mark')[cur];
+    if (m) m.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }
+
+  function pick(li) {
+    results.querySelectorAll('li.on').forEach(x => x.classList.remove('on'));
+    li.classList.add('on');
+    active = items[+li.dataset.i];
+    nav.hidden = false;
+    show(0);
+  }
+
+  $('#find').addEventListener('click', run);
+  sortSel.addEventListener('change', () => { if (src) run(); });
+  minSel.addEventListener('change', () => { if (src) run(); });
+  results.addEventListener('click', e => { const li = e.target.closest('li'); if (li) pick(li); });
+  results.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { const li = e.target.closest('li'); if (li) { e.preventDefault(); pick(li); } } });
+  $('#prev').addEventListener('click', () => active && show(cur - 1));
+  $('#next').addEventListener('click', () => active && show(cur + 1));
+  let saveT;
+  text.addEventListener('input', () => { clearTimeout(saveT); saveT = setTimeout(() => store.set('rpf.text', text.value), 400); });
+})();
+</script>
+</body>
+</html>
