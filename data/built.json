@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T01:57:53.542Z",
+ "updated": "2026-10-27T01:58:44.529Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -586,9 +586,14 @@
   },
   {
    "slug": "offline-qr-code-maker",
-   "status": "pending",
+   "status": "pass",
    "attempts": 1,
-   "model": "opus-5.5"
+   "model": "opus-5.5",
+   "kb": 18.1,
+   "tests": "6/6",
+   "built": "2026-10-27T01:58:24Z",
+   "minutes": 14,
+   "approved": false
   },
   {
    "slug": "memorable-password-maker",

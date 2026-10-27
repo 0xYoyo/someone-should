@@ -1,0 +1,64 @@
+{
+  "slug": "offline-qr-code-maker",
+  "wish": "someone should make a tool that generates QR codes without a web service",
+  "year": 2015,
+  "agreed": 16,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/16794/qr-code-generator-library-no-web-service",
+      "date": "2015-01-31",
+      "points": 5,
+      "comments": 4
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/46678/privacy-friendly-qr-code-app",
+      "date": "2017-10-25",
+      "points": 6,
+      "comments": 1
+    }
+  ],
+  "spec": "Turns text, a link or Wi-Fi details into a QR code right in the browser, with a selectable error-correction level.\nType or paste, or switch to Wi-Fi and enter the network name and password; the code updates as you type; download it as PNG or SVG.\nIt sends nothing anywhere, does not scan codes, and does not remember what you encoded.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#text",
+        "text": "HELLO"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#info",
+        "contains": "21×21 modules"
+      }
+    },
+    {
+      "tap": "#mode-wifi"
+    },
+    {
+      "type": {
+        "sel": "#ssid",
+        "text": "Cafe;5G"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#payload",
+        "contains": "WIFI:T:WPA;S:Cafe\\;5G;"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#qr svg",
+        "visible": true
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:58:24Z",
+  "model": "opus-5.5",
+  "minutes": 14,
+  "approved": false,
+  "notes": "QR encoder written from scratch (byte mode, UTF-8, versions 1-40, L/M/Q/H, all 8 masks). Matrices cross-checked bit-for-bit against the python qrcode library on 88 cases up to version 40."
+}
