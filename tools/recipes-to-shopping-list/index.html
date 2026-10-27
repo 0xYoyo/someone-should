@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a recipe database with a shopping list generator</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+h2 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 8px 0 0; }
+textarea { min-height: 132px; resize: vertical; }
+.grow { flex: 1 1 auto; min-width: 0; }
+.rname { flex: 1 1 auto; min-width: 0; text-align: left; border: 0; padding: 0; overflow-wrap: anywhere; }
+.rname small { display: block; color: var(--meta); font-size: 14px; }
+.step { display: flex; align-items: center; gap: 6px; flex: none; }
+.step button { width: var(--tap); padding: 0; }
+.n { min-width: 24px; text-align: center; font-variant-numeric: tabular-nums; }
+#list li { padding: 0; }
+.item { width: 100%; min-height: var(--tap); border: 0; padding: 10px 0; text-align: left; display: flex; gap: 12px; align-items: center; border-radius: 0; }
+.item::before { content: ""; flex: none; width: 22px; height: 22px; border: 1.5px solid var(--ink); border-radius: var(--radius); }
+.item[aria-pressed="true"] { color: var(--meta); text-decoration: line-through; }
+.item[aria-pressed="true"]::before { background: var(--ink); box-shadow: inset 0 0 0 3px var(--paper); }
+.item span { overflow-wrap: anywhere; }
+.no { border-color: var(--no); }
+
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a recipe database with a shopping list generator</h1>
+
+<main id="app" class="stack">
+  <form id="form" class="stack" autocomplete="off">
+    <input id="rname" placeholder="Recipe name" aria-label="Recipe name">
+    <textarea id="ings" placeholder="Ingredients, one per line&#10;200 g flour&#10;2 eggs&#10;1/2 cup milk" aria-label="Ingredients, one per line"></textarea>
+    <div class="row"><button id="save" class="primary" type="submit">Save recipe</button><button id="cancel" type="button" hidden>Cancel</button><button id="del" class="no" type="button" hidden>Delete</button></div>
+    <p id="msg" class="meta" role="status"></p>
+  </form>
+
+  <h2>Recipes &middot; times this week</h2>
+  <ul id="recipes" class="plain"></ul>
+
+  <h2 id="lhead">Shopping list</h2>
+  <ul id="list" class="plain"></ul>
+  <div class="row" id="lactions" hidden><button id="copy" type="button">Copy list</button><button id="reset" type="button">New week</button></div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  // storage helper — never throws
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+
+  const KEY = 'recipes-to-shopping-list:v1';
+  const state = Object.assign({ recipes: [], got: [] }, store.get(KEY, {}));
+  let editing = null;
+  const save = () => store.set(KEY, state);
+  const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  // unit aliases -> [canonical unit, factor into base]
+  const UNITS = {
+    g: ['g', 1], gram: ['g', 1], grams: ['g', 1], gr: ['g', 1], kg: ['g', 1000], kilo: ['g', 1000], kilos: ['g', 1000],
+    ml: ['ml', 1], l: ['ml', 1000], liter: ['ml', 1000], liters: ['ml', 1000], litre: ['ml', 1000], litres: ['ml', 1000], dl: ['ml', 100], cl: ['ml', 10],
+    tsp: ['tsp', 1], teaspoon: ['tsp', 1], teaspoons: ['tsp', 1], tbsp: ['tbsp', 1], tablespoon: ['tbsp', 1], tablespoons: ['tbsp', 1],
+    cup: ['cup', 1], cups: ['cup', 1], oz: ['oz', 1], ounce: ['oz', 1], ounces: ['oz', 1], lb: ['lb', 1], lbs: ['lb', 1], pound: ['lb', 1], pounds: ['lb', 1],
+    clove: ['clove', 1], cloves: ['clove', 1], can: ['can', 1], cans: ['can', 1], tin: ['can', 1], tins: ['can', 1],
+    pinch: ['pinch', 1], bunch: ['bunch', 1], bunches: ['bunch', 1], slice: ['slice', 1], slices: ['slice', 1], pack: ['pack', 1], packs: ['pack', 1]
+  };
+  const FRAC = { '½': .5, '¼': .25, '¾': .75, '⅓': 1 / 3, '⅔': 2 / 3 };
+
+  function num(s) {
+    s = s.replace(/[½¼¾⅓⅔]/g, m => ' ' + FRAC[m]).trim();
+    return s.split(/\s+/).reduce((t, p) => {
+      if (p.includes('/')) { const [a, b] = p.split('/').map(Number); return t + (b ? a / b : 0); }
+      return t + Number(p.replace(',', '.'));
+    }, 0);
+  }
+
+  // "1 1/2 cups milk" -> {qty, unit, name}
+  function parse(line) {
+    const m = line.match(/^\s*((?:\d+(?:[.,]\d+)?\s*)?(?:\d+\/\d+|[½¼¾⅓⅔])?)\s*(.*)$/);
+    let qty = m[1].trim() ? num(m[1]) : null;
+    let rest = m[2].trim();
+    let unit = '';
+    const u = rest.match(/^([a-zA-Z]+)\.?\s+(?:of\s+)?(.+)$/) || rest.match(/^(g|kg|ml|l)\b\.?\s*(.+)$/i);
+    if (qty != null && u && UNITS[u[1].toLowerCase()]) {
+      const [cu, f] = UNITS[u[1].toLowerCase()];
+      unit = cu; qty *= f; rest = u[2];
+    }
+    return { qty, unit, name: rest.replace(/\s+/g, ' ').trim() };
+  }
+
+  const keyOf = (name, unit) => name.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/(es|s)\b/g, '') + '|' + unit;
+
+  function fmt(q, unit) {
+    if (unit === 'g' && q >= 1000) return [+(q / 1000).toFixed(2), 'kg'];
+    if (unit === 'ml' && q >= 1000) return [+(q / 1000).toFixed(2), 'l'];
+    return [+q.toFixed(2), unit];
+  }
+
+  function shopping() {
+    const map = new Map();
+    for (const r of state.recipes) {
+      if (!r.n) continue;
+      for (const line of r.ings) {
+        const p = parse(line);
+        if (!p.name) continue;
+        const k = keyOf(p.name, p.qty == null ? '-' : p.unit);
+        const cur = map.get(k) || { name: p.name, unit: p.unit, qty: p.qty == null ? null : 0 };
+        if (p.qty != null) cur.qty += p.qty * r.n;
+        map.set(k, cur);
+      }
+    }
+    return [...map].map(([k, v]) => {
+      let text = v.name;
+      if (v.qty != null) { const [q, u] = fmt(v.qty, v.unit); text = q + (u ? ' ' + u : '') + ' ' + v.name; }
+      return { k, text };
+    }).sort((a, b) => a.k.localeCompare(b.k));
+  }
+
+  function render() {
+    const R = $('#recipes');
+    R.innerHTML = state.recipes.length ? state.recipes.map((r, i) =>
+      `<li><button class="rname" type="button" data-edit="${i}">${esc(r.name)}<small>${r.ings.length} ingredient${r.ings.length === 1 ? '' : 's'}</small></button>` +
+      `<span class="step"><button class="minus" type="button" data-d="-1" data-i="${i}" aria-label="One less ${esc(r.name)}">&minus;</button>` +
+      `<span class="n">${r.n}</span><button class="plus" type="button" data-d="1" data-i="${i}" aria-label="One more ${esc(r.name)}">+</button></span></li>`
+    ).join('') : '<li class="empty">No recipes yet.</li>';
+
+    const items = shopping();
+    const got = new Set(state.got);
+    $('#list').innerHTML = items.length ? items.map(it =>
+      `<li><button class="item" type="button" data-k="${esc(it.k)}" aria-pressed="${got.has(it.k)}"><span>${esc(it.text)}</span></button></li>`
+    ).join('') : `<li class="empty">${state.recipes.length ? 'Tap + on a recipe to add it to this week.' : 'Save a recipe, then add it to the week.'}</li>`;
+    $('#lactions').hidden = !items.length;
+    $('#lhead').textContent = items.length ? `Shopping list · ${items.length - items.filter(i => got.has(i.k)).length} to get` : 'Shopping list';
+  }
+
+  function resetForm() {
+    editing = null;
+    $('#rname').value = ''; $('#ings').value = '';
+    $('#save').textContent = 'Save recipe'; $('#cancel').hidden = $('#del').hidden = true;
+  }
+
+  $('#form').addEventListener('submit', e => {
+    e.preventDefault();
+    const name = $('#rname').value.trim();
+    const ings = $('#ings').value.split('\n').map(s => s.trim()).filter(Boolean);
+    if (!name || !ings.length) { $('#msg').textContent = name ? 'Add at least one ingredient.' : 'Give the recipe a name.'; return; }
+    if (editing != null && state.recipes[editing]) Object.assign(state.recipes[editing], { name, ings });
+    else state.recipes.push({ name, ings, n: 0 });
+    $('#msg').textContent = editing != null ? 'Updated.' : 'Saved.';
+    resetForm(); save(); render();
+  });
+
+  $('#cancel').addEventListener('click', () => { resetForm(); $('#msg').textContent = ''; });
+
+  $('#recipes').addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    if (b.dataset.edit != null) {
+      const i = +b.dataset.edit, r = state.recipes[i];
+      editing = i;
+      $('#rname').value = r.name; $('#ings').value = r.ings.join('\n');
+      $('#save').textContent = 'Update recipe'; $('#cancel').hidden = $('#del').hidden = false;
+      $('#msg').textContent = 'Editing ' + r.name + '.';
+      $('#rname').focus();
+      return;
+    }
+    const r = state.recipes[+b.dataset.i];
+    r.n = Math.max(0, r.n + +b.dataset.d);
+    save(); render();
+  });
+
+  $('#del').addEventListener('click', () => {
+    if (editing == null) return;
+    state.recipes.splice(editing, 1);
+    resetForm(); $('#msg').textContent = 'Deleted.'; save(); render();
+  });
+
+  $('#list').addEventListener('click', e => {
+    const b = e.target.closest('.item');
+    if (!b) return;
+    const k = b.dataset.k, got = new Set(state.got);
+    got.has(k) ? got.delete(k) : got.add(k);
+    state.got = [...got]; save(); render();
+  });
+
+  $('#reset').addEventListener('click', () => {
+    state.recipes.forEach(r => { r.n = 0; });
+    state.got = []; save(); render();
+  });
+
+  $('#copy').addEventListener('click', async () => {
+    const got = new Set(state.got);
+    const text = shopping().filter(i => !got.has(i.k)).map(i => '- ' + i.text).join('\n');
+    try { await navigator.clipboard.writeText(text); $('#copy').textContent = 'Copied'; }
+    catch { $('#copy').textContent = 'Copy failed'; }
+    setTimeout(() => { $('#copy').textContent = 'Copy list'; }, 1500);
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

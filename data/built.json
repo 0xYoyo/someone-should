@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T02:01:33.604Z",
+ "updated": "2026-10-27T02:01:45.035Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -765,9 +765,14 @@
   },
   {
    "slug": "recipes-to-shopping-list",
-   "status": "pending",
+   "status": "pass",
    "attempts": 1,
-   "model": "opus-5.5"
+   "model": "opus-5.5",
+   "kb": 12,
+   "tests": "6/6",
+   "built": "2026-10-27T02:00:22Z",
+   "minutes": 6,
+   "approved": false
   },
   {
    "slug": "editor-color-scheme-maker",
