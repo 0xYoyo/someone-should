@@ -46,64 +46,240 @@ ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: fl
 .built { color: var(--built); }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 
-.track { position: relative; height: 64px; border: 1.5px solid var(--ink); border-radius: var(--radius); overflow: hidden; }
-.zone { position: absolute; top: 0; bottom: 0; left: 46%; width: 8%; background: var(--line); }
-.mark { position: absolute; top: 0; bottom: 0; width: 4px; margin-left: -2px; background: var(--ink); }
-#stop { width: 100%; min-height: 72px; font-size: 20px; }
-#stop:disabled { opacity: .45; cursor: default; }
-#result { min-height: 3em; }
-.locked .mark { background: var(--meta); }
+
+:root { --gold: #a87a12; }
+@media (prefers-color-scheme: dark) { :root { --gold: #e3b341; } }
+body { padding-bottom: 32px; }
+main { max-width: 420px; margin: 0 auto; }
+.stage { position: relative; width: 100%; aspect-ratio: 1; }
+svg { width: 100%; height: 100%; display: block; overflow: visible; }
+#ring { fill: none; stroke: var(--ink); stroke-width: 9; transition: stroke .4s; }
+#pulse { transform-origin: 0 0; }
+.guide { stroke: var(--line); stroke-width: 1.5; stroke-dasharray: 3 6; }
+.pointer { fill: var(--ink); }
+#ball { fill: var(--ink); transition: fill .4s; }
+.veil { position: absolute; inset: -4px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 4px; padding: 20px; background: color-mix(in srgb, var(--paper) 80%, transparent); backdrop-filter: blur(1.5px); transition: opacity .6s; }
+.veil.gone { opacity: 0; pointer-events: none; }
+.veil p { margin: 0; font-size: 26px; line-height: 1.2; font-weight: 600; letter-spacing: -.01em; }
+.veil p.q { font-weight: 400; color: var(--meta); font-size: 20px; }
+.veil p.ever { font-size: 40px; margin-bottom: 8px; }
+#begin, #release { width: 100%; min-height: 72px; font-size: 20px; margin-top: 18px; }
+#release { margin-top: 12px; }
+#release:disabled { opacity: .45; }
+.tense #ring, .tense #ball { stroke-width: 9; }
+.shade { position: fixed; inset: 0; background: #000; opacity: 0; pointer-events: none; transition: opacity 1.2s; z-index: -1; }
+.tense .shade { opacity: .0; }
+#verdict { margin-top: 20px; animation: rise .9s ease both; }
+#verdict[hidden], #release[hidden], #begin[hidden] { display: none; }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.v { font-size: 40px; line-height: 1.08; font-weight: 600; letter-spacing: -.02em; margin: 0; }
+.v.win { color: var(--gold); }
+.v.lose { color: var(--no); }
+.away { font: 500 20px/1.4 var(--mono); margin: 8px 0 0; }
+.stamp { font: 16px/1.4 var(--mono); color: var(--meta); margin: 4px 0 0; }
+.share { margin-top: 24px; border-top: 1px solid var(--line); padding-top: 16px; }
+.share label { display: block; font-size: 16px; color: var(--meta); margin-bottom: 8px; }
+.share textarea { font-size: 16px; min-height: 96px; resize: none; }
+.share button { margin-top: 10px; width: 100%; font-size: 16px; }
+.ring-win #ring { stroke: var(--gold); }
+.ring-win #ball { fill: var(--gold); }
+.ring-lose #ring { stroke: var(--no); }
+.ring-lose #ball { fill: var(--no); }
 </style>
 <style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
 </head>
 <body>
 <h1 id="wish">someone should make a game that gives you only one try and you fail forever</h1>
-<main id="app" class="stack">
-  <p class="meta" id="rule">One try. Stop the line inside the grey zone.</p>
-  <div class="track" id="track"><div class="zone"></div><div class="mark" id="mark"></div></div>
-  <button class="primary" id="stop" type="button">Stop</button>
-  <div id="result" class="big" aria-live="polite"></div>
-  <p class="meta" id="note"></p>
+<main id="app">
+  <div class="stage" id="stage">
+    <svg viewBox="-150 -150 300 300" aria-label="A rotating ring with a gap. A ball waits at the centre.">
+      <line class="guide" x1="0" y1="-8" x2="0" y2="-138"/>
+      <g id="pulse"><g id="ringg"><circle id="ring" r="118" stroke-dasharray="0 1000"/></g></g>
+      <circle id="ball" r="7" cx="0" cy="0"/>
+      <path class="pointer" d="M-7 -146 L7 -146 L0 -133 Z"/>
+    </svg>
+    <div class="veil" id="warn">
+      <p class="ever">You get one try.<br>Ever.</p>
+      <p class="q">No refresh.<br>No second chance.</p>
+      <button class="primary" id="begin" type="button">I have one try</button>
+    </div>
+  </div>
+  <button class="primary" id="release" type="button" hidden>Release</button>
+  <section id="verdict" hidden aria-live="polite">
+    <p class="v" id="vtext"></p>
+    <p class="away" id="away"></p>
+    <p class="stamp" id="stamp"></p>
+    <div class="share">
+      <label for="sharetext">Share your one try</label>
+      <textarea id="sharetext" readonly></textarea>
+      <button type="button" id="copy">Copy</button>
+    </div>
+  </section>
 </main>
 <script>
 (() => {
   'use strict';
   const KEY = 'one-try-only-game';
+  const GAP = 26;          // gap width in degrees
+  const SPEED = 110;       // ring degrees per second
+  const SLOW = 0.2;        // time scale after release
+  const FLIGHT = 1.4;      // seconds for the ball to reach the ring
+  const R = 118, C = 2 * Math.PI * R;
+  const $ = s => document.querySelector(s);
+  const ring = $('#ring'), ringg = $('#ringg'), ball = $('#ball'), pulse = $('#pulse');
+  const warn = $('#warn'), begin = $('#begin'), release = $('#release');
+  const verdict = $('#verdict');
+
+  // Storage: localStorage first, a cookie as backup.
   const store = {
-    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
-    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } }
+    get() {
+      try { const v = localStorage.getItem(KEY); if (v) return JSON.parse(v); } catch (e) {}
+      try {
+        const m = document.cookie.match(/(?:^|; )ots=([^;]*)/);
+        if (m) return JSON.parse(decodeURIComponent(m[1]));
+      } catch (e) {}
+      return null;
+    },
+    set(v) {
+      try { localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) {}
+      try { document.cookie = 'ots=' + encodeURIComponent(JSON.stringify(v)) + '; max-age=315360000; path=/; SameSite=Lax'; } catch (e) {}
+    }
   };
-  const $ = (s, r = document) => r.querySelector(s);
-  const ZONE_MIN = 46, ZONE_MAX = 54;
-  const mark = $('#mark'), stop = $('#stop'), result = $('#result'), note = $('#note'), rule = $('#rule');
-  let raf = 0, t0 = performance.now();
 
-  // triangle wave 0..100, period 1.4 s
-  const posAt = t => { const p = (t / 700) % 2; return (p < 1 ? p : 2 - p) * 100; };
-  const show = r => {
-    cancelAnimationFrame(raf);
-    document.body.classList.add('locked');
-    mark.style.left = r.pos + '%';
-    stop.disabled = true;
-    stop.textContent = 'Used';
-    rule.textContent = 'Your one try is spent.';
-    result.className = 'big ' + (r.hit ? 'built' : 'no');
-    result.textContent = r.hit ? 'Hit.' : 'Missed by ' + r.off + '%.';
-    note.textContent = r.hit ? 'It stays that way.' : 'You fail forever.';
+  const wrap = a => ((a + 540) % 360) - 180;
+  let phi = Math.random() * 360;   // ring rotation, degrees clockwise
+  const draw = () => ringg.setAttribute('transform', 'rotate(' + phi.toFixed(2) + ')');
+  ring.setAttribute('stroke-dasharray', (C * (1 - GAP / 360)).toFixed(2) + ' ' + (C * GAP / 360).toFixed(2));
+  // Signed offset of the gap centre from straight up.
+  const offset = () => wrap(phi - GAP / 2 + 90);
+
+  let audio = null;
+  const thump = (g, f) => {
+    if (!audio) return;
+    const t = audio.currentTime, o = audio.createOscillator(), v = audio.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(f * 1.8, t);
+    o.frequency.exponentialRampToValueAtTime(f * .6, t + .14);
+    v.gain.setValueAtTime(0, t);
+    v.gain.linearRampToValueAtTime(g, t + .015);
+    v.gain.exponentialRampToValueAtTime(.001, t + .22);
+    o.connect(v); v.connect(audio.destination);
+    o.start(t); o.stop(t + .25);
   };
-  const frame = now => { mark.style.left = posAt(now - t0) + '%'; raf = requestAnimationFrame(frame); };
+  const tone = (f, at, len, g) => {
+    if (!audio) return;
+    const t = audio.currentTime + at, o = audio.createOscillator(), v = audio.createGain();
+    o.type = 'sine'; o.frequency.value = f;
+    v.gain.setValueAtTime(0, t);
+    v.gain.linearRampToValueAtTime(g, t + .03);
+    v.gain.exponentialRampToValueAtTime(.001, t + len);
+    o.connect(v); v.connect(audio.destination);
+    o.start(t); o.stop(t + len + .05);
+  };
+  const beat = () => {
+    thump(.9, 62);
+    setTimeout(() => thump(.6, 54), 170);
+    pulse.animate([{ transform: 'scale(1.025)' }, { transform: 'scale(1)' }], { duration: 380 });
+  };
 
-  const saved = store.get(KEY, null);
-  if (saved && typeof saved.pos === 'number') { show(saved); return; }
-  raf = requestAnimationFrame(frame);
+  const fmt = ts => {
+    const d = new Date(ts);
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) + ', ' +
+      d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  };
 
-  stop.addEventListener('click', () => {
-    const pos = Math.round(posAt(performance.now() - t0) * 10) / 10;
-    const off = pos < ZONE_MIN ? ZONE_MIN - pos : pos > ZONE_MAX ? pos - ZONE_MAX : 0;
-    const r = { pos, hit: off === 0, off: Math.round(off) };
-    const ok = store.set(KEY, r);
-    show(r);
-    if (!ok) note.textContent += ' This browser will not remember it.';
+  // Show the permanent verdict. r = { hit, away, margin, phi, ts, left }
+  const showVerdict = (r, animateBall) => {
+    warn.classList.add('gone');
+    begin.hidden = true; release.hidden = true;
+    document.body.classList.add(r.hit ? 'ring-win' : 'ring-lose');
+    if (typeof r.phi === 'number') { phi = r.phi; draw(); }
+    const y = r.hit ? -R - 22 : -(R - 14);
+    ball.setAttribute('cy', r.left ? 0 : y);
+    $('#vtext').textContent = r.hit ? 'You made it. 1 try.' : 'You missed. Forever.';
+    $('#vtext').className = 'v ' + (r.hit ? 'win' : 'lose');
+    let line = '';
+    if (r.left) line = 'You left before it landed.';
+    else if (r.hit) line = r.margin + '\u00b0 to spare.';
+    else line = r.away + '\u00b0 away.';
+    $('#away').textContent = line;
+    $('#stamp').textContent = fmt(r.ts);
+    const day = new Date(r.ts).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+    const base = location.href.split('?')[0].split('#')[0];
+    $('#sharetext').value = r.hit
+      ? 'I got one try and made it. ' + day + '. No second chance. ' + base
+      : 'I got one try and missed by ' + (r.left ? 'leaving' : r.away + '\u00b0') + '. ' + day + '. Forever. ' + base;
+    verdict.hidden = false;
+    document.title = r.hit ? 'You made it. 1 try.' : 'You missed. Forever.';
+  };
+
+  const saved = store.get();
+  if (saved && saved.pending) {
+    const r = { hit: false, left: true, away: 0, ts: saved.ts };
+    store.set(r);
+    showVerdict(r);
+    return;
+  }
+  if (saved && typeof saved.ts === 'number') { showVerdict(saved); return; }
+
+  // Idle: the ring turns behind the warning.
+  let last = performance.now(), scale = 1, released = false, relAt = 0, done = false, lastBeat = 0, beatGap = 900;
+  draw();
+  const frame = now => {
+    const dt = Math.min(now - last, 50) / 1000; last = now;
+    if (released) {
+      const el = (now - relAt) / 1000;
+      scale += (SLOW - scale) * Math.min(1, dt * 9);
+      const p = Math.min(el / FLIGHT, 1);
+      ball.setAttribute('cy', (-(R - 14) * p).toFixed(2));
+      if (now - lastBeat > beatGap) { lastBeat = now; beat(); beatGap = Math.max(380, beatGap - 90); }
+      pulse.style.transform = 'scale(' + (1 + p * 0.05).toFixed(3) + ')';
+      phi += SPEED * scale * dt; draw();
+      if (p >= 1 && !done) { done = true; land(); return; }
+    } else {
+      phi += SPEED * dt; draw();
+    }
+    requestAnimationFrame(frame);
+  };
+  requestAnimationFrame(frame);
+
+  begin.addEventListener('click', () => {
+    warn.classList.add('gone');
+    begin.hidden = true;
+    release.hidden = false;
+    release.focus({ preventScroll: true });
+  });
+
+  release.addEventListener('click', () => {
+    if (released) return;
+    released = true; relAt = performance.now(); lastBeat = relAt - beatGap + 200;
+    release.disabled = true; release.textContent = 'Released';
+    store.set({ pending: true, ts: Date.now() });   // leaving now counts as a miss
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) { audio = new AC(); if (audio.resume) audio.resume(); }
+    } catch (e) { audio = null; }
+  });
+
+  const land = () => {
+    const d = Math.abs(offset());
+    const hit = d <= GAP / 2;
+    const r = { hit, phi, ts: Date.now(),
+      away: hit ? 0 : Math.max(1, Math.round(d - GAP / 2)),
+      margin: hit ? Math.round(GAP / 2 - d) : 0 };
+    store.set(r);
+    pulse.style.transform = '';
+    if (hit) { tone(659, 0, 1.6, .25); tone(988, .18, 2.2, .22); tone(1319, .4, 2.6, .12); }
+    else { tone(44, 0, 2.4, .9); tone(41, .05, 2.4, .6); }
+    showVerdict(r);
+  };
+
+  $('#copy').addEventListener('click', () => {
+    const ta = $('#sharetext'), b = $('#copy');
+    const ok = () => { b.textContent = 'Copied'; setTimeout(() => { b.textContent = 'Copy'; }, 1800); };
+    const fallback = () => { ta.select(); try { document.execCommand('copy'); ok(); } catch (e) { b.textContent = 'Select the text and copy it'; } };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(ta.value).then(ok, fallback);
+    else fallback();
   });
 })();
 </script>

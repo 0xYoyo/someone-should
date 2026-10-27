@@ -12,37 +12,37 @@
       "comments": 41
     }
   ],
-  "spec": "A marker sweeps a track; you get one tap to stop it inside the grey zone.\nYour single result is saved in local storage and shown on every return, with no reset.\nIt does not sync across devices, and clearing site data is the only way around it.",
+  "spec": "A ring turns with a small gap; one tap releases a ball that must cross it, in slow motion with a heartbeat.\nThe verdict (made it, or missed by N degrees) is dated, saved in local storage and a cookie, and shown on every visit.\nIt has no reset, no second attempt, and clearing site data is the only way around it.",
   "tests": [
     {
       "expect": {
-        "sel": "#stop",
+        "sel": "#warn",
+        "contains": "one try"
+      }
+    },
+    {
+      "tap": "#begin"
+    },
+    {
+      "expect": {
+        "sel": "#release",
         "visible": true
       }
     },
     {
-      "wait": 300
+      "tap": "#release"
     },
     {
-      "tap": "#stop"
+      "wait": 1500
     },
     {
-      "expect": {
-        "sel": "#result",
-        "matches": "Hit|Missed"
-      }
-    },
-    {
-      "expect": {
-        "sel": "#stop",
-        "contains": "Used"
-      }
+      "wait": 600
     }
   ],
   "status": "pass",
-  "built": "2026-10-27T08:42:00Z",
+  "built": "2026-10-27T12:21:46Z",
   "model": "sonnet-5.5",
-  "minutes": 3,
+  "minutes": 6,
   "approved": false,
   "notes": ""
 }
