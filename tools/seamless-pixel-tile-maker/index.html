@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app that makes seamless pixel tiles</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+main { max-width: 900px; }
+.cols { display: grid; gap: 16px; }
+@media (min-width: 760px) { .cols { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; } }
+canvas { display: block; width: 100%; height: auto; aspect-ratio: 1; image-rendering: pixelated; image-rendering: crisp-edges; border: 1.5px solid var(--line); border-radius: var(--radius); }
+#grid { touch-action: none; cursor: crosshair; }
+.tools { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.tools button { padding: 0 6px; }
+.tools button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.pal { display: grid; grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); gap: 6px; }
+.pal button { min-width: 44px; min-height: 44px; padding: 0; border: 1.5px solid var(--line); }
+.pal button[aria-pressed="true"] { outline: 3px solid var(--ink); outline-offset: 2px; }
+.pal input[type=color] { min-width: 44px; min-height: 44px; height: 44px; padding: 2px; cursor: pointer; }
+.opts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+label.f { display: grid; gap: 4px; font-size: 16px; color: var(--meta); }
+#status { color: var(--meta); font-size: 16px; font-variant-numeric: tabular-nums; }
+#save { display: inline-flex; align-items: center; min-height: var(--tap); padding: 0 18px; border-radius: var(--radius); background: var(--ink); color: var(--paper); text-decoration: none; }
+#save[hidden] { display: none; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make an app that makes seamless pixel tiles</h1>
+
+<main id="app" class="stack">
+  <div class="cols">
+    <div class="stack">
+      <canvas id="grid" width="512" height="512" aria-label="tile editor, edges wrap"></canvas>
+      <div id="status">0 px</div>
+      <div class="tools" role="toolbar">
+        <button id="tool-draw" aria-pressed="true">draw</button>
+        <button id="tool-erase" aria-pressed="false">erase</button>
+        <button id="tool-fill" aria-pressed="false">fill</button>
+        <button id="undo">undo</button>
+      </div>
+      <div class="pal" id="pal"></div>
+    </div>
+    <div class="stack">
+      <canvas id="preview" width="384" height="384" aria-label="3 by 3 tiled preview"></canvas>
+      <div class="tools">
+        <button id="offset" title="shift by half a tile to expose seams">offset ½</button>
+        <button id="shl" aria-label="shift left">←</button>
+        <button id="shu" aria-label="shift up">↑</button>
+        <button id="clear">clear</button>
+      </div>
+      <div class="opts">
+        <label class="f">size
+          <select id="size"><option>8</option><option selected>16</option><option>24</option><option>32</option></select>
+        </label>
+        <label class="f">export scale
+          <select id="scale"><option value="1">1×</option><option value="4">4×</option><option value="8" selected>8×</option><option value="16">16×</option></select>
+        </label>
+      </div>
+      <div class="row">
+        <button id="export" class="primary">export PNG</button>
+        <a id="save" hidden download="tile.png" href="#">save tile.png</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  const COLORS = ['#000000','#1d2b53','#7e2553','#008751','#ab5236','#5f574f','#c2c3c7','#fff1e8',
+                  '#ff004d','#ffa300','#ffec27','#00e436','#29adff','#83769c','#ff77a8','#ffccaa'];
+  const KEY = 'seamless-pixel-tile-maker';
+  const saved = store.get(KEY, null);
+
+  let size = 16, px = [], color = COLORS[0], tool = 'draw';
+  const undoStack = [];
+
+  if (saved && Array.isArray(saved.px) && [8, 16, 24, 32].includes(saved.size) && saved.px.length === saved.size * saved.size) {
+    size = saved.size; px = saved.px; color = saved.color || color;
+  } else {
+    px = new Array(size * size).fill(null);
+  }
+
+  const grid = $('#grid'), gctx = grid.getContext('2d');
+  const prev = $('#preview'), pctx = prev.getContext('2d');
+  const tile = document.createElement('canvas'), tctx = tile.getContext('2d');
+  const wrap = n => ((n % size) + size) % size;
+  const idx = (x, y) => wrap(y) * size + wrap(x);
+
+  function persist() { store.set(KEY, { size, px, color }); }
+
+  function renderTile() {
+    tile.width = tile.height = size;
+    tctx.clearRect(0, 0, size, size);
+    for (let i = 0; i < px.length; i++) {
+      if (px[i]) { tctx.fillStyle = px[i]; tctx.fillRect(i % size, (i / size) | 0, 1, 1); }
+    }
+  }
+
+  function render() {
+    renderTile();
+    const W = grid.width, c = W / size;
+    gctx.imageSmoothingEnabled = false;
+    // checkerboard marks transparent pixels
+    for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+      gctx.fillStyle = (x + y) % 2 ? '#d9d4c7' : '#ece8de';
+      gctx.fillRect(x * c, y * c, c, c);
+    }
+    gctx.drawImage(tile, 0, 0, W, W);
+    gctx.strokeStyle = 'rgba(128,128,128,.35)';
+    gctx.lineWidth = 1;
+    gctx.beginPath();
+    for (let i = 1; i < size; i++) {
+      const p = Math.round(i * c) + 0.5;
+      gctx.moveTo(p, 0); gctx.lineTo(p, W); gctx.moveTo(0, p); gctx.lineTo(W, p);
+    }
+    gctx.stroke();
+
+    const P = prev.width, t = P / 3;
+    pctx.imageSmoothingEnabled = false;
+    pctx.fillStyle = '#ece8de';
+    pctx.fillRect(0, 0, P, P);
+    for (let y = 0; y < 3; y++) for (let x = 0; x < 3; x++) pctx.drawImage(tile, x * t, y * t, t, t);
+
+    const n = px.filter(Boolean).length;
+    $('#status').textContent = `${n} px of ${size * size} · ${size}×${size}, edges wrap`;
+    $('#save').hidden = true;
+  }
+
+  function pushUndo() {
+    undoStack.push({ size, px: px.slice() });
+    if (undoStack.length > 60) undoStack.shift();
+  }
+
+  function cellAt(e) {
+    const r = grid.getBoundingClientRect();
+    const x = Math.floor((e.clientX - r.left) / r.width * size);
+    const y = Math.floor((e.clientY - r.top) / r.height * size);
+    return [Math.min(size - 1, Math.max(0, x)), Math.min(size - 1, Math.max(0, y))];
+  }
+
+  // flood fill on a torus: regions continue across the edges
+  function fill(x, y, to) {
+    const from = px[idx(x, y)];
+    if (from === to) return;
+    const q = [[x, y]];
+    while (q.length) {
+      const [a, b] = q.pop(), i = idx(a, b);
+      if (px[i] !== from) continue;
+      px[i] = to;
+      q.push([wrap(a + 1), b], [wrap(a - 1), b], [a, wrap(b + 1)], [a, wrap(b - 1)]);
+    }
+  }
+
+  function paint(x, y) {
+    const v = tool === 'erase' ? null : color;
+    const i = idx(x, y);
+    if (px[i] === v) return false;
+    px[i] = v;
+    return true;
+  }
+
+  let drawing = false, last = null;
+  grid.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    const [x, y] = cellAt(e);
+    pushUndo();
+    if (tool === 'fill') { fill(x, y, color); render(); persist(); return; }
+    drawing = true; last = [x, y];
+    try { grid.setPointerCapture(e.pointerId); } catch {}
+    paint(x, y); render();
+  });
+  grid.addEventListener('pointermove', e => {
+    if (!drawing) return;
+    const [x, y] = cellAt(e);
+    if (last && x === last[0] && y === last[1]) return;
+    // fill gaps between fast pointer samples
+    const [x0, y0] = last, steps = Math.max(Math.abs(x - x0), Math.abs(y - y0));
+    let changed = false;
+    for (let s = 1; s <= steps; s++) changed = paint(Math.round(x0 + (x - x0) * s / steps), Math.round(y0 + (y - y0) * s / steps)) || changed;
+    last = [x, y];
+    if (changed) render();
+  });
+  const end = () => { if (drawing) { drawing = false; last = null; persist(); } };
+  grid.addEventListener('pointerup', end);
+  grid.addEventListener('pointercancel', end);
+
+  function setTool(t) {
+    tool = t;
+    $$('[id^="tool-"]').forEach(b => b.setAttribute('aria-pressed', String(b.id === 'tool-' + t)));
+  }
+  $('#tool-draw').onclick = () => setTool('draw');
+  $('#tool-erase').onclick = () => setTool('erase');
+  $('#tool-fill').onclick = () => setTool('fill');
+
+  $('#undo').onclick = () => {
+    const s = undoStack.pop();
+    if (!s) return;
+    size = s.size; px = s.px; $('#size').value = String(size);
+    render(); persist();
+  };
+
+  function shift(dx, dy) {
+    pushUndo();
+    const out = new Array(size * size);
+    for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) out[idx(x + dx, y + dy)] = px[y * size + x];
+    px = out; render(); persist();
+  }
+  $('#offset').onclick = () => shift(size >> 1, size >> 1);
+  $('#shl').onclick = () => shift(-1, 0);
+  $('#shu').onclick = () => shift(0, -1);
+  $('#clear').onclick = () => { pushUndo(); px = new Array(size * size).fill(null); render(); persist(); };
+
+  $('#size').onchange = e => {
+    const n = +e.target.value;
+    pushUndo();
+    // keep the top-left of the old tile, tiled if the new one is bigger
+    const out = new Array(n * n);
+    for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) out[y * n + x] = px[(y % size) * size + (x % size)];
+    size = n; px = out; render(); persist();
+  };
+
+  // palette
+  const pal = $('#pal');
+  function renderPalette() {
+    pal.textContent = '';
+    COLORS.forEach((c, i) => {
+      const b = document.createElement('button');
+      b.id = 'c-' + i; b.style.background = c; b.setAttribute('aria-label', 'color ' + c);
+      b.setAttribute('aria-pressed', String(c === color));
+      b.onclick = () => pick(c);
+      pal.appendChild(b);
+    });
+    const inp = document.createElement('input');
+    inp.type = 'color'; inp.id = 'custom'; inp.setAttribute('aria-label', 'custom color');
+    inp.value = COLORS.includes(color) ? '#ff004d' : color;
+    inp.oninput = () => pick(inp.value);
+    pal.appendChild(inp);
+  }
+  function pick(c) {
+    color = c;
+    $$('button', pal).forEach(b => b.setAttribute('aria-pressed', String(b.getAttribute('aria-label') === 'color ' + c)));
+    if (tool === 'erase') setTool('draw');
+    persist();
+  }
+
+  $('#export').onclick = () => {
+    const k = +$('#scale').value, out = document.createElement('canvas');
+    out.width = out.height = size * k;
+    const o = out.getContext('2d');
+    o.imageSmoothingEnabled = false;
+    o.drawImage(tile, 0, 0, size * k, size * k);
+    const a = $('#save');
+    try {
+      a.href = out.toDataURL('image/png');
+      a.download = `tile-${size}px@${k}x.png`;
+      a.textContent = `save tile-${size}px@${k}x.png`;
+      a.hidden = false;
+    } catch {
+      $('#status').textContent = 'could not export on this browser';
+    }
+  };
+
+  $('#size').value = String(size);
+  renderPalette();
+  render();
+})();
+</script>
+</body>
+</html>

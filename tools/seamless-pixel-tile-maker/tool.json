@@ -1,0 +1,45 @@
+{
+  "slug": "seamless-pixel-tile-maker",
+  "wish": "someone should make an app that makes seamless pixel tiles",
+  "year": 2014,
+  "agreed": 18,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/204/what-pixel-graphics-program-supports-creating-seamless-tiles",
+      "date": "2014-02-05",
+      "points": 14,
+      "comments": 4
+    }
+  ],
+  "spec": "A pixel editor whose canvas wraps at the edges, with a live 3x3 tiled preview so seams show while you draw.\nPick a size and color, draw, erase or fill (fills continue across edges), use offset 1/2 or shift to check seams, then export a PNG at 1-16x.\nIt does not animate, use layers, or upload anything; the tile is kept only in this browser.",
+  "tests": [
+    {
+      "tap": "#tool-fill"
+    },
+    {
+      "tap": "#grid"
+    },
+    {
+      "expect": {
+        "sel": "#status",
+        "matches": "^256 px of 256"
+      }
+    },
+    {
+      "tap": "#export"
+    },
+    {
+      "expect": {
+        "sel": "#save",
+        "visible": true
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:54:46Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": ""
+}
