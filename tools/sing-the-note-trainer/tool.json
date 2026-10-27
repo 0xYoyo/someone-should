@@ -1,0 +1,48 @@
+{
+  "slug": "sing-the-note-trainer",
+  "wish": "someone should make an app that plays a tone and shows if I hit it when singing",
+  "year": 2015,
+  "agreed": 13,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/23540/software-to-play-a-tone-and-show-me-when-i-hit-it-when-singing",
+      "date": "2015-09-03",
+      "points": 11,
+      "comments": 2
+    }
+  ],
+  "spec": "Plays a target note (C2 to C6) and listens through the microphone to show how many cents sharp or flat you are, live.\nPick a note with - / + or New note, tap Play to hear it, tap Sing and hold the note; within 20 cents for half a second counts as a hit.\nAny octave counts as the same note; it does not record or upload audio, and it cannot score with the microphone blocked.",
+  "tests": [
+    {
+      "tap": "#up"
+    },
+    {
+      "expect": {
+        "sel": "#note",
+        "contains": "A#3"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#hz",
+        "matches": "^233\\.1 Hz$"
+      }
+    },
+    {
+      "tap": "#play"
+    },
+    {
+      "expect": {
+        "sel": "#status",
+        "contains": "Playing A#3"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:37:18Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Pitch detection uses the microphone via getUserMedia, requested on tap only; audio stays on the device. Mic input is ignored while the reference tone plays."
+}
