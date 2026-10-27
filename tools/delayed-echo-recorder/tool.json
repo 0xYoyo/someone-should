@@ -1,0 +1,48 @@
+{
+  "slug": "delayed-echo-recorder",
+  "wish": "someone should make an app that records a sound and plays it back after a set delay",
+  "year": 2016,
+  "agreed": 11,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/35552/record-a-sound-and-play-it-back-after-a-user-defined-delay",
+      "date": "2016-08-17",
+      "points": 9,
+      "comments": 2
+    }
+  ],
+  "spec": "Records the microphone continuously and plays it back to your speakers or headphones after a delay you set, 0 to 10 seconds in half-second steps.\nPick a preset or nudge with -/+ 0.5 s, tap start, allow the microphone; the delay can be changed while it runs and is remembered.\nIt does not save or upload audio, and nothing leaves the device.",
+  "tests": [
+    {
+      "tap": "button[data-d=\"5\"]"
+    },
+    {
+      "tap": "#more"
+    },
+    {
+      "expect": {
+        "sel": "#delay",
+        "contains": "5.5"
+      }
+    },
+    {
+      "tap": "#go"
+    },
+    {
+      "wait": 800
+    },
+    {
+      "expect": {
+        "sel": "#status",
+        "matches": "[Mm]icrophone|Recording"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:50:11Z",
+  "model": "opus-5.5",
+  "minutes": 5,
+  "approved": false,
+  "notes": "Live delay line via Web Audio DelayNode; echo cancellation on to limit speaker feedback. Microphone requested only on tap."
+}
