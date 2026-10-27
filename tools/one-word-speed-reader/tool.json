@@ -1,0 +1,51 @@
+{
+  "slug": "one-word-speed-reader",
+  "wish": "someone should make an app that helps with speed reading",
+  "year": 2014,
+  "agreed": 33,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/1905/speed-reading-software-for-windows",
+      "date": "2014-03-02",
+      "points": 29,
+      "comments": 4
+    }
+  ],
+  "spec": "Shows pasted text one word at a time at a fixed point, with the focus letter marked, at a chosen words-per-minute.\nPaste text, press play; pause, jump back 10 words, scrub, or change speed with +/- (space, left, up/down on a keyboard).\nIt does not fetch articles or files from the web; pausing longer on punctuation is its only pacing trick.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#text",
+        "text": "speed reading means seeing words without moving your eyes"
+      }
+    },
+    {
+      "tap": "#play"
+    },
+    {
+      "wait": 700
+    },
+    {
+      "tap": "#play"
+    },
+    {
+      "expect": {
+        "sel": "#progress",
+        "matches": "^[2-9] / 9 words"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#word .orp",
+        "count": 1
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:34:29Z",
+  "model": "opus-5.5",
+  "minutes": 5,
+  "approved": false,
+  "notes": ""
+}

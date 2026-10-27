@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app that helps with speed reading</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+#stage { border: 1.5px solid var(--line); border-radius: var(--radius); height: 132px; display: grid; align-content: center; position: relative; overflow: hidden; }
+#stage::before, #stage::after { content: ""; position: absolute; left: 50%; width: 1.5px; height: 14px; background: var(--line); }
+#stage::before { top: 0; } #stage::after { bottom: 0; }
+#word { display: grid; grid-template-columns: 1fr auto 1fr; font-family: var(--mono); font-size: 40px; line-height: 1.1; white-space: pre; min-height: 1.1em; }
+#word .pre { text-align: right; } #word .post { text-align: left; }
+#word .orp { color: var(--no); }
+#word.idle { display: block; text-align: center; font: 17px/1.45 var(--sans); color: var(--meta); white-space: normal; padding: 0 16px; }
+#status { font: 15px/1.4 var(--mono); color: var(--meta); display: flex; justify-content: space-between; gap: 12px; }
+#seek { padding: 0; border: 0; min-height: var(--tap); accent-color: var(--ink); }
+textarea { min-height: 140px; resize: vertical; }
+.controls { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.speed { display: grid; grid-template-columns: var(--tap) 1fr var(--tap); gap: 10px; align-items: center; }
+.speed button { padding: 0; }
+#wpm { text-align: center; font: 500 20px/1.2 var(--mono); font-variant-numeric: tabular-nums; }
+
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make an app that helps with speed reading</h1>
+
+<main id="app" class="stack">
+  <div id="stage" aria-live="off"><div id="word" class="idle">Paste text below, then press play.</div></div>
+  <div id="status"><span id="progress">0 / 0 words</span><span id="left"></span></div>
+  <input id="seek" type="range" min="0" max="0" value="0" aria-label="Position">
+  <div class="controls">
+    <button id="back" type="button" aria-label="Back 10 words">-10</button>
+    <button id="play" class="primary" type="button">Play</button>
+    <button id="restart" type="button">Start</button>
+  </div>
+  <div class="speed">
+    <button id="slower" type="button" aria-label="Slower">-</button>
+    <div id="wpm">300 wpm</div>
+    <button id="faster" type="button" aria-label="Faster">+</button>
+  </div>
+  <textarea id="text" placeholder="Paste text here" aria-label="Text to read"></textarea>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  // storage helper — never throws
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+
+  const wordEl = $('#word'), playBtn = $('#play'), seek = $('#seek'), text = $('#text');
+  let words = [], pos = 0, timer = null, wpm = store.get('sr.wpm', 300);
+  text.value = store.get('sr.text', '');
+  pos = store.get('sr.pos', 0);
+
+  // optimal recognition point: the letter the eye should land on
+  const orpIndex = n => n <= 1 ? 0 : n <= 5 ? 1 : n <= 9 ? 2 : n <= 13 ? 3 : 4;
+
+  function parse() {
+    words = [];
+    text.value.split(/\n\s*\n/).forEach(para => {
+      const w = para.split(/\s+/).filter(Boolean);
+      if (w.length) { w[w.length - 1] = { t: w[w.length - 1], para: true }; }
+      w.forEach(x => words.push(typeof x === 'string' ? { t: x } : x));
+    });
+    seek.max = Math.max(0, words.length - 1);
+    if (pos >= words.length) pos = 0;
+  }
+
+  function delay(w) {
+    let d = 60000 / wpm;
+    if (/[.!?]["')\]]*$/.test(w.t)) d *= 2.2;
+    else if (/[,;:—-]["')\]]*$/.test(w.t)) d *= 1.5;
+    if (w.t.length > 8) d *= 1.3;
+    if (w.para) d *= 1.5;
+    return d;
+  }
+
+  function show() {
+    const w = words[pos];
+    if (!w) { idle(words.length ? 'Done. Press play to read again.' : 'Paste text below, then press play.'); return; }
+    const t = w.t, i = orpIndex(t.length);
+    const side = Math.max(i, t.length - i - 1) + 0.5;
+    const half = (wordEl.clientWidth || 300) / 2;
+    const size = Math.max(16, Math.min(40, half / (side * 0.62)));
+    wordEl.className = '';
+    wordEl.style.fontSize = size + 'px';
+    wordEl.innerHTML = '';
+    [['pre', t.slice(0, i)], ['orp', t[i]], ['post', t.slice(i + 1)]].forEach(([c, s]) => {
+      const span = document.createElement('span'); span.className = c; span.textContent = s; wordEl.appendChild(span);
+    });
+    status();
+  }
+
+  function idle(msg) {
+    wordEl.className = 'idle'; wordEl.style.fontSize = ''; wordEl.textContent = msg; status();
+  }
+
+  function status() {
+    const n = words.length, at = Math.min(pos + 1, n);
+    $('#progress').textContent = at + ' / ' + n + ' words';
+    const secs = Math.round((n - pos) * 60 / wpm);
+    $('#left').textContent = n ? (secs >= 60 ? Math.round(secs / 60) + ' min left' : Math.max(0, secs) + ' s left') : '';
+    seek.value = Math.min(pos, Math.max(0, n - 1));
+    $('#wpm').textContent = wpm + ' wpm';
+  }
+
+  function tick() {
+    show();
+    if (pos >= words.length) { stop(); return; }
+    timer = setTimeout(() => {
+      pos++;
+      if (pos >= words.length) { stop(); show(); return; }
+      tick();
+    }, delay(words[pos]));
+  }
+
+  function play() {
+    parse();
+    if (!words.length) { idle('Nothing to read yet. Paste some text first.'); return; }
+    if (pos >= words.length - 1 && wordEl.className === 'idle') pos = 0;
+    playBtn.textContent = 'Pause';
+    tick();
+  }
+
+  function stop() {
+    clearTimeout(timer); timer = null;
+    playBtn.textContent = 'Play';
+    store.set('sr.pos', pos);
+  }
+
+  const toggle = () => timer ? stop() : play();
+  const setWpm = v => { wpm = Math.max(100, Math.min(1000, v)); store.set('sr.wpm', wpm); status(); };
+  const jump = p => { const was = !!timer; stop(); parse(); pos = Math.max(0, Math.min(p, words.length - 1)); show(); store.set('sr.pos', pos); if (was) play(); };
+
+  playBtn.addEventListener('click', toggle);
+  $('#back').addEventListener('click', () => jump(pos - 10));
+  $('#restart').addEventListener('click', () => jump(0));
+  $('#slower').addEventListener('click', () => setWpm(wpm - 25));
+  $('#faster').addEventListener('click', () => setWpm(wpm + 25));
+  seek.addEventListener('input', () => jump(+seek.value));
+  text.addEventListener('input', () => {
+    stop(); store.set('sr.text', text.value); pos = 0; parse(); store.set('sr.pos', 0);
+    words.length ? show() : idle('Paste text below, then press play.');
+  });
+  document.addEventListener('keydown', e => {
+    if (e.target === text) return;
+    if (e.key === ' ') { e.preventDefault(); toggle(); }
+    else if (e.key === 'ArrowLeft') jump(pos - 10);
+    else if (e.key === 'ArrowUp') setWpm(wpm + 25);
+    else if (e.key === 'ArrowDown') setWpm(wpm - 25);
+  });
+
+  parse();
+  words.length ? show() : status();
+})();
+</script>
+</body>
+</html>

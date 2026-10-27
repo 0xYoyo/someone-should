@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T01:35:14.374Z",
+ "updated": "2026-10-27T01:35:31.950Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -126,9 +126,14 @@
   },
   {
    "slug": "one-word-speed-reader",
-   "status": "pending",
+   "status": "pass",
    "attempts": 1,
-   "model": "opus-5.5"
+   "model": "opus-5.5",
+   "kb": 9.3,
+   "tests": "6/6",
+   "built": "2026-10-27T01:34:29Z",
+   "minutes": 5,
+   "approved": false
   },
   {
    "slug": "audio-bpm-detector",
