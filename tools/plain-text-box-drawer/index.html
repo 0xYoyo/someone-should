@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that draws shapes in plain text</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+#app { min-width: 0; }
+.tools { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.tools button { padding: 0 8px; }
+.row button { padding: 0 14px; }
+#textrow { display: none; flex-wrap: nowrap; }
+#textrow.on { display: flex; }
+#textrow input { flex: 1; min-width: 0; font-family: var(--mono); }
+#wrap { overflow: auto; border: 1.5px solid var(--line); border-radius: var(--radius); max-height: 62dvh; -webkit-overflow-scrolling: touch; }
+#grid {
+  display: inline-block; vertical-align: top; padding: 0; margin: 0;
+  font: 20px/24px var(--mono); white-space: pre; user-select: none; -webkit-user-select: none;
+  touch-action: none; cursor: crosshair;
+  background-image: linear-gradient(var(--line) 1px, transparent 1px);
+  background-size: 100% 24px; background-position: 0 23px;
+}
+#grid.pan { touch-action: pan-x pan-y; cursor: grab; }
+#grid > div { height: 24px; white-space: nowrap; }
+#grid span { display: inline-block; width: 1ch; height: 24px; vertical-align: top; text-align: center; overflow: hidden; }
+#grid span.hl { background: var(--ink); color: var(--paper); }
+#status { font: 16px/1.4 var(--sans); color: var(--meta); margin: 0; min-height: 22px; }
+#out { display: none; font: 16px/1.3 var(--mono); min-height: 160px; white-space: pre; }
+#out.on { display: block; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that draws shapes in plain text</h1>
+
+<main id="app" class="stack">
+  <div class="tools" role="toolbar" aria-label="Drawing tool">
+    <button id="m-box" data-mode="box" class="primary">Box</button>
+    <button id="m-line" data-mode="line">Line</button>
+    <button id="m-arrow" data-mode="arrow">Arrow</button>
+    <button id="m-text" data-mode="text">Text</button>
+    <button id="m-erase" data-mode="erase">Erase</button>
+    <button id="m-scroll" data-mode="scroll">Scroll</button>
+  </div>
+  <div id="textrow" class="row">
+    <input id="txt" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="text at the marked cell" aria-label="Text to place">
+    <button id="place">Place</button>
+  </div>
+  <div id="wrap"><div id="grid" role="img" aria-label="Drawing canvas"></div></div>
+  <p id="status" aria-live="polite"></p>
+  <div class="row">
+    <button id="undo">Undo</button>
+    <button id="clear">Clear</button>
+    <button id="charset">ASCII</button>
+    <button id="copy" class="primary">Copy text</button>
+  </div>
+  <textarea id="out" readonly aria-label="Drawing as plain text"></textarea>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  // storage helper — never throws
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  const COLS = 60, ROWS = 30, N = COLS * ROWS, KEY = 'ptbd.v1';
+  // L: line cells. 0 = empty, 1–15 = direction bits (U1 R2 D4 L8), 16–19 = arrowhead U R D L.
+  // T: text characters, which win over L.
+  let L = new Array(N).fill(0), T = new Array(N).fill('');
+  let ascii = false, mode = 'box';
+  const undoStack = [];
+
+  const saved = store.get(KEY, null);
+  if (saved && Array.isArray(saved.L) && saved.L.length === N && Array.isArray(saved.T) && saved.T.length === N) {
+    L = saved.L; T = saved.T; ascii = !!saved.ascii;
+  }
+
+  const UNI = ' │─└││┌├─┘─┴┐┤┬┼';
+  const glyph = v => {
+    if (!v) return ' ';
+    if (v >= 16) return (ascii ? '^>v<' : '▲▶▼◀')[v - 16];
+    if (!ascii) return UNI[v];
+    return (v & 10) && (v & 5) ? '+' : (v & 5) ? '|' : '-';
+  };
+  const charAt = (l, t, i) => t[i] || glyph(l[i]);
+
+  // ---- grid DOM ----
+  const grid = $('#grid'), wrap = $('#wrap'), status = $('#status');
+  const spans = [];
+  const shown = new Array(N).fill(null);
+  {
+    const frag = document.createDocumentFragment();
+    for (let r = 0; r < ROWS; r++) {
+      const row = document.createElement('div');
+      for (let c = 0; c < COLS; c++) { const s = document.createElement('span'); row.appendChild(s); spans.push(s); }
+      frag.appendChild(row);
+    }
+    grid.appendChild(frag);
+  }
+
+  let marked = -1;
+  function render(l = L, t = T) {
+    for (let i = 0; i < N; i++) {
+      const ch = charAt(l, t, i);
+      if (shown[i] !== ch) { spans[i].textContent = ch; shown[i] = ch; }
+    }
+  }
+  function mark(i) {
+    if (marked >= 0) spans[marked].classList.remove('hl');
+    marked = i;
+    if (i >= 0) spans[i].classList.add('hl');
+  }
+
+  // ---- drawing operations ----
+  const idx = p => p.r * COLS + p.c;
+  const dirBit = (p, q) => !q ? 0 : q.r < p.r ? 1 : q.c > p.c ? 2 : q.r > p.r ? 4 : q.c < p.c ? 8 : 0;
+
+  function straight(a, b) {
+    const pts = [], dr = Math.sign(b.r - a.r), dc = Math.sign(b.c - a.c);
+    let p = { r: a.r, c: a.c };
+    pts.push(p);
+    while (p.r !== b.r || p.c !== b.c) { p = { r: p.r + dr, c: p.c + dc }; pts.push(p); }
+    return pts;
+  }
+  function elbow(a, b) {
+    // horizontal first, then vertical
+    const mid = { r: a.r, c: b.c };
+    const h = straight(a, mid), v = straight(mid, b);
+    return h.concat(v.slice(1));
+  }
+  function perimeter(a, b) {
+    const r1 = Math.min(a.r, b.r), r2 = Math.max(a.r, b.r), c1 = Math.min(a.c, b.c), c2 = Math.max(a.c, b.c);
+    const pts = [];
+    for (let c = c1; c <= c2; c++) pts.push({ r: r1, c });
+    for (let r = r1 + 1; r <= r2; r++) pts.push({ r, c: c2 });
+    for (let c = c2 - 1; c >= c1; c--) pts.push({ r: r2, c });
+    for (let r = r2 - 1; r > r1; r--) pts.push({ r, c: c1 });
+    return pts;
+  }
+  function drawPath(l, t, pts, closed, arrow) {
+    const n = pts.length;
+    if (n < 2) return;
+    for (let i = 0; i < n; i++) {
+      const prev = i > 0 ? pts[i - 1] : closed ? pts[n - 1] : null;
+      const next = i < n - 1 ? pts[i + 1] : closed ? pts[0] : null;
+      const k = idx(pts[i]);
+      const base = l[k] < 16 ? l[k] : 0;
+      l[k] = base | dirBit(pts[i], prev) | dirBit(pts[i], next);
+      t[k] = '';
+    }
+    if (arrow) {
+      const p = pts[n - 2], q = pts[n - 1];
+      l[idx(q)] = 16 + (q.r < p.r ? 0 : q.c > p.c ? 1 : q.r > p.r ? 2 : 3);
+    }
+  }
+  function apply(l, t, op) {
+    const { a, b } = op;
+    if (op.kind === 'box') {
+      if (a.r === b.r || a.c === b.c) drawPath(l, t, straight(a, b), false, false);
+      else drawPath(l, t, perimeter(a, b), true, false);
+    } else if (op.kind === 'line' || op.kind === 'arrow') {
+      drawPath(l, t, elbow(a, b), false, op.kind === 'arrow');
+    } else if (op.kind === 'erase') {
+      for (let r = Math.min(a.r, b.r); r <= Math.max(a.r, b.r); r++)
+        for (let c = Math.min(a.c, b.c); c <= Math.max(a.c, b.c); c++) { l[r * COLS + c] = 0; t[r * COLS + c] = ''; }
+    } else if (op.kind === 'text') {
+      [...op.s].forEach((ch, j) => {
+        const c = a.c + j;
+        if (c < COLS) { const k = a.r * COLS + c; t[k] = ch === ' ' ? '' : ch; l[k] = 0; }
+      });
+    }
+  }
+  function preview(op) {
+    const l = L.slice(), t = T.slice();
+    apply(l, t, op);
+    render(l, t);
+  }
+  function save() { store.set(KEY, { L, T, ascii }); }
+  function commit(op) {
+    undoStack.push(JSON.stringify([L, T]));
+    if (undoStack.length > 100) undoStack.shift();
+    apply(L, T, op);
+    save(); render();
+  }
+
+  // ---- modes ----
+  const HINTS = {
+    box: 'Drag, or tap two corners.',
+    line: 'Drag, or tap start then end.',
+    arrow: 'Drag, or tap start then end.',
+    text: 'Tap a cell, then type and press Enter.',
+    erase: 'Drag, or tap two corners of the area.',
+    scroll: 'Drag to move around the canvas.'
+  };
+  let anchor = null, cursor = null, press = null;
+  const say = s => { status.textContent = s; };
+
+  function setMode(m) {
+    mode = m;
+    $$('.tools button').forEach(b => b.classList.toggle('primary', b.dataset.mode === m));
+    $('#textrow').classList.toggle('on', m === 'text');
+    grid.classList.toggle('pan', m === 'scroll');
+    anchor = null; cursor = null; press = null; mark(-1); render();
+    say(HINTS[m]);
+  }
+  $$('.tools button').forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode)));
+
+  function cellAt(e) {
+    const rect = grid.getBoundingClientRect();
+    const c = Math.floor((e.clientX - rect.left) / (rect.width / COLS));
+    const r = Math.floor((e.clientY - rect.top) / (rect.height / ROWS));
+    return { r: Math.max(0, Math.min(ROWS - 1, r)), c: Math.max(0, Math.min(COLS - 1, c)) };
+  }
+  const same = (p, q) => p && q && p.r === q.r && p.c === q.c;
+
+  grid.addEventListener('pointerdown', e => {
+    if (mode === 'scroll' || (e.pointerType === 'mouse' && e.button !== 0)) return;
+    const c = cellAt(e);
+    e.preventDefault();
+    if (mode === 'text') { setCursor(c); $('#txt').focus({ preventScroll: true }); return; }
+    try { grid.setPointerCapture(e.pointerId); } catch {}
+    const start = anchor || c;
+    press = { start, last: c, moved: !same(start, c) };
+    if (press.moved) preview({ kind: mode, a: start, b: c });
+  });
+  grid.addEventListener('pointermove', e => {
+    if (mode === 'scroll' || mode === 'text') return;
+    const c = cellAt(e);
+    if (press) {
+      if (same(c, press.last)) return;
+      press.last = c;
+      if (!same(c, press.start)) press.moved = true;
+      preview({ kind: mode, a: press.start, b: c });
+    } else if (anchor && e.pointerType === 'mouse') {
+      preview({ kind: mode, a: anchor, b: c });
+    }
+  });
+  grid.addEventListener('pointerup', e => {
+    if (!press) return;
+    const c = cellAt(e), p = press;
+    press = null;
+    if (p.moved && !same(c, p.start)) {
+      commit({ kind: mode, a: p.start, b: c });
+      anchor = null; mark(-1); say(HINTS[mode]);
+    } else if (anchor) {
+      anchor = null; mark(-1); render(); say(HINTS[mode]);
+    } else {
+      anchor = c; mark(idx(c));
+      say(mode === 'box' || mode === 'erase' ? 'Now tap the opposite corner.' : 'Now tap where it ends.');
+    }
+  });
+  grid.addEventListener('pointercancel', () => { press = null; render(); });
+
+  // ---- text ----
+  const txt = $('#txt');
+  function setCursor(c) {
+    cursor = c; mark(idx(c));
+    say('Type, then press Enter.');
+    if (txt.value) preview({ kind: 'text', a: c, s: txt.value });
+  }
+  function placeText() {
+    if (!cursor) { say('Tap a cell on the canvas first.'); return; }
+    if (!txt.value) { say('Type something first.'); return; }
+    commit({ kind: 'text', a: cursor, s: txt.value });
+    txt.value = '';
+    if (cursor.r < ROWS - 1) setCursor({ r: cursor.r + 1, c: cursor.c });
+    say('Placed. Next line is marked.');
+  }
+  txt.addEventListener('input', () => { if (cursor) preview({ kind: 'text', a: cursor, s: txt.value }); });
+  txt.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); placeText(); } });
+  $('#place').addEventListener('click', placeText);
+
+  // ---- actions ----
+  $('#undo').addEventListener('click', () => {
+    const s = undoStack.pop();
+    if (!s) { say('Nothing to undo.'); return; }
+    [L, T] = JSON.parse(s);
+    save(); render(); say('Undone.');
+  });
+  $('#clear').addEventListener('click', () => {
+    if (!L.some(Boolean) && !T.some(Boolean)) { say('Already empty.'); return; }
+    undoStack.push(JSON.stringify([L, T]));
+    L = new Array(N).fill(0); T = new Array(N).fill('');
+    anchor = null; mark(-1); save(); render(); say('Cleared. Undo brings it back.');
+  });
+  const charsetBtn = $('#charset');
+  const syncCharset = () => { charsetBtn.textContent = ascii ? 'Unicode' : 'ASCII'; };
+  charsetBtn.addEventListener('click', () => {
+    ascii = !ascii; syncCharset(); save(); render();
+    say(ascii ? 'Plain ASCII: + - | > < ^ v' : 'Unicode box lines.');
+  });
+
+  function asText() {
+    const lines = [];
+    for (let r = 0; r < ROWS; r++) {
+      let s = '';
+      for (let c = 0; c < COLS; c++) s += charAt(L, T, r * COLS + c);
+      lines.push(s.replace(/\s+$/, ''));
+    }
+    while (lines.length && !lines[0]) lines.shift();
+    while (lines.length && !lines[lines.length - 1]) lines.pop();
+    const indent = Math.min(...lines.filter(Boolean).map(s => s.match(/^ */)[0].length));
+    return lines.map(s => s.slice(indent)).join('\n');
+  }
+  const out = $('#out');
+  function legacyCopy(text) {
+    out.value = text;
+    out.classList.add('on');
+    out.focus(); out.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch {}
+    if (ok) out.classList.remove('on');
+    return ok;
+  }
+  $('#copy').addEventListener('click', async () => {
+    const text = asText();
+    if (!text) { say('Nothing drawn yet.'); out.classList.remove('on'); return; }
+    const n = text.split('\n').length, msg = `Copied ${n} line${n > 1 ? 's' : ''}.`;
+    try {
+      if (!navigator.clipboard) throw 0;
+      await navigator.clipboard.writeText(text);
+      out.classList.remove('on'); say(msg);
+    } catch {
+      say(legacyCopy(text) ? msg : 'Copy blocked here. Select the text below and copy it.');
+    }
+  });
+
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && document.activeElement !== txt) { e.preventDefault(); $('#undo').click(); }
+    if (e.key === 'Escape' && anchor) { anchor = null; mark(-1); render(); say(HINTS[mode]); }
+  });
+
+  syncCharset();
+  render();
+  say(L.some(Boolean) || T.some(Boolean) ? HINTS[mode] : 'Empty canvas. ' + HINTS[mode]);
+})();
+</script>
+</body>
+</html>

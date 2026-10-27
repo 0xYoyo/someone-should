@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T01:45:58.304Z",
+ "updated": "2026-10-27T01:46:27.121Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -350,9 +350,14 @@
   },
   {
    "slug": "plain-text-box-drawer",
-   "status": "pending",
+   "status": "pass",
    "attempts": 1,
-   "model": "opus-5.5"
+   "model": "opus-5.5",
+   "kb": 15.8,
+   "tests": "5/5",
+   "built": "2026-10-27T01:43:13Z",
+   "minutes": 9,
+   "approved": false
   },
   {
    "slug": "family-tree-maker",

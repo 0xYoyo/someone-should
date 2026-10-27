@@ -1,0 +1,45 @@
+{
+  "slug": "plain-text-box-drawer",
+  "wish": "someone should make a tool that draws shapes in plain text",
+  "year": 2014,
+  "agreed": 27,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/3916/software-to-draw-shapes-in-plain-text-file-ascii-unicode",
+      "date": "2014-05-07",
+      "points": 21,
+      "comments": 6
+    }
+  ],
+  "spec": "Draws boxes, lines, arrows and text on a 60x30 character grid, with crossing lines merged into proper junctions.\nPick a tool, drag (or tap two cells) on the grid, switch between Unicode box lines and plain ASCII, then Copy text puts the trimmed drawing on the clipboard.\nIt does not draw circles or freehand, move or resize shapes after drawing, or import existing text art.",
+  "tests": [
+    {
+      "tap": "#grid > div:nth-child(2) > span:nth-child(2)"
+    },
+    {
+      "tap": "#grid > div:nth-child(4) > span:nth-child(6)"
+    },
+    {
+      "expect": {
+        "sel": "#grid > div:nth-child(2)",
+        "contains": "┌───┐"
+      }
+    },
+    {
+      "tap": "#charset"
+    },
+    {
+      "expect": {
+        "sel": "#grid > div:nth-child(4)",
+        "contains": "+---+"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:43:13Z",
+  "model": "opus-5.5",
+  "minutes": 9,
+  "approved": false,
+  "notes": "Drawing persists in localStorage. Lines bend horizontal-first. Copy falls back to a selectable text box when the clipboard is blocked."
+}
