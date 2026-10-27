@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app that runs checklists, like pre-flight or surgical safety lists</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+
+/* ---- tool styles below ---- */
+.hidden { display: none !important; }
+label { display: grid; gap: 6px; }
+label span { font: 15px/1.3 var(--mono); color: var(--meta); }
+textarea { min-height: 180px; resize: vertical; line-height: 1.5; }
+#lists li > button.name { flex: 1; text-align: left; border: 0; padding: 0; font-weight: 500; }
+#lists li .count { color: var(--meta); font: 16px/1.3 var(--mono); }
+#run-name { font-size: 22px; font-weight: 500; margin: 0; }
+#progress { font: 16px/1.3 var(--mono); color: var(--meta); }
+.bar { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--ink); width: 0; transition: width .15s; }
+#current { border: 1.5px solid var(--ink); border-radius: var(--radius); padding: 20px 16px; display: grid; gap: 6px; }
+#step { font-size: 28px; line-height: 1.2; font-weight: 500; overflow-wrap: anywhere; }
+#resp { font: 500 20px/1.3 var(--mono); }
+#check { min-height: 64px; font-size: 20px; width: 100%; }
+.row > button { flex: 1; }
+#steps-list li { cursor: pointer; min-height: 48px; }
+#steps-list li .t { flex: 1; overflow-wrap: anywhere; }
+#steps-list li .r { font-family: var(--mono); color: var(--meta); text-align: right; }
+#steps-list li .s { font-family: var(--mono); width: 3.5em; flex: none; }
+#steps-list li.done .t { color: var(--meta); }
+#steps-list li.skip .s { color: var(--no); }
+#steps-list li.now { font-weight: 600; }
+#complete { font-size: 20px; font-weight: 500; }
+
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make an app that runs checklists, like pre-flight or surgical safety lists</h1>
+
+<main id="app" class="stack">
+  <section id="home" class="stack">
+    <ul id="lists" class="plain"></ul>
+    <button id="new" class="primary">New checklist</button>
+  </section>
+
+  <section id="edit" class="stack hidden">
+    <label><span>Name</span><input id="name" autocomplete="off" maxlength="80"></label>
+    <label><span>Steps, one per line. Optional response after ...</span>
+      <textarea id="steps" spellcheck="false" placeholder="Fuel selector ... BOTH&#10;Flaps ... SET"></textarea></label>
+    <p id="edit-err" class="no hidden"></p>
+    <div class="row"><button id="save" class="primary">Save and run</button><button id="cancel">Cancel</button></div>
+    <button id="delete" class="no hidden" style="border-color:var(--no)">Delete checklist</button>
+  </section>
+
+  <section id="run" class="stack hidden">
+    <div class="row" style="justify-content:space-between"><h2 id="run-name"></h2><span id="progress"></span></div>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="current">
+      <div id="step"></div>
+      <div id="resp"></div>
+    </div>
+    <p id="complete" class="built hidden"></p>
+    <button id="check" class="primary">Check</button>
+    <div class="row"><button id="back">Back</button><button id="skip">Skip</button></div>
+    <ul id="steps-list" class="plain"></ul>
+    <div class="row"><button id="reset">Reset</button><button id="edit-btn">Edit</button><button id="home-btn">All lists</button></div>
+  </section>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  // storage helper — never throws
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+
+  const KEY = 'run-a-checklist:v1';
+  let data = store.get(KEY, { lists: [] });
+  if (!data || !Array.isArray(data.lists)) data = { lists: [] };
+  let cur = null;      // list being run
+  let editing = null;  // list being edited, or null for new
+  const save = () => store.set(KEY, data);
+
+  // "Fuel ... ON" -> challenge "Fuel", response "ON"
+  const parse = line => {
+    const m = line.match(/^(.*?)\s*(?:\.{2,}|…|\s[—–]\s|\s-{1,2}\s)\s*(.*)$/);
+    return m && m[1] && m[2] ? { t: m[1], r: m[2] } : { t: line, r: '' };
+  };
+  const unparse = s => s.r ? s.t + ' ... ' + s.r : s.t;
+
+  const show = id => ['home', 'edit', 'run'].forEach(s => $('#' + s).classList.toggle('hidden', s !== id));
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+
+  function renderHome() {
+    const ul = $('#lists'); ul.textContent = '';
+    data.lists.forEach(l => {
+      const li = el('li');
+      const b = el('button', 'name', l.name); b.onclick = () => run(l);
+      const done = l.state.filter(x => x).length;
+      li.append(b, el('span', 'count', (done ? done + '/' : '') + l.steps.length));
+      ul.append(li);
+    });
+    // with nothing saved yet, open straight into a new checklist
+    if (!data.lists.length) return edit(null, true);
+    show('home');
+  }
+
+  function edit(l, quiet) {
+    editing = l;
+    $('#name').value = l ? l.name : '';
+    $('#steps').value = l ? l.steps.map(unparse).join('\n') : '';
+    $('#delete').classList.toggle('hidden', !l);
+    $('#cancel').classList.toggle('hidden', !l && !data.lists.length);
+    $('#edit-err').classList.add('hidden');
+    show('edit');
+    if (!quiet) $('#name').focus();
+  }
+
+  function saveEdit() {
+    const name = $('#name').value.trim();
+    const steps = $('#steps').value.split('\n').map(s => s.trim()).filter(Boolean).map(parse);
+    const err = !name ? 'Give it a name.' : !steps.length ? 'Add at least one step.' : '';
+    if (err) { const e = $('#edit-err'); e.textContent = err; e.classList.remove('hidden'); return; }
+    let l = editing;
+    if (l) {
+      const same = l.steps.length === steps.length && l.steps.every((s, i) => s.t === steps[i].t);
+      l.name = name; l.steps = steps;
+      if (!same) l.state = steps.map(() => 0);
+    } else {
+      l = { name, steps, state: steps.map(() => 0) };
+      data.lists.push(l);
+    }
+    save();
+    run(l);
+  }
+
+  // state per step: 0 open, 1 checked, 2 skipped
+  const nextOpen = l => l.state.indexOf(0);
+
+  function run(l) { cur = l; show('run'); renderRun(); }
+
+  function renderRun() {
+    const l = cur, i = nextOpen(l), n = l.steps.length;
+    const handled = l.state.filter(x => x).length;
+    $('#run-name').textContent = l.name;
+    $('#progress').textContent = handled + ' / ' + n;
+    $('#bar').style.width = (handled / n * 100) + '%';
+    const finished = i < 0;
+    $('#current').classList.toggle('hidden', finished);
+    $('#check').classList.toggle('hidden', finished);
+    $('#skip').disabled = finished;
+    $('#back').disabled = handled === 0;
+    if (!finished) { $('#step').textContent = l.steps[i].t; $('#resp').textContent = l.steps[i].r; }
+    const skipped = l.state.filter(x => x === 2).length;
+    const c = $('#complete');
+    c.className = (skipped ? 'no' : 'built') + (finished ? '' : ' hidden');
+    c.textContent = skipped ? 'Done, ' + skipped + ' skipped.' : 'Checklist complete.';
+    const ul = $('#steps-list'); ul.textContent = '';
+    l.steps.forEach((s, k) => {
+      const st = l.state[k];
+      const li = el('li', st === 1 ? 'done' : st === 2 ? 'skip' : k === i ? 'now' : '');
+      li.append(el('span', 's', st === 1 ? '[x]' : st === 2 ? 'skip' : k === i ? '>' : '[ ]'), el('span', 't', s.t));
+      if (s.r) li.append(el('span', 'r', s.r));
+      li.onclick = () => { l.state[k] = st === 1 ? 0 : 1; save(); renderRun(); };
+      ul.append(li);
+    });
+  }
+
+  function mark(v) {
+    const i = nextOpen(cur); if (i < 0) return;
+    cur.state[i] = v; cur.last = cur.last || []; cur.last.push(i);
+    save(); renderRun();
+  }
+
+  $('#new').onclick = () => edit(null);
+  $('#cancel').onclick = () => editing ? run(editing) : renderHome();
+  $('#save').onclick = saveEdit;
+  $('#name').addEventListener('keydown', e => { if (e.key === 'Enter') $('#steps').focus(); });
+  $('#delete').onclick = () => {
+    const b = $('#delete');
+    if (b.dataset.arm !== '1') { b.dataset.arm = '1'; b.textContent = 'Tap again to delete'; return; }
+    b.dataset.arm = ''; b.textContent = 'Delete checklist';
+    data.lists = data.lists.filter(x => x !== editing); save(); renderHome();
+  };
+  $('#check').onclick = () => mark(1);
+  $('#skip').onclick = () => mark(2);
+  $('#back').onclick = () => {
+    // undo the most recent check/skip
+    const last = (cur.last || []).filter(k => cur.state[k]);
+    const k = last.length ? last[last.length - 1] : cur.state.map((x, j) => x ? j : -1).filter(j => j >= 0).pop();
+    if (k == null || k < 0) return;
+    cur.state[k] = 0; cur.last = last.slice(0, -1); save(); renderRun();
+  };
+  $('#reset').onclick = () => { cur.state = cur.steps.map(() => 0); cur.last = []; save(); renderRun(); };
+  $('#edit-btn').onclick = () => edit(cur);
+  $('#home-btn').onclick = renderHome;
+
+  renderHome();
+})();
+</script>
+</body>
+</html>

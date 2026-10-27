@@ -1,0 +1,54 @@
+{
+  "slug": "run-a-checklist",
+  "wish": "someone should make an app that runs checklists, like pre-flight or surgical safety lists",
+  "year": 2014,
+  "agreed": 11,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/7071/checklist-app-for-iphone-pre-flight-checklist-surgical-safety-checklist-etc",
+      "date": "2014-06-19",
+      "points": 8,
+      "comments": 3
+    }
+  ],
+  "spec": "Write named checklists, one step per line, with an optional response after '...' (Fuel ... ON).\nRun one step at a time: the current step is shown large, tap Check or Skip to advance, Back to undo, Reset to start over; progress is saved on the device.\nIt does not ship with any checklists, sync between devices, or replace an official procedure.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#name",
+        "text": "Pre-flight"
+      }
+    },
+    {
+      "type": {
+        "sel": "#steps",
+        "text": "Fuel selector ... BOTH\nFlaps ... SET"
+      }
+    },
+    {
+      "tap": "#save"
+    },
+    {
+      "expect": {
+        "sel": "#step",
+        "contains": "Fuel selector"
+      }
+    },
+    {
+      "tap": "#check"
+    },
+    {
+      "expect": {
+        "sel": "#progress",
+        "contains": "1 / 2"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:43:13Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": ""
+}
