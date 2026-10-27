@@ -1,0 +1,58 @@
+{
+  "slug": "simple-sketch-pad",
+  "wish": "someone should make an app that is drawing software for amateurs",
+  "year": 2014,
+  "agreed": 52,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/395/drawing-software-for-amateurs",
+      "date": "2014-02-05",
+      "points": 24,
+      "comments": 7
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/35647/tool-for-sketching-drawing-painting-quickly-linux-ubuntu",
+      "date": "2016-08-22",
+      "points": 16,
+      "comments": 5
+    }
+  ],
+  "spec": "A blank page you draw on with finger, mouse or stylus: pen, see-through marker, eraser, three sizes, six colors plus any color.\nDraw, undo or redo any stroke, clear (also undoable), and save the page as a PNG; the drawing is kept between visits.\nIt does not do layers, shapes, text, fill bucket or opening existing images.",
+  "tests": [
+    {
+      "expect": {
+        "sel": "#status",
+        "contains": "Empty page"
+      }
+    },
+    {
+      "tap": "#pad"
+    },
+    {
+      "expect": {
+        "sel": "#status",
+        "contains": "1 stroke"
+      }
+    },
+    {
+      "tap": "#clear"
+    },
+    {
+      "tap": "#undo"
+    },
+    {
+      "expect": {
+        "sel": "#status",
+        "contains": "1 stroke"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:54:46Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Stylus pressure varies pen width. Ctrl/Cmd+Z undo, Shift to redo. Strokes kept in localStorage."
+}

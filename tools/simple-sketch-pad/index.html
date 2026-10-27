@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app that is drawing software for amateurs</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+
+/* ---- tool styles below ---- */
+.bar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.bar button { padding: 0 12px; min-width: var(--tap); }
+.bar button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.sizes button { display: inline-grid; place-items: center; padding: 0; width: var(--tap); }
+.sizes i { display: block; border-radius: 50%; background: currentColor; }
+.swatch { width: var(--tap); padding: 0; border-color: var(--line); }
+.swatch[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--ink); }
+.pick { position: relative; width: var(--tap); height: var(--tap); border: 1.5px dashed var(--meta); border-radius: var(--radius); overflow: hidden; display: inline-block; }
+.pick input { position: absolute; inset: -8px; width: calc(100% + 16px); height: calc(100% + 16px); padding: 0; border: 0; opacity: 0; cursor: pointer; }
+.pick span { position: absolute; inset: 8px; border-radius: 50%; background: conic-gradient(#c8321e, #e8b923, #2e7d4f, #2457c5, #8a3fb8, #c8321e); pointer-events: none; }
+.pick.on { box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--ink); }
+#pad { display: block; width: 100%; height: max(280px, calc(100dvh - 360px)); background: #fff; border: 1.5px solid var(--line); border-radius: var(--radius); touch-action: none; cursor: crosshair; -webkit-user-select: none; user-select: none; }
+#status { color: var(--meta); font-size: 16px; margin: 0; min-height: 24px; }
+.actions button { flex: 1 1 0; padding: 0 8px; }
+
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make an app that is drawing software for amateurs</h1>
+
+<main id="app" class="stack">
+  <div class="bar" role="group" aria-label="Brush">
+    <button id="pen" aria-pressed="true">Pen</button>
+    <button id="marker" aria-pressed="false">Marker</button>
+    <button id="eraser" aria-pressed="false">Eraser</button>
+    <span class="bar sizes" role="group" aria-label="Size">
+      <button data-size="3" aria-label="Thin" aria-pressed="false"><i style="width:4px;height:4px"></i></button>
+      <button data-size="8" aria-label="Medium" aria-pressed="true"><i style="width:9px;height:9px"></i></button>
+      <button data-size="20" aria-label="Thick" aria-pressed="false"><i style="width:18px;height:18px"></i></button>
+    </span>
+  </div>
+  <div class="bar" id="colors" role="group" aria-label="Color">
+    <button class="swatch" data-color="#141414" aria-label="Black" style="background:#141414"></button>
+    <button class="swatch" data-color="#c8321e" aria-label="Red" style="background:#c8321e"></button>
+    <button class="swatch" data-color="#e8b923" aria-label="Yellow" style="background:#e8b923"></button>
+    <button class="swatch" data-color="#2e7d4f" aria-label="Green" style="background:#2e7d4f"></button>
+    <button class="swatch" data-color="#2457c5" aria-label="Blue" style="background:#2457c5"></button>
+    <label class="pick" id="pickwrap" aria-label="Any color"><input type="color" id="pick" value="#8a3fb8"><span></span></label>
+  </div>
+  <canvas id="pad" aria-label="Drawing area"></canvas>
+  <p id="status" aria-live="polite"></p>
+  <div class="bar actions">
+    <button id="undo">Undo</button>
+    <button id="redo">Redo</button>
+    <button id="clear">Clear</button>
+    <button id="save" class="primary">Save PNG</button>
+  </div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  // storage helper — never throws
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+
+  const KEY = 'simple-sketch-pad:v1';
+  const pad = $('#pad');
+  const ctx = pad.getContext('2d');
+  const base = document.createElement('canvas'); // committed strokes
+  const bctx = base.getContext('2d');
+  const status = $('#status');
+
+  // Coordinates are stored as fractions of the canvas width so drawings survive resizes.
+  let actions = store.get(KEY, []);
+  if (!Array.isArray(actions)) actions = [];
+  let redo = [];
+  let brush = 'pen', size = 8, color = '#141414';
+  let current = null, W = 0, H = 0, dpr = 1;
+
+  function visibleStrokes() {
+    let start = 0;
+    actions.forEach((a, i) => { if (a.t === 'clear') start = i + 1; });
+    return actions.slice(start);
+  }
+
+  function drawStroke(c, s) {
+    const pts = s.p;
+    if (!pts.length) return;
+    const k = W;
+    c.save();
+    c.lineCap = 'round';
+    c.lineJoin = 'round';
+    c.strokeStyle = c.fillStyle = s.b === 'eraser' ? '#ffffff' : s.c;
+    c.globalAlpha = s.b === 'marker' ? 0.4 : 1;
+    const w = s.w * k / 400;
+    if (pts.length === 1) {
+      c.beginPath();
+      c.arc(pts[0][0] * k, pts[0][1] * k, w * (pts[0][2] || 1) / 2, 0, Math.PI * 2);
+      c.fill();
+    } else if (s.pr) {
+      // pressure-varying pen: per-segment widths
+      for (let i = 1; i < pts.length; i++) {
+        c.beginPath();
+        c.lineWidth = Math.max(0.5, w * pts[i][2]);
+        c.moveTo(pts[i - 1][0] * k, pts[i - 1][1] * k);
+        c.lineTo(pts[i][0] * k, pts[i][1] * k);
+        c.stroke();
+      }
+    } else {
+      c.lineWidth = w;
+      c.beginPath();
+      c.moveTo(pts[0][0] * k, pts[0][1] * k);
+      for (let i = 1; i < pts.length - 1; i++) {
+        const mx = (pts[i][0] + pts[i + 1][0]) / 2, my = (pts[i][1] + pts[i + 1][1]) / 2;
+        c.quadraticCurveTo(pts[i][0] * k, pts[i][1] * k, mx * k, my * k);
+      }
+      const last = pts[pts.length - 1];
+      c.lineTo(last[0] * k, last[1] * k);
+      c.stroke();
+    }
+    c.restore();
+  }
+
+  function rebuild() {
+    bctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    bctx.fillStyle = '#ffffff';
+    bctx.fillRect(0, 0, W, H);
+    visibleStrokes().forEach(s => drawStroke(bctx, s));
+    paint();
+  }
+
+  function paint() {
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.drawImage(base, 0, 0);
+    if (current) { ctx.setTransform(dpr, 0, 0, dpr, 0, 0); drawStroke(ctx, current); }
+  }
+
+  function resize() {
+    const r = pad.getBoundingClientRect();
+    dpr = Math.min(window.devicePixelRatio || 1, 3);
+    W = Math.max(1, r.width); H = Math.max(1, r.height);
+    pad.width = base.width = Math.round(W * dpr);
+    pad.height = base.height = Math.round(H * dpr);
+    rebuild();
+  }
+
+  function update() {
+    const n = visibleStrokes().length;
+    status.textContent = n ? `${n} stroke${n === 1 ? '' : 's'}` : 'Empty page. Draw with a finger, mouse or stylus.';
+    $('#undo').disabled = !actions.length;
+    $('#redo').disabled = !redo.length;
+    $('#clear').disabled = !n;
+  }
+
+  function persist() {
+    const json = JSON.stringify(actions);
+    if (json.length < 4e6) store.set(KEY, actions);
+  }
+
+  function commit(a) {
+    actions.push(a);
+    redo = [];
+    if (a.t === 'stroke') { drawStroke(bctx, a); paint(); } else rebuild();
+    persist();
+    update();
+  }
+
+  // pointer drawing
+  const pt = (e) => {
+    const r = pad.getBoundingClientRect();
+    const pr = e.pointerType === 'pen' && e.pressure > 0 ? e.pressure * 1.6 : 1;
+    return [+((e.clientX - r.left) / W).toFixed(4), +((e.clientY - r.top) / W).toFixed(4), +pr.toFixed(2)];
+  };
+  pad.addEventListener('pointerdown', (e) => {
+    if (current || (e.pointerType === 'mouse' && e.button !== 0)) return;
+    e.preventDefault();
+    try { pad.setPointerCapture(e.pointerId); } catch {}
+    current = { t: 'stroke', b: brush, c: color, w: size, pr: e.pointerType === 'pen' ? 1 : 0, id: e.pointerId, p: [pt(e)] };
+    paint();
+  });
+  pad.addEventListener('pointermove', (e) => {
+    if (!current || e.pointerId !== current.id) return;
+    const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+    (evs.length ? evs : [e]).forEach(ev => current.p.push(pt(ev)));
+    paint();
+  });
+  const end = (e) => {
+    if (!current || e.pointerId !== current.id) return;
+    const s = current; current = null;
+    delete s.id;
+    if (!s.pr) s.p = s.p.map(p => [p[0], p[1]]);
+    commit(s);
+  };
+  pad.addEventListener('pointerup', end);
+  pad.addEventListener('pointercancel', end);
+
+  // controls
+  const setPressed = (list, on) => list.forEach(b => b.setAttribute('aria-pressed', String(b === on)));
+  const brushes = ['#pen', '#marker', '#eraser'].map(s => $(s));
+  brushes.forEach(b => b.addEventListener('click', () => { brush = b.id; setPressed(brushes, b); }));
+  const sizes = $$('[data-size]');
+  sizes.forEach(b => b.addEventListener('click', () => { size = +b.dataset.size; setPressed(sizes, b); }));
+  const swatches = $$('.swatch');
+  const pickwrap = $('#pickwrap');
+  function chooseColor(c, btn) {
+    color = c;
+    setPressed(swatches, btn);
+    pickwrap.classList.toggle('on', !btn);
+    if (brush === 'eraser') { brush = 'pen'; setPressed(brushes, brushes[0]); }
+  }
+  swatches.forEach(b => b.addEventListener('click', () => chooseColor(b.dataset.color, b)));
+  $('#pick').addEventListener('input', (e) => chooseColor(e.target.value, null));
+  setPressed(swatches, swatches[0]);
+
+  function undo() {
+    if (!actions.length) return;
+    redo.push(actions.pop());
+    rebuild(); persist(); update();
+  }
+  function redoOne() {
+    if (!redo.length) return;
+    actions.push(redo.pop());
+    rebuild(); persist(); update();
+  }
+  $('#undo').addEventListener('click', undo);
+  $('#redo').addEventListener('click', redoOne);
+  $('#clear').addEventListener('click', () => { if (visibleStrokes().length) commit({ t: 'clear' }); });
+  document.addEventListener('keydown', (e) => {
+    if (!(e.ctrlKey || e.metaKey) || e.key.toLowerCase() !== 'z') return;
+    e.preventDefault();
+    e.shiftKey ? redoOne() : undo();
+  });
+
+  $('#save').addEventListener('click', () => {
+    if (!visibleStrokes().length) { status.textContent = 'Nothing to save yet.'; return; }
+    const name = 'sketch-' + new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-') + '.png';
+    base.toBlob((blob) => {
+      if (!blob) { status.textContent = 'Could not save on this browser.'; return; }
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      status.textContent = 'Saved ' + name;
+    }, 'image/png');
+  });
+
+  let rt;
+  window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(resize, 120); });
+  resize();
+  update();
+})();
+</script>
+</body>
+</html>
