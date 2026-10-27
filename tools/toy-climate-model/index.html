@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that simulates a simple climate model</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+.out { display: flex; gap: 24px; flex-wrap: wrap; align-items: baseline; }
+.out .lbl { font-size: 16px; color: var(--meta); }
+#delta { font-size: 22px; font-variant-numeric: tabular-nums; }
+.chart { position: relative; border-bottom: 1.5px solid var(--ink); border-left: 1.5px solid var(--ink); }
+.chart svg { display: block; width: 100%; height: 200px; }
+.ax { display: flex; justify-content: space-between; font-size: 16px; color: var(--meta); font-variant-numeric: tabular-nums; }
+.yl { position: absolute; left: 6px; font-size: 16px; color: var(--meta); background: var(--paper); padding: 0 2px; line-height: 1.2; }
+.ctl { display: grid; grid-template-columns: 1fr 110px; gap: 4px 10px; align-items: center; }
+.ctl label { grid-column: 1 / -1; font-size: 16px; }
+.ctl label span { color: var(--meta); }
+input[type=range] { padding: 0; border: 0; min-height: var(--tap); accent-color: var(--ink); }
+input[type=number] { text-align: right; font-variant-numeric: tabular-nums; }
+.presets { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 8px; }
+.presets button { padding: 0 8px; }
+.note { font-size: 16px; color: var(--meta); margin: 0; }
+#pinned { stroke: var(--meta); stroke-dasharray: 4 4; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that simulates a simple climate model</h1>
+
+<main id="app" class="stack">
+  <div class="out">
+    <div><div class="lbl">settles at</div><div class="big" id="eq">14.0 °C</div></div>
+    <div><div class="lbl">vs. 1850</div><div id="delta">+0.0 °C</div></div>
+    <div><div class="lbl">half-way by</div><div id="half">—</div></div>
+  </div>
+
+  <div>
+    <div class="chart">
+      <svg id="plot" viewBox="0 0 340 200" preserveAspectRatio="none" aria-label="surface temperature over 200 years">
+        <line id="base" x1="0" x2="340" stroke="var(--line)" stroke-width="1" vector-effect="non-scaling-stroke"/>
+        <polyline id="pinned" fill="none" stroke-width="2" vector-effect="non-scaling-stroke" points=""/>
+        <polyline id="curve" fill="none" stroke="var(--ink)" stroke-width="2.5" vector-effect="non-scaling-stroke" points=""/>
+      </svg>
+      <span class="yl" id="ytop" style="top:2px"></span>
+      <span class="yl" id="ybot" style="bottom:2px"></span>
+    </div>
+    <div class="ax"><span>year 0</span><span>100</span><span>200</span></div>
+  </div>
+
+  <div class="presets">
+    <button id="p-pre">1850</button>
+    <button id="p-now">today</button>
+    <button id="p-double">2× CO₂</button>
+    <button id="p-quad">4× CO₂</button>
+  </div>
+
+  <div class="ctl">
+    <label for="co2n">CO₂ <span>ppm</span></label>
+    <input type="range" id="co2" min="100" max="2000" step="10" aria-label="CO2 ppm">
+    <input type="number" id="co2n" min="100" max="2000" step="10" inputmode="numeric">
+  </div>
+  <div class="ctl">
+    <label for="albn">albedo <span>share of sunlight reflected</span></label>
+    <input type="range" id="alb" min="0.10" max="0.60" step="0.01" aria-label="albedo">
+    <input type="number" id="albn" min="0.10" max="0.60" step="0.01" inputmode="decimal">
+  </div>
+  <div class="ctl">
+    <label for="soln">sun <span>W/m²</span></label>
+    <input type="range" id="sol" min="1200" max="1500" step="1" aria-label="solar input">
+    <input type="number" id="soln" min="1200" max="1500" step="1" inputmode="numeric">
+  </div>
+
+  <div class="row"><button id="pin">pin this run</button><span class="note" id="msg">dashed line = pinned run</span></div>
+  <p class="note">Energy balance, one 100 m ocean layer, starting from 1850: 280 ppm, 0.30, 1361 W/m², 14.0 °C.</p>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  // Budyko-style energy balance: C dT/dt = S(1-a)/4 + 5.35 ln(CO2/280) - (A + B T)
+  // B = 1.3 W/m2/K folds in water-vapour and other fast feedbacks (about 2.9 C per doubling).
+  const BASE = { co2: 280, alb: 0.30, sol: 1361 };
+  const T0 = 14.0, B = 1.3;
+  const A = BASE.sol * (1 - BASE.alb) / 4 - B * T0;
+  const C = 1000 * 4186 * 100;          // J/m2/K, 100 m of sea water
+  const YEAR = 3.156e7, YEARS = 200, SUB = 12;
+
+  const forcing = p => p.sol * (1 - p.alb) / 4 + 5.35 * Math.log(p.co2 / 280) - A;
+  const equilibrium = p => forcing(p) / B;
+
+  function run(p) {
+    const f = forcing(p), dt = YEAR / SUB, out = [T0];
+    let T = T0;
+    for (let y = 1; y <= YEARS; y++) {
+      for (let s = 0; s < SUB; s++) T += dt * (f - B * T) / C;
+      out.push(T);
+    }
+    return out;
+  }
+
+  const fields = {
+    co2: [$('#co2'), $('#co2n'), 100, 2000],
+    alb: [$('#alb'), $('#albn'), 0.10, 0.60],
+    sol: [$('#sol'), $('#soln'), 1200, 1500]
+  };
+  let p = Object.assign({}, BASE, store.get('tcm-p', {}));
+  let pinned = store.get('tcm-pin', null);
+  for (const k in fields) if (!Number.isFinite(p[k])) p[k] = BASE[k];
+
+  const fmt = t => (Math.round(t * 10) / 10).toFixed(1);
+  const sign = d => (d >= 0 ? '+' : '−') + fmt(Math.abs(d));
+
+  function sync() {
+    for (const k in fields) {
+      const [r, n] = fields[k];
+      r.value = p[k];
+      if (document.activeElement !== n) n.value = p[k];
+    }
+  }
+
+  function draw() {
+    const temps = run(p), eq = equilibrium(p);
+    $('#eq').textContent = fmt(eq) + ' °C';
+    $('#delta').textContent = sign(eq - T0) + ' °C';
+    const target = T0 + (eq - T0) / 2;
+    let half = '—';
+    if (Math.abs(eq - T0) >= 0.05) {
+      const i = temps.findIndex(t => (eq > T0 ? t >= target : t <= target));
+      half = i < 0 ? 'after 200 yr' : 'year ' + i;
+    }
+    $('#half').textContent = half;
+
+    const all = temps.concat(pinned || [], [T0]);
+    let lo = Math.min(...all), hi = Math.max(...all);
+    if (hi - lo < 2) { const m = (hi + lo) / 2; lo = m - 1; hi = m + 1; }
+    const pad = (hi - lo) * 0.12; lo -= pad; hi += pad;
+    const y = t => (200 * (hi - t) / (hi - lo)).toFixed(1);
+    const pts = arr => arr.map((t, i) => (i * 340 / YEARS).toFixed(1) + ',' + y(t)).join(' ');
+    $('#curve').setAttribute('points', pts(temps));
+    $('#pinned').setAttribute('points', pinned ? pts(pinned) : '');
+    const base = $('#base'); base.setAttribute('y1', y(T0)); base.setAttribute('y2', y(T0));
+    $('#ytop').textContent = fmt(hi) + ' °C';
+    $('#ybot').textContent = fmt(lo) + ' °C';
+    $('#msg').textContent = pinned ? 'dashed line = pinned run' : 'pin a run to compare';
+  }
+
+  function set(k, v) {
+    const [, , min, max] = fields[k];
+    if (!Number.isFinite(v)) return;
+    p[k] = Math.min(max, Math.max(min, v));
+    store.set('tcm-p', p);
+    sync(); draw();
+  }
+
+  for (const k in fields) {
+    const [r, n] = fields[k];
+    r.addEventListener('input', () => set(k, parseFloat(r.value)));
+    n.addEventListener('input', () => { const v = parseFloat(n.value); if (v >= fields[k][2] && v <= fields[k][3]) set(k, v); });
+    n.addEventListener('change', () => { set(k, parseFloat(n.value)); n.value = p[k]; });
+  }
+
+  const presets = { 'p-pre': 280, 'p-now': 420, 'p-double': 560, 'p-quad': 1120 };
+  for (const id in presets) $('#' + id).addEventListener('click', () => {
+    p = Object.assign({}, BASE, { co2: presets[id] });
+    store.set('tcm-p', p);
+    for (const k in fields) fields[k][1].value = p[k];
+    sync(); draw();
+  });
+
+  $('#pin').addEventListener('click', () => {
+    pinned = run(p);
+    store.set('tcm-pin', pinned.map(t => Math.round(t * 100) / 100));
+    draw();
+  });
+
+  sync(); draw();
+})();
+</script>
+</body>
+</html>

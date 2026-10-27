@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T01:36:56.613Z",
+ "updated": "2026-10-27T01:38:36.689Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -203,9 +203,14 @@
   },
   {
    "slug": "toy-climate-model",
-   "status": "pending",
+   "status": "pass",
    "attempts": 1,
-   "model": "opus-5.5"
+   "model": "opus-5.5",
+   "kb": 10.2,
+   "tests": "6/6",
+   "built": "2026-10-27T01:37:18Z",
+   "minutes": 6,
+   "approved": false
   },
   {
    "slug": "battlemap-print-tiler",
