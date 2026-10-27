@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make an app that tracks my fitness without storing data online</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+
+/* ---- tool styles below ---- */
+.meta { font-size: 16px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+label.f { display: grid; gap: 4px; font-size: 16px; color: var(--meta); min-width: 0; }
+label.f input, label.f select { color: var(--ink); min-width: 0; }
+@media (max-width: 400px) { .grid2 { grid-template-columns: minmax(0, 1fr); } }
+section { display: grid; gap: 12px; padding-top: 8px; border-top: 1px solid var(--line); }
+h2 { font: 500 16px/1.3 var(--mono); color: var(--meta); margin: 8px 0 0; }
+#msg { min-height: 1.45em; }
+#chart { width: 100%; height: 160px; display: block; color: var(--ink); }
+#chart .ax { stroke: var(--line); }
+#chart .ln { stroke: currentColor; fill: none; stroke-width: 2; }
+#chart circle { fill: currentColor; }
+#chart text { fill: var(--meta); font: 13px var(--mono); }
+.day { padding: 14px 0 2px; color: var(--meta); font: 500 16px/1.3 var(--mono); border-bottom: 1px solid var(--line); }
+ul.plain li span { min-width: 0; overflow-wrap: anywhere; }
+li button.del { padding: 0; width: 44px; flex: none; border-color: var(--line); color: var(--meta); }
+.filebtn { position: relative; display: inline-flex; align-items: center; min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); border-radius: var(--radius); cursor: pointer; }
+.filebtn input { position: absolute; inset: 0; opacity: 0; width: 100%; min-height: 0; padding: 0; cursor: pointer; }
+
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make an app that tracks my fitness without storing data online</h1>
+
+<main id="app" class="stack">
+<p class="meta" id="where">Saved only in this browser. Nothing is sent anywhere.</p>
+<form id="form" class="stack" autocomplete="off">
+  <div class="grid2">
+    <label class="f">Exercise<input id="exercise" list="names" placeholder="Squat" required></label>
+    <label class="f">Date<input id="date" type="date" required></label>
+  </div>
+  <datalist id="names"></datalist>
+  <div class="grid3">
+    <label class="f">Sets<input id="sets" type="number" inputmode="numeric" min="1" step="1" value="3"></label>
+    <label class="f">Reps<input id="reps" type="number" inputmode="numeric" min="1" step="1" placeholder="5"></label>
+    <label class="f"><span id="wlabel">Weight</span><input id="weight" type="number" inputmode="decimal" min="0" step="any" placeholder="0"></label>
+  </div>
+  <div class="row">
+    <button class="primary" id="add" type="submit">Log set</button>
+    <select id="unit" aria-label="Unit" style="width:auto"><option>kg</option><option>lb</option></select>
+  </div>
+  <p id="msg" class="meta" aria-live="polite"></p>
+</form>
+
+<section>
+  <h2>Progress</h2>
+  <select id="pick" aria-label="Exercise"></select>
+  <p id="best" class="meta">Log a workout to see progress.</p>
+  <svg id="chart" viewBox="0 0 340 160" preserveAspectRatio="none" aria-hidden="true"></svg>
+</section>
+
+<section>
+  <h2>History</h2>
+  <div id="log"><p class="empty">No workouts yet.</p></div>
+</section>
+
+<section>
+  <h2>Backup</h2>
+  <div class="row">
+    <button id="export" type="button">Export file</button>
+    <label class="filebtn">Import file<input id="import" type="file" accept="application/json,.json"></label>
+  </div>
+</section>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  // storage helper — never throws
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+
+  const KEY = 'private-workout-log';
+  let data = store.get(KEY, { unit: 'kg', entries: [] });
+  if (!data || !Array.isArray(data.entries)) data = { unit: 'kg', entries: [] };
+  const save = () => store.set(KEY, data);
+  const today = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); };
+  const num = v => { const n = parseFloat(v); return isFinite(n) ? n : 0; };
+  const fmt = n => String(Math.round(n * 100) / 100);
+  const key = s => s.trim().toLowerCase();
+  const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const say = t => { $('#msg').textContent = t; };
+  // Epley estimate
+  const e1rm = (w, r) => r <= 1 ? w : w * (1 + r / 30);
+
+  $('#date').value = today();
+  $('#unit').value = data.unit === 'lb' ? 'lb' : 'kg';
+
+  function names() {
+    const seen = new Map();
+    [...data.entries].sort((a, b) => b.date.localeCompare(a.date) || b.t - a.t).forEach(e => { if (!seen.has(key(e.ex))) seen.set(key(e.ex), e.ex); });
+    return [...seen.values()];
+  }
+
+  function line(e) {
+    const w = e.w > 0 ? ` @ ${fmt(e.w)} ${e.u}` : '';
+    return `${e.ex} ${e.s}×${e.r}${w}`;
+  }
+
+  function renderLog() {
+    const el = $('#log');
+    if (!data.entries.length) { el.innerHTML = '<p class="empty">No workouts yet.</p>'; return; }
+    const sorted = [...data.entries].sort((a, b) => b.date.localeCompare(a.date) || b.t - a.t);
+    let html = '', day = '';
+    for (const e of sorted) {
+      if (e.date !== day) { if (day) html += '</ul>'; day = e.date; html += `<div class="day">${day}</div><ul class="plain">`; }
+      html += `<li><span>${esc(line(e))}</span><button class="del" type="button" data-t="${e.t}" aria-label="Delete">×</button></li>`;
+    }
+    el.innerHTML = html + '</ul>';
+  }
+
+  function renderPick() {
+    const list = names(), pick = $('#pick'), cur = pick.value;
+    pick.innerHTML = list.map(n => `<option>${esc(n)}</option>`).join('');
+    pick.hidden = !list.length;
+    if (list.some(n => n === cur)) pick.value = cur;
+    $('#names').innerHTML = list.map(n => `<option value="${esc(n)}">`).join('');
+  }
+
+  function renderProgress() {
+    const svg = $('#chart'), best = $('#best'), name = $('#pick').value;
+    svg.innerHTML = '';
+    const rows = data.entries.filter(e => name && key(e.ex) === key(name));
+    if (!rows.length) { best.textContent = 'Log a workout to see progress.'; svg.style.display = 'none'; return; }
+    const u = rows[rows.length - 1].u;
+    const byDay = new Map();
+    for (const e of rows) {
+      const d = byDay.get(e.date) || { w: 0, vol: 0, reps: 0 };
+      d.w = Math.max(d.w, e.w); d.vol += e.s * e.r * e.w; d.reps += e.s * e.r;
+      byDay.set(e.date, d);
+    }
+    const days = [...byDay.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+    const weighted = rows.some(e => e.w > 0);
+    const top = rows.reduce((a, e) => e.w > a.w || (e.w === a.w && e.r > a.r) ? e : a, rows[0]);
+    const est = Math.max(...rows.map(e => e1rm(e.w, e.r)));
+    best.textContent = weighted
+      ? `Best ${fmt(top.w)} ${u} × ${top.r} · est. 1RM ${fmt(Math.round(est))} ${u} · ${days.length} session${days.length > 1 ? 's' : ''}`
+      : `Most reps in a day ${Math.max(...days.map(d => d[1].reps))} · ${days.length} session${days.length > 1 ? 's' : ''}`;
+    const vals = days.map(d => weighted ? d[1].w : d[1].reps);
+    if (vals.length < 2) { svg.style.display = 'none'; return; }
+    svg.style.display = '';
+    const W = 340, H = 160, pl = 6, pr = 6, pt = 14, pb = 20;
+    let lo = Math.min(...vals), hi = Math.max(...vals);
+    if (hi === lo) { hi += 1; lo = Math.max(0, lo - 1); }
+    const x = i => pl + i * (W - pl - pr) / (vals.length - 1);
+    const y = v => pt + (1 - (v - lo) / (hi - lo)) * (H - pt - pb);
+    const pts = vals.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+    svg.innerHTML =
+      `<line class="ax" x1="0" x2="${W}" y1="${H - pb}" y2="${H - pb}"/>` +
+      `<polyline class="ln" points="${pts}" vector-effect="non-scaling-stroke"/>` +
+      vals.map((v, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="3"/>`).join('') +
+      `<text x="0" y="${H - 4}">${days[0][0]}</text><text x="${W}" y="${H - 4}" text-anchor="end">${days[days.length - 1][0]}</text>` +
+      `<text x="0" y="11">${weighted ? fmt(hi) + ' ' + u : hi + ' reps'}</text>`;
+  }
+
+  function render() { renderPick(); renderProgress(); renderLog(); }
+
+  $('#form').addEventListener('submit', ev => {
+    ev.preventDefault();
+    const ex = $('#exercise').value.trim().replace(/\s+/g, ' ');
+    const s = Math.round(num($('#sets').value)), r = Math.round(num($('#reps').value)), w = num($('#weight').value);
+    const date = $('#date').value || today();
+    if (!ex) return say('Name the exercise.');
+    if (s < 1 || r < 1) return say('Sets and reps must be at least 1.');
+    if (w < 0) return say('Weight cannot be negative.');
+    const existing = names().find(n => key(n) === key(ex));
+    const e = { t: Date.now(), date, ex: existing || ex, s, r, w, u: data.unit };
+    data.entries.push(e); save();
+    $('#pick').value = e.ex;
+    render();
+    $('#pick').value = e.ex; renderProgress();
+    say(`Logged ${line(e)}.`);
+  });
+
+  $('#unit').addEventListener('change', () => { data.unit = $('#unit').value; save(); });
+  $('#pick').addEventListener('change', renderProgress);
+  $('#log').addEventListener('click', ev => {
+    const b = ev.target.closest('button.del'); if (!b) return;
+    const t = Number(b.dataset.t);
+    data.entries = data.entries.filter(e => e.t !== t); save(); render(); say('Deleted.');
+  });
+
+  $('#export').addEventListener('click', () => {
+    if (!data.entries.length) return say('Nothing to export yet.');
+    const blob = new Blob([JSON.stringify(data, null, 1)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = `workouts-${today()}.json`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    say('Saved a file to this device.');
+  });
+
+  $('#import').addEventListener('change', ev => {
+    const f = ev.target.files && ev.target.files[0]; if (!f) return;
+    f.text().then(txt => {
+      const inc = JSON.parse(txt);
+      const list = Array.isArray(inc) ? inc : inc.entries;
+      if (!Array.isArray(list)) throw new Error();
+      const have = new Set(data.entries.map(e => e.t + '|' + e.ex));
+      let added = 0;
+      for (const e of list) {
+        if (!e || typeof e.ex !== 'string' || !/^\d{4}-\d\d-\d\d$/.test(e.date)) continue;
+        const clean = { t: num(e.t) || Date.now() + added, date: e.date, ex: e.ex.slice(0, 80), s: Math.max(1, Math.round(num(e.s))), r: Math.max(1, Math.round(num(e.r))), w: Math.max(0, num(e.w)), u: e.u === 'lb' ? 'lb' : 'kg' };
+        if (have.has(clean.t + '|' + clean.ex)) continue;
+        have.add(clean.t + '|' + clean.ex); data.entries.push(clean); added++;
+      }
+      save(); render(); say(`Imported ${added} entr${added === 1 ? 'y' : 'ies'}.`);
+    }).catch(() => say('That file is not a workout backup.')).finally(() => { ev.target.value = ''; });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

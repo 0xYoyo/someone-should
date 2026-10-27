@@ -1,0 +1,57 @@
+{
+  "slug": "private-workout-log",
+  "wish": "someone should make an app that tracks my fitness without storing data online",
+  "year": 2014,
+  "agreed": 16,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/13810/fitness-tracking-software-that-doesnt-store-data-online",
+      "date": "2014-11-10",
+      "points": 13,
+      "comments": 3
+    }
+  ],
+  "spec": "Logs workouts (exercise, sets, reps, weight) by date and shows best set, estimated 1RM and a progress line per exercise.\nType an exercise, sets, reps and weight, tap Log set; pick an exercise to see progress; export or import a backup file.\nStores everything in this browser only; no account, no sync, no network.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#exercise",
+        "text": "Squat"
+      }
+    },
+    {
+      "type": {
+        "sel": "#reps",
+        "text": "5"
+      }
+    },
+    {
+      "type": {
+        "sel": "#weight",
+        "text": "100"
+      }
+    },
+    {
+      "tap": "#add"
+    },
+    {
+      "expect": {
+        "sel": "#log li",
+        "contains": "Squat 3×5 @ 100 kg"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#best",
+        "contains": "Best 100 kg × 5"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T02:09:14Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Data lives in localStorage; export/import JSON file for backup. No network."
+}
