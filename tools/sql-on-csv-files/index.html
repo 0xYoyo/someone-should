@@ -1,0 +1,790 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that runs SQL on CSV files</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+#app { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+.meta { font-size: 16px; }
+.btn { display: inline-flex; align-items: center; min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); border-radius: var(--radius); cursor: pointer; }
+.btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+textarea { font: 16px/1.45 var(--mono); resize: vertical; }
+#sql { min-height: 120px; }
+ul.plain li > div { min-width: 0; }
+.tname { border: 0; padding: 0; min-width: 44px; font: 600 17px/1.3 var(--mono); text-align: left; text-decoration: underline; text-underline-offset: 3px; }
+.cols { overflow-wrap: anywhere; }
+#msg { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.scroll { overflow-x: auto; max-width: 100%; }
+table { border-collapse: collapse; font: 16px/1.35 var(--mono); }
+th, td { padding: 8px 16px 8px 0; text-align: left; white-space: nowrap; max-width: 22em; overflow: hidden; text-overflow: ellipsis; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-weight: 600; border-bottom: 1.5px solid var(--ink); }
+td.n { text-align: right; font-variant-numeric: tabular-nums; }
+td.nul { color: var(--meta); }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that runs SQL on CSV files</h1>
+
+<main id="app" class="stack">
+  <section class="stack">
+    <div class="row">
+      <label class="btn" for="file" role="button" tabindex="0" id="open">Open CSV files</label>
+      <input type="file" id="file" multiple accept=".csv,.tsv,.txt,text/csv,text/tab-separated-values" hidden>
+      <button id="pastetoggle" hidden>Paste CSV</button>
+    </div>
+    <div id="pastebox" class="stack">
+      <input id="tname" placeholder="table name" autocapitalize="off" autocomplete="off" spellcheck="false" aria-label="table name">
+      <textarea id="csv" rows="4" placeholder="name,city,age&#10;Ada,London,36" spellcheck="false" aria-label="CSV text"></textarea>
+      <div class="row"><button id="add">Add table</button><span id="addmsg" class="meta"></span></div>
+    </div>
+    <ul id="tables" class="plain"></ul>
+  </section>
+
+  <section class="stack">
+    <textarea id="sql" rows="5" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="SQL query" placeholder="SELECT * FROM people WHERE age > 30"></textarea>
+    <div class="row"><button class="primary" id="run">Run</button><span id="msg" class="meta"></span></div>
+    <div id="out" class="scroll"><p class="empty">Open or paste a CSV, then run a SELECT.</p></div>
+    <div class="row"><button id="dl" hidden>Download result as CSV</button></div>
+  </section>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  /* ---------- values ---------- */
+  class SqlError extends Error {}
+  const fail = m => { throw new SqlError(m); };
+  const lc = s => String(s).toLowerCase();
+  const NUMRE = /^\s*[-+]?(\d+\.?\d*|\.\d+)([eE][-+]?\d+)?\s*$/;
+  const str = v => typeof v === 'number' ? fmt(v) : String(v);
+  const num = v => typeof v === 'number' ? v : NUMRE.test(v) ? +v : (parseFloat(v) || 0);
+  const tv = v => v == null ? null : typeof v === 'number' ? v !== 0 : NUMRE.test(v) ? +v !== 0 : false;
+  const keyOf = v => v == null ? '\u0000' : typeof v === 'number' ? 'n' + v : NUMRE.test(v) ? 'n' + (+v) : 's' + v;
+  function fmt(v) {
+    if (v == null) return '';
+    if (typeof v !== 'number') return v;
+    return Number.isInteger(v) ? String(v) : String(+v.toPrecision(12));
+  }
+  function cmp(a, b) {
+    if (typeof a === 'number' && typeof b !== 'number' && NUMRE.test(b)) b = +b;
+    else if (typeof b === 'number' && typeof a !== 'number' && NUMRE.test(a)) a = +a;
+    if (typeof a === 'number' && typeof b === 'number') return a < b ? -1 : a > b ? 1 : 0;
+    if (typeof a === 'number') return -1;
+    if (typeof b === 'number') return 1;
+    return a < b ? -1 : a > b ? 1 : 0;
+  }
+  const sortCmp = (a, b) => a == null ? (b == null ? 0 : -1) : b == null ? 1 : cmp(a, b);
+  const likeCache = new Map();
+  function likeRe(p) {
+    let re = likeCache.get(p);
+    if (!re) {
+      re = new RegExp('^' + p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/%/g, '[\\s\\S]*').replace(/_/g, '[\\s\\S]') + '$', 'i');
+      likeCache.set(p, re);
+    }
+    return re;
+  }
+
+  /* ---------- tokenizer + parser ---------- */
+  const RESERVED = new Set('SELECT FROM WHERE GROUP BY HAVING ORDER LIMIT OFFSET JOIN INNER LEFT RIGHT FULL OUTER CROSS ON AS AND OR NOT UNION ALL ASC DESC IS NULL IN LIKE BETWEEN CASE WHEN THEN ELSE END DISTINCT'.split(' '));
+
+  function tokenize(src) {
+    const toks = [];
+    const re = /\s+|--[^\n]*|\/\*[\s\S]*?\*\/|(\d+\.?\d*(?:[eE][-+]?\d+)?|\.\d+)|'((?:[^']|'')*)'|"((?:[^"]|"")*)"|`([^`]*)`|\[([^\]]*)\]|([A-Za-z_][A-Za-z0-9_$]*)|(<=|>=|<>|!=|==|\|\||[(),.*+\-\/%=<>;])/y;
+    let i = 0;
+    while (i < src.length) {
+      re.lastIndex = i;
+      const m = re.exec(src);
+      if (!m) fail(/['"`[]/.test(src[i]) ? `unclosed ${src[i]}` : `unexpected character ${src[i]}`);
+      const s = i;
+      i = re.lastIndex;
+      if (m[1] != null) toks.push({ k: 'num', v: +m[1], s, e: i });
+      else if (m[2] != null) toks.push({ k: 'str', v: m[2].replace(/''/g, "'"), s, e: i });
+      else if (m[3] != null) toks.push({ k: 'qid', v: m[3].replace(/""/g, '"'), s, e: i });
+      else if (m[4] != null || m[5] != null) toks.push({ k: 'qid', v: m[4] ?? m[5], s, e: i });
+      else if (m[6] != null) toks.push({ k: 'id', v: m[6], u: m[6].toUpperCase(), s, e: i });
+      else if (m[7] != null) toks.push({ k: 'op', v: m[7], s, e: i });
+    }
+    toks.push({ k: 'eof', v: '', s: i, e: i });
+    return toks;
+  }
+
+  function parse(src) {
+    const T = tokenize(src);
+    let p = 0;
+    const kw = w => T[p].k === 'id' && T[p].u === w;
+    const acc = w => kw(w) ? (p++, true) : false;
+    const op = o => T[p].k === 'op' && T[p].v === o;
+    const accOp = o => op(o) ? (p++, true) : false;
+    const near = () => T[p].k === 'eof' ? 'the end' : `"${src.slice(T[p].s, T[p].e)}"`;
+    const exp = w => { if (!acc(w)) fail(`expected ${w} near ${near()}`); };
+    const expOp = o => { if (!accOp(o)) fail(`expected ${o} near ${near()}`); };
+    const isName = t => t.k === 'qid' || (t.k === 'id' && !RESERVED.has(t.u));
+    const ident = what => { if (isName(T[p])) return T[p++].v; fail(`expected ${what} near ${near()}`); };
+    const alias = () => acc('AS') ? ident('a name') : isName(T[p]) ? T[p++].v : null;
+    const intLit = () => { const t = T[p]; if (t.k === 'num' && Number.isInteger(t.v)) { p++; return t.v; } fail(`expected a whole number near ${near()}`); };
+
+    function query() {
+      const q = { cores: [core()], ops: [], order: [], limit: null, offset: 0 };
+      while (acc('UNION')) { q.ops.push(acc('ALL') ? 'all' : 'distinct'); q.cores.push(core()); }
+      if (acc('ORDER')) {
+        exp('BY');
+        do { const e = expr(); const desc = acc('DESC'); if (!desc) acc('ASC'); q.order.push({ e, desc }); } while (accOp(','));
+      }
+      if (acc('LIMIT')) {
+        q.limit = intLit();
+        if (acc('OFFSET')) q.offset = intLit();
+        else if (accOp(',')) { q.offset = q.limit; q.limit = intLit(); }
+      }
+      return q;
+    }
+
+    function core() {
+      exp('SELECT');
+      const c = { distinct: acc('DISTINCT'), items: [], from: [], where: null, group: [], having: null };
+      if (!c.distinct) acc('ALL');
+      do {
+        if (accOp('*')) c.items.push({ star: true });
+        else if (isName(T[p]) && T[p + 1].v === '.' && T[p + 2].k === 'op' && T[p + 2].v === '*') { c.items.push({ star: true, tb: T[p].v }); p += 3; }
+        else {
+          const s = T[p].s, e = expr();
+          c.items.push({ e, name: alias() ?? (e.t === 'col' ? e.name : src.slice(s, T[p - 1].e)) });
+        }
+      } while (accOp(','));
+      if (acc('FROM')) {
+        c.from.push(source('first'));
+        for (;;) {
+          let type;
+          if (accOp(',')) type = 'cross';
+          else if (acc('CROSS')) { exp('JOIN'); type = 'cross'; }
+          else if (acc('JOIN')) type = 'inner';
+          else if (acc('INNER')) { exp('JOIN'); type = 'inner'; }
+          else if (acc('LEFT')) { acc('OUTER'); exp('JOIN'); type = 'left'; }
+          else if (kw('RIGHT') || kw('FULL')) fail(`${T[p].u} JOIN is not supported; swap the tables and use LEFT JOIN`);
+          else break;
+          const s = source(type);
+          if (type !== 'cross') { exp('ON'); s.on = expr(); }
+          c.from.push(s);
+        }
+      }
+      if (acc('WHERE')) c.where = expr();
+      if (acc('GROUP')) { exp('BY'); do c.group.push(expr()); while (accOp(',')); }
+      if (acc('HAVING')) c.having = expr();
+      return c;
+    }
+
+    function source(type) {
+      if (accOp('(')) { const q = query(); expOp(')'); return { q, type, alias: alias() || 'sub' }; }
+      const name = ident('a table name');
+      return { name, type, alias: alias() || name };
+    }
+
+    const expr = () => or();
+    function or() { let a = and(); while (acc('OR')) a = { t: 'or', a, b: and() }; return a; }
+    function and() { let a = not(); while (acc('AND')) a = { t: 'and', a, b: not() }; return a; }
+    function not() { return acc('NOT') ? { t: 'not', a: not() } : compare(); }
+    function compare() {
+      let a = add();
+      for (;;) {
+        const t = T[p];
+        if (t.k === 'op' && ['=', '==', '!=', '<>', '<', '<=', '>', '>='].includes(t.v)) {
+          p++;
+          a = { t: 'cmp', op: t.v === '==' ? '=' : t.v === '<>' ? '!=' : t.v, a, b: add() };
+          continue;
+        }
+        if (acc('IS')) { const neg = acc('NOT'); exp('NULL'); a = { t: 'isnull', a, neg }; continue; }
+        const save = p, neg = acc('NOT');
+        if (acc('LIKE')) a = { t: 'like', a, b: add(), neg };
+        else if (acc('IN')) {
+          expOp('(');
+          if (kw('SELECT')) a = { t: 'in', a, q: query(), neg };
+          else { const list = []; do list.push(expr()); while (accOp(',')); a = { t: 'in', a, list, neg }; }
+          expOp(')');
+        } else if (acc('BETWEEN')) { const lo = add(); exp('AND'); a = { t: 'between', a, lo, hi: add(), neg }; }
+        else { p = save; return a; }
+      }
+    }
+    function add() {
+      let a = mul();
+      while (T[p].k === 'op' && (T[p].v === '+' || T[p].v === '-' || T[p].v === '||')) { const o = T[p++].v; a = { t: 'bin', op: o, a, b: mul() }; }
+      return a;
+    }
+    function mul() {
+      let a = unary();
+      while (T[p].k === 'op' && (T[p].v === '*' || T[p].v === '/' || T[p].v === '%')) { const o = T[p++].v; a = { t: 'bin', op: o, a, b: unary() }; }
+      return a;
+    }
+    function unary() {
+      if (accOp('-')) return { t: 'neg', a: unary() };
+      if (accOp('+')) return unary();
+      return primary();
+    }
+    function primary() {
+      const t = T[p];
+      if (t.k === 'num' || t.k === 'str') { p++; return { t: 'lit', v: t.v }; }
+      if (accOp('(')) {
+        if (kw('SELECT')) { const q = query(); expOp(')'); return { t: 'sub', q }; }
+        const e = expr(); expOp(')'); return e;
+      }
+      if (t.k === 'id') {
+        if (acc('NULL')) return { t: 'lit', v: null };
+        if (t.u === 'TRUE' || t.u === 'FALSE') { p++; return { t: 'lit', v: t.u === 'TRUE' ? 1 : 0 }; }
+        if (acc('CASE')) {
+          const c = { t: 'case', base: kw('WHEN') ? null : expr(), whens: [], els: null };
+          while (acc('WHEN')) { const w = expr(); exp('THEN'); c.whens.push([w, expr()]); }
+          if (!c.whens.length) fail(`expected WHEN near ${near()}`);
+          if (acc('ELSE')) c.els = expr();
+          exp('END');
+          return c;
+        }
+        if (t.u === 'CAST' && T[p + 1].v === '(') {
+          p += 2;
+          const a = expr(); exp('AS');
+          const ty = ident('a type').toUpperCase();
+          if (accOp('(')) { while (!accOp(')')) { if (T[p].k === 'eof') fail('unclosed ('); p++; } }
+          expOp(')');
+          return { t: 'cast', a, ty };
+        }
+        if (T[p + 1].k === 'op' && T[p + 1].v === '(' && !RESERVED.has(t.u)) {
+          p += 2;
+          const f = { t: 'fn', name: t.u, args: [], distinct: false, star: false };
+          if (accOp('*')) f.star = true;
+          else if (!op(')')) { f.distinct = acc('DISTINCT'); do f.args.push(expr()); while (accOp(',')); }
+          expOp(')');
+          return f;
+        }
+      }
+      if (isName(t)) {
+        p++;
+        if (accOp('.')) {
+          const c = T[p];
+          if (c.k !== 'id' && c.k !== 'qid') fail(`expected a column name near ${near()}`);
+          p++;
+          return { t: 'col', tb: t.v, name: c.v };
+        }
+        return { t: 'col', tb: null, name: t.v };
+      }
+      fail(`unexpected ${near()}`);
+    }
+
+    const q = query();
+    accOp(';');
+    if (T[p].k !== 'eof') fail(`unexpected ${near()}`);
+    return q;
+  }
+
+  /* ---------- executor ---------- */
+  const AGG = new Set(['COUNT', 'SUM', 'AVG', 'MIN', 'MAX', 'TOTAL', 'GROUP_CONCAT']);
+  const isAgg = n => n.t === 'fn' && AGG.has(n.name) && !((n.name === 'MIN' || n.name === 'MAX') && n.args.length > 1);
+  function hasAgg(n) {
+    if (!n || typeof n !== 'object') return false;
+    if (Array.isArray(n)) return n.some(hasAgg);
+    if (n.t === 'sub' || n.t === undefined) return false;
+    if (isAgg(n)) return true;
+    for (const k in n) if (k !== 'q' && k !== 'r' && hasAgg(n[k])) return true;
+    return false;
+  }
+
+  const nul1 = f => (a, ...r) => a == null ? null : f(a, ...r);
+  const FN = {
+    UPPER: nul1(a => str(a).toUpperCase()),
+    LOWER: nul1(a => str(a).toLowerCase()),
+    LENGTH: nul1(a => str(a).length),
+    TRIM: nul1(a => str(a).trim()),
+    LTRIM: nul1(a => str(a).trimStart()),
+    RTRIM: nul1(a => str(a).trimEnd()),
+    ABS: nul1(a => Math.abs(num(a))),
+    ROUND: nul1((a, d) => { const f = 10 ** (d == null ? 0 : num(d)); return Math.round(num(a) * f) / f; }),
+    FLOOR: nul1(a => Math.floor(num(a))),
+    CEIL: nul1(a => Math.ceil(num(a))),
+    SUBSTR: nul1((a, s, n) => { a = str(a); s = num(s ?? 1); const i = s > 0 ? s - 1 : Math.max(a.length + s, 0); return n == null ? a.slice(i) : a.slice(i, i + Math.max(num(n), 0)); }),
+    REPLACE: nul1((a, f, t) => f == null || t == null ? null : str(a).split(str(f)).join(str(t))),
+    INSTR: nul1((a, b) => b == null ? null : str(a).indexOf(str(b)) + 1),
+    COALESCE: (...a) => a.find(v => v != null) ?? null,
+    NULLIF: (a, b) => a != null && b != null && cmp(a, b) === 0 ? null : a,
+    IIF: (c, a, b) => tv(c) === true ? a : b,
+    MIN: (...a) => a.some(v => v == null) ? null : a.reduce((m, v) => cmp(v, m) < 0 ? v : m),
+    MAX: (...a) => a.some(v => v == null) ? null : a.reduce((m, v) => cmp(v, m) > 0 ? v : m)
+  };
+  FN.IFNULL = FN.COALESCE; FN.SUBSTRING = FN.SUBSTR; FN.CEILING = FN.CEIL;
+
+  function sortRows(rows, keys, order) {
+    const idx = rows.map((_, i) => i).sort((a, b) => {
+      for (let k = 0; k < order.length; k++) { const d = sortCmp(keys[a][k], keys[b][k]); if (d) return order[k].desc ? -d : d; }
+      return a - b;
+    });
+    return idx.map(i => rows[i]);
+  }
+  function dedupe(rows, side) {
+    const seen = new Set(), out = [], keep = [];
+    rows.forEach((r, i) => { const k = r.map(keyOf).join('\u0001'); if (!seen.has(k)) { seen.add(k); out.push(r); if (side) keep.push(side[i]); } });
+    return [out, keep];
+  }
+
+  function execQuery(q, db) {
+    let res;
+    if (q.cores.length === 1) res = execCore(q.cores[0], db, q.order);
+    else {
+      res = execCore(q.cores[0], db, []);
+      for (let i = 1; i < q.cores.length; i++) {
+        const r = execCore(q.cores[i], db, []);
+        if (r.cols.length !== res.cols.length) fail('each part of a UNION needs the same number of columns');
+        res.rows = res.rows.concat(r.rows);
+        if (q.ops[i - 1] === 'distinct') res.rows = dedupe(res.rows)[0];
+      }
+      if (q.order.length) {
+        const names = res.cols.map(lc);
+        const ix = q.order.map(({ e }) => {
+          if (e.t === 'lit' && typeof e.v === 'number' && e.v >= 1 && e.v <= names.length) return e.v - 1;
+          const k = e.t === 'col' && !e.tb ? names.indexOf(lc(e.name)) : -1;
+          if (k < 0) fail('ORDER BY after UNION must name an output column');
+          return k;
+        });
+        res.rows = sortRows(res.rows, res.rows.map(r => ix.map(k => r[k])), q.order);
+      }
+    }
+    if (q.offset || q.limit != null) res.rows = res.rows.slice(q.offset, q.limit == null ? undefined : q.offset + q.limit);
+    return res;
+  }
+
+  function execCore(c, db, order) {
+    const srcs = c.from.map(f => {
+      if (f.q) { const r = execQuery(f.q, db); return { alias: f.alias, cols: r.cols, keys: r.cols.map(lc), rows: r.rows, type: f.type, on: f.on }; }
+      const t = db.get(lc(f.name));
+      if (!t) fail(`no table named ${f.name}` + (db.size ? ` (tables: ${[...db.values()].map(t => t.name).join(', ')})` : '; open a CSV first'));
+      return { alias: f.alias, cols: t.cols, keys: t.keys, rows: t.rows, type: f.type, on: f.on };
+    });
+    const seenAlias = new Set();
+    for (const s of srcs) { if (seenAlias.has(lc(s.alias))) fail(`${s.alias} is used twice; give one an alias`); seenAlias.add(lc(s.alias)); }
+    const aliasItems = new Map();
+    for (const it of c.items) if (!it.star && !aliasItems.has(lc(it.name))) aliasItems.set(lc(it.name), it.e);
+
+    function resolve(n) {
+      const name = lc(n.name);
+      if (n.tb) {
+        const si = srcs.findIndex(s => lc(s.alias) === lc(n.tb));
+        if (si < 0) fail(`no table or alias named ${n.tb}`);
+        const ci = srcs[si].keys.indexOf(name);
+        if (ci < 0) fail(`${n.tb} has no column ${n.name}`);
+        return (n.r = [si, ci]);
+      }
+      let hit = null;
+      srcs.forEach((s, si) => {
+        const ci = s.keys.indexOf(name);
+        if (ci < 0) return;
+        if (hit) fail(`${n.name} is in more than one table; write table.${n.name}`);
+        hit = [si, ci];
+      });
+      if (hit) return (n.r = hit);
+      const ae = aliasItems.get(name);
+      if (ae && ae !== n) return (n.r = ae);
+      fail(`no column named ${n.name}` + (srcs.length ? ` (columns: ${srcs.flatMap(s => s.cols).slice(0, 12).join(', ')})` : ''));
+    }
+
+    function agg(n, x) {
+      if (!x.g) fail(`${n.name}() can't be used here`);
+      if (n.star) { if (n.name !== 'COUNT') fail(`${n.name}(*) is not valid`); return x.g.length; }
+      if (!n.args.length) fail(`${n.name}() needs an argument`);
+      let vals = [];
+      for (const r of x.g) { const v = ev(n.args[0], { r }); if (v != null) vals.push(v); }
+      if (n.distinct) { const seen = new Set(); vals = vals.filter(v => { const k = keyOf(v); if (seen.has(k)) return false; seen.add(k); return true; }); }
+      const sum = () => vals.reduce((s, v) => s + num(v), 0);
+      switch (n.name) {
+        case 'COUNT': return vals.length;
+        case 'SUM': return vals.length ? sum() : null;
+        case 'TOTAL': return sum();
+        case 'AVG': return vals.length ? sum() / vals.length : null;
+        case 'MIN': return vals.length ? vals.reduce((m, v) => cmp(v, m) < 0 ? v : m) : null;
+        case 'MAX': return vals.length ? vals.reduce((m, v) => cmp(v, m) > 0 ? v : m) : null;
+        case 'GROUP_CONCAT': return vals.length ? vals.map(str).join(n.args[1] ? str(ev(n.args[1], x)) : ',') : null;
+      }
+    }
+
+    function ev(n, x) {
+      switch (n.t) {
+        case 'lit': return n.v;
+        case 'col': {
+          const r = n.r !== undefined ? n.r : resolve(n);
+          if (!Array.isArray(r)) return ev(r, x);
+          const row = x.r[r[0]];
+          return row ? (row[r[1]] ?? null) : null;
+        }
+        case 'and': { const a = tv(ev(n.a, x)); if (a === false) return 0; const b = tv(ev(n.b, x)); if (b === false) return 0; return a == null || b == null ? null : 1; }
+        case 'or': { const a = tv(ev(n.a, x)); if (a === true) return 1; const b = tv(ev(n.b, x)); if (b === true) return 1; return a == null || b == null ? null : 0; }
+        case 'not': { const a = tv(ev(n.a, x)); return a == null ? null : a ? 0 : 1; }
+        case 'cmp': {
+          const a = ev(n.a, x), b = ev(n.b, x);
+          if (a == null || b == null) return null;
+          const d = cmp(a, b);
+          return +(n.op === '=' ? d === 0 : n.op === '!=' ? d !== 0 : n.op === '<' ? d < 0 : n.op === '<=' ? d <= 0 : n.op === '>' ? d > 0 : d >= 0);
+        }
+        case 'bin': {
+          const a = ev(n.a, x), b = ev(n.b, x);
+          if (a == null || b == null) return null;
+          if (n.op === '||') return str(a) + str(b);
+          const p = num(a), q = num(b);
+          if (n.op === '+') return p + q;
+          if (n.op === '-') return p - q;
+          if (n.op === '*') return p * q;
+          if (q === 0) return null;
+          return n.op === '/' ? p / q : p % q;
+        }
+        case 'neg': { const a = ev(n.a, x); return a == null ? null : -num(a); }
+        case 'isnull': return +((ev(n.a, x) == null) !== n.neg);
+        case 'like': { const a = ev(n.a, x), b = ev(n.b, x); return a == null || b == null ? null : +(likeRe(str(b)).test(str(a)) !== n.neg); }
+        case 'between': {
+          const a = ev(n.a, x), lo = ev(n.lo, x), hi = ev(n.hi, x);
+          if (a == null || lo == null || hi == null) return null;
+          return +((cmp(a, lo) >= 0 && cmp(a, hi) <= 0) !== n.neg);
+        }
+        case 'in': {
+          const a = ev(n.a, x);
+          if (a == null) return null;
+          let hit = false, sawNull = false;
+          if (n.q) {
+            if (!n.set) { const r = execQuery(n.q, db); n.set = new Set(r.rows.map(row => keyOf(row[0]))); }
+            hit = n.set.has(keyOf(a)); sawNull = n.set.has(keyOf(null));
+          } else {
+            for (const e of n.list) { const v = ev(e, x); if (v == null) sawNull = true; else if (cmp(a, v) === 0) { hit = true; break; } }
+          }
+          if (hit) return n.neg ? 0 : 1;
+          return sawNull ? null : n.neg ? 1 : 0;
+        }
+        case 'case': {
+          const base = n.base ? ev(n.base, x) : null;
+          for (const [w, r] of n.whens) {
+            if (n.base) { const v = ev(w, x); if (base != null && v != null && cmp(base, v) === 0) return ev(r, x); }
+            else if (tv(ev(w, x)) === true) return ev(r, x);
+          }
+          return n.els ? ev(n.els, x) : null;
+        }
+        case 'cast': {
+          const a = ev(n.a, x);
+          if (a == null) return null;
+          if (/INT/.test(n.ty)) return Math.trunc(num(a));
+          if (/REAL|FLOA|DOUB|NUM|DEC/.test(n.ty)) return num(a);
+          return str(a);
+        }
+        case 'sub': {
+          if (!n.res) n.res = execQuery(n.q, db);
+          return n.res.rows.length ? n.res.rows[0][0] ?? null : null;
+        }
+        case 'fn': {
+          if (isAgg(n)) return agg(n, x);
+          const f = FN[n.name];
+          if (!f) fail(`unknown function ${n.name}()`);
+          return f(...n.args.map(a => ev(a, x)));
+        }
+      }
+      fail('cannot evaluate expression');
+    }
+
+    function join(left, j) {
+      const s = srcs[j], out = [];
+      const push = r => { if (out.length >= 2e6) fail('that join makes over 2 million rows; add an ON condition'); out.push(r); };
+      if (s.type === 'cross') { for (const l of left) for (const r of s.rows) push([...l, r]); return out; }
+      let hash = null, probe = null;
+      const on = s.on;
+      if (on.t === 'cmp' && on.op === '=' && on.a.t === 'col' && on.b.t === 'col') {
+        const ra = resolve(on.a), rb = resolve(on.b);
+        if (Array.isArray(ra) && Array.isArray(rb)) {
+          const pair = ra[0] === j && rb[0] < j ? [ra, rb] : rb[0] === j && ra[0] < j ? [rb, ra] : null;
+          if (pair) {
+            hash = new Map();
+            for (const r of s.rows) {
+              const v = r[pair[0][1]];
+              if (v == null) continue;
+              const k = keyOf(v);
+              let list = hash.get(k);
+              if (!list) hash.set(k, list = []);
+              list.push(r);
+            }
+            probe = pair[1];
+          }
+        }
+      }
+      for (const l of left) {
+        let matched = false;
+        if (hash) {
+          const lr = l[probe[0]], v = lr ? lr[probe[1]] : null;
+          const hits = v == null ? null : hash.get(keyOf(v));
+          if (hits) for (const r of hits) { push([...l, r]); matched = true; }
+        } else {
+          for (const r of s.rows) { const row = [...l, r]; if (tv(ev(on, { r: row })) === true) { push(row); matched = true; } }
+        }
+        if (!matched && s.type === 'left') push([...l, null]);
+      }
+      return out;
+    }
+
+    let rows = srcs.length ? srcs[0].rows.map(r => [r]) : [[]];
+    for (let j = 1; j < srcs.length; j++) rows = join(rows, j);
+    if (c.where) rows = rows.filter(r => tv(ev(c.where, { r })) === true);
+
+    let ctxs;
+    if (c.group.length || c.having || c.items.some(it => !it.star && hasAgg(it.e))) {
+      const groups = new Map();
+      for (const r of rows) {
+        const k = c.group.map(e => keyOf(ev(e, { r }))).join('\u0001');
+        let g = groups.get(k);
+        if (!g) groups.set(k, g = []);
+        g.push(r);
+      }
+      if (!c.group.length && !groups.size) groups.set('', []);
+      ctxs = [...groups.values()].map(g => ({ r: g[0] || [], g }));
+      if (c.having) ctxs = ctxs.filter(x => tv(ev(c.having, x)) === true);
+    } else ctxs = rows.map(r => ({ r }));
+
+    const items = [];
+    for (const it of c.items) {
+      if (!it.star) { items.push(it); continue; }
+      let any = false;
+      srcs.forEach((s, si) => {
+        if (it.tb && lc(s.alias) !== lc(it.tb)) return;
+        any = true;
+        s.cols.forEach((name, ci) => items.push({ e: { t: 'col', r: [si, ci] }, name }));
+      });
+      if (!any) fail(it.tb ? `no table or alias named ${it.tb}` : 'SELECT * needs a FROM');
+    }
+    let out = ctxs.map(x => items.map(it => ev(it.e, x)));
+    if (c.distinct) [out, ctxs] = dedupe(out, ctxs);
+
+    if (order.length) {
+      const names = items.map(it => lc(it.name));
+      const pick = order.map(({ e }) => {
+        if (e.t === 'lit' && typeof e.v === 'number') {
+          if (!Number.isInteger(e.v) || e.v < 1 || e.v > items.length) fail(`ORDER BY ${e.v} is out of range`);
+          return e.v - 1;
+        }
+        if (e.t === 'col' && !e.tb && aliasItems.has(lc(e.name))) return names.indexOf(lc(e.name));
+        return -1;
+      });
+      const keys = out.map((row, i) => order.map(({ e }, k) => pick[k] >= 0 ? row[pick[k]] : ev(e, ctxs[i])));
+      out = sortRows(out, keys, order);
+    }
+    return { cols: items.map(it => it.name), rows: out };
+  }
+
+  /* ---------- CSV ---------- */
+  function parseCSV(text) {
+    text = text.replace(/^\uFEFF/, '');
+    const firstLine = text.split(/\r?\n/, 1)[0].replace(/"[^"]*"/g, '');
+    let d = ',', best = 0;
+    for (const c of [',', ';', '\t', '|']) { const n = firstLine.split(c).length - 1; if (n > best) { best = n; d = c; } }
+    const rows = [];
+    let row = [], f = '', q = false;
+    for (let i = 0, n = text.length; i < n; i++) {
+      const ch = text[i];
+      if (q) {
+        if (ch === '"') { if (text[i + 1] === '"') { f += '"'; i++; } else q = false; }
+        else f += ch;
+      } else if (ch === '"' && f === '') q = true;
+      else if (ch === d) { row.push(f); f = ''; }
+      else if (ch === '\n' || ch === '\r') {
+        if (ch === '\r' && text[i + 1] === '\n') i++;
+        row.push(f); rows.push(row); row = []; f = '';
+      } else f += ch;
+    }
+    if (f !== '' || row.length) { row.push(f); rows.push(row); }
+    const data = rows.filter(r => r.length > 1 || r[0].trim() !== '');
+    if (!data.length) throw new SqlError('that CSV is empty');
+    const width = Math.max(...data.map(r => r.length));
+    const seen = new Set();
+    const cols = [];
+    for (let i = 0; i < width; i++) {
+      let name = (data[0][i] || '').trim() || `col${i + 1}`, base = name, k = 2;
+      while (seen.has(lc(name))) name = `${base}_${k++}`;
+      seen.add(lc(name));
+      cols.push(name);
+    }
+    const body = data.slice(1);
+    const numeric = cols.map((_, i) => body.every(r => { const v = (r[i] ?? '').trim(); return v === '' || (NUMRE.test(v) && !/^[-+]?0\d/.test(v)); }));
+    const out = body.map(r => cols.map((_, i) => {
+      const v = r[i];
+      if (v == null || v.trim() === '') return null;
+      return numeric[i] ? +v : v;
+    }));
+    return { cols, keys: cols.map(lc), rows: out };
+  }
+
+  /* ---------- UI ---------- */
+  const db = new Map();
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  let last = null;
+
+  function cleanName(n) {
+    n = String(n).replace(/\.[A-Za-z0-9]{1,4}$/, '').replace(/[^A-Za-z0-9_]+/g, '_').replace(/^_+|_+$/g, '');
+    if (!n) n = 'data';
+    if (/^\d/.test(n)) n = 't_' + n;
+    if (RESERVED.has(n.toUpperCase())) n += '_t';
+    return n;
+  }
+
+  function addTable(rawName, csv) {
+    const name = cleanName(rawName);
+    const t = parseCSV(csv);
+    db.set(lc(name), { name, csv, ...t });
+    return name;
+  }
+
+  function save() {
+    const ok = store.set('sqlcsv.tables', [...db.values()].map(t => ({ name: t.name, csv: t.csv })));
+    if (!ok) { try { localStorage.removeItem('sqlcsv.tables'); } catch {} }
+    return ok;
+  }
+
+  function renderTables() {
+    const ul = $('#tables');
+    ul.innerHTML = [...db.values()].map(t => {
+      const cols = t.cols.length > 12 ? t.cols.slice(0, 12).join(', ') + ', …' : t.cols.join(', ');
+      return `<li><div><button class="tname" data-t="${esc(t.name)}">${esc(t.name)}</button>` +
+        `<div class="meta cols">${t.rows.length} rows · ${esc(cols)}</div></div>` +
+        `<button data-rm="${esc(t.name)}" aria-label="Remove ${esc(t.name)}">Remove</button></li>`;
+    }).join('');
+    const has = db.size > 0;
+    $('#pastetoggle').hidden = !has;
+    if (!has) $('#pastebox').hidden = false;
+  }
+
+  function note(sel, text, bad) { const el = $(sel); el.textContent = text; el.classList.toggle('no', !!bad); }
+
+  function afterAdd(name, kept) {
+    renderTables();
+    const sql = $('#sql');
+    if (!sql.value.trim()) sql.value = `SELECT * FROM ${name} LIMIT 100`;
+    note('#addmsg', kept ? '' : 'too big to keep after reload', false);
+  }
+
+  async function addFiles(files) {
+    let name = null;
+    for (const f of files) {
+      try { name = addTable(f.name, await f.text()); }
+      catch (e) { note('#msg', `${f.name}: ${e.message}`, true); }
+    }
+    if (name) { $('#pastebox').hidden = true; afterAdd(name, save()); }
+  }
+
+  function renderResult(res, ms) {
+    last = res;
+    const LIM = 500;
+    let h = '<table><thead><tr>' + res.cols.map(c => `<th>${esc(c)}</th>`).join('') + '</tr></thead><tbody>';
+    for (const row of res.rows.slice(0, LIM)) {
+      h += '<tr>' + row.map(v => v == null ? '<td class="nul">null</td>' : `<td${typeof v === 'number' ? ' class="n"' : ''} title="${esc(fmt(v))}">${esc(fmt(v))}</td>`).join('') + '</tr>';
+    }
+    $('#out').innerHTML = h + '</tbody></table>';
+    const n = res.rows.length;
+    note('#msg', `${n} row${n === 1 ? '' : 's'}${n > LIM ? `, showing first ${LIM}` : ''} · ${ms} ms`);
+    $('#dl').hidden = n === 0;
+  }
+
+  function run() {
+    const sql = $('#sql').value;
+    store.set('sqlcsv.sql', sql);
+    if (!sql.trim()) { note('#msg', 'write a query first', true); return; }
+    const t0 = performance.now();
+    try {
+      const res = execQuery(parse(sql), db);
+      renderResult(res, Math.round(performance.now() - t0));
+    } catch (e) {
+      if (!(e instanceof SqlError) && !(e instanceof RangeError)) console.warn(e);
+      note('#msg', e instanceof SqlError ? e.message : 'query too large for this device', true);
+      $('#out').innerHTML = ''; $('#dl').hidden = true; last = null;
+    }
+  }
+
+  const csvCell = v => { const s = fmt(v); return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
+
+  $('#run').addEventListener('click', run);
+  $('#sql').addEventListener('keydown', e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); run(); } });
+  $('#add').addEventListener('click', () => {
+    const csv = $('#csv').value;
+    if (!csv.trim()) { note('#addmsg', 'paste some CSV first', true); return; }
+    try {
+      const name = addTable($('#tname').value || 'data', csv);
+      $('#csv').value = ''; $('#tname').value = '';
+      $('#pastebox').hidden = true;
+      afterAdd(name, save());
+    } catch (e) { note('#addmsg', e.message, true); }
+  });
+  $('#pastetoggle').addEventListener('click', () => { const b = $('#pastebox'); b.hidden = !b.hidden; if (!b.hidden) $('#tname').focus(); });
+  $('#file').addEventListener('change', e => { addFiles([...e.target.files]); e.target.value = ''; });
+  $('#open').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('#file').click(); } });
+  $('#tables').addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    if (b.dataset.rm) { db.delete(lc(b.dataset.rm)); save(); renderTables(); }
+    else if (b.dataset.t) { $('#sql').value = `SELECT * FROM ${b.dataset.t} LIMIT 100`; run(); }
+  });
+  document.addEventListener('dragover', e => e.preventDefault());
+  document.addEventListener('drop', e => { e.preventDefault(); if (e.dataTransfer.files.length) addFiles([...e.dataTransfer.files]); });
+  $('#dl').addEventListener('click', () => {
+    if (!last) return;
+    const text = [last.cols, ...last.rows].map(r => r.map(csvCell).join(',')).join('\r\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([text], { type: 'text/csv' }));
+    a.download = 'result.csv';
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  });
+
+  // restore after first paint so big saved tables never block load
+  setTimeout(() => {
+    for (const t of store.get('sqlcsv.tables', [])) { try { addTable(t.name, t.csv); } catch {} }
+    const sql = store.get('sqlcsv.sql', '');
+    if (sql && !$('#sql').value) $('#sql').value = sql;
+    if (db.size) $('#pastebox').hidden = true;
+    renderTables();
+  }, 0);
+})();
+</script>
+</body>
+</html>

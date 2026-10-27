@@ -1,0 +1,54 @@
+{
+  "slug": "sql-on-csv-files",
+  "wish": "someone should make a tool that runs SQL on CSV files",
+  "year": 2019,
+  "agreed": 37,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/61396/is-there-a-software-tool-which-allows-to-perform-sql-on-csv-files",
+      "date": "2019-05-21",
+      "points": 23,
+      "comments": 14
+    }
+  ],
+  "spec": "Loads CSV files (open, drop or paste) as tables named after the file and runs SQL SELECT queries on them in the browser.\nSupports WHERE, JOIN / LEFT JOIN, GROUP BY with COUNT/SUM/AVG/MIN/MAX, HAVING, ORDER BY, LIMIT, DISTINCT, UNION, subqueries, CASE and common string/number functions; results can be downloaded as CSV.\nDoes not modify the files: no INSERT/UPDATE/DELETE, no RIGHT/FULL JOIN, no window functions; nothing leaves the device.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#tname",
+        "text": "people"
+      }
+    },
+    {
+      "type": {
+        "sel": "#csv",
+        "text": "name,city,age\nAda,London,36\nAlan,London,41\nGrace,New York,85\nLinus,Helsinki,22"
+      }
+    },
+    {
+      "tap": "#add"
+    },
+    {
+      "type": {
+        "sel": "#sql",
+        "text": "SELECT city, COUNT(*) AS n, MAX(age) AS oldest FROM people WHERE age > 30 GROUP BY city ORDER BY n DESC"
+      }
+    },
+    {
+      "tap": "#run"
+    },
+    {
+      "expect": {
+        "sel": "#out tbody tr",
+        "matches": "^London\\s*2\\s*41$"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:43:13Z",
+  "model": "opus-5.5",
+  "minutes": 7,
+  "approved": false,
+  "notes": "Small SQL engine written for this tool; CSV columns are typed as numbers when every value is numeric (leading-zero codes stay text). Tables and the last query are kept in localStorage when they fit."
+}
