@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T01:56:47.701Z",
+ "updated": "2026-10-27T01:57:21.809Z",
  "tools": [
   {
    "slug": "arrows-on-a-screenshot",
@@ -666,9 +666,14 @@
   },
   {
    "slug": "visual-equation-editor",
-   "status": "pending",
+   "status": "pass",
    "attempts": 1,
-   "model": "opus-5.5"
+   "model": "opus-5.5",
+   "kb": 17.8,
+   "tests": "6/6",
+   "built": "2026-10-27T01:54:46Z",
+   "minutes": 9,
+   "approved": false
   }
  ]
 }
