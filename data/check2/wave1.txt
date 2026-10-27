@@ -1,0 +1,180 @@
+arrows-on-a-screenshot — a tool that adds text and arrows to a screenshot
+freelance-money-ledger — an app that tracks a freelancer's finances
+pocket-kanban-board — an app that works like trello
+markdown-writing-room — a beautiful markdown editor
+blood-test-results-log — a web app to store blood test results
+markdown-file-viewer — a simple markdown viewer
+compare-two-tables — a tool that compares two tables and shows the differences
+logo-turtle-playground — a LOGO interpreter that has a turtle
+packet-header-diagram — a tool that draws binary protocol figures from a spec
+frame-step-video-player — a video player that steps backward frame by frame
+text-to-timeline — a tool that turns text into a timeline diagram
+html-css-scratchpad — a site where users can write HTML and CSS
+pixel-icon-editor — a web-based icon editor
+one-word-speed-reader — an app that helps with speed reading
+audio-bpm-detector — a tool that detects the BPM of an audio file
+remove-passersby-from-photos — an app that removes passers-by by combining several photos of the same scene
+simple-circuit-simulator — an app that simulates electrical circuits
+venn-diagram-maker — a tool that draws Venn diagrams
+sing-the-note-trainer — an app that plays a tone and shows if I hit it when singing
+plate-tectonics-sandbox — a simulator of plate tectonics
+toy-climate-model — a tool that simulates a simple climate model
+battlemap-print-tiler — a tool that prints large battlemaps for rpgs
+seating-chart-planner — a tool that plans seating charts
+decision-tree-builder — a tool that builds decision trees
+sunrise-sunset-calculator — a tool that shows sunrise and sunset times
+night-sky-star-chart — an app that draws star charts
+cafe-ambience-mixer — an app that generates cafe or library ambience noise
+spot-image-differences — a tool that shows the differences between two images
+json-diff-viewer — a diff tool for JSON files
+sql-on-csv-files — a tool that runs SQL on CSV files
+mystery-string-decoder — a tool that tries many decoders on a mystery string
+highlight-text-matches — a grep that highlights matches instead of filtering
+plain-text-box-drawer — a tool that draws shapes in plain text
+family-tree-maker — an app that makes family trees simple enough for anyone
+colorblind-image-filter — a tool that filters images so colorblind people can tell colors apart
+hide-text-in-image — a tool that hides data inside images
+run-a-checklist — an app that runs checklists, like pre-flight or surgical safety lists
+gpx-track-stats — an app that calculates distance and elevation gain from a GPX file
+treasure-hunt-clue-maker — a tool that generates treasure hunts
+printable-game-cards — a tool that makes and prints game cards
+command-line-quest — a game that teaches the Linux command line
+piano-note-game — a game that teaches piano playing
+skip-silence-player — a player that skips silent parts of audio and video
+transcription-player — an app that plays audio with easy rewind and speed control for transcribing
+delayed-echo-recorder — an app that records a sound and plays it back after a set delay
+epub-file-reader — a tool that opens epub files
+mbox-email-reader — a tool that opens large mbox email files and lets me read them
+real-file-type-checker — a tool that tells a file's real type from its content, not its extension
+file-checksum-checker — a file integrity checker
+jpgs-to-one-pdf — a tool that joins many JPG images into one PDF without recompressing
+hex-file-viewer — a tool that views files as hex
+live-regex-tester — a tool that tests regular expressions live, like SQLFiddle
+big-json-viewer — a viewer for huge JSON files
+offline-qr-code-maker — a tool that generates QR codes without a web service
+memorable-password-maker — a password generator that makes memorable passwords
+measure-on-a-photo — a tool that measures real distances on images
+gif-animation-maker — a tool that animates GIFs
+seamless-pixel-tile-maker — an app that makes seamless pixel tiles
+geometric-avatar-maker — a tool that generates avatar portraits
+image-color-extractor — a web app that extracts all the colours of an image
+simple-sketch-pad — an app that is drawing software for amateurs
+mind-map-maker — a tool for making mind maps
+flowchart-maker — an app that draws flowcharts
+visual-equation-editor — a tool that edits math equations visually
+compass-and-straightedge — a WYSIWYG geometry tool
+3d-equation-plotter — a tool that plots math equations in 3D
+graph-image-digitizer — a tool that makes a plot when I click on a graph
+brainfuck-debugger — an IDE for Brainfuck
+toddler-tap-games — computer games for 4 year old children
+picture-swap-storybook — a storybook program where parents can change the pictures but not the text
+table-to-heatmap — a tool that makes a heatmap from a table of numbers
+redact-a-scan — a tool that blacks out information in scanned documents
+recipes-to-shopping-list — a recipe database with a shopping list generator
+editor-color-scheme-maker — a tool that generates text editor color schemes
+screenshot-in-browser-frame — a tool that wraps screenshots in a browser window
+guitar-chord-charts — an app that shows guitar chord fingering charts with alternate symbols
+draw-on-video — an app that annotates video by drawing on frames
+videos-side-by-side — an app that plays several videos side by side
+video-to-frames — a tool that steps through a video and extracts single frames
+cv-website-builder — a site that builds a personal CV website
+simple-invoice-maker — an app for invoicing and accounting
+fountain-screenplay-formatter — a tool that converts fountain screenplays to PDF
+spending-and-budget-tracker — an app that tracks my spending and budget
+vegetarian-day-calendar — an app that tracks my vegetarian days
+wine-cellar-log — an app to manage a wine cellar
+work-diary — an app to keep a work diary
+text-scratchpad — a site that is just a text scratchpad
+text-diff — a tool that diffs two texts pasted into it
+compare-two-lists — a tool that compares two lists of words, one per line
+repeated-phrase-finder — a tool that detects repeated sentences or phrases in a document
+cooking-measure-converter — an app that converts cooking measures, like 40g of sugar to mL
+html-to-markdown — a tool that converts HTML to Markdown
+rest-break-reminder — a tool that forces me to take rest breaks at the computer
+identical-image-check — a tool that checks whether two images are exactly the same
+small-svg-editor — a standalone SVG editor
+neural-network-diagram — a tool that draws convolutional neural network diagrams
+split-scanned-photos — a tool that crops a scan of several photos into separate images
+where-did-i-put-it — an app that reminds me where I put things
+private-workout-log — an app that tracks my fitness without storing data online
+qr-contact-card — an app that makes QR codes to swap contact info
+mahjong-score-counter — a Mahjong score counting app
+relational-algebra-runner — a tool that runs relational algebra queries
+ics-calendar-viewer — a tool that shows the contents of an .ics calendar file
+eml-attachment-extractor — a tool that extracts attachments from .eml files
+chord-progression-player — an app for composing music with good chord playback
+movie-end-credits-maker — a tool that makes movie end credits
+list-to-graphic — a tool that turns a list into a graphic like SmartArt
+low-poly-map-maker — an app that creates maps made of polygons
+memory-and-focus-drills — an app that trains perception, cognition and memory
+lfsr-maximal-taps-finder — a tool that finds polynomial masks with maximal period for LFSRs
+latex-table-maker — an app that creates latex tables
+number-key-alarm-clock — an alarm clock you set with number keys
+xml-diff — a tool that diffs XML files
+markdown-to-pdf — a tool that converts Markdown to PDF without LaTeX
+apache-log-viewer — a tool that views Apache logs
+tree-of-notes — a tool that stores links and notes in a tree
+gantt-chart-maker — an app that makes gantt charts
+quick-erd-maker — a tool that draws data model diagrams quickly
+tech-tree-diagram — a tool that diagrams a tech tree
+ear-training-drills — an app for ear training
+voice-character-changer — an app that changes your voice into character voices
+last-minutes-recorder — an app that keeps recording the last few minutes of microphone audio
+audio-waveform-image — a tool that makes an image of an audio file's waveform
+batch-image-resizer — a tool that resizes images automatically
+blur-screenshot-text — a tool that smears or blurs text in a screenshot
+sprite-sheet-slicer — a tool that cuts each icon out of a sheet as an individual image
+home-library-catalog — an app for managing a library of books
+sun-position-finder — an app that shows where the sun is in the sky
+random-melody-maker — a tool that generates a random melody over a chord progression
+anagram-maker — a tool that generates anagrams
+css-specificity-calculator — a tool that calculates CSS selector specificity
+encrypted-diary — an app that keeps an encrypted personal diary
+gapless-loop-player — a media player that loops a file with no gap
+programmer-calculator — a calculator for programmers
+base64-hex-converter — a tool that converts between base64 and hex
+json-csv-xml-converter — a tool that converts structured text like XML, JSON and CSV
+timer-and-stopwatch — an app that is a nice-looking timer and stopwatch
+plain-todo-list — a to-do list app
+pomodoro-timer — a pomodoro timer
+unit-converter — a universal unit conversion app
+small-web-search-engine — a search engine that excludes the biggest websites
+idea-giveaway-board — a platform for sharing ideas people want to give away
+social-bookmarking-site — a successor to del.icio.us
+open-calendar-replacement — a powerful open-source replacement for Google Calendar
+cloud-music-library — a cloud music library that does not delete your music
+screen-to-gif-recorder — a tool that records the screen to an animated GIF
+self-hosted-code-host — a self-hosted replacement for GitHub
+crud-app-builder — an open source tool for creating simple CRUD apps
+comment-on-web-pages — a tool that enables commenting on HTML elements
+richest-by-liquid-assets — a list of the richest people by liquid assets
+recruiter-blocklist — a recruiter email blocklist
+decentralised-team-chat — a decentralised alternative to Slack
+employers-who-do-not-pay — a list of employers who do not pay
+failed-startups-archive — a repository of failed startups
+disk-encryption — an alternative to TrueCrypt
+personal-document-organizer — a tool for personal document hell
+part-time-dev-jobs — a listing of part-time dev jobs
+offline-map-browser — an offline map browser with offline search
+time-per-program-log — a program that logs time spent in each program
+searchable-scanned-pdf — a tool that makes a scanned PDF searchable
+dns-ttl-wall-of-shame — a wall of shame for ISPs that ignore DNS TTLs
+linux-office-suite — a tool that replaces Microsoft Office on Linux
+audiobook-library — a Calibre equivalent for audiobooks
+file-sync-between-computers — a tool that syncs files between computers
+screen-recorder — a tool that records the screen with mouse movement and saves video
+realtime-html-collab — a tool that edits HTML together in real time with a preview
+merge-pdf-pages — a tool that combines pages from several PDFs into one
+private-messaging-network — an alternative messaging network to WhatsApp
+password-manager — a password manager
+find-duplicate-files — a tool that finds duplicate files
+thesis-latex-editor — an app that edits LaTeX for writing a thesis
+lossless-video-cutter — a tool that cuts videos without losing quality
+free-matlab-alternative — a tool that replaces Matlab for free
+clipboard-history — a tool that remembers clipboard content
+disk-space-map — a tool that shows where my disk space went
+identify-a-song — an app that listens to a song and tells me what it is
+asset-transaction-tracker — an app that tracks assets and transactions better than mint
+warm-night-screen — an app that makes the screen tint warmer at night
+temporary-phone-numbers — a site that gives temporary phone numbers
+handwriting-to-latex — an app that converts handwritten math equations to latex
