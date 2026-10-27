@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a storybook program where parents can change the pictures but not the text</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+.pages { display: grid; gap: 16px; }
+.page { border: 1.5px solid var(--line); border-radius: var(--radius); padding: 12px; display: grid; gap: 10px; }
+.pic { width: 100%; aspect-ratio: 4 / 3; border: 1.5px dashed var(--line); border-radius: var(--radius); display: grid; place-items: center; overflow: hidden; color: var(--meta); }
+.pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.has-img { border-style: solid; }
+.ptext { white-space: pre-wrap; font-size: 19px; line-height: 1.5; margin: 0; }
+textarea { resize: vertical; min-height: 88px; }
+.status { font: 16px/1.4 var(--mono); color: var(--meta); }
+.err { color: var(--no); min-height: 0; }
+.err:empty { display: none; }
+#reader { position: fixed; inset: 0; background: var(--paper); padding: var(--gutter); display: none; flex-direction: column; gap: 14px; overflow-y: auto; z-index: 5; }
+#reader.open { display: flex; }
+#reader .pic { aspect-ratio: auto; flex: 1 1 auto; min-height: 220px; max-height: 60vh; }
+#reader .pic img { object-fit: contain; }
+#reader-text { font-size: 24px; line-height: 1.4; margin: 0; white-space: pre-wrap; }
+.nav { display: flex; gap: 10px; align-items: center; justify-content: space-between; }
+.nav button { flex: 1; }
+.nav span { flex: 1; text-align: center; }
+hr { border: 0; border-top: 1px solid var(--line); margin: 4px 0; width: 100%; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a storybook program where parents can change the pictures but not the text</h1>
+
+<main id="app" class="stack">
+  <input id="title" type="text" placeholder="Book title" maxlength="80" aria-label="Book title">
+  <div class="row">
+    <button id="read" class="primary" type="button">Read the book</button>
+    <button id="lock" type="button">Lock the text</button>
+  </div>
+  <p id="lockstate" class="status">Text is open for writing.</p>
+  <p id="err" class="err" role="status"></p>
+  <div id="pages" class="pages"></div>
+  <p id="empty" class="empty">No pages yet. Write the first one below.</p>
+  <div id="adder" class="stack">
+    <hr>
+    <textarea id="new-text" placeholder="Words for a new page" aria-label="Words for a new page"></textarea>
+    <button id="add" type="button">Add page</button>
+  </div>
+  <input id="file" type="file" accept="image/*" hidden>
+</main>
+<section id="reader" aria-label="Reader">
+  <div id="reader-pic" class="pic"></div>
+  <p id="reader-text"></p>
+  <div class="nav">
+    <button id="prev" type="button" aria-label="Previous page">Back</button>
+    <span id="pageno" class="status"></span>
+    <button id="next" type="button" aria-label="Next page">Next</button>
+  </div>
+  <button id="close" type="button">Close book</button>
+</section>
+
+<script>
+(() => {
+  'use strict';
+  // storage helper — never throws
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  const KEY = 'picture-swap-storybook';
+  let book = store.get(KEY, null);
+  if (!book || !Array.isArray(book.pages)) book = { title: '', locked: false, pages: [] };
+  let pickFor = -1, at = 0;
+
+  const err = msg => { $('#err').textContent = msg || ''; };
+  const save = () => {
+    try { localStorage.setItem(KEY, JSON.stringify(book)); return true; }
+    catch { err('Could not save. The picture may be too large, or storage is off.'); return false; }
+  };
+
+  function picEl(el, src, label) {
+    el.textContent = '';
+    el.classList.toggle('has-img', !!src);
+    if (src) { const img = new Image(); img.src = src; img.alt = label; el.append(img); }
+    else el.textContent = 'No picture yet';
+  }
+
+  function render() {
+    $('#title').value = book.title;
+    $('#title').disabled = book.locked;
+    $('#lock').textContent = book.locked ? 'Unlock the text' : 'Lock the text';
+    $('#lockstate').textContent = book.locked
+      ? 'Text is locked. Pictures can still be changed.'
+      : 'Text is open for writing.';
+    $('#adder').hidden = book.locked;
+    $('#empty').hidden = book.pages.length > 0;
+    $('#read').disabled = book.pages.length === 0;
+    const wrap = $('#pages');
+    wrap.textContent = '';
+    book.pages.forEach((p, i) => {
+      const card = document.createElement('div');
+      card.className = 'page';
+      const meta = document.createElement('div');
+      meta.className = 'status';
+      meta.textContent = 'Page ' + (i + 1);
+      const pic = document.createElement('div');
+      pic.className = 'pic';
+      picEl(pic, p.img, 'Picture for page ' + (i + 1));
+      card.append(meta, pic);
+      if (book.locked) {
+        const t = document.createElement('p');
+        t.className = 'ptext';
+        t.textContent = p.text;
+        card.append(t);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.className = 'ptext-edit';
+        ta.value = p.text;
+        ta.setAttribute('aria-label', 'Words on page ' + (i + 1));
+        ta.addEventListener('input', () => { p.text = ta.value; save(); });
+        card.append(ta);
+      }
+      const row = document.createElement('div');
+      row.className = 'row';
+      const change = document.createElement('button');
+      change.type = 'button';
+      change.className = 'change';
+      change.textContent = p.img ? 'Change picture' : 'Add picture';
+      change.addEventListener('click', () => { pickFor = i; err(''); $('#file').value = ''; $('#file').click(); });
+      row.append(change);
+      if (p.img) {
+        const clear = document.createElement('button');
+        clear.type = 'button';
+        clear.textContent = 'Remove picture';
+        clear.addEventListener('click', () => { const old = p.img; p.img = ''; if (!save()) p.img = old; render(); });
+        row.append(clear);
+      }
+      if (!book.locked) {
+        const del = document.createElement('button');
+        del.type = 'button';
+        del.className = 'del';
+        del.textContent = 'Delete page';
+        del.addEventListener('click', () => { book.pages.splice(i, 1); save(); render(); });
+        row.append(del);
+      }
+      card.append(row);
+      wrap.append(card);
+    });
+  }
+
+  // Shrink photos so a whole book fits in local storage.
+  function shrink(file) {
+    return new Promise((resolve, reject) => {
+      const fr = new FileReader();
+      fr.onerror = () => reject(new Error('read'));
+      fr.onload = () => {
+        const img = new Image();
+        img.onerror = () => reject(new Error('decode'));
+        img.onload = () => {
+          const max = 900, s = Math.min(1, max / Math.max(img.width, img.height));
+          const c = document.createElement('canvas');
+          c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+          c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+          resolve(c.toDataURL('image/jpeg', 0.72));
+        };
+        img.src = fr.result;
+      };
+      fr.readAsDataURL(file);
+    });
+  }
+
+  $('#file').addEventListener('change', async e => {
+    const f = e.target.files && e.target.files[0];
+    const p = book.pages[pickFor];
+    if (!f || !p) return;
+    try {
+      const data = await shrink(f);
+      const old = p.img; p.img = data;
+      if (!save()) p.img = old;
+      render();
+    } catch { err('That file could not be opened as a picture.'); }
+  });
+
+  $('#title').addEventListener('input', e => { book.title = e.target.value; save(); });
+
+  $('#add').addEventListener('click', () => {
+    const text = $('#new-text').value.trim();
+    if (!text) { err('Write some words for the page first.'); return; }
+    err('');
+    book.pages.push({ text, img: '' });
+    $('#new-text').value = '';
+    save(); render();
+  });
+
+  let unlockArmed = 0;
+  $('#lock').addEventListener('click', () => {
+    if (!book.locked) {
+      if (!book.pages.length) { err('Add a page before locking.'); return; }
+      book.locked = true; err(''); save(); render(); return;
+    }
+    if (Date.now() - unlockArmed < 4000) {
+      book.locked = false; unlockArmed = 0; err(''); save(); render();
+    } else {
+      unlockArmed = Date.now();
+      $('#lock').textContent = 'Tap again to unlock';
+    }
+  });
+
+  function show() {
+    const p = book.pages[at];
+    picEl($('#reader-pic'), p.img, 'Picture for page ' + (at + 1));
+    $('#reader-text').textContent = p.text;
+    $('#pageno').textContent = (at + 1) + ' / ' + book.pages.length;
+    $('#prev').disabled = at === 0;
+    $('#next').disabled = at === book.pages.length - 1;
+  }
+  $('#read').addEventListener('click', () => {
+    if (!book.pages.length) return;
+    at = 0; show(); $('#reader').classList.add('open'); window.scrollTo(0, 0);
+  });
+  $('#prev').addEventListener('click', () => { if (at > 0) { at--; show(); } });
+  $('#next').addEventListener('click', () => { if (at < book.pages.length - 1) { at++; show(); } });
+  $('#close').addEventListener('click', () => { $('#reader').classList.remove('open'); });
+  document.addEventListener('keydown', e => {
+    if (!$('#reader').classList.contains('open')) return;
+    if (e.key === 'ArrowRight') $('#next').click();
+    else if (e.key === 'ArrowLeft') $('#prev').click();
+    else if (e.key === 'Escape') $('#close').click();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
