@@ -112,7 +112,7 @@ async function open(t) {
   current = t; history.replaceState(null, '', '#' + t.slug);
   $('#ptitle').textContent = t.wish;
   const s = $('#stage'); s.replaceChildren();
-  const i = document.createElement('iframe'); i.sandbox = 'allow-scripts allow-same-origin allow-forms'; i.src = `tools/${t.slug}/index.html`; i.title = t.wish; s.appendChild(i);
+  const i = document.createElement('iframe'); i.sandbox = 'allow-scripts allow-same-origin allow-forms allow-downloads'; i.allow = 'microphone; camera; geolocation; accelerometer; gyroscope; clipboard-write'; i.src = `tools/${t.slug}/index.html`; i.title = t.wish; s.appendChild(i);
   $('#drawer').classList.remove('up'); $('#chev').textContent = '▴';
   $('#player').classList.add('open'); document.body.style.overflow = 'hidden';
   const j = await load(`tools/${t.slug}/tool.json`);
