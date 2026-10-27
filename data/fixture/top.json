@@ -1,0 +1,12 @@
+{
+  "generated": "2026-10-27T01:00:00Z",
+  "build": [
+    {"slug":"fastest-supermarket-line","wish":"someone should make an app that tells you which supermarket line is fastest","year":2019,"agreed":3100,"category":"everyday","sources":[{"site":"hn","url":"https://news.ycombinator.com/item?id=0","date":"2019-03-14","points":212,"comments":88}],"spec_hint":"inputs: people per line, items per cart estimate, cashier tempo tap; output: a line number"},
+    {"slug":"split-the-bill-fairly","wish":"someone should make an app that splits a restaurant bill by what each person actually ordered","year":2017,"agreed":2400,"category":"money","sources":[{"site":"reddit","url":"https://www.reddit.com/r/SomebodyMakeThis/comments/0/","date":"2017-06-02","points":1900,"comments":500}],"spec_hint":"items, who shared what, tip and tax split proportionally"},
+    {"slug":"how-long-until-sunset-walk","wish":"someone should make an app that tells you if you have time for a walk before sunset","year":2021,"agreed":640,"category":"outdoors","sources":[{"site":"hn","url":"https://news.ycombinator.com/item?id=1","date":"2021-09-20","points":380,"comments":260}],"spec_hint":"sun-angle math from device location (on tap) or a typed city; offline"}
+  ],
+  "no": [
+    {"slug":"identify-any-plant","wish":"someone should make an app that identifies any plant from a photo","year":2016,"agreed":5200,"no":"exists: Google Lens","sources":[{"site":"reddit","url":"https://www.reddit.com/r/AppIdeas/comments/1/","date":"2016-04-11","points":4000,"comments":1200}]},
+    {"slug":"show-all-my-subscriptions","wish":"someone should make an app that shows every subscription I'm paying for","year":2020,"agreed":3900,"no":"needs: your bank password","sources":[{"site":"hn","url":"https://news.ycombinator.com/item?id=2","date":"2020-01-30","points":2900,"comments":1000}]}
+  ]
+}

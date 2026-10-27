@@ -1,0 +1,8 @@
+{
+  "updated": "2026-10-27T01:00:00Z",
+  "tools": [
+    {"slug":"fastest-supermarket-line","status":"pass","kb":14.2,"tests":"4/4","built":"2026-10-28T02:10:00Z","minutes":4,"model":"opus-5.5","approved":false},
+    {"slug":"split-the-bill-fairly","status":"pass","kb":19.8,"tests":"5/5","built":"2026-10-28T02:14:00Z","minutes":6,"model":"opus-5.5","approved":false},
+    {"slug":"how-long-until-sunset-walk","status":"dropped","reason":"tests failed twice: sunset math off by DST","built":"2026-10-28T02:20:00Z","minutes":9,"model":"opus-5.5","approved":false}
+  ]
+}

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light dark">
+<title>review — someone should.</title>
+<style>
+:root{--paper:#f4f1ea;--ink:#141414;--meta:#6b6b6b;--line:#d9d4c7;--no:#c8321e;--built:#2e7d4f;--sans:-apple-system,"SF Pro Text","Segoe UI",Inter,Roboto,system-ui,sans-serif;--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+@media(prefers-color-scheme:dark){:root{--paper:#121212;--ink:#ededed;--meta:#9a9a9a;--line:#2a2a2a}}
+*{box-sizing:border-box}html,body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.4 var(--sans)}body{padding:0 16px 120px}
+header{position:sticky;top:0;background:var(--paper);padding:12px 0;font:13px/1.4 var(--mono);color:var(--meta);display:flex;justify-content:space-between;align-items:center;z-index:2;border-bottom:1px solid var(--line)}
+header button{min-height:40px;padding:0 14px;border:1.5px solid var(--ink);background:transparent;font:inherit;color:inherit;border-radius:4px}
+.card{padding:20px 0;border-bottom:1px solid var(--line)}
+.wish{font-size:20px;font-weight:500;margin:0 0 6px}
+.meta{font:13px/1.5 var(--mono);color:var(--meta);margin-bottom:10px}
+img{width:100%;max-width:390px;border:1px solid var(--line);border-radius:4px;display:block;background:#fff}
+.row{display:flex;gap:10px;margin-top:12px}
+.row button{flex:1;min-height:48px;border:1.5px solid var(--ink);background:transparent;font:inherit;color:inherit;border-radius:4px}
+.card.ok .ok{background:var(--built);color:#fff;border-color:var(--built)}
+.card.drop .drop{background:var(--no);color:#fff;border-color:var(--no)}
+.card.ok,.card.drop{opacity:.55}
+a{color:inherit}
+</style>
+</head>
+<body>
+<header><span id="s">—</span><span><button id="all">approve all pass</button> <button id="dl">download approved.json</button></span></header>
+<main id="list"></main>
+<script>
+(async () => {
+const $ = s => document.querySelector(s);
+const built = await (await fetch('data/built.json', {cache:'no-cache'})).json();
+const top = await (await fetch('data/top.json', {cache:'no-cache'})).json();
+const wishes = Object.fromEntries((top.build||[]).map(w => [w.slug, w]));
+const pass = (built.tools||[]).filter(t => t.status === 'pass');
+const state = Object.fromEntries(pass.map(t => [t.slug, t.approved ? 'ok' : '']));
+try { Object.assign(state, JSON.parse(localStorage.getItem('review') || '{}')); } catch {}
+const save = () => { try { localStorage.setItem('review', JSON.stringify(state)); } catch {} ; const ok = Object.values(state).filter(v => v === 'ok').length, drop = Object.values(state).filter(v => v === 'drop').length; $('#s').textContent = `${pass.length} pass · ${ok} approved · ${drop} dropped · ${pass.length - ok - drop} left`; };
+for (const t of pass) {
+  const w = wishes[t.slug] || {wish: t.slug};
+  const c = document.createElement('section'); c.className = 'card ' + (state[t.slug] || ''); c.dataset.slug = t.slug;
+  c.innerHTML = `<h2 class="wish"></h2><div class="meta">${w.year || ''} · ${w.agreed || ''} agreed · ${t.kb || '?'} kB · tests ${t.tests || '?'} · <a href="tools/${t.slug}/" target="_blank">open</a> · <a href="${(w.sources||[])[0]?.url || '#'}" target="_blank">source</a></div><img loading="lazy" src="qa/${t.slug}.png" alt=""><div class="row"><button class="ok">approve</button><button class="drop">drop</button></div>`;
+  c.querySelector('.wish').textContent = w.wish;
+  c.querySelector('.ok').onclick = () => { state[t.slug] = 'ok'; c.className = 'card ok'; save(); };
+  c.querySelector('.drop').onclick = () => { state[t.slug] = 'drop'; c.className = 'card drop'; save(); };
+  $('#list').appendChild(c);
+}
+save();
+$('#all').onclick = () => { for (const t of pass) if (state[t.slug] !== 'drop') { state[t.slug] = 'ok'; document.querySelector(`[data-slug="${t.slug}"]`).className = 'card ok'; } save(); };
+$('#dl').onclick = () => {
+  const when = new Date().toISOString();
+  const out = { ...built, updated: when, tools: built.tools.map(t => state[t.slug] === 'drop' ? {...t, status:'dropped', reason:'dropped by yoav in review', approved:false} : state[t.slug] === 'ok' ? {...t, approved:true, approvedAt: t.approvedAt || when} : t) };
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(out, null, 2)], {type:'application/json'})); a.download = 'built.json'; a.click();
+};
+})();
+</script>
+</body>
+</html>
