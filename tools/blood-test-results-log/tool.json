@@ -1,0 +1,64 @@
+{
+  "slug": "blood-test-results-log",
+  "wish": "someone should make a web app to store blood test results",
+  "year": 2011,
+  "agreed": 105,
+  "sources": [
+    {
+      "site": "hn",
+      "url": "https://news.ycombinator.com/item?id=36025977",
+      "date": "2023-05-22",
+      "points": 45,
+      "comments": 57
+    },
+    {
+      "site": "hn",
+      "url": "https://news.ycombinator.com/item?id=2509092",
+      "date": "2011-05-03",
+      "points": 1,
+      "comments": 2
+    }
+  ],
+  "spec": "Stores blood test results on this device: date, marker, value, unit and the lab reference range.\nAdd a result, tap a marker to see its history as a chart and table; values outside the range are flagged high or low; export and import CSV.\nIt does not read lab PDFs, interpret results, give medical advice or sync anywhere.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#marker",
+        "text": "LDL"
+      }
+    },
+    {
+      "type": {
+        "sel": "#value",
+        "text": "190"
+      }
+    },
+    {
+      "type": {
+        "sel": "#hi",
+        "text": "130"
+      }
+    },
+    {
+      "tap": "#add"
+    },
+    {
+      "expect": {
+        "sel": "#detail .flag",
+        "contains": "high"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#chart circle",
+        "count": 1
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:30:02Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Data stays in localStorage on the device; CSV export/import for backup."
+}

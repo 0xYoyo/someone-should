@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a web app to store blood test results</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+label { display: grid; gap: 4px; font-size: 15px; color: var(--meta); }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.grid .wide { grid-column: 1 / -1; }
+#err { min-height: 1.45em; margin: 0; color: var(--no); font-size: 15px; }
+h2 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 8px 0 0; }
+.mk { width: 100%; text-align: left; display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 10px 12px; border-color: var(--line); }
+.mk[aria-pressed="true"] { border-color: var(--ink); }
+.mk b { font-weight: 600; }
+.mk span { font-variant-numeric: tabular-nums; text-align: right; }
+#markers { display: grid; gap: 8px; }
+.flag { font: 600 14px/1 var(--mono); text-transform: uppercase; }
+.flag.high, .flag.low { color: var(--no); }
+.flag.ok { color: var(--built); }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 8px 4px; border-bottom: 1px solid var(--line); font-size: 15px; vertical-align: middle; }
+th { color: var(--meta); font-weight: 500; }
+td button { min-height: 40px; min-width: 44px; padding: 0 10px; border-color: var(--line); font-size: 15px; }
+#chart { width: 100%; height: auto; display: block; }
+#chart text { font: 13px var(--mono); fill: var(--meta); }
+.file { position: relative; display: inline-flex; align-items: center; min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); border-radius: var(--radius); cursor: pointer; }
+.file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; min-height: 0; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a web app to store blood test results</h1>
+
+<main id="app" class="stack">
+  <form id="form" class="grid" autocomplete="off" novalidate>
+    <label class="wide">Marker<input id="marker" list="known" placeholder="LDL, HbA1c, Ferritin" enterkeyhint="next"></label>
+    <label>Value<input id="value" inputmode="decimal" placeholder="0.0"></label>
+    <label>Unit<input id="unit" placeholder="mg/dL"></label>
+    <label>Range low<input id="lo" inputmode="decimal" placeholder="optional"></label>
+    <label>Range high<input id="hi" inputmode="decimal" placeholder="optional"></label>
+    <label class="wide">Date<input id="date" type="date"></label>
+    <button id="add" class="primary wide" type="submit">Save result</button>
+  </form>
+  <datalist id="known"></datalist>
+  <p id="err" role="status"></p>
+
+  <section id="list" class="stack"></section>
+  <section id="detail" class="stack" hidden></section>
+
+  <div class="row" id="io">
+    <button id="export" type="button">Export CSV</button>
+    <label class="file">Import CSV<input id="import" type="file" accept=".csv,text/csv"></label>
+  </div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const KEY = 'blood-test-results-log';
+  let rows = store.get(KEY, []);
+  if (!Array.isArray(rows)) rows = [];
+  let current = null;
+
+  const today = () => new Date().toISOString().slice(0, 10);
+  const num = s => { s = String(s ?? '').trim().replace(',', '.'); if (s === '') return null; const n = Number(s); return Number.isFinite(n) ? n : NaN; };
+  const norm = s => s.trim().replace(/\s+/g, ' ');
+  const keyOf = s => norm(s).toLowerCase();
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const fmt = n => n == null ? '' : String(+n.toPrecision(6));
+  const flagOf = r => r.lo != null && r.value < r.lo ? 'low' : r.hi != null && r.value > r.hi ? 'high' : (r.lo != null || r.hi != null) ? 'ok' : '';
+  const flagHtml = r => { const f = flagOf(r); return f ? `<span class="flag ${f}">${f === 'ok' ? 'in range' : f}</span>` : ''; };
+  const range = r => r.lo != null && r.hi != null ? `${fmt(r.lo)}–${fmt(r.hi)}` : r.lo != null ? `≥ ${fmt(r.lo)}` : r.hi != null ? `≤ ${fmt(r.hi)}` : '';
+  const save = () => store.set(KEY, rows);
+  const byDate = (a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : a.id - b.id;
+
+  function groups() {
+    const m = new Map();
+    for (const r of rows) { const k = keyOf(r.marker); if (!m.has(k)) m.set(k, []); m.get(k).push(r); }
+    for (const list of m.values()) list.sort(byDate);
+    return m;
+  }
+
+  function render() {
+    const g = groups();
+    $('#known').innerHTML = [...g.values()].map(l => `<option value="${esc(l[l.length - 1].marker)}">`).join('');
+    const list = $('#list');
+    if (!g.size) { list.innerHTML = '<p class="empty">No results yet.</p>'; $('#detail').hidden = true; return; }
+    if (current && !g.has(current)) current = null;
+    const keys = [...g.keys()].sort();
+    list.innerHTML = '<h2>Markers</h2><div id="markers">' + keys.map(k => {
+      const l = g.get(k), last = l[l.length - 1];
+      return `<button type="button" class="mk" data-k="${esc(k)}" aria-pressed="${k === current}"><b>${esc(last.marker)}</b><span>${fmt(last.value)} ${esc(last.unit)} ${flagHtml(last)}</span></button>`;
+    }).join('') + '</div>';
+    renderDetail(g);
+  }
+
+  function renderDetail(g) {
+    const d = $('#detail');
+    if (!current) { d.hidden = true; d.innerHTML = ''; return; }
+    const l = g.get(current);
+    d.hidden = false;
+    d.innerHTML = `<h2>${esc(l[l.length - 1].marker)} · ${l.length} result${l.length > 1 ? 's' : ''}</h2>` + chart(l) +
+      '<table><thead><tr><th>Date</th><th>Value</th><th>Range</th><th></th></tr></thead><tbody>' +
+      l.slice().reverse().map(r => `<tr><td>${esc(r.date)}</td><td>${fmt(r.value)} ${esc(r.unit)} ${flagHtml(r)}</td><td>${range(r)}</td><td><button type="button" data-del="${r.id}" aria-label="Delete">Del</button></td></tr>`).join('') +
+      '</tbody></table>';
+  }
+
+  function chart(l) {
+    const W = 340, H = 170, L = 44, R = 12, T = 12, B = 26;
+    const last = l[l.length - 1];
+    const vals = l.map(r => r.value);
+    if (last.lo != null) vals.push(last.lo);
+    if (last.hi != null) vals.push(last.hi);
+    let min = Math.min(...vals), max = Math.max(...vals);
+    if (min === max) { const p = Math.abs(min) * 0.1 || 1; min -= p; max += p; }
+    const pad = (max - min) * 0.1; min -= pad; max += pad;
+    const t = l.map(r => Date.parse(r.date));
+    const t0 = t[0], t1 = t[t.length - 1];
+    const x = i => t1 === t0 ? (L + W - R) / 2 : L + (t[i] - t0) / (t1 - t0) * (W - L - R);
+    const y = v => T + (max - v) / (max - min) * (H - T - B);
+    let s = `<svg id="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Values over time">`;
+    if (last.lo != null || last.hi != null) {
+      const top = y(last.hi != null ? last.hi : max), bot = y(last.lo != null ? last.lo : min);
+      s += `<rect x="${L}" y="${top}" width="${W - L - R}" height="${Math.max(0, bot - top)}" fill="var(--built)" opacity="0.12"/>`;
+    }
+    s += `<line x1="${L}" y1="${H - B}" x2="${W - R}" y2="${H - B}" stroke="var(--line)"/>`;
+    s += `<text x="${L - 6}" y="${y(max - pad) + 4}" text-anchor="end">${fmt(+(max - pad).toPrecision(3))}</text>`;
+    s += `<text x="${L - 6}" y="${y(min + pad) + 4}" text-anchor="end">${fmt(+(min + pad).toPrecision(3))}</text>`;
+    s += `<text x="${L}" y="${H - 6}">${esc(l[0].date)}</text>`;
+    if (l.length > 1) s += `<text x="${W - R}" y="${H - 6}" text-anchor="end">${esc(last.date)}</text>`;
+    if (l.length > 1) s += `<polyline fill="none" stroke="var(--ink)" stroke-width="1.5" points="${l.map((r, i) => `${x(i).toFixed(1)},${y(r.value).toFixed(1)}`).join(' ')}"/>`;
+    s += l.map((r, i) => { const f = flagOf(r); return `<circle cx="${x(i).toFixed(1)}" cy="${y(r.value).toFixed(1)}" r="4.5" fill="${f === 'high' || f === 'low' ? 'var(--no)' : 'var(--ink)'}"/>`; }).join('');
+    return s + '</svg>';
+  }
+
+  const err = m => { $('#err').textContent = m; };
+
+  $('#marker').addEventListener('change', () => {
+    const l = groups().get(keyOf($('#marker').value));
+    if (!l) return;
+    const last = l[l.length - 1];
+    if (!$('#unit').value) $('#unit').value = last.unit;
+    if (!$('#lo').value && last.lo != null) $('#lo').value = fmt(last.lo);
+    if (!$('#hi').value && last.hi != null) $('#hi').value = fmt(last.hi);
+  });
+
+  $('#form').addEventListener('submit', e => {
+    e.preventDefault();
+    const marker = norm($('#marker').value);
+    const value = num($('#value').value), lo = num($('#lo').value), hi = num($('#hi').value);
+    const date = $('#date').value || today();
+    if (!marker) return err('Enter a marker name.');
+    if (value == null || Number.isNaN(value)) return err('Value must be a number.');
+    if (Number.isNaN(lo) || Number.isNaN(hi)) return err('Range must be numbers.');
+    if (lo != null && hi != null && lo > hi) return err('Range low is above range high.');
+    err('');
+    rows.push({ id: Date.now() + Math.random(), date, marker, value, unit: norm($('#unit').value), lo, hi });
+    save();
+    current = keyOf(marker);
+    $('#value').value = '';
+    render();
+    $('#value').focus();
+  });
+
+  $('#app').addEventListener('click', e => {
+    const mk = e.target.closest('.mk');
+    if (mk) { current = current === mk.dataset.k ? null : mk.dataset.k; render(); return; }
+    const del = e.target.closest('[data-del]');
+    if (del) { rows = rows.filter(r => String(r.id) !== del.dataset.del); save(); render(); }
+  });
+
+  const csvCell = v => { v = v == null ? '' : String(v); return /[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v; };
+  $('#export').addEventListener('click', () => {
+    if (!rows.length) return err('Nothing to export yet.');
+    const csv = 'date,marker,value,unit,low,high\n' + rows.slice().sort(byDate).map(r => [r.date, r.marker, r.value, r.unit, r.lo, r.hi].map(csvCell).join(',')).join('\n') + '\n';
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+    a.download = `blood-tests-${today()}.csv`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  });
+
+  function parseCsv(text) {
+    const out = []; let row = [], cell = '', q = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (q) { if (c === '"') { if (text[i + 1] === '"') { cell += '"'; i++; } else q = false; } else cell += c; }
+      else if (c === '"') q = true;
+      else if (c === ',') { row.push(cell); cell = ''; }
+      else if (c === '\n' || c === '\r') { if (c === '\r' && text[i + 1] === '\n') i++; row.push(cell); out.push(row); row = []; cell = ''; }
+      else cell += c;
+    }
+    if (cell || row.length) { row.push(cell); out.push(row); }
+    return out;
+  }
+
+  $('#import').addEventListener('change', e => {
+    const f = e.target.files[0];
+    if (!f) return;
+    const rd = new FileReader();
+    rd.onload = () => {
+      const seen = new Set(rows.map(r => [r.date, keyOf(r.marker), r.value].join('|')));
+      let added = 0;
+      for (const [date, marker, v, unit, lo, hi] of parseCsv(String(rd.result)).slice(1)) {
+        const value = num(v), l = num(lo), h = num(hi);
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(date || '') || !marker || value == null || Number.isNaN(value)) continue;
+        const k = [date, keyOf(marker), value].join('|');
+        if (seen.has(k)) continue;
+        seen.add(k);
+        rows.push({ id: Date.now() + Math.random(), date, marker: norm(marker), value, unit: norm(unit || ''), lo: Number.isNaN(l) ? null : l, hi: Number.isNaN(h) ? null : h });
+        added++;
+      }
+      save(); render();
+      err(added ? '' : 'No new rows found in that file.');
+      e.target.value = '';
+    };
+    rd.onerror = () => err('Could not read that file.');
+    rd.readAsText(f);
+  });
+
+  $('#date').value = today();
+  render();
+})();
+</script>
+</body>
+</html>
