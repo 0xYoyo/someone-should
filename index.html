@@ -75,10 +75,7 @@ footer a{text-decoration:none;border-bottom:1px solid var(--line)}
 </section>
 
 <div class="controls" role="toolbar" aria-label="sort and filter">
-  <div class="segs"><div class="seg" id="show" aria-label="show">
-    <button data-v="built" aria-pressed="true">built</button>
-    <button data-v="no" aria-pressed="false">told no</button>
-  </div>
+  <div class="segs">
   <div class="seg" id="sort" aria-label="sort">
     <button data-v="wanted" aria-pressed="true">most wanted</button>
     <button data-v="new" aria-pressed="false">newest</button>
@@ -207,8 +204,8 @@ let t; $('#q').value = state.q; $('#q').oninput = e => { clearTimeout(t); t = se
   built = wishes.filter(w => status[w.slug]?.status === 'pass').map(w => ({ ...w, ...status[w.slug], kind: 'built' }));
   const seenNo = new Set();
   nos = [...(top2?.no || []), ...(top?.no || [])].filter(w => !seenNo.has(w.slug) && seenNo.add(w.slug)).map(w => ({ ...w, kind: 'no' }));
-  $('#stats').innerHTML = `<b>${built.length}</b> wishes built · <b>${nos.length}</b> told no · every one a real post`;
-  setSeg('show', 'show'); setSeg('sort', 'sort');
+  $('#stats').innerHTML = `<b>${built.length}</b> wishes built · every one a real post · every one works on your phone`;
+  state.show = 'built'; setSeg('sort', 'sort');
   compute();
   const want = decodeURIComponent(location.hash.slice(1));
   const hit = want && built.find(w => w.slug === want);
