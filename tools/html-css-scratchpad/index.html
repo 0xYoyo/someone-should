@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a site where users can write HTML and CSS</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+main { max-width: 1100px; }
+.panes { display: grid; gap: 12px; }
+@media (min-width: 900px) { .panes { grid-template-columns: 1fr 1fr; } .panes .preview-wrap { grid-column: 1 / -1; } }
+label.meta { display: block; margin-bottom: 6px; }
+textarea.code { font: 16px/1.45 var(--mono); min-height: 180px; resize: vertical; white-space: pre; overflow-wrap: normal; overflow-x: auto; tab-size: 2; }
+iframe#preview { width: 100%; height: 320px; border: 1.5px solid var(--line); border-radius: var(--radius); background: #fff; display: block; resize: vertical; }
+#status { font-size: 16px; }
+#status.err { color: var(--no); }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a site where users can write HTML and CSS</h1>
+
+<main id="app" class="stack">
+  <div class="panes">
+    <div>
+      <label class="meta" for="html">HTML</label>
+      <textarea id="html" class="code" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+    </div>
+    <div>
+      <label class="meta" for="css">CSS</label>
+      <textarea id="css" class="code" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+    </div>
+    <div class="preview-wrap">
+      <label class="meta" for="preview">Preview</label>
+      <iframe id="preview" title="Preview" sandbox></iframe>
+    </div>
+  </div>
+  <p id="status" class="meta" aria-live="polite"></p>
+  <div class="row">
+    <button id="download" class="primary" type="button">Download .html</button>
+    <button id="clear" type="button">Clear</button>
+  </div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const KEY = 'html-css-scratchpad';
+  const START = {
+    html: '<h1>Hello</h1>\n<p>Edit the HTML and CSS. The preview updates as you type.</p>',
+    css: 'body {\n  font-family: system-ui, sans-serif;\n  padding: 16px;\n}\nh1 {\n  color: tomato;\n}'
+  };
+
+  const htmlEl = $('#html'), cssEl = $('#css'), frame = $('#preview'), status = $('#status');
+  const saved = store.get(KEY, START);
+  htmlEl.value = typeof saved.html === 'string' ? saved.html : START.html;
+  cssEl.value = typeof saved.css === 'string' ? saved.css : START.css;
+
+  // Stop the closing tag from ending the style block early.
+  const safeCss = css => css.replace(/<\/style/gi, '<\\/style');
+
+  function documentFor(html, css) {
+    return '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n' +
+      '<meta name="viewport" content="width=device-width, initial-scale=1">\n' +
+      '<title>Scratchpad</title>\n<style>\n' + safeCss(css) + '\n</style>\n</head>\n<body>\n' +
+      html + '\n</body>\n</html>\n';
+  }
+
+  function countRules(css) {
+    try {
+      const sheet = new CSSStyleSheet();
+      sheet.replaceSync(css);
+      return sheet.cssRules.length;
+    } catch {
+      return (css.match(/\{/g) || []).length;
+    }
+  }
+
+  function render() {
+    const html = htmlEl.value, css = cssEl.value;
+    store.set(KEY, { html, css });
+    if (!html.trim() && !css.trim()) {
+      frame.srcdoc = '';
+      status.textContent = 'Nothing yet. Write some HTML above.';
+      return;
+    }
+    const doc = documentFor(html, css);
+    frame.srcdoc = doc;
+    let els = 0;
+    try { els = new DOMParser().parseFromString(html, 'text/html').body.querySelectorAll('*').length; } catch {}
+    const rules = countRules(css);
+    const bytes = new Blob([doc]).size;
+    status.textContent = `${els} element${els === 1 ? '' : 's'} · ${rules} CSS rule${rules === 1 ? '' : 's'} · ${bytes} bytes`;
+  }
+
+  let timer = 0;
+  const schedule = () => { clearTimeout(timer); timer = setTimeout(render, 200); };
+  htmlEl.addEventListener('input', schedule);
+  cssEl.addEventListener('input', schedule);
+
+  // Tab inserts two spaces instead of leaving the editor; Escape then Tab still moves focus.
+  let escaped = false;
+  for (const ta of [htmlEl, cssEl]) {
+    ta.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { escaped = true; return; }
+      if (e.key === 'Tab' && !e.shiftKey && !escaped) {
+        e.preventDefault();
+        const s = ta.selectionStart, end = ta.selectionEnd;
+        ta.setRangeText('  ', s, end, 'end');
+        schedule();
+      }
+      escaped = false;
+    });
+  }
+
+  $('#download').addEventListener('click', () => {
+    if (!htmlEl.value.trim() && !cssEl.value.trim()) { status.textContent = 'Nothing to download yet.'; return; }
+    try {
+      const url = URL.createObjectURL(new Blob([documentFor(htmlEl.value, cssEl.value)], { type: 'text/html' }));
+      const a = document.createElement('a');
+      a.href = url; a.download = 'page.html';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      status.textContent = 'Saved as page.html.';
+    } catch {
+      status.textContent = 'Download failed in this browser.';
+    }
+  });
+
+  $('#clear').addEventListener('click', () => {
+    htmlEl.value = ''; cssEl.value = '';
+    render();
+    htmlEl.focus();
+  });
+
+  requestAnimationFrame(render);
+})();
+</script>
+</body>
+</html>

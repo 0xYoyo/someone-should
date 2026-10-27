@@ -1,0 +1,54 @@
+{
+  "slug": "html-css-scratchpad",
+  "wish": "someone should make a site where users can write HTML and CSS",
+  "year": 2022,
+  "agreed": 95,
+  "sources": [
+    {
+      "site": "hn",
+      "url": "https://news.ycombinator.com/item?id=31667761",
+      "date": "2022-06-08",
+      "points": 37,
+      "comments": 58
+    }
+  ],
+  "spec": "Write HTML and CSS in two panes and see the page render live in a sandboxed preview.\nYour work is kept on this device between visits; Download saves it as one standalone .html file.\nIt does not run JavaScript, load remote images or fonts, or publish anything online.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#html",
+        "text": "<ul><li>one</li><li>two</li></ul>"
+      }
+    },
+    {
+      "type": {
+        "sel": "#css",
+        "text": "li { color: red; } ul { margin: 0; }"
+      }
+    },
+    {
+      "wait": 500
+    },
+    {
+      "expect": {
+        "sel": "#status",
+        "contains": "3 elements · 2 CSS rules"
+      }
+    },
+    {
+      "tap": "#clear"
+    },
+    {
+      "expect": {
+        "sel": "#status",
+        "contains": "Nothing yet"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:34:29Z",
+  "model": "opus-5.5",
+  "minutes": 5,
+  "approved": false,
+  "notes": "Preview is a sandboxed iframe with scripts disabled; the page's CSP blocks any remote URLs the user writes, so the preview stays offline."
+}
