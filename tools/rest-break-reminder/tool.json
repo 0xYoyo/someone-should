@@ -1,0 +1,68 @@
+{
+  "slug": "rest-break-reminder",
+  "wish": "someone should make a tool that forces me to take rest breaks at the computer",
+  "year": 2014,
+  "agreed": 54,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/599/software-forcing-me-to-make-rest-breaks-during-work-at-the-computer",
+      "date": "2014-02-07",
+      "points": 22,
+      "comments": 5
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/18082/force-user-to-look-away-from-monitor",
+      "date": "2015-03-20",
+      "points": 15,
+      "comments": 2
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/45143/automated-screen-pause-reminder",
+      "date": "2017-08-13",
+      "points": 8,
+      "comments": 2
+    }
+  ],
+  "spec": "Counts down a work period, then covers the whole screen (fullscreen where the browser allows) with a break countdown, a chime and a rest tip.\nSet work and break minutes, tap start, keep the tab open; breaks repeat until you stop, and settings, running timer and today's taken/skipped count survive a reload.\nIt cannot lock other apps or the OS; skipping a break is possible only by holding a button for 3 seconds.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#work",
+        "text": "30"
+      }
+    },
+    {
+      "tap": "#start"
+    },
+    {
+      "expect": {
+        "sel": "#time",
+        "matches": "^(30:00|29:5\\d)$"
+      }
+    },
+    {
+      "tap": "#break-now"
+    },
+    {
+      "expect": {
+        "sel": "#overlay",
+        "visible": true
+      }
+    },
+    {
+      "expect": {
+        "sel": "#break-time",
+        "matches": "^[45]:\\d\\d$"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T02:08:16Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Browser tab cannot lock the OS; it takes over the tab and requests fullscreen on break. Skip needs a 3 s hold."
+}
