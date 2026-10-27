@@ -35,3 +35,6 @@ Quality check on arrows-on-a-screenshot, freelance-money-ledger, sing-the-note-t
 5. Factory's best three: `sql-on-csv-files` (real SQL with JOIN/GROUP BY, offline), `simple-circuit-simulator` (live nodal analysis), `logo-turtle-playground` (full LOGO with procedures and recursion). Mine from what I opened: `arrows-on-a-screenshot`, `hide-text-in-image`, `table-to-heatmap`.
 
 **Reserve left ($187 of credit, 40 reserve wishes):** a second factory run with the same prompt builds the reserve if you want 140. Not tonight; approve the 100 first.
+
+## 2026-10-27 10:05 — WAVE 2 brief
+Owner's verdict on wave 1: too many decade-old, generic, developer-ish wishes. Read `WAVE2.md` and execute it. Recent (2020+), human, sonnet builders, cap $140, stop at 600 PASS total. The wall already merges `data/top2.json` and sorts recent + wanted first.

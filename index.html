@@ -142,11 +142,18 @@ for (const ev of ['touchstart','wheel','keydown','pointerdown']) addEventListene
 
 (async () => {
   const top = await load('data/top.json', 'data/fixture/top.json');
+  const top2 = await load('data/top2.json');
   const built = await load('data/built.json', 'data/fixture/built.json');
   if (!top) { $('#wall').innerHTML = '<p class="meta">nothing yet.</p>'; return; }
   const status = Object.fromEntries((built?.tools || []).map(t => [t.slug, t]));
-  const shipped = (top.build || []).filter(w => status[w.slug]?.status === 'pass').map(w => ({...w, ...status[w.slug]}));
-  const nos = top.no || [];
+  const seen = new Set();
+  const wishes = [...(top2?.build || []), ...(top.build || []), ...(top.reserve || [])].filter(w => !seen.has(w.slug) && seen.add(w.slug));
+  const shipped = wishes.filter(w => status[w.slug]?.status === 'pass').map(w => ({...w, ...status[w.slug]}));
+  // recent and wanted first: agreement weighted by recency (every year after 2020 counts +50%)
+  const score = w => (w.agreed || 0) * (1 + 0.5 * Math.max(0, (w.year || 2014) - 2020)) + (w.year >= 2023 ? 5 : 0);
+  shipped.sort((a, b) => score(b) - score(a) || (b.year || 0) - (a.year || 0));
+  const seenNo = new Set();
+  const nos = [...(top2?.no || []), ...(top.no || [])].filter(w => !seenNo.has(w.slug) && seenNo.add(w.slug)).sort((a, b) => score(b) - score(a));
   const approved = shipped.filter(t => t.approved).length;
   $('#count').innerHTML = `<b>${shipped.length}</b> built · <b>${nos.length}</b> told no${approved ? ` · <b>${approved}</b> approved` : ''}`;
   if (shipped.length && approved === shipped.length) $('#byline').textContent = "built overnight by yoav zrihan's agents. he approved every one.";
