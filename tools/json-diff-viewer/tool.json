@@ -1,0 +1,64 @@
+{
+  "slug": "json-diff-viewer",
+  "wish": "someone should make a diff tool for JSON files",
+  "year": 2015,
+  "agreed": 68,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/25018/diff-tool-for-json-files",
+      "date": "2015-09-22",
+      "points": 40,
+      "comments": 7
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/17812/java-library-that-diffs-json-and-generates-what-was-added-deleted-modified",
+      "date": "2015-03-10",
+      "points": 19,
+      "comments": 2
+    }
+  ],
+  "spec": "Structural diff of two JSON documents: lists every added, removed and changed path with old and new values, ignoring key order.\nPaste or open two .json files, tap compare; filter by kind, swap sides, optionally ignore array order.\nDoes not merge or patch files, and compares arrays by position unless told to ignore order.",
+  "tests": [
+    {
+      "type": {
+        "sel": "#a",
+        "text": "{\"name\":\"ann\",\"age\":30,\"tags\":[\"x\"]}"
+      }
+    },
+    {
+      "type": {
+        "sel": "#b",
+        "text": "{\"age\":31,\"tags\":[\"x\",\"y\"],\"city\":\"Oslo\"}"
+      }
+    },
+    {
+      "tap": "#compare"
+    },
+    {
+      "expect": {
+        "sel": "#summary",
+        "contains": "2 added, 1 removed, 1 changed"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#results li.chg",
+        "contains": "$.age"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#results li",
+        "count": 4
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T01:43:12Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": ""
+}

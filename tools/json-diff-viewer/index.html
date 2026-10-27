@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a diff tool for JSON files</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+main { max-width: 900px; }
+.pair { display: grid; gap: 12px; grid-template-columns: 1fr; }
+@media (min-width: 720px) { .pair { grid-template-columns: 1fr 1fr; } }
+.side { display: grid; gap: 8px; min-width: 0; }
+.side .row { justify-content: space-between; }
+textarea { font: 16px/1.4 var(--mono); min-height: 160px; resize: vertical; white-space: pre; overflow: auto; }
+textarea.bad { border-color: var(--no); }
+label.file { display: inline-flex; align-items: center; min-height: var(--tap); padding: 0 14px; border: 1.5px solid var(--line); border-radius: var(--radius); cursor: pointer; }
+label.file input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.err { color: var(--no); min-height: 0; font-size: 16px; }
+#summary { font-size: 17px; }
+#results li { display: block; padding: 10px 0; }
+.path { font: 16px/1.4 var(--mono); word-break: break-all; }
+.val { font: 16px/1.4 var(--mono); word-break: break-all; color: var(--meta); }
+.k { display: inline-block; min-width: 5.5em; font: 500 16px/1.4 var(--mono); }
+.add .k { color: var(--built); }
+.del .k { color: var(--no); }
+.chg .k { color: var(--ink); }
+.val ins { text-decoration: none; color: var(--built); }
+.val del { color: var(--no); }
+#filters button[aria-pressed="false"] { opacity: .45; }
+#anyOrder[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a diff tool for JSON files</h1>
+
+<main id="app" class="stack">
+  <div class="pair">
+    <div class="side">
+      <div class="row"><span class="meta">left (old)</span><label class="file">open file<input type="file" id="fileA" accept=".json,application/json,text/plain"></label></div>
+      <textarea id="a" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="left JSON" placeholder='{"name": "old"}'></textarea>
+      <div class="err" id="errA" role="alert"></div>
+    </div>
+    <div class="side">
+      <div class="row"><span class="meta">right (new)</span><label class="file">open file<input type="file" id="fileB" accept=".json,application/json,text/plain"></label></div>
+      <textarea id="b" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="right JSON" placeholder='{"name": "new"}'></textarea>
+      <div class="err" id="errB" role="alert"></div>
+    </div>
+  </div>
+  <div class="row">
+    <button class="primary" id="compare">compare</button>
+    <button id="swap">swap</button>
+    <button id="clear">clear</button>
+    <button id="anyOrder" aria-pressed="false">ignore array order: off</button>
+  </div>
+  <div id="summary" aria-live="polite"></div>
+  <div class="row" id="filters" hidden>
+    <button data-k="add" aria-pressed="true">added</button>
+    <button data-k="del" aria-pressed="true">removed</button>
+    <button data-k="chg" aria-pressed="true">changed</button>
+  </div>
+  <ul class="plain" id="results"></ul>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  const A = $('#a'), B = $('#b'), anyOrder = $('#anyOrder');
+  const saved = store.get('jdv', {});
+  A.value = saved.a || ''; B.value = saved.b || ''; const setOrder = on => { anyOrder.setAttribute('aria-pressed', String(on)); anyOrder.textContent = 'ignore array order: ' + (on ? 'on' : 'off'); };
+  setOrder(!!saved.o);
+  const ordered = () => anyOrder.getAttribute('aria-pressed') === 'true';
+  const save = () => store.set('jdv', { a: A.value.slice(0, 200000), b: B.value.slice(0, 200000), o: ordered() });
+
+  const typeOf = v => v === null ? 'null' : Array.isArray(v) ? 'array' : typeof v;
+  const ident = /^[A-Za-z_$][\w$]*$/;
+  const keyPath = (p, k) => ident.test(k) ? p + '.' + k : p + '[' + JSON.stringify(k) + ']';
+  const show = v => { const s = JSON.stringify(v); return s.length > 160 ? s.slice(0, 157) + '...' : s; };
+  // stable string with sorted keys, for comparing values regardless of key order
+  const canon = v => {
+    const t = typeOf(v);
+    if (t === 'array') { const items = v.map(canon); if (ordered()) items.sort(); return '[' + items.join(',') + ']'; }
+    if (t === 'object') return '{' + Object.keys(v).sort().map(k => JSON.stringify(k) + ':' + canon(v[k])).join(',') + '}';
+    return JSON.stringify(v);
+  };
+
+  function diff(a, b, path, out) {
+    const ta = typeOf(a), tb = typeOf(b);
+    if (ta !== tb) { out.push({ k: 'chg', path, a, b, note: ta + ' → ' + tb }); return; }
+    if (ta === 'object') {
+      for (const k of Object.keys(a)) {
+        if (!Object.prototype.hasOwnProperty.call(b, k)) out.push({ k: 'del', path: keyPath(path, k), a: a[k] });
+        else diff(a[k], b[k], keyPath(path, k), out);
+      }
+      for (const k of Object.keys(b)) if (!Object.prototype.hasOwnProperty.call(a, k)) out.push({ k: 'add', path: keyPath(path, k), b: b[k] });
+    } else if (ta === 'array') {
+      if (ordered()) {
+        // multiset compare: match equal items, report leftovers
+        const pool = new Map();
+        b.forEach((v, i) => { const c = canon(v); if (!pool.has(c)) pool.set(c, []); pool.get(c).push(i); });
+        a.forEach((v, i) => { const l = pool.get(canon(v)); if (l && l.length) l.shift(); else out.push({ k: 'del', path: path + '[' + i + ']', a: v }); });
+        for (const l of pool.values()) for (const i of l) out.push({ k: 'add', path: path + '[' + i + ']', b: b[i] });
+      } else {
+        const n = Math.max(a.length, b.length);
+        for (let i = 0; i < n; i++) {
+          const p = path + '[' + i + ']';
+          if (i >= b.length) out.push({ k: 'del', path: p, a: a[i] });
+          else if (i >= a.length) out.push({ k: 'add', path: p, b: b[i] });
+          else diff(a[i], b[i], p, out);
+        }
+      }
+    } else if (a !== b) out.push({ k: 'chg', path, a, b });
+  }
+
+  function parse(ta, errEl, label) {
+    const s = ta.value.trim();
+    ta.classList.remove('bad'); errEl.textContent = '';
+    if (!s) { errEl.textContent = label + ' is empty.'; ta.classList.add('bad'); return undefined; }
+    try { return { v: JSON.parse(s) }; } catch (e) {
+      let msg = String(e.message || e).replace(/^JSON\.parse:\s*/, '');
+      const m = /position (\d+)/.exec(msg);
+      if (m) { const before = s.slice(0, +m[1]).split('\n'); msg = 'line ' + before.length + ', col ' + (before[before.length - 1].length + 1) + ': ' + msg.replace(/\s*\(line.*\)$/, ''); }
+      errEl.textContent = label + ' is not valid JSON — ' + msg;
+      ta.classList.add('bad');
+      return undefined;
+    }
+  }
+
+  const NAMES = { add: 'added', del: 'removed', chg: 'changed' };
+  let last = [];
+  const pressed = () => new Set($$('#filters button').filter(b => b.getAttribute('aria-pressed') === 'true').map(b => b.dataset.k));
+
+  function render() {
+    const list = $('#results'); list.textContent = '';
+    const on = pressed();
+    const frag = document.createDocumentFragment();
+    for (const d of last) {
+      if (!on.has(d.k)) continue;
+      const li = document.createElement('li'); li.className = d.k;
+      const head = document.createElement('div'); head.className = 'path';
+      const k = document.createElement('span'); k.className = 'k'; k.textContent = NAMES[d.k];
+      head.append(k, d.path);
+      const val = document.createElement('div'); val.className = 'val';
+      if (d.k === 'add') { const i = document.createElement('ins'); i.textContent = show(d.b); val.append(i); }
+      else if (d.k === 'del') { const x = document.createElement('del'); x.textContent = show(d.a); val.append(x); }
+      else {
+        const x = document.createElement('del'); x.textContent = show(d.a);
+        const i = document.createElement('ins'); i.textContent = show(d.b);
+        val.append(x, ' → ', i);
+        if (d.note) val.append('  (' + d.note + ')');
+      }
+      li.append(head, val); frag.append(li);
+    }
+    list.append(frag);
+  }
+
+  function compare() {
+    save();
+    const pa = parse(A, $('#errA'), 'left'), pb = parse(B, $('#errB'), 'right');
+    last = []; $('#results').textContent = '';
+    if (!pa || !pb) { $('#summary').textContent = ''; $('#filters').hidden = true; return; }
+    diff(pa.v, pb.v, '$', last);
+    const c = { add: 0, del: 0, chg: 0 };
+    last.forEach(d => c[d.k]++);
+    $('#summary').textContent = last.length
+      ? c.add + ' added, ' + c.del + ' removed, ' + c.chg + ' changed'
+      : 'identical — no differences';
+    $('#filters').hidden = !last.length;
+    render();
+  }
+
+  function readFile(input, ta) {
+    const f = input.files && input.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = () => { ta.value = String(r.result); save(); input.value = ''; if (A.value.trim() && B.value.trim()) compare(); };
+    r.onerror = () => { $('#summary').textContent = 'could not read that file.'; };
+    r.readAsText(f);
+  }
+
+  $('#compare').addEventListener('click', compare);
+  $('#swap').addEventListener('click', () => { [A.value, B.value] = [B.value, A.value]; if (A.value.trim() && B.value.trim()) compare(); else save(); });
+  $('#clear').addEventListener('click', () => { A.value = B.value = ''; last = []; render(); $('#summary').textContent = ''; $('#filters').hidden = true; $('#errA').textContent = $('#errB').textContent = ''; A.classList.remove('bad'); B.classList.remove('bad'); save(); });
+  anyOrder.addEventListener('click', () => { setOrder(!ordered()); save(); if (last.length || $('#summary').textContent) compare(); });
+  $('#fileA').addEventListener('change', e => readFile(e.target, A));
+  $('#fileB').addEventListener('change', e => readFile(e.target, B));
+  $$('#filters button').forEach(b => b.addEventListener('click', () => { b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true'); render(); }));
+  [A, B].forEach(t => {
+    t.addEventListener('input', save);
+    t.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); compare(); } });
+  });
+  if (A.value.trim() && B.value.trim()) setTimeout(compare, 0);
+})();
+</script>
+</body>
+</html>
