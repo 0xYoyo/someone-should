@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a browser-based remake of Worms</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+h1 { font-size: 16px; }
+#app { max-width: 560px; }
+canvas { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; border: 1.5px solid var(--line); border-radius: var(--radius); touch-action: manipulation; }
+.info { display: flex; justify-content: space-between; gap: 12px; font: 16px/1.4 var(--mono); }
+#log { font: 16px/1.4 var(--mono); color: var(--meta); min-height: 24px; }
+.ctl { display: grid; grid-template-columns: 44px 1fr 44px 56px; gap: 8px; align-items: center; }
+.ctl button { padding: 0; min-width: 44px; }
+.ctl input { padding: 0; min-height: 44px; border: 0; accent-color: var(--ink); }
+.ctl .v { font: 16px/1 var(--mono); text-align: right; }
+.lbl { font: 16px/1.4 var(--mono); color: var(--meta); margin-bottom: -6px; }
+.acts { display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 8px; }
+button:disabled { opacity: .35; cursor: default; }
+</style>
+<style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
+</head>
+<body>
+<h1 id="wish">someone should make a browser-based remake of Worms</h1>
+<main id="app" class="stack">
+<div class="info"><span id="turn">Team 1 to fire</span><span id="wind">wind 0</span></div>
+<canvas id="cv" width="360" height="240" aria-label="battlefield"></canvas>
+<div id="log">Aim, set power, fire.</div>
+<div class="lbl">angle</div>
+<div class="ctl"><button id="a-dec" aria-label="angle down">-</button><input id="angle" type="range" min="0" max="180" value="45" aria-label="angle"><button id="a-inc" aria-label="angle up">+</button><span class="v" id="angv">45</span></div>
+<div class="lbl">power</div>
+<div class="ctl"><button id="p-dec" aria-label="power down">-</button><input id="power" type="range" min="10" max="100" value="60" aria-label="power"><button id="p-inc" aria-label="power up">+</button><span class="v" id="powv">60</span></div>
+<div class="acts"><button id="left" aria-label="walk left">&larr;</button><button id="right" aria-label="walk right">&rarr;</button><button id="fire" class="primary">Fire</button></div>
+<button id="new">New map</button>
+</main>
+<script>
+(() => {
+  'use strict';
+  const W = 360, H = 240, WATER = H - 8, R = 5, CRATER = 24;
+  const $ = (s) => document.querySelector(s);
+  const cv = $('#cv'), ctx = cv.getContext('2d');
+  const terr = document.createElement('canvas'); terr.width = W; terr.height = H;
+  const tctx = terr.getContext('2d');
+  let mask, worms, teams, ptr, turnTeam, cur, wind, state, shell, steps, over, colors;
+
+  function readColors() {
+    const s = getComputedStyle(document.documentElement);
+    colors = { paper: s.getPropertyValue('--paper').trim(), ink: s.getPropertyValue('--ink').trim(), meta: s.getPropertyValue('--meta').trim(), no: s.getPropertyValue('--no').trim() };
+  }
+  function bake() {
+    const img = tctx.createImageData(W, H);
+    const c = colors.meta.replace('#', '');
+    const r = parseInt(c.slice(0, 2), 16), g = parseInt(c.slice(2, 4), 16), b = parseInt(c.slice(4, 6), 16);
+    for (let i = 0; i < W * H; i++) {
+      if (mask[i]) { img.data[i * 4] = r; img.data[i * 4 + 1] = g; img.data[i * 4 + 2] = b; img.data[i * 4 + 3] = 255; }
+    }
+    tctx.putImageData(img, 0, 0);
+  }
+  const solid = (x, y) => { x = Math.round(x); y = Math.round(y); return x >= 0 && x < W && y >= 0 && y < WATER && mask[y * W + x] === 1; };
+
+  function genMap() {
+    const p1 = Math.random() * 6, p2 = Math.random() * 6, p3 = Math.random() * 6;
+    mask = new Uint8Array(W * H);
+    for (let x = 0; x < W; x++) {
+      let h = 140 + 24 * Math.sin(x * 0.02 + p1) + 12 * Math.sin(x * 0.05 + p2) + 6 * Math.sin(x * 0.11 + p3);
+      h = Math.max(90, Math.min(185, h));
+      for (let y = Math.floor(h); y < WATER; y++) mask[y * W + x] = 1;
+    }
+  }
+  const grounded = (w) => { for (let dx = -2; dx <= 2; dx++) if (solid(w.x + dx, w.y + R + 1)) return true; return false; };
+  const blocked = (x, y) => {
+    for (let yy = y - R; yy <= y + R - 2; yy++) for (let xx = x - R + 1; xx <= x + R - 1; xx++) if (solid(xx, yy)) return true;
+    return false;
+  };
+
+  function newGame() {
+    genMap(); readColors(); bake();
+    const xs = [30, 100, 260, 330];
+    worms = xs.map((x, i) => {
+      const t = i < 2 ? 0 : 1;
+      const w = { x: x + Math.round(Math.random() * 16 - 8), y: 0, vy: 0, hp: 100, team: t, ang: t ? 135 : 45, pow: 60, alive: true };
+      while (!grounded(w) && w.y < H) w.y++;
+      while (blocked(w.x, w.y) && w.y > 0) w.y--;
+      return w;
+    });
+    teams = [[worms[0], worms[1]], [worms[2], worms[3]]];
+    ptr = [0, 0]; turnTeam = 1; over = false; shell = null;
+    nextTurn();
+    say('Aim, set power, fire.');
+  }
+
+  function nextTurn() {
+    const alive = teams.map((t) => t.filter((w) => w.alive));
+    if (!alive[0].length || !alive[1].length) {
+      over = true; state = 'over';
+      $('#turn').textContent = !alive[0].length && !alive[1].length ? 'Draw' : 'Team ' + (alive[0].length ? 1 : 2) + ' wins';
+      $('#wind').textContent = ''; sync(); return;
+    }
+    turnTeam = 1 - turnTeam;
+    const list = teams[turnTeam];
+    do { ptr[turnTeam] = (ptr[turnTeam] + 1) % list.length; } while (!list[ptr[turnTeam]].alive);
+    cur = list[ptr[turnTeam]];
+    wind = Math.round(Math.random() * 16 - 8);
+    state = 'aim';
+    $('#turn').textContent = 'Team ' + (turnTeam + 1) + ' to fire';
+    $('#wind').textContent = 'wind ' + (wind < 0 ? '\u2190 ' : wind > 0 ? '\u2192 ' : '') + Math.abs(wind);
+    $('#angle').value = cur.ang; $('#power').value = cur.pow;
+    sync();
+  }
+
+  function sync() {
+    cur.ang = +$('#angle').value; cur.pow = +$('#power').value;
+    $('#angv').textContent = $('#angle').value; $('#powv').textContent = $('#power').value;
+    const ready = state === 'aim' && !over;
+    for (const id of ['#fire', '#left', '#right', '#a-dec', '#a-inc', '#p-dec', '#p-inc', '#angle', '#power']) $(id).disabled = !ready;
+  }
+  function say(t) { $('#log').textContent = t; }
+
+  function adjust(id, d) {
+    const el = $(id); el.value = Math.max(+el.min, Math.min(+el.max, +el.value + d)); sync();
+  }
+  function walk(d) {
+    if (state !== 'aim') return;
+    for (let i = 0; i < 2; i++) {
+      const nx = cur.x + d * 2;
+      if (nx < R || nx > W - R) break;
+      let moved = false;
+      for (let k = 0; k <= 5; k++) if (!blocked(nx, cur.y - k)) { cur.x = nx; cur.y -= k; moved = true; break; }
+      if (!moved) break;
+    }
+  }
+  function fire() {
+    if (state !== 'aim') return;
+    sync();
+    const a = cur.ang * Math.PI / 180, v = cur.pow * 0.07;
+    shell = { x: cur.x, y: cur.y - 2, vx: Math.cos(a) * v, vy: -Math.sin(a) * v, age: 0 };
+    state = 'fly'; steps = 0; sync();
+  }
+  function explode(x, y) {
+    const x0 = Math.round(x), y0 = Math.round(y);
+    for (let yy = -CRATER; yy <= CRATER; yy++) for (let xx = -CRATER; xx <= CRATER; xx++) {
+      const px = x0 + xx, py = y0 + yy;
+      if (xx * xx + yy * yy <= CRATER * CRATER && px >= 0 && px < W && py >= 0 && py < H) mask[py * W + px] = 0;
+    }
+    bake();
+    const out = [];
+    for (const w of worms) {
+      if (!w.alive) continue;
+      const d = Math.hypot(w.x - x, w.y - y);
+      if (d < CRATER + 8) {
+        const dmg = Math.max(1, Math.round(60 * (1 - d / (CRATER + 8))));
+        w.hp -= dmg; w.vy = 0;
+        out.push('Team ' + (w.team + 1) + ' -' + dmg);
+        if (w.hp <= 0) { w.hp = 0; w.alive = false; }
+      }
+    }
+    say(out.length ? out.join(', ') : 'Missed.');
+    shell = null; state = 'settle';
+  }
+  function stepShell() {
+    const s = shell;
+    s.vx += wind * 0.003; s.vy += 0.1;
+    s.x += s.vx; s.y += s.vy; s.age++;
+    if (s.x < -30 || s.x > W + 30) { say('Out of bounds.'); shell = null; state = 'settle'; return; }
+    if (s.y > WATER) { say('Splash.'); shell = null; state = 'settle'; return; }
+    if (solid(s.x, s.y)) return explode(s.x, s.y);
+    for (const w of worms) if (w.alive && (w !== cur || s.age > 8) && Math.hypot(w.x - s.x, w.y - s.y) < R + 1) return explode(s.x, s.y);
+  }
+  function settle() {
+    let moving = false;
+    for (const w of worms) {
+      if (!w.alive) continue;
+      if (blocked(w.x, w.y)) { w.y--; moving = true; continue; }
+      if (!grounded(w)) { w.vy = Math.min(w.vy + 0.3, 4); w.y += w.vy; moving = true; }
+      else w.vy = 0;
+      if (w.y + R >= WATER) { w.alive = false; w.hp = 0; say('Team ' + (w.team + 1) + ' fell in the water.'); }
+    }
+    if (!moving) nextTurn();
+  }
+
+  function draw() {
+    ctx.fillStyle = colors.paper; ctx.fillRect(0, 0, W, H);
+    ctx.drawImage(terr, 0, 0);
+    ctx.fillStyle = colors.ink; ctx.globalAlpha = 0.25; ctx.fillRect(0, WATER, W, 8); ctx.globalAlpha = 1;
+    for (const w of worms) {
+      if (!w.alive) continue;
+      ctx.beginPath(); ctx.arc(w.x, w.y, R, 0, 7);
+      ctx.fillStyle = w.team ? colors.paper : colors.ink; ctx.fill();
+      ctx.lineWidth = 2; ctx.strokeStyle = colors.ink; ctx.stroke();
+      ctx.fillStyle = colors.ink; ctx.fillRect(w.x - 8, w.y - 14, 16, 3);
+      ctx.fillStyle = colors.no; ctx.fillRect(w.x - 8, w.y - 14, 16 * w.hp / 100, 3);
+    }
+    if (state === 'aim' && cur) {
+      const a = cur.ang * Math.PI / 180, len = 6 + cur.pow * 0.22;
+      ctx.strokeStyle = colors.no; ctx.lineWidth = 2; ctx.beginPath();
+      ctx.moveTo(cur.x, cur.y); ctx.lineTo(cur.x + Math.cos(a) * len, cur.y - Math.sin(a) * len); ctx.stroke();
+      ctx.fillStyle = colors.no; ctx.beginPath(); ctx.moveTo(cur.x, cur.y - 24); ctx.lineTo(cur.x - 4, cur.y - 30); ctx.lineTo(cur.x + 4, cur.y - 30); ctx.fill();
+    }
+    if (shell) { ctx.fillStyle = colors.no; ctx.beginPath(); ctx.arc(shell.x, shell.y, 2.5, 0, 7); ctx.fill(); }
+  }
+  function frame() {
+    if (state === 'fly') for (let i = 0; i < 4 && shell; i++) { stepShell(); if (++steps > 1500 && shell) { shell = null; state = 'settle'; } }
+    else if (state === 'settle') settle();
+    draw();
+    requestAnimationFrame(frame);
+  }
+
+  $('#angle').addEventListener('input', sync);
+  $('#power').addEventListener('input', sync);
+  $('#a-dec').onclick = () => adjust('#angle', -5);
+  $('#a-inc').onclick = () => adjust('#angle', 5);
+  $('#p-dec').onclick = () => adjust('#power', -5);
+  $('#p-inc').onclick = () => adjust('#power', 5);
+  $('#left').onclick = () => walk(-1);
+  $('#right').onclick = () => walk(1);
+  $('#fire').onclick = fire;
+  $('#new').onclick = newGame;
+  if (window.matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { readColors(); bake(); });
+  newGame();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

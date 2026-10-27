@@ -1,0 +1,48 @@
+{
+ "slug": "artillery-worms-remake",
+ "wish": "someone should make a browser-based remake of Worms",
+ "year": 2010,
+ "agreed": 67,
+ "sources": [
+  {
+   "site": "reddit",
+   "url": "https://www.reddit.com/r/SomebodyMakeThis/comments/c2u3p/",
+   "date": "2010-05-11",
+   "points": 40,
+   "comments": 27
+  }
+ ],
+ "spec": "Two teams of two worms take turns on random destructible terrain. Set angle and power against the wind, walk left or right, fire; craters damage worms and water drowns them.\nHot-seat on one phone: use the sliders or +/- buttons, then Fire; last team standing wins.\nNo AI opponent, no network play, no other weapons.",
+ "tests": [
+  {
+   "tap": "#a-inc"
+  },
+  {
+   "expect": {
+    "sel": "#angv",
+    "matches": "^50$"
+   }
+  },
+  {
+   "tap": "#fire"
+  },
+  {
+   "wait": 1500
+  },
+  {
+   "wait": 1500
+  },
+  {
+   "expect": {
+    "sel": "#turn",
+    "contains": "Team 2"
+   }
+  }
+ ],
+ "status": "pending",
+ "built": "2026-10-27T11:20:00Z",
+ "model": "sonnet-5.5",
+ "minutes": 4,
+ "approved": false,
+ "notes": "Hot-seat only; no computer opponent."
+}
