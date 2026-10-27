@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that draws convolutional neural network diagrams</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+main { max-width: 900px; }
+textarea { font: 16px/1.5 var(--mono); min-height: 190px; resize: vertical; white-space: pre; overflow-x: auto; }
+#canvas { border: 1px solid var(--line); border-radius: var(--radius); padding: 8px; overflow-x: auto; }
+#canvas svg { display: block; width: 100%; height: auto; min-width: 0; }
+#status { min-height: 1.4em; font-size: 16px; }
+.err { color: var(--no); }
+.presets button { padding: 0 12px; }
+label.meta { font-size: 16px; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that draws convolutional neural network diagrams</h1>
+
+<main id="app" class="stack">
+  <div class="row presets">
+    <button type="button" data-preset="lenet">LeNet-5</button>
+    <button type="button" data-preset="alexnet">AlexNet</button>
+    <button type="button" data-preset="vgg">VGG-16</button>
+    <button type="button" id="clear">Clear</button>
+  </div>
+  <label class="meta" for="spec">one layer per line: type size [kernel] — e.g. conv 28x28x6 5x5</label>
+  <textarea id="spec" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+  <div id="status" class="meta" aria-live="polite"></div>
+  <div id="canvas"></div>
+  <div class="row">
+    <button type="button" class="primary" id="svg">Download SVG</button>
+    <button type="button" id="png">Download PNG</button>
+    <button type="button" id="copy">Copy SVG</button>
+  </div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  const PRESETS = {
+    lenet: `input 32x32x1
+conv 28x28x6 5x5
+pool 14x14x6 2x2
+conv 10x10x16 5x5
+pool 5x5x16 2x2
+fc 120
+fc 84
+output 10`,
+    alexnet: `input 227x227x3
+conv 55x55x96 11x11
+pool 27x27x96 3x3
+conv 27x27x256 5x5
+pool 13x13x256 3x3
+conv 13x13x384 3x3
+conv 13x13x384 3x3
+conv 13x13x256 3x3
+pool 6x6x256 3x3
+fc 4096
+fc 4096
+output 1000`,
+    vgg: `input 224x224x3
+conv 224x224x64 3x3
+pool 112x112x64
+conv 112x112x128 3x3
+pool 56x56x128
+conv 56x56x256 3x3
+pool 28x28x256
+conv 28x28x512 3x3
+pool 14x14x512
+conv 14x14x512 3x3
+pool 7x7x512
+fc 4096
+fc 4096
+output 1000`
+  };
+
+  const TYPES = {
+    input: 'input', in: 'input', image: 'input',
+    conv: 'conv', convolution: 'conv', conv2d: 'conv',
+    pool: 'pool', maxpool: 'pool', avgpool: 'pool', pooling: 'pool',
+    norm: 'norm', bn: 'norm', batchnorm: 'norm',
+    fc: 'fc', dense: 'fc', linear: 'fc', flatten: 'fc',
+    output: 'output', out: 'output', softmax: 'output'
+  };
+  const NAMES = { input: 'input', conv: 'conv', pool: 'pool', norm: 'norm', fc: 'fc', output: 'output' };
+
+  // "conv 28x28x6 5x5" -> {type, dims:[28,28,6], kernel:'5x5', label}
+  function parse(text) {
+    const layers = [], errors = [];
+    text.split('\n').forEach((raw, i) => {
+      const line = raw.replace(/#.*$/, '').trim();
+      if (!line) return;
+      const parts = line.split(/\s+/);
+      const type = TYPES[parts[0].toLowerCase()];
+      if (!type) { errors.push(`line ${i + 1}: unknown type "${parts[0]}"`); return; }
+      const sizeTok = (parts[1] || '').toLowerCase().replace(/[×*,]/g, 'x');
+      const dims = sizeTok.split('x').filter(Boolean).map(Number);
+      if (!dims.length || dims.some(n => !Number.isFinite(n) || n <= 0 || n > 1e7)) {
+        errors.push(`line ${i + 1}: size like 28x28x6 or 120`); return;
+      }
+      let kernel = '', rest = parts.slice(2);
+      if (rest[0] && /^\d+([x×*]\d+)?$/i.test(rest[0])) {
+        const k = rest.shift().replace(/[×*]/g, 'x');
+        kernel = k.includes('x') ? k : k + 'x' + k;
+      }
+      layers.push({ type, dims, kernel, label: rest.join(' ') });
+    });
+    return { layers, errors };
+  }
+
+  const PALETTES = {
+    light: { bg: '#ffffff', ink: '#141414', meta: '#6b6b6b', input: '#e9e4d8', conv: '#f6f3ec', pool: '#d9d4c7', norm: '#efe9dc', fc: '#c9c3b4', output: '#141414' },
+    dark:  { bg: '#121212', ink: '#ededed', meta: '#9a9a9a', input: '#2f2f2f', conv: '#1c1c1c', pool: '#3a3a3a', norm: '#262626', fc: '#4a4a4a', output: '#ededed' }
+  };
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const lg = n => Math.log2(Math.max(1, n));
+  const SVG_NS = ['http:', '', 'www.w3.org', '2000', 'svg'].join('/');
+  const FONT = '-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif';
+
+  // Block geometry: face height ~ spatial height, face width ~ channels, oblique depth ~ spatial width.
+  function geom(l) {
+    const [a, b, c] = l.dims;
+    if (l.dims.length === 1) {
+      return { h: 30 + 14 * lg(a), w: 12, d: 0, flat: true };
+    }
+    const h = 24 + 16 * lg(a);
+    const width = b != null ? b : a;
+    const ch = c != null ? c : (l.dims.length === 2 ? 1 : 1);
+    return { h, w: 6 + 7 * lg(ch), d: 0.55 * (12 + 14 * lg(width)) * 0.7, flat: false };
+  }
+
+  function draw(layers, theme) {
+    const P = PALETTES[theme];
+    const gap = 44, pad = 24, top = 22;
+    const gs = layers.map(geom);
+    const maxH = Math.max(...gs.map(g => g.h + g.d));
+    const baseline = top + maxH; // bottom of front faces
+    let x = pad + 30, parts = [];
+    const textY1 = baseline + 26, textY2 = baseline + 46, textY3 = baseline + 74, textY4 = baseline + 94;
+    let maxX = 0;
+    gs.forEach((g, i) => {
+      const l = layers[i];
+      const fill = P[l.type];
+      const stroke = P.ink;
+      const y = baseline - g.h;
+      const cx = x + g.w / 2;
+      let s = `<g class="block" data-type="${l.type}">`;
+      if (g.flat) {
+        s += `<rect x="${x}" y="${y}" width="${g.w}" height="${g.h}" fill="${fill}" stroke="${stroke}" stroke-width="1.2"/>`;
+      } else {
+        const dx = g.d, dy = g.d * 0.8;
+        s += `<polygon points="${x},${y} ${x + dx},${y - dy} ${x + dx + g.w},${y - dy} ${x + g.w},${y}" fill="${fill}" stroke="${stroke}" stroke-width="1.2" stroke-linejoin="round"/>`;
+        s += `<polygon points="${x + g.w},${y} ${x + g.w + dx},${y - dy} ${x + g.w + dx},${y - dy + g.h} ${x + g.w},${y + g.h}" fill="${fill}" stroke="${stroke}" stroke-width="1.2" stroke-linejoin="round" opacity="0.9"/>`;
+        s += `<rect x="${x}" y="${y}" width="${g.w}" height="${g.h}" fill="${fill}" stroke="${stroke}" stroke-width="1.2"/>`;
+        if (l.kernel && layers[i - 1] && !gs[i - 1].flat) {
+          // kernel square on previous block, line to this block
+          const pg = gs[i - 1], px = x - gap - pg.w - pg.d;
+          const ks = Math.min(pg.h * 0.35, 6 + 3 * lg(parseInt(l.kernel, 10) || 1) * 2);
+          const kx = px + pg.w * 0.2 + pg.d * 0.4, ky = baseline - pg.h * 0.6 - pg.d * 0.3;
+          s += `<rect x="${kx}" y="${ky}" width="${ks}" height="${ks}" fill="none" stroke="${stroke}" stroke-width="1" stroke-dasharray="3 2"/>`;
+          s += `<line x1="${kx + ks}" y1="${ky + ks / 2}" x2="${x + g.w * 0.5 + dx * 0.4}" y2="${y + g.h * 0.35 - dy * 0.3}" stroke="${stroke}" stroke-width="0.8" stroke-dasharray="3 2"/>`;
+        }
+      }
+      const right = x + g.w + g.d;
+      const mid = (x + right) / 2;
+      const name = l.label || NAMES[l.type] + (l.kernel ? ' ' + l.kernel.replace('x', '×') : '');
+      s += `<text x="${mid}" y="${(i % 2) ? textY3 : textY1}" text-anchor="middle" font-family="${FONT}" font-size="16" font-weight="600" fill="${P.ink}">${esc(name)}</text>`;
+      s += `<text x="${mid}" y="${(i % 2) ? textY4 : textY2}" text-anchor="middle" font-family="${FONT}" font-size="16" fill="${P.meta}">${esc(l.dims.join('×'))}</text>`;
+      s += '</g>';
+      parts.push(s);
+      if (i < gs.length - 1) {
+        const ay = baseline - Math.min(g.h, gs[i + 1].h) / 2;
+        const x1 = right + 4, x2 = right + gap - 4;
+        parts.push(`<line x1="${x1}" y1="${ay}" x2="${x2 - 5}" y2="${ay}" stroke="${P.meta}" stroke-width="1.2"/><polygon points="${x2},${ay} ${x2 - 6},${ay - 3.5} ${x2 - 6},${ay + 3.5}" fill="${P.meta}"/>`);
+      }
+      x = right + gap;
+      maxX = Math.max(maxX, right + 50);
+    });
+    const W = Math.ceil(Math.max(maxX, x - gap) + pad), H = Math.ceil(textY4 + 12);
+    return `<svg xmlns="${SVG_NS}" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="network diagram"><rect width="${W}" height="${H}" fill="${P.bg}"/>${parts.join('')}</svg>`;
+  }
+
+  const spec = $('#spec'), canvas = $('#canvas'), status = $('#status');
+  let current = { layers: [], errors: [] };
+  const dark = () => matchMedia && matchMedia('(prefers-color-scheme: dark)').matches;
+
+  function say(msg, err) { status.textContent = msg; status.classList.toggle('err', !!err); }
+
+  function render() {
+    current = parse(spec.value);
+    store.set('nnd.spec', spec.value);
+    const { layers, errors } = current;
+    if (!layers.length) {
+      canvas.innerHTML = '<p class="empty" id="empty">No layers yet. Type one per line, or pick a preset.</p>';
+      say(errors[0] || '', !!errors.length);
+      return;
+    }
+    canvas.innerHTML = draw(layers, dark() ? 'dark' : 'light');
+    // keep labels legible on phones: wide nets scroll inside the frame
+    const svg = canvas.firstChild;
+    svg.style.minWidth = Math.round(svg.viewBox.baseVal.width * 0.55) + 'px';
+    say(errors.length ? errors[0] : `${layers.length} layer${layers.length > 1 ? 's' : ''}`, !!errors.length);
+  }
+
+  function exportSvg() { return draw(current.layers, 'light'); }
+
+  function download(href, name) {
+    const a = document.createElement('a');
+    a.href = href; a.download = name; a.rel = 'noopener';
+    document.body.appendChild(a); a.click(); a.remove();
+  }
+
+  $('#svg').addEventListener('click', () => {
+    if (!current.layers.length) return say('Nothing to save yet.', true);
+    download('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(exportSvg()), 'network.svg');
+    say('saved network.svg');
+  });
+
+  $('#png').addEventListener('click', () => {
+    if (!current.layers.length) return say('Nothing to save yet.', true);
+    const svg = exportSvg();
+    const m = svg.match(/viewBox="0 0 (\d+) (\d+)"/);
+    const scale = 3, w = +m[1] * scale, h = +m[2] * scale;
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const c = document.createElement('canvas');
+        c.width = w; c.height = h;
+        c.getContext('2d').drawImage(img, 0, 0, w, h);
+        download(c.toDataURL('image/png'), 'network.png');
+        say('saved network.png');
+      } catch { say('PNG export not supported here; use SVG.', true); }
+    };
+    img.onerror = () => say('PNG export not supported here; use SVG.', true);
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  });
+
+  $('#copy').addEventListener('click', async () => {
+    if (!current.layers.length) return say('Nothing to copy yet.', true);
+    try { await navigator.clipboard.writeText(exportSvg()); say('SVG copied'); }
+    catch { say('Clipboard blocked; use Download SVG.', true); }
+  });
+
+  $$('[data-preset]').forEach(b => b.addEventListener('click', () => { spec.value = PRESETS[b.dataset.preset]; render(); }));
+  $('#clear').addEventListener('click', () => { spec.value = ''; render(); spec.focus(); });
+  spec.addEventListener('input', render);
+  try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', render); } catch {}
+
+  spec.value = store.get('nnd.spec', PRESETS.lenet);
+  render();
+})();
+</script>
+</body>
+</html>
