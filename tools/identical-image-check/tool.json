@@ -1,0 +1,55 @@
+{
+  "slug": "identical-image-check",
+  "wish": "someone should make a tool that checks whether two images are exactly the same",
+  "year": 2014,
+  "agreed": 51,
+  "sources": [
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/9774/command-line-tool-to-check-whether-two-images-are-exactly-the-same-graphically",
+      "date": "2014-07-13",
+      "points": 32,
+      "comments": 8
+    },
+    {
+      "site": "se",
+      "url": "https://softwarerecs.stackexchange.com/questions/51032/compare-two-image-files-for-identical-data-excluding-metadata",
+      "date": "2018-07-08",
+      "points": 6,
+      "comments": 5
+    }
+  ],
+  "spec": "Decodes two images in the browser and compares every pixel, ignoring metadata, format and compression.\nPick or drop image A and image B; it says Identical or Different, counts differing pixels, shows where, and notes whether the files themselves are byte-identical.\nIt does not do fuzzy or perceptual matching, and never uploads anything.",
+  "tests": [
+    {
+      "tap": "#sampleSame"
+    },
+    {
+      "expect": {
+        "sel": "#verdict",
+        "contains": "Identical"
+      }
+    },
+    {
+      "tap": "#sampleDiff"
+    },
+    {
+      "expect": {
+        "sel": "#verdict",
+        "contains": "Different"
+      }
+    },
+    {
+      "expect": {
+        "sel": "#facts",
+        "contains": "1 of 1,536"
+      }
+    }
+  ],
+  "status": "pass",
+  "built": "2026-10-27T02:08:16Z",
+  "model": "opus-5.5",
+  "minutes": 6,
+  "approved": false,
+  "notes": "Pixel comparison after browser decoding with colour-space conversion off; EXIF orientation is applied by the decoder."
+}

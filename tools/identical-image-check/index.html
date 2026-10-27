@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:;">
+<meta name="color-scheme" content="light dark">
+<title>someone should make a tool that checks whether two images are exactly the same</title>
+<style>
+/* someone should. — shared tokens. Inline this block into every tool and the shell. */
+:root {
+  --paper: #f4f1ea;
+  --ink: #141414;
+  --meta: #6b6b6b;
+  --line: #d9d4c7;
+  --no: #c8321e;
+  --built: #2e7d4f;
+  --accent: #141414;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  --tap: 44px;
+  --gutter: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #ededed; --meta: #9a9a9a; --line: #2a2a2a; --accent: #ededed; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font: 17px/1.45 var(--sans); -webkit-text-size-adjust: 100%; }
+body { padding: var(--gutter); min-height: 100dvh; }
+h1 { font: 500 15px/1.3 var(--mono); color: var(--meta); margin: 0 0 20px; letter-spacing: 0; text-transform: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: var(--tap); padding: 0 18px; border: 1.5px solid var(--ink); background: transparent; border-radius: var(--radius); cursor: pointer; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button:active { transform: translateY(1px); }
+input, select, textarea { min-height: var(--tap); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius); background: transparent; width: 100%; }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.meta { font: 13px/1.4 var(--mono); color: var(--meta); }
+.big { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stack { display: grid; gap: 12px; }
+.empty { color: var(--meta); padding: 24px 0; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.no { color: var(--no); }
+.built { color: var(--built); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- tool styles below ---- */
+.slots { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.slot { position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px; min-height: 132px; padding: 10px; border: 1.5px dashed var(--line); border-radius: var(--radius); text-align: center; cursor: pointer; overflow: hidden; min-width: 0; }
+.slot.drag { border-color: var(--ink); }
+.slot.filled { border-style: solid; }
+.slot input { position: absolute; inset: 0; opacity: 0; cursor: pointer; min-height: 0; padding: 0; border: 0; }
+.slot canvas { max-width: 100%; max-height: 80px; image-rendering: pixelated; }
+.slot .name { font-size: 16px; color: var(--meta); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.slot .letter { font-weight: 500; }
+#verdict.same { color: var(--built); }
+#verdict.diff { color: var(--no); }
+#facts { font-size: 16px; }
+#facts li span:last-child { text-align: right; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+#diffwrap { display: none; }
+#diffwrap canvas { max-width: 100%; border: 1px solid var(--line); image-rendering: pixelated; background: var(--paper); }
+.hint { color: var(--meta); font-size: 16px; margin: 0; }
+.samples button { flex: 1 1 140px; }
+</style>
+</head>
+<body>
+<h1 id="wish">someone should make a tool that checks whether two images are exactly the same</h1>
+
+<main id="app" class="stack">
+  <div class="slots">
+    <label class="slot" id="slotA"><span class="letter">Image A</span><span class="name" id="nameA">tap or drop</span><canvas id="thumbA" hidden></canvas><input type="file" id="fileA" accept="image/*" aria-label="Image A"></label>
+    <label class="slot" id="slotB"><span class="letter">Image B</span><span class="name" id="nameB">tap or drop</span><canvas id="thumbB" hidden></canvas><input type="file" id="fileB" accept="image/*" aria-label="Image B"></label>
+  </div>
+
+  <div id="verdict" class="big" aria-live="polite"></div>
+  <p class="hint" id="status">Compares decoded pixels, not files. Metadata, format and compression are ignored.</p>
+  <ul class="plain" id="facts"></ul>
+  <div id="diffwrap" class="stack">
+    <p class="hint">Differing pixels in red</p>
+    <canvas id="diff"></canvas>
+  </div>
+
+  <div class="row samples">
+    <button id="sampleSame" type="button">Sample: same pixels</button>
+    <button id="sampleDiff" type="button">Sample: one pixel off</button>
+  </div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (s, r = document) => r.querySelector(s);
+
+  // Each slot holds { name, size, data: ImageData, hash: hex|null }
+  const slots = { A: null, B: null };
+  let token = 0;
+
+  function setStatus(t) { $('#status').textContent = t; }
+
+  async function sha256(buf) {
+    try {
+      if (!crypto.subtle) return null;
+      const h = await crypto.subtle.digest('SHA-256', buf);
+      return [...new Uint8Array(h)].map(b => b.toString(16).padStart(2, '0')).join('');
+    } catch { return null; }
+  }
+
+  async function decode(file) {
+    let bmp;
+    try {
+      bmp = await createImageBitmap(file, { colorSpaceConversion: 'none', premultiplyAlpha: 'none' });
+    } catch {
+      bmp = await createImageBitmap(file);
+    }
+    const c = document.createElement('canvas');
+    c.width = bmp.width; c.height = bmp.height;
+    const ctx = c.getContext('2d', { willReadFrequently: true });
+    ctx.drawImage(bmp, 0, 0);
+    if (bmp.close) bmp.close();
+    return ctx.getImageData(0, 0, c.width, c.height);
+  }
+
+  function showThumb(key, data) {
+    const c = $('#thumb' + key);
+    c.width = data.width; c.height = data.height;
+    c.getContext('2d').putImageData(data, 0, 0);
+    c.hidden = false;
+    $('#slot' + key).classList.add('filled');
+  }
+
+  async function load(key, file) {
+    if (!file) return;
+    const my = ++token;
+    $('#name' + key).textContent = file.name || 'image';
+    setStatus('Reading ' + (file.name || 'image') + '…');
+    try {
+      const buf = await file.arrayBuffer();
+      const [data, hash] = await Promise.all([decode(file), sha256(buf)]);
+      slots[key] = { name: file.name || 'image', size: file.size, data, hash };
+      showThumb(key, data);
+      if (my === token) compare();
+    } catch {
+      slots[key] = null;
+      $('#thumb' + key).hidden = true;
+      $('#slot' + key).classList.remove('filled');
+      $('#name' + key).textContent = 'not an image this browser can read';
+      setStatus('Could not decode ' + (file.name || 'that file') + '.');
+      clearResult();
+    }
+  }
+
+  function clearResult() {
+    $('#verdict').textContent = '';
+    $('#verdict').className = 'big';
+    $('#facts').innerHTML = '';
+    $('#diffwrap').style.display = 'none';
+  }
+
+  function fact(label, value) {
+    const li = document.createElement('li');
+    const a = document.createElement('span'); a.textContent = label;
+    const b = document.createElement('span'); b.textContent = value;
+    li.append(a, b);
+    $('#facts').append(li);
+  }
+
+
+  function compare() {
+    clearResult();
+    const A = slots.A, B = slots.B;
+    if (!A || !B) { setStatus('Add ' + (A ? 'image B' : B ? 'image A' : 'two images') + '.'); return; }
+    const a = A.data, b = B.data;
+    const v = $('#verdict');
+
+    fact('Size A', a.width + ' × ' + a.height);
+    fact('Size B', b.width + ' × ' + b.height);
+    if (A.hash && B.hash) fact('Files byte-identical', A.hash === B.hash ? 'yes' : 'no');
+
+    if (a.width !== b.width || a.height !== b.height) {
+      v.textContent = 'Different'; v.classList.add('diff');
+      setStatus('The dimensions differ, so the pixels cannot match.');
+      return;
+    }
+
+    const w = a.width, h = a.height, pa = a.data, pb = b.data;
+    const out = new ImageData(w, h);
+    const po = out.data;
+    let count = 0, maxDelta = 0, x0 = w, y0 = h, x1 = -1, y1 = -1;
+    for (let i = 0, p = 0; i < pa.length; i += 4, p++) {
+      const d = Math.max(Math.abs(pa[i] - pb[i]), Math.abs(pa[i + 1] - pb[i + 1]), Math.abs(pa[i + 2] - pb[i + 2]), Math.abs(pa[i + 3] - pb[i + 3]));
+      if (d) {
+        count++;
+        if (d > maxDelta) maxDelta = d;
+        const x = p % w, y = (p - x) / w;
+        if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+        po[i] = 200; po[i + 1] = 50; po[i + 2] = 30; po[i + 3] = 255;
+      } else {
+        // faint grey copy of A for context
+        const g = (pa[i] * 0.3 + pa[i + 1] * 0.59 + pa[i + 2] * 0.11) | 0;
+        po[i] = po[i + 1] = po[i + 2] = 255 - ((255 - g) >> 2); po[i + 3] = 255;
+      }
+    }
+
+    const total = w * h;
+    if (count === 0) {
+      v.textContent = 'Identical'; v.classList.add('same');
+      fact('Differing pixels', '0 of ' + total.toLocaleString('en-US'));
+      setStatus(A.hash && B.hash && A.hash !== B.hash
+        ? 'Every pixel matches. The files differ only in metadata or encoding.'
+        : 'Every pixel matches.');
+      return;
+    }
+
+    v.textContent = 'Different'; v.classList.add('diff');
+    const pct = count / total * 100;
+    fact('Differing pixels', count.toLocaleString('en-US') + ' of ' + total.toLocaleString('en-US') + ' (' + (pct < 0.01 ? '<0.01' : pct.toFixed(2)) + '%)');
+    fact('Largest channel change', maxDelta + ' / 255');
+    fact('Changed area', 'x ' + x0 + '–' + x1 + ', y ' + y0 + '–' + y1);
+    setStatus(maxDelta <= 2 ? 'Tiny differences, likely rounding or re-encoding.' : 'The pixels are not the same.');
+    const dc = $('#diff');
+    dc.width = w; dc.height = h;
+    dc.getContext('2d').putImageData(out, 0, 0);
+    $('#diffwrap').style.display = '';
+  }
+
+  for (const key of ['A', 'B']) {
+    const input = $('#file' + key), slot = $('#slot' + key);
+    input.addEventListener('change', () => load(key, input.files[0]));
+    slot.addEventListener('dragover', e => { e.preventDefault(); slot.classList.add('drag'); });
+    slot.addEventListener('dragleave', () => slot.classList.remove('drag'));
+    slot.addEventListener('drop', e => {
+      e.preventDefault(); slot.classList.remove('drag');
+      const files = [...(e.dataTransfer?.files || [])];
+      if (files.length >= 2) { load('A', files[0]); load('B', files[1]); }
+      else load(key, files[0]);
+    });
+  }
+
+  // Generated sample pair, so the comparison can be seen without files at hand.
+  function sampleImage() {
+    const w = 48, h = 32, d = new ImageData(w, h);
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const i = (y * w + x) * 4;
+      d.data[i] = x * 5; d.data[i + 1] = y * 7; d.data[i + 2] = ((x >> 3) + (y >> 3)) % 2 ? 180 : 60; d.data[i + 3] = 255;
+    }
+    return d;
+  }
+  function loadSample(tweak) {
+    token++;
+    const a = sampleImage(), b = sampleImage();
+    if (tweak) { const i = (17 * 48 + 29) * 4; b.data[i] ^= 0x40; }
+    slots.A = { name: 'sample-a.png', size: 0, data: a, hash: null };
+    slots.B = { name: tweak ? 'sample-b-edited.png' : 'sample-b.png', size: 0, data: b, hash: null };
+    for (const k of ['A', 'B']) { $('#name' + k).textContent = slots[k].name; showThumb(k, slots[k].data); }
+    compare();
+  }
+  $('#sampleSame').addEventListener('click', () => loadSample(false));
+  $('#sampleDiff').addEventListener('click', () => loadSample(true));
+})();
+</script>
+</body>
+</html>
