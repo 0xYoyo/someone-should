@@ -47,167 +47,357 @@ ul.plain li { padding: 12px 0; border-bottom: 1px solid var(--line); display: fl
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 
 /* ---- tool styles below ---- */
-body { padding: 12px 8px; }
-h1 { margin-left: 8px; margin-bottom: 12px; }
-#board { display: grid; grid-template-columns: repeat(8, 1fr); width: 100%; max-width: 480px; margin: 0 auto; border: 1.5px solid var(--ink); user-select: none; -webkit-user-select: none; }
-.sq { aspect-ratio: 1; min-height: 44px; display: flex; align-items: center; justify-content: center; font-size: 30px; line-height: 1; position: relative; cursor: pointer; background: var(--paper); -webkit-tap-highlight-color: transparent; }
-.sq.dark { background: color-mix(in srgb, var(--line) 70%, var(--ink) 12%); }
-.p { font-family: var(--sans); }
-.p.w { color: #fff; text-shadow: 0 0 2px #000, 0 0 2px #000, 0 0 1px #000, 0 0 1px #000; }
-.p.b { color: #111; text-shadow: 0 0 1px #fff; }
-.sq.sel { outline: 3px solid var(--ink); outline-offset: -3px; }
-.sq.go::after { content: ""; position: absolute; width: 30%; height: 30%; border-radius: 50%; background: var(--ink); opacity: .35; }
-.sq.go.cap::after { width: 86%; height: 86%; background: none; border: 3px solid var(--no); opacity: .8; }
-.sq.mine { box-shadow: inset 0 0 0 3px var(--built); }
-.sq.king { box-shadow: inset 0 0 0 3px var(--no); }
-.sq.last { background: color-mix(in srgb, var(--built) 22%, var(--paper)); }
-#status { font: 500 20px/1.3 var(--sans); margin: 14px 8px 4px; min-height: 52px; }
-#hint { margin: 0 8px 12px; min-height: 22px; }
+:root { --gold: #d79a12; --sqL: #ecdfc0; --sqD: #b9916a; }
+@media (prefers-color-scheme: dark) { :root { --sqL: #cdbf9d; --sqD: #8d6a4a; } }
+body { padding: 12px 8px 24px; max-width: 520px; margin: 0 auto; }
+h1 { margin: 0 8px 10px; }
+.seg { display: flex; gap: 8px; margin: 0 8px 10px; }
+.seg button { flex: 1; font-size: 16px; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.tray { display: flex; flex-wrap: wrap; align-items: center; gap: 0; min-height: 28px; margin: 0 8px; }
+.tp { position: relative; width: 26px; height: 26px; margin-right: -4px; }
+.tp .pcs { filter: none; }
+#wrap { position: relative; width: 100%; margin: 4px 0; touch-action: manipulation; }
+#board { display: grid; grid-template-columns: repeat(8, 1fr); width: 100%; border-radius: 6px; overflow: hidden; box-shadow: 0 0 0 1.5px var(--ink), 0 8px 24px rgba(0,0,0,.18); user-select: none; -webkit-user-select: none; }
+.sq { aspect-ratio: 1; min-height: 44px; background: var(--sqL); position: relative; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.sq.dark { background: var(--sqD); }
+.sq.last::before { content: ""; position: absolute; inset: 0; background: rgba(215,154,18,.42); }
+.sq.sel::before { content: ""; position: absolute; inset: 0; background: rgba(255,255,255,.45); }
+.sq.go::after { content: ""; position: absolute; left: 35%; top: 35%; width: 30%; height: 30%; border-radius: 50%; background: rgba(20,20,20,.3); z-index: 3; }
+.sq.go.cap::after { left: 6%; top: 6%; width: 88%; height: 88%; background: none; border: 4px solid rgba(200,50,30,.7); }
+#pieces { position: absolute; inset: 0; pointer-events: none; }
+.pc { position: absolute; left: 0; top: 0; width: 12.5%; height: 12.5%; z-index: 2; }
+.ready .pc { transition: transform .28s cubic-bezier(.3,.7,.2,1), opacity .25s; }
+.pc.moving { z-index: 4; }
+.pc.gone { opacity: 0; }
+.pcs { width: 100%; height: 100%; display: block; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; filter: drop-shadow(0 1.5px 1px rgba(0,0,0,.35)); }
+.pcs.w { fill: #f8f3e7; color: #1d1b19; }
+.pcs.b { fill: #35312d; color: #efe8d6; }
+.pcs [fill="none"] { fill: none; }
+.cr { position: absolute; right: 2%; top: 2%; width: 40%; height: 40%; stroke: #3b2a00; stroke-width: 1.2; fill: var(--gold); display: none; filter: drop-shadow(0 0 3px rgba(255,200,60,.9)); }
+.pc.mine .pcs { filter: drop-shadow(0 0 5px rgba(255,190,40,.95)) drop-shadow(0 0 2px rgba(255,190,40,.9)); }
+.pc.mine .cr, .pc.shown .cr, .tp.shown .cr { display: block; }
+.pc.mine .cr { animation: breathe 2.4s ease-in-out infinite; }
+@keyframes breathe { 50% { transform: scale(1.12); } }
+#reveal { position: absolute; z-index: 6; width: 12.5%; height: 12.5%; display: none; pointer-events: none; }
+#reveal.on { display: block; }
+#reveal svg { width: 100%; height: 100%; fill: var(--gold); stroke: #3b2a00; stroke-width: 1; transform-origin: 50% 60%; animation: pop .9s cubic-bezier(.2,1.6,.4,1) both; filter: drop-shadow(0 0 10px rgba(255,200,60,.95)); }
+#reveal::after { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 3px solid var(--gold); animation: ring 1s ease-out both; }
+@keyframes pop { 0% { transform: translateY(20%) scale(0); } 60% { transform: translateY(-70%) scale(2.2); } 100% { transform: translateY(-45%) scale(1.8); } }
+@keyframes ring { from { transform: scale(.6); opacity: 1; } to { transform: scale(3.2); opacity: 0; } }
+#over { position: absolute; left: 6%; right: 6%; top: 34%; z-index: 7; background: var(--paper); border: 1.5px solid var(--ink); border-radius: 8px; padding: 16px; text-align: center; display: none; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+#over.on { display: block; animation: rise .4s ease-out both; }
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } }
+#over b { display: block; font: 600 26px/1.15 var(--sans); }
+#over span { display: block; margin: 6px 0 12px; color: var(--meta); }
+#status { font: 500 20px/1.3 var(--sans); margin: 12px 8px 2px; min-height: 28px; }
+#hint { margin: 0 8px 12px; min-height: 22px; font-size: 16px; }
 .row { margin: 0 8px; }
 </style>
 <style data-embed-hide>html.embed h1:first-of-type{display:none}html.embed body{padding-top:12px}</style><script>if(location.search.indexOf("embed")>-1)document.documentElement.className+=" embed";</script>
 </head>
 <body>
-<h1 id="wish">someone should make a chess variant where a hidden random piece is the king</h1>
-<main id="app">
-  <div id="board" role="grid" aria-label="chess board"></div>
-  <div id="status" aria-live="polite"></div>
-  <div id="hint" class="meta"></div>
-  <div class="row">
-    <button id="peek" class="primary">show my king</button>
-    <button id="new">new game</button>
-  </div>
-</main>
+<h1>someone should make a chess variant where a hidden random piece is the king</h1>
+<div class="seg" role="group" aria-label="Mode">
+  <button id="mode-cpu" aria-pressed="true">vs computer</button>
+  <button id="mode-pp" aria-pressed="false">pass and play</button>
+</div>
+<div class="tray" id="tray-b" aria-label="Black pieces taken"></div>
+<div id="wrap">
+  <div id="board"></div>
+  <div id="pieces"></div>
+  <div id="reveal"><svg viewBox="0 0 24 24"><use href="#crown"/></svg></div>
+  <div id="over"><b>That was the king.</b><span id="over-sub"></span><button class="primary" id="again">Play again</button></div>
+</div>
+<div class="tray" id="tray-w" aria-label="White pieces taken"></div>
+<div id="status" role="status"></div>
+<p id="hint" class="meta"></p>
+<div class="row">
+  <button id="peek" hidden>Show my king</button>
+  <button id="new">New game</button>
+</div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="crown" viewBox="0 0 24 24"><path d="M3 19L2 7l6 5 4-8 4 8 6-5-1 12z"/></symbol>
+<symbol id="p" viewBox="0 0 45 45"><circle cx="22.5" cy="13" r="6"/><path d="M15 36c0-9 3-12 7.5-14 4.5 2 7.5 5 7.5 14z"/><path d="M12 36h21v4H12z"/></symbol>
+<symbol id="r" viewBox="0 0 45 45"><path d="M12 40h21v-5H12zM14 35V19h17v16zM12 19V9h4.5v3.5h4V9h4.5v3.5h4V9H33v10z"/></symbol>
+<symbol id="n" viewBox="0 0 45 45"><path d="M13 40c0-11 2-17 8-22l-4-4 4-.5 3-5 2.5 5c6 3 10 10 10 26z"/><path d="M12 40h21v-3H12z"/><circle cx="22" cy="17" r="1.3" fill="currentColor"/></symbol>
+<symbol id="b" viewBox="0 0 45 45"><path d="M22.5 5c5 3.5 8 8 8 13 0 4-2.5 7-5 9h-6c-2.5-2-5-5-5-9 0-5 3-9.5 8-13z"/><path d="M12 40c0-5 4-8 10.5-8S33 35 33 40z"/><path fill="none" d="M22.5 12v8M19 16h7"/></symbol>
+<symbol id="q" viewBox="0 0 45 45"><path d="M9 15l5 15 3-15 5.5 15 5.5-15 3 15 5-15 2 24H7z"/><path d="M8 40h29v-3H8z"/><circle cx="8" cy="12" r="2.5"/><circle cx="16" cy="9" r="2.5"/><circle cx="22.5" cy="8" r="2.5"/><circle cx="29" cy="9" r="2.5"/><circle cx="37" cy="12" r="2.5"/></symbol>
+<symbol id="k" viewBox="0 0 45 45"><path d="M22.5 13c-8 0-13 5-13 12 0 6 3 9 3 15h20c0-6 3-9 3-15 0-7-5-12-13-12z"/><path fill="none" d="M22.5 3v10M18.5 7h8"/><path d="M11 40h23v-3H11z"/></symbol>
+</defs></svg>
 <script>
-(() => {
-  'use strict';
-  const $ = (s, r = document) => r.querySelector(s);
-  const GLYPH = { K: '\u265A', Q: '\u265B', R: '\u265C', B: '\u265D', N: '\u265E', P: '\u265F\uFE0E' };
-  const NAME = { K: 'king', Q: 'queen', R: 'rook', B: 'bishop', N: 'knight', P: 'pawn' };
-  const FILES = 'abcdefgh';
-  const BACK = ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'];
-  // board[r][f], r=0 is rank 8 (top). piece = {c:'w'|'b', t, k: secret king?}
-  let board, turn, sel, moves, peeking, over, last;
+(function () {
+  var FILES = 'abcdefgh', VAL = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 4 };
+  var boardEl = document.getElementById('board'), piecesEl = document.getElementById('pieces');
+  var wrap = document.getElementById('wrap'), reveal = document.getElementById('reveal');
+  var overEl = document.getElementById('over'), statusEl = document.getElementById('status');
+  var hintEl = document.getElementById('hint'), peekBtn = document.getElementById('peek');
+  var G, els = {}, nextId = 1, mode = 'cpu', peeking = false, ready = false, aiTimer = null;
 
-  const sqName = (r, f) => FILES[f] + (8 - r);
-  const inB = (r, f) => r >= 0 && r < 8 && f >= 0 && f < 8;
+  try { if (localStorage.getItem('hkc-mode') === 'pp') mode = 'pp'; } catch (e) {}
 
-  function setup() {
-    board = Array.from({ length: 8 }, () => Array(8).fill(null));
-    for (let f = 0; f < 8; f++) {
-      board[0][f] = { c: 'b', t: BACK[f] };
-      board[1][f] = { c: 'b', t: 'P' };
-      board[6][f] = { c: 'w', t: 'P' };
-      board[7][f] = { c: 'w', t: BACK[f] };
+  function sqName(i) { return FILES[i % 8] + (8 - Math.floor(i / 8)); }
+  function idx(name) { return (8 - +name[1]) * 8 + FILES.indexOf(name[0]); }
+  function who(c) { return c === 'w' ? 'White' : 'Black'; }
+
+  // ---- rules: normal movement, no check, castling or en passant; pawns promote to queen ----
+  function newBoard() {
+    var b = new Array(64).fill(null), back = 'rnbqkbnr', i;
+    for (i = 0; i < 8; i++) {
+      b[i] = { t: back[i], c: 'b', id: nextId++ };
+      b[8 + i] = { t: 'p', c: 'b', id: nextId++ };
+      b[48 + i] = { t: 'p', c: 'w', id: nextId++ };
+      b[56 + i] = { t: back[i], c: 'w', id: nextId++ };
     }
-    // each side secretly crowns one of its own 16 pieces
-    for (const c of ['w', 'b']) {
-      const own = [].concat(...board).filter(p => p && p.c === c);
-      own[Math.floor(Math.random() * own.length)].k = true;
-    }
-    turn = 'w'; sel = null; moves = []; peeking = false; over = null; last = null;
-    render();
+    return b;
   }
-
-  function movesFor(r, f) {
-    const p = board[r][f], out = [];
-    const add = (rr, ff, mustCap, noCap) => {
-      if (!inB(rr, ff)) return false;
-      const q = board[rr][ff];
-      if (q && (q.c === p.c || noCap)) return false;
-      if (mustCap && !q) return false;
-      out.push([rr, ff]);
+  var KN = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
+  var ROOK = [[1,0],[-1,0],[0,1],[0,-1]], BISH = [[1,1],[1,-1],[-1,1],[-1,-1]];
+  function gen(b, color) {
+    var out = [], i, p, r, c;
+    function add(from, tr, tc) {
+      if (tr < 0 || tr > 7 || tc < 0 || tc > 7) return false;
+      var t = tr * 8 + tc, q = b[t];
+      if (q && q.c === color) return false;
+      out.push({ from: from, to: t, cap: !!q });
       return !q;
-    };
-    const slide = dirs => dirs.forEach(([dr, df]) => {
-      for (let i = 1; i < 8; i++) if (!add(r + dr * i, f + df * i)) break;
-    });
-    const D = [[1, 0], [-1, 0], [0, 1], [0, -1]], X = [[1, 1], [1, -1], [-1, 1], [-1, -1]];
-    if (p.t === 'R') slide(D);
-    else if (p.t === 'B') slide(X);
-    else if (p.t === 'Q') slide(D.concat(X));
-    else if (p.t === 'K') D.concat(X).forEach(([a, b]) => add(r + a, f + b));
-    else if (p.t === 'N') [[1, 2], [2, 1], [-1, 2], [-2, 1], [1, -2], [2, -1], [-1, -2], [-2, -1]].forEach(([a, b]) => add(r + a, f + b));
-    else {
-      const d = p.c === 'w' ? -1 : 1, start = p.c === 'w' ? 6 : 1;
-      if (inB(r + d, f) && !board[r + d][f]) {
-        out.push([r + d, f]);
-        if (r === start && !board[r + 2 * d][f]) out.push([r + 2 * d, f]);
+    }
+    for (i = 0; i < 64; i++) {
+      p = b[i];
+      if (!p || p.c !== color) continue;
+      r = Math.floor(i / 8); c = i % 8;
+      if (p.t === 'p') {
+        var d = color === 'w' ? -1 : 1, start = color === 'w' ? 6 : 1, t = (r + d) * 8 + c;
+        if (r + d >= 0 && r + d < 8) {
+          if (!b[t]) {
+            out.push({ from: i, to: t, cap: false });
+            if (r === start && !b[t + d * 8]) out.push({ from: i, to: t + d * 8, cap: false });
+          }
+          [-1, 1].forEach(function (dc) {
+            var cc = c + dc, tt = (r + d) * 8 + cc;
+            if (cc >= 0 && cc < 8 && b[tt] && b[tt].c !== color) out.push({ from: i, to: tt, cap: true });
+          });
+        }
+      } else if (p.t === 'n') {
+        KN.forEach(function (m) { add(i, r + m[0], c + m[1]); });
+      } else if (p.t === 'k') {
+        for (var dr = -1; dr <= 1; dr++) for (var dc = -1; dc <= 1; dc++) if (dr || dc) add(i, r + dr, c + dc);
+      } else {
+        var dirs = p.t === 'r' ? ROOK : p.t === 'b' ? BISH : ROOK.concat(BISH);
+        dirs.forEach(function (m) {
+          var rr = r + m[0], cc = c + m[1];
+          while (add(i, rr, cc)) { rr += m[0]; cc += m[1]; }
+        });
       }
-      [-1, 1].forEach(s => add(r + d, f + s, true));
     }
     return out;
   }
+  function apply(b, m) {
+    var n = b.slice(), p = n[m.from];
+    if (p.t === 'p' && (m.to < 8 || m.to > 55)) p = { t: 'q', c: p.c, id: p.id, k: p.k };
+    n[m.to] = p; n[m.from] = null;
+    return n;
+  }
 
-  function move(r, f) {
-    const [sr, sf] = sel, p = board[sr][sf], taken = board[r][f];
-    board[r][f] = p; board[sr][sf] = null;
-    if (p.t === 'P' && (r === 0 || r === 7)) p.t = 'Q'; // promotion is always a queen
-    last = [[sr, sf], [r, f]];
-    sel = null; moves = []; peeking = false;
-    if (taken && taken.k) { over = { winner: p.c, king: taken, at: sqName(r, f) }; }
-    else {
-      turn = turn === 'w' ? 'b' : 'w';
-      const any = board.some((row, rr) => row.some((q, ff) => q && q.c === turn && movesFor(rr, ff).length));
-      if (!any) over = { draw: true };
+  // ---- computer: 2-ply search on material, plus a heavy weight on its own secret king ----
+  function evalFor(b, me) {
+    var s = 0, i, p, v, r, c;
+    for (i = 0; i < 64; i++) {
+      p = b[i]; if (!p) continue;
+      r = Math.floor(i / 8); c = i % 8;
+      v = VAL[p.t] + (p.k && p.c === me ? 100 : 0);
+      v += 0.04 * (7 - Math.abs(c - 3.5) - Math.abs(r - 3.5));
+      if (p.t === 'p') v += 0.05 * (p.c === 'w' ? 6 - r : r - 1);
+      s += p.c === me ? v : -v;
     }
-    render();
+    return s;
+  }
+  // The computer does not know which of your pieces is the king; it only counts material there.
+  function pickAi(b, me) {
+    var foe = me === 'w' ? 'b' : 'w', best = null, bestScore = -1e9;
+    gen(b, me).forEach(function (m) {
+      var b1 = apply(b, m), replies = gen(b1, foe), worst = replies.length ? 1e9 : evalFor(b1, me);
+      replies.forEach(function (r) {
+        var s = evalFor(apply(b1, r), me);
+        if (s < worst) worst = s;
+      });
+      worst += Math.random() * 0.15;
+      if (worst > bestScore) { bestScore = worst; best = m; }
+    });
+    return best;
   }
 
-  function tap(r, f) {
-    if (over) return;
-    const p = board[r][f];
-    if (sel && moves.some(m => m[0] === r && m[1] === f)) return move(r, f);
-    if (p && p.c === turn) { sel = [r, f]; moves = movesFor(r, f); }
-    else { sel = null; moves = []; }
-    render();
+  // ---- game ----
+  function pickRandom(color) {
+    var list = G.b.filter(function (p) { return p && p.c === color; });
+    return list[Math.floor(Math.random() * list.length)];
   }
-
-  const who = c => (c === 'w' ? 'White' : 'Black');
-
+  function newGame(opening) {
+    clearTimeout(aiTimer);
+    nextId = 1; els = {}; piecesEl.innerHTML = '';
+    G = { b: newBoard(), turn: 'w', sel: -1, moves: [], last: null, over: null, cap: { w: [], b: [] }, busy: false };
+    var kw;
+    if (opening) {
+      'e2e4 e7e5 g1f3 b8c6 f1b5 a7a6 b5c6 d7c6'.split(' ').forEach(function (s) {
+        var m = { from: idx(s.slice(0, 2)), to: idx(s.slice(2)) }, t = G.b[m.to];
+        if (t) G.cap[G.b[m.from].c].push(t);
+        G.b = apply(G.b, m); G.last = m;
+      });
+      kw = G.b[idx('f3')];
+    }
+    kw = kw || pickRandom('w');
+    kw.k = true; pickRandom('b').k = true;
+    peeking = false;
+    overEl.classList.remove('on'); reveal.classList.remove('on');
+    render(); updateText();
+  }
+  function shown(p) {
+    if (!p.k) return false;
+    if (G.over) return true;
+    if (mode === 'cpu') return p.c === 'w';
+    return peeking && p.c === G.turn;
+  }
+  function trayHtml(list) {
+    return list.map(function (p) {
+      return '<span class="tp' + (p.k && G.over ? ' shown' : '') + '"><svg class="pcs ' + p.c + '" viewBox="0 0 45 45"><use href="#' + p.t +
+        '"/></svg><svg class="cr" viewBox="0 0 24 24"><use href="#crown"/></svg></span>';
+    }).join('');
+  }
+  function build() {
+    if (boardEl.children.length) return;
+    for (var i = 0; i < 64; i++) {
+      var s = document.createElement('div');
+      s.setAttribute('data-sq', sqName(i));
+      boardEl.appendChild(s);
+    }
+  }
+  function place(el, i) {
+    el.style.transform = 'translate(' + (i % 8) * 100 + '%,' + Math.floor(i / 8) * 100 + '%)';
+  }
   function render() {
-    const el = $('#board');
-    el.textContent = '';
-    for (let r = 0; r < 8; r++) for (let f = 0; f < 8; f++) {
-      const d = document.createElement('div');
-      const p = board[r][f];
-      d.className = 'sq' + ((r + f) % 2 ? ' dark' : '');
-      d.dataset.sq = sqName(r, f);
-      d.setAttribute('role', 'gridcell');
-      if (p) {
-        const s = document.createElement('span');
-        s.className = 'p ' + p.c; s.textContent = GLYPH[p.t];
-        d.appendChild(s);
-        d.setAttribute('aria-label', who(p.c) + ' ' + NAME[p.t] + ' ' + d.dataset.sq);
-      }
-      if (last && last.some(l => l[0] === r && l[1] === f)) d.classList.add('last');
-      if (sel && sel[0] === r && sel[1] === f) d.classList.add('sel');
-      if (moves.some(m => m[0] === r && m[1] === f)) d.classList.add('go', ...(p ? ['cap'] : []));
-      if (p && p.k) {
-        if (over) d.classList.add('king');
-        else if (peeking && p.c === turn) d.classList.add('mine');
-      }
-      d.addEventListener('click', () => tap(r, f));
-      el.appendChild(d);
+    build();
+    var sqs = boardEl.children, seen = {}, i, p, el;
+    for (i = 0; i < 64; i++) {
+      var cls = ['sq'], m = null;
+      if ((i % 8 + Math.floor(i / 8)) % 2) cls.push('dark');
+      if (G.last && (G.last.from === i || G.last.to === i)) cls.push('last');
+      if (G.sel === i) cls.push('sel');
+      G.moves.forEach(function (x) { if (x.to === i) m = x; });
+      if (m) cls.push('go'); if (m && m.cap) cls.push('cap');
+      p = G.b[i];
+      if (p && shown(p)) cls.push('mine');
+      sqs[i].className = cls.join(' ');
     }
-    const st = $('#status'), hint = $('#hint'), pk = $('#peek');
-    if (over && over.draw) {
-      st.textContent = 'No moves left. Draw.';
-      hint.textContent = 'Both hidden kings are marked in red.';
-    } else if (over) {
-      st.textContent = who(over.winner) + ' captured the king: the ' + NAME[over.king.t] + ' on ' + over.at + '.';
-      hint.textContent = 'Both hidden kings are marked in red.';
+    for (i = 0; i < 64; i++) {
+      p = G.b[i]; if (!p) continue;
+      seen[p.id] = true;
+      el = els[p.id];
+      if (!el) {
+        el = els[p.id] = document.createElement('div');
+        el.innerHTML = '<svg class="pcs" viewBox="0 0 45 45"><use href="#p"/></svg><svg class="cr" viewBox="0 0 24 24"><use href="#crown"/></svg>';
+        piecesEl.appendChild(el);
+        place(el, i);
+      }
+      el.className = 'pc' + (shown(p) ? (G.over ? ' shown' : ' mine') : '');
+      el.firstChild.setAttribute('class', 'pcs ' + p.c);
+      el.firstChild.firstChild.setAttribute('href', '#' + p.t);
+      place(el, i);
+    }
+    Object.keys(els).forEach(function (id) {
+      if (!seen[id]) {
+        var dead = els[id]; delete els[id];
+        dead.classList.add('gone');
+        setTimeout(function () { dead.remove(); }, 400);
+      }
+    });
+    // top tray: black pieces white has taken; bottom tray: white pieces black has taken
+    document.getElementById('tray-b').innerHTML = trayHtml(G.cap.w);
+    document.getElementById('tray-w').innerHTML = trayHtml(G.cap.b);
+    if (!ready) { ready = true; requestAnimationFrame(function () { requestAnimationFrame(function () { wrap.classList.add('ready'); }); }); }
+  }
+  function updateText() {
+    if (G.over) return;
+    if (mode === 'cpu') {
+      statusEl.textContent = G.turn === 'w' ? 'Your move' : 'Computer is thinking';
+      hintEl.textContent = 'You play white. Your crowned piece is your king: lose it and you lose.';
     } else {
-      st.textContent = who(turn) + ' to move';
-      hint.textContent = peeking ? 'Your king is outlined in green. Opponent looks away.' : 'Each side has one secret king. Capture it to win.';
+      statusEl.textContent = who(G.turn) + ' to move';
+      hintEl.textContent = peeking ? 'Your king is crowned. Opponent looks away.' : 'Each side has one secret king. Capture it to win.';
     }
-    pk.style.display = over ? 'none' : '';
-    pk.textContent = peeking ? 'hide my king' : 'show my king';
+    peekBtn.hidden = mode !== 'pp';
+    peekBtn.textContent = peeking ? 'Hide my king' : 'Show my king';
+    document.getElementById('mode-cpu').setAttribute('aria-pressed', mode === 'cpu');
+    document.getElementById('mode-pp').setAttribute('aria-pressed', mode === 'pp');
   }
 
-  $('#peek').addEventListener('click', () => { peeking = !peeking; render(); });
-  $('#new').addEventListener('click', setup);
-  setup();
+  function doMove(m) {
+    G.busy = true;
+    var mover = G.b[m.from], target = G.b[m.to], moverEl = els[mover.id];
+    if (target) G.cap[mover.c].push(target);
+    if (moverEl) moverEl.classList.add('moving');
+    G.b = apply(G.b, m); G.last = m; G.sel = -1; G.moves = [];
+    G.turn = G.turn === 'w' ? 'b' : 'w';
+    peeking = false;
+    if (target && target.k) {
+      G.over = { winner: mover.c };
+      render();
+      showReveal(m.to, mover.c);
+      return;
+    }
+    render(); updateText();
+    setTimeout(function () { if (moverEl) moverEl.classList.remove('moving'); G.busy = false; afterMove(); }, 320);
+  }
+  function afterMove() {
+    if (G.over) return;
+    if (!gen(G.b, G.turn).length) {
+      G.over = { winner: null };
+      statusEl.textContent = 'No legal moves. Draw.';
+      return;
+    }
+    if (mode === 'cpu' && G.turn === 'b') {
+      aiTimer = setTimeout(function () {
+        var m = pickAi(G.b, 'b');
+        if (m) doMove(m);
+      }, 500);
+    }
+  }
+  function showReveal(at, winner) {
+    reveal.style.transform = 'translate(' + (at % 8) * 100 + '%,' + Math.floor(at / 8) * 100 + '%)';
+    reveal.classList.remove('on'); void reveal.offsetWidth; reveal.classList.add('on');
+    statusEl.textContent = 'That was the king.';
+    document.getElementById('over-sub').textContent = mode === 'cpu' ? (winner === 'w' ? 'You win.' : 'Computer wins.') : who(winner) + ' wins.';
+    hintEl.textContent = 'Both hidden kings are crowned.';
+    peekBtn.hidden = true;
+    setTimeout(function () { overEl.classList.add('on'); G.busy = false; }, 1100);
+  }
+
+  boardEl.addEventListener('click', function (e) {
+    var sq = e.target.closest('[data-sq]');
+    if (!sq || G.over || G.busy) return;
+    if (mode === 'cpu' && G.turn !== 'w') return;
+    var i = idx(sq.getAttribute('data-sq')), p = G.b[i], m;
+    if (G.sel >= 0) {
+      m = G.moves.filter(function (x) { return x.to === i; })[0];
+      if (m) { doMove(m); return; }
+    }
+    if (p && p.c === G.turn) {
+      G.sel = i;
+      G.moves = gen(G.b, G.turn).filter(function (x) { return x.from === i; });
+    } else { G.sel = -1; G.moves = []; }
+    render();
+  });
+  peekBtn.addEventListener('click', function () { peeking = !peeking; render(); updateText(); });
+  function setMode(m) {
+    mode = m;
+    try { localStorage.setItem('hkc-mode', m); } catch (e) {}
+    newGame(true);
+  }
+  document.getElementById('mode-cpu').addEventListener('click', function () { setMode('cpu'); });
+  document.getElementById('mode-pp').addEventListener('click', function () { setMode('pp'); });
+  document.getElementById('new').addEventListener('click', function () { newGame(false); });
+  document.getElementById('again').addEventListener('click', function () { newGame(false); });
+
+  newGame(true);
 })();
 </script>
 </body>

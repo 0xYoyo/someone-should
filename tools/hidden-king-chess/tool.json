@@ -12,17 +12,8 @@
       "comments": 21
     }
   ],
-  "spec": "Two-player pass-and-play chess where each side secretly has one of its 16 pieces crowned as the king.\nTap a piece then a square to move; show my king outlines your own secret king; capture the opponent's hidden king to win and both are revealed.\nNo check, castling or en passant; pawns promote to queen; one device, no engine.",
+  "spec": "Chess where one random piece on each side is secretly the king, with no check: capture the hidden king to win.\nYou play white against a computer that looks two moves ahead and guards its own secret king; your crowned piece glows only for you. Tap a piece, then a dot. Pass and play is one tap away.\nNo check, castling or en passant; pawns promote to queen; the computer does not know which of your pieces is the king.",
   "tests": [
-    {
-      "expect": {
-        "sel": "#status",
-        "contains": "White to move"
-      }
-    },
-    {
-      "tap": "#peek"
-    },
     {
       "expect": {
         "sel": ".sq.mine",
@@ -30,22 +21,31 @@
       }
     },
     {
-      "tap": "[data-sq=\"e2\"]"
+      "tap": "[data-sq=\"d2\"]"
     },
     {
-      "tap": "[data-sq=\"e4\"]"
+      "expect": {
+        "sel": ".sq.go",
+        "count": 2
+      }
+    },
+    {
+      "tap": "[data-sq=\"d4\"]"
+    },
+    {
+      "wait": 1400
     },
     {
       "expect": {
         "sel": "#status",
-        "contains": "Black to move"
+        "contains": "Your move"
       }
     }
   ],
   "status": "pass",
-  "built": "2026-10-27T08:40:52Z",
+  "built": "2026-10-27T12:23:34Z",
   "model": "sonnet-5.5",
-  "minutes": 4,
+  "minutes": 9,
   "approved": false,
-  "notes": "Pass-and-play on one device; the player to move taps show my king to see their own secret king."
+  "notes": "Plays white against a 2-ply computer by default; pass and play on one device uses the show my king button."
 }
